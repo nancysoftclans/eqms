@@ -1,0 +1,182 @@
+.abp-badge {
+    position: relative;
+    overflow: visible;
+}
+
+.abp-badge[data-abp-badge]:after {
+    content: attr(data-abp-badge);
+    position: absolute;
+    font-size: 10px;
+    top: -10px;
+    right: 2px;
+    width: auto;
+    font-weight: bold;
+    color: white;
+    text-shadow: rgba(0, 0, 0, 0.5) 0 -0.08em 0;
+    -webkit-border-radius: 3px;
+    border-radius: 3px;
+    padding: 1px 4px;
+    background-image: none;
+    background-color: #C00;
+    background-image: -webkit-gradient(linear, 50% 0%, 50% 100%, color-stop(0%, #ff1a1a), color-stop(3%, #e60000), color-stop(100%, #b30000));
+    background-image: -webkit-linear-gradient(top, #ff1a1a,#e60000 3%,#b30000);
+    background-image: linear-gradient(top, #ff1a1a,#e60000 3%,#b30000);
+    -webkit-box-shadow: rgba(0, 0, 0, 0.3) 0 0.1em 0.1em;
+    box-shadow: rgba(0, 0, 0, 0.3) 0 0.1em 0.1em;
+}
+
+.abp-badge.hide-badge[data-abp-badge]:after {
+    display: none!important;
+}
+body {
+    background: #eaecfa;
+}
+ .loader {
+     width: 250px;
+     height: 150px;
+     line-height: 50px;
+     text-align: center;
+     position: absolute;
+     top: 50%;
+     left: 50%;
+     transform: translate(-50%, -50%);
+     font-family: helvetica, arial, sans-serif;
+     text-transform: uppercase;
+     font-weight: 900;
+     color: #ce4233;
+     letter-spacing: 0.2em;
+}
+ .loader::before, .loader::after {
+     content: "";
+     display: block;
+     width: 15px;
+     height: 15px;
+     background: #ce4233;
+     position: absolute;
+     animation: load 0.7s infinite alternate ease-in-out;
+}
+ .loader::before {
+     top: 0;
+}
+ .loader::after {
+     bottom: 0;
+}
+ @keyframes load {
+     0% {
+         left: 0;
+         height: 70px;
+         width: 15px;
+    }
+     50% {
+         height: 8px;
+         width: 40px;
+    }
+     100% {
+         left: 235px;
+         height: 70px;
+         width: 15px;
+    }
+}
+.valid-cell {
+    background-color: #DFF2BF;
+    background-image: url(../images/valid.png); /*16px*/
+    background-repeat: no-repeat;
+    background-position: right;
+}
+
+.invalid-cell {
+    background-color: #FFBABA;
+    background-image: url(../images/invalid.png); /*16px*/
+    background-repeat: no-repeat;
+    background-position: right;
+    /*text-decoration: line-through;*/
+}
+
+.is_duplicate_cell {
+    background-color: #FFBABA !important;
+}
+
+.is_notduplicate_cell {
+    background-color: #DFF2BF !important;
+}
+
+.valid-row {
+    background-color: #DFF2BF !important;
+}
+
+.invalid-row {
+    background-color: #FFBABA !important;
+}
+.fast-track-row {
+    background-color: #35baf6 !important;
+}
+.striked-valid-row {
+    text-decoration: line-through !important;
+    color : BLACK !important;
+    background-color: #DFF2BF !important; 
+}
+.striked-invalid-row {
+    text-decoration: line-through !important;
+    color : BLACK !important;
+    background-color: #FFBABA !important;
+}
+
+.medium-row {
+    background-color: #d1e0e0 !important;
+}
+.wrap .x-grid-cell-inner {
+    white-space: normal;
+}
+.rowHeight {
+    white-space: normal;
+    height: 50px;
+}
+.rowHeight .x-grid-cell-inner {
+    white-space: normal;
+}
+
+/*
+navigation
+*/
+
+  .x-treelist-navigation .x-treelist-item-text{
+      color: #adb3b8 !important;
+      margin-left: 40px !important;
+      margin-right: 24px !important;
+      font-size: 12px !important;
+      line-height: 50px !important;
+  }
+
+.x-treelist-navigation .x-treelist-item-icon:before, .x-treelist-navigation .x-treelist-item-tool:before, .x-treelist-navigation .x-treelist-item-expander {
+    line-height: 50px !important;
+}
+
+/*Alerts Notifications*/
+.noti {
+    padding:0px 2px 0px 2px;
+    background:#e3495a;
+    color:#fff;
+    font-weight:bold;
+    font-size: 22px;
+    position: relative;
+    overflow: visible;
+    border-radius: 50%;
+   /* height: 18px;
+    width: 34px;*/
+    text-align:center;
+}
+.noti:after{
+    height: 38px;
+    width: 34px;
+    display: inline-block;
+    position: absolute;
+    top: 22px;
+    right: -180px;
+    text-align:center;
+    color:#fff;
+    font-weight: bold;
+    font-size: 10px;
+    line-height: 18px;
+}
+
+

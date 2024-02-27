@@ -1,0 +1,1334 @@
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus .x-tab-navigation-top-ml,
+.x-tab-focus .x-tab-navigation-top-mr {
+    background-image: url(images/tab/tab-navigation-top-focus-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus .x-tab-navigation-top-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-top-focus-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus.x-tab-over .x-tab-navigation-top-tl,
+.x-tab-focus.x-tab-over .x-tab-navigation-top-bl,
+.x-tab-focus.x-tab-over .x-tab-navigation-top-tr,
+.x-tab-focus.x-tab-over .x-tab-navigation-top-br,
+.x-tab-focus.x-tab-over .x-tab-navigation-top-tc,
+.x-tab-focus.x-tab-over .x-tab-navigation-top-bc {
+    background-image: url(images/tab/tab-navigation-top-focus-over-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus.x-tab-over .x-tab-navigation-top-ml,
+.x-tab-focus.x-tab-over .x-tab-navigation-top-mr {
+    background-image: url(images/tab/tab-navigation-top-focus-over-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus.x-tab-over .x-tab-navigation-top-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-top-focus-over-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab.x-tab-active .x-tab-navigation-top-tl,
+.x-tab.x-tab-active .x-tab-navigation-top-bl,
+.x-tab.x-tab-active .x-tab-navigation-top-tr,
+.x-tab.x-tab-active .x-tab-navigation-top-br,
+.x-tab.x-tab-active .x-tab-navigation-top-tc,
+.x-tab.x-tab-active .x-tab-navigation-top-bc {
+    background-image: url(images/tab/tab-navigation-top-active-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab.x-tab-active .x-tab-navigation-top-ml,
+.x-tab.x-tab-active .x-tab-navigation-top-mr {
+    background-image: url(images/tab/tab-navigation-top-active-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab.x-tab-active .x-tab-navigation-top-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-top-active-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus.x-tab-active .x-tab-navigation-top-tl,
+.x-tab-focus.x-tab-active .x-tab-navigation-top-bl,
+.x-tab-focus.x-tab-active .x-tab-navigation-top-tr,
+.x-tab-focus.x-tab-active .x-tab-navigation-top-br,
+.x-tab-focus.x-tab-active .x-tab-navigation-top-tc,
+.x-tab-focus.x-tab-active .x-tab-navigation-top-bc {
+    background-image: url(images/tab/tab-navigation-top-focus-active-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus.x-tab-active .x-tab-navigation-top-ml,
+.x-tab-focus.x-tab-active .x-tab-navigation-top-mr {
+    background-image: url(images/tab/tab-navigation-top-focus-active-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus.x-tab-active .x-tab-navigation-top-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-top-focus-active-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab.x-tab-disabled .x-tab-navigation-top-tl,
+.x-tab.x-tab-disabled .x-tab-navigation-top-bl,
+.x-tab.x-tab-disabled .x-tab-navigation-top-tr,
+.x-tab.x-tab-disabled .x-tab-navigation-top-br,
+.x-tab.x-tab-disabled .x-tab-navigation-top-tc,
+.x-tab.x-tab-disabled .x-tab-navigation-top-bc {
+    background-image: url(images/tab/tab-navigation-top-disabled-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab.x-tab-disabled .x-tab-navigation-top-ml,
+.x-tab.x-tab-disabled .x-tab-navigation-top-mr {
+    background-image: url(images/tab/tab-navigation-top-disabled-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab.x-tab-disabled .x-tab-navigation-top-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-top-disabled-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-over .x-tab-navigation-right-tl,
+.x-tab-over .x-tab-navigation-right-bl,
+.x-tab-over .x-tab-navigation-right-tr,
+.x-tab-over .x-tab-navigation-right-br,
+.x-tab-over .x-tab-navigation-right-tc,
+.x-tab-over .x-tab-navigation-right-bc {
+    background-image: url(images/tab/tab-navigation-right-over-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-over .x-tab-navigation-right-ml,
+.x-tab-over .x-tab-navigation-right-mr {
+    background-image: url(images/tab/tab-navigation-right-over-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-over .x-tab-navigation-right-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-right-over-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus .x-tab-navigation-right-tl,
+.x-tab-focus .x-tab-navigation-right-bl,
+.x-tab-focus .x-tab-navigation-right-tr,
+.x-tab-focus .x-tab-navigation-right-br,
+.x-tab-focus .x-tab-navigation-right-tc,
+.x-tab-focus .x-tab-navigation-right-bc {
+    background-image: url(images/tab/tab-navigation-right-focus-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus .x-tab-navigation-right-ml,
+.x-tab-focus .x-tab-navigation-right-mr {
+    background-image: url(images/tab/tab-navigation-right-focus-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus .x-tab-navigation-right-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-right-focus-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus.x-tab-over .x-tab-navigation-right-tl,
+.x-tab-focus.x-tab-over .x-tab-navigation-right-bl,
+.x-tab-focus.x-tab-over .x-tab-navigation-right-tr,
+.x-tab-focus.x-tab-over .x-tab-navigation-right-br,
+.x-tab-focus.x-tab-over .x-tab-navigation-right-tc,
+.x-tab-focus.x-tab-over .x-tab-navigation-right-bc {
+    background-image: url(images/tab/tab-navigation-right-focus-over-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus.x-tab-over .x-tab-navigation-right-ml,
+.x-tab-focus.x-tab-over .x-tab-navigation-right-mr {
+    background-image: url(images/tab/tab-navigation-right-focus-over-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus.x-tab-over .x-tab-navigation-right-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-right-focus-over-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab.x-tab-active .x-tab-navigation-right-tl,
+.x-tab.x-tab-active .x-tab-navigation-right-bl,
+.x-tab.x-tab-active .x-tab-navigation-right-tr,
+.x-tab.x-tab-active .x-tab-navigation-right-br,
+.x-tab.x-tab-active .x-tab-navigation-right-tc,
+.x-tab.x-tab-active .x-tab-navigation-right-bc {
+    background-image: url(images/tab/tab-navigation-right-active-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab.x-tab-active .x-tab-navigation-right-ml,
+.x-tab.x-tab-active .x-tab-navigation-right-mr {
+    background-image: url(images/tab/tab-navigation-right-active-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab.x-tab-active .x-tab-navigation-right-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-right-active-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus.x-tab-active .x-tab-navigation-right-tl,
+.x-tab-focus.x-tab-active .x-tab-navigation-right-bl,
+.x-tab-focus.x-tab-active .x-tab-navigation-right-tr,
+.x-tab-focus.x-tab-active .x-tab-navigation-right-br,
+.x-tab-focus.x-tab-active .x-tab-navigation-right-tc,
+.x-tab-focus.x-tab-active .x-tab-navigation-right-bc {
+    background-image: url(images/tab/tab-navigation-right-focus-active-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus.x-tab-active .x-tab-navigation-right-ml,
+.x-tab-focus.x-tab-active .x-tab-navigation-right-mr {
+    background-image: url(images/tab/tab-navigation-right-focus-active-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus.x-tab-active .x-tab-navigation-right-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-right-focus-active-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab.x-tab-disabled .x-tab-navigation-right-tl,
+.x-tab.x-tab-disabled .x-tab-navigation-right-bl,
+.x-tab.x-tab-disabled .x-tab-navigation-right-tr,
+.x-tab.x-tab-disabled .x-tab-navigation-right-br,
+.x-tab.x-tab-disabled .x-tab-navigation-right-tc,
+.x-tab.x-tab-disabled .x-tab-navigation-right-bc {
+    background-image: url(images/tab/tab-navigation-right-disabled-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab.x-tab-disabled .x-tab-navigation-right-ml,
+.x-tab.x-tab-disabled .x-tab-navigation-right-mr {
+    background-image: url(images/tab/tab-navigation-right-disabled-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab.x-tab-disabled .x-tab-navigation-right-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-right-disabled-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-over .x-tab-navigation-bottom-tl,
+.x-tab-over .x-tab-navigation-bottom-bl,
+.x-tab-over .x-tab-navigation-bottom-tr,
+.x-tab-over .x-tab-navigation-bottom-br,
+.x-tab-over .x-tab-navigation-bottom-tc,
+.x-tab-over .x-tab-navigation-bottom-bc {
+    background-image: url(images/tab/tab-navigation-bottom-over-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-over .x-tab-navigation-bottom-ml,
+.x-tab-over .x-tab-navigation-bottom-mr {
+    background-image: url(images/tab/tab-navigation-bottom-over-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-over .x-tab-navigation-bottom-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-bottom-over-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus .x-tab-navigation-bottom-tl,
+.x-tab-focus .x-tab-navigation-bottom-bl,
+.x-tab-focus .x-tab-navigation-bottom-tr,
+.x-tab-focus .x-tab-navigation-bottom-br,
+.x-tab-focus .x-tab-navigation-bottom-tc,
+.x-tab-focus .x-tab-navigation-bottom-bc {
+    background-image: url(images/tab/tab-navigation-bottom-focus-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus .x-tab-navigation-bottom-ml,
+.x-tab-focus .x-tab-navigation-bottom-mr {
+    background-image: url(images/tab/tab-navigation-bottom-focus-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus .x-tab-navigation-bottom-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-bottom-focus-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-tl,
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-bl,
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-tr,
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-br,
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-tc,
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-bc {
+    background-image: url(images/tab/tab-navigation-bottom-focus-over-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-ml,
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-mr {
+    background-image: url(images/tab/tab-navigation-bottom-focus-over-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus.x-tab-over .x-tab-navigation-bottom-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-bottom-focus-over-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab.x-tab-active .x-tab-navigation-bottom-tl,
+.x-tab.x-tab-active .x-tab-navigation-bottom-bl,
+.x-tab.x-tab-active .x-tab-navigation-bottom-tr,
+.x-tab.x-tab-active .x-tab-navigation-bottom-br,
+.x-tab.x-tab-active .x-tab-navigation-bottom-tc,
+.x-tab.x-tab-active .x-tab-navigation-bottom-bc {
+    background-image: url(images/tab/tab-navigation-bottom-active-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab.x-tab-active .x-tab-navigation-bottom-ml,
+.x-tab.x-tab-active .x-tab-navigation-bottom-mr {
+    background-image: url(images/tab/tab-navigation-bottom-active-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab.x-tab-active .x-tab-navigation-bottom-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-bottom-active-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-tl,
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-bl,
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-tr,
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-br,
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-tc,
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-bc {
+    background-image: url(images/tab/tab-navigation-bottom-focus-active-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-ml,
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-mr {
+    background-image: url(images/tab/tab-navigation-bottom-focus-active-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus.x-tab-active .x-tab-navigation-bottom-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-bottom-focus-active-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-tl,
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-bl,
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-tr,
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-br,
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-tc,
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-bc {
+    background-image: url(images/tab/tab-navigation-bottom-disabled-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-ml,
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-mr {
+    background-image: url(images/tab/tab-navigation-bottom-disabled-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab.x-tab-disabled .x-tab-navigation-bottom-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-bottom-disabled-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-over .x-tab-navigation-left-tl,
+.x-tab-over .x-tab-navigation-left-bl,
+.x-tab-over .x-tab-navigation-left-tr,
+.x-tab-over .x-tab-navigation-left-br,
+.x-tab-over .x-tab-navigation-left-tc,
+.x-tab-over .x-tab-navigation-left-bc {
+    background-image: url(images/tab/tab-navigation-left-over-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-over .x-tab-navigation-left-ml,
+.x-tab-over .x-tab-navigation-left-mr {
+    background-image: url(images/tab/tab-navigation-left-over-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-over .x-tab-navigation-left-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-left-over-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus .x-tab-navigation-left-tl,
+.x-tab-focus .x-tab-navigation-left-bl,
+.x-tab-focus .x-tab-navigation-left-tr,
+.x-tab-focus .x-tab-navigation-left-br,
+.x-tab-focus .x-tab-navigation-left-tc,
+.x-tab-focus .x-tab-navigation-left-bc {
+    background-image: url(images/tab/tab-navigation-left-focus-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus .x-tab-navigation-left-ml,
+.x-tab-focus .x-tab-navigation-left-mr {
+    background-image: url(images/tab/tab-navigation-left-focus-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus .x-tab-navigation-left-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-left-focus-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus.x-tab-over .x-tab-navigation-left-tl,
+.x-tab-focus.x-tab-over .x-tab-navigation-left-bl,
+.x-tab-focus.x-tab-over .x-tab-navigation-left-tr,
+.x-tab-focus.x-tab-over .x-tab-navigation-left-br,
+.x-tab-focus.x-tab-over .x-tab-navigation-left-tc,
+.x-tab-focus.x-tab-over .x-tab-navigation-left-bc {
+    background-image: url(images/tab/tab-navigation-left-focus-over-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus.x-tab-over .x-tab-navigation-left-ml,
+.x-tab-focus.x-tab-over .x-tab-navigation-left-mr {
+    background-image: url(images/tab/tab-navigation-left-focus-over-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus.x-tab-over .x-tab-navigation-left-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-left-focus-over-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab.x-tab-active .x-tab-navigation-left-tl,
+.x-tab.x-tab-active .x-tab-navigation-left-bl,
+.x-tab.x-tab-active .x-tab-navigation-left-tr,
+.x-tab.x-tab-active .x-tab-navigation-left-br,
+.x-tab.x-tab-active .x-tab-navigation-left-tc,
+.x-tab.x-tab-active .x-tab-navigation-left-bc {
+    background-image: url(images/tab/tab-navigation-left-active-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab.x-tab-active .x-tab-navigation-left-ml,
+.x-tab.x-tab-active .x-tab-navigation-left-mr {
+    background-image: url(images/tab/tab-navigation-left-active-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab.x-tab-active .x-tab-navigation-left-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-left-active-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab-focus.x-tab-active .x-tab-navigation-left-tl,
+.x-tab-focus.x-tab-active .x-tab-navigation-left-bl,
+.x-tab-focus.x-tab-active .x-tab-navigation-left-tr,
+.x-tab-focus.x-tab-active .x-tab-navigation-left-br,
+.x-tab-focus.x-tab-active .x-tab-navigation-left-tc,
+.x-tab-focus.x-tab-active .x-tab-navigation-left-bc {
+    background-image: url(images/tab/tab-navigation-left-focus-active-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab-focus.x-tab-active .x-tab-navigation-left-ml,
+.x-tab-focus.x-tab-active .x-tab-navigation-left-mr {
+    background-image: url(images/tab/tab-navigation-left-focus-active-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab-focus.x-tab-active .x-tab-navigation-left-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-left-focus-active-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4065 */
+.x-tab.x-tab-disabled .x-tab-navigation-left-tl,
+.x-tab.x-tab-disabled .x-tab-navigation-left-bl,
+.x-tab.x-tab-disabled .x-tab-navigation-left-tr,
+.x-tab.x-tab-disabled .x-tab-navigation-left-br,
+.x-tab.x-tab-disabled .x-tab-navigation-left-tc,
+.x-tab.x-tab-disabled .x-tab-navigation-left-bc {
+    background-image: url(images/tab/tab-navigation-left-disabled-corners.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4074 */
+.x-tab.x-tab-disabled .x-tab-navigation-left-ml,
+.x-tab.x-tab-disabled .x-tab-navigation-left-mr {
+    background-image: url(images/tab/tab-navigation-left-disabled-sides.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4079 */
+.x-tab.x-tab-disabled .x-tab-navigation-left-mc {
+    background-repeat: repeat-x;
+    background-image: url(images/tab/tab-navigation-left-disabled-fbg.gif);
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4089 */
+.x-tab-navigation-tl,
+.x-tab-navigation-bl,
+.x-tab-navigation-tr,
+.x-tab-navigation-br {
+    -ms-filter: "progid:DXImageTransform.Microsoft.gradient(startColorstr=#00FFFFFF,endColorstr=#00FFFFFF)";
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4099 */
+.x-tab-navigation .x-tab-close-btn {
+    top: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    font: 12px/1 'Font Awesome 5 Free';
+    color: #fff;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/etc/mixins/font-icon.scss:132 */
+.x-tab-navigation .x-tab-close-btn:before {
+    content: '\f00d';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4109 */
+.x-tab-bar-plain .x-tab-navigation .x-tab-close-btn {
+    color: #919191;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4121 */
+.x-tab-navigation .x-tab-close-btn-over {
+    background-position: -16px 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4131 */
+.x-tab-navigation .x-tab-close-btn-pressed {
+    background-position: -32px 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4139 */
+.x-keyboard-mode .x-tab-navigation.x-tab-focus .x-tab-close-btn {
+    color: #fff;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4145 */
+.x-keyboard-mode .x-tab-bar-plain .x-tab-navigation.x-tab-focus .x-tab-close-btn {
+    color: #919191;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4156 */
+.x-tab-navigation.x-tab-over .x-tab-close-btn {
+    color: #fff;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4160 */
+.x-tab-bar-plain .x-tab-navigation.x-tab-over .x-tab-close-btn {
+    color: #919191;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4171 */
+.x-keyboard-mode .x-tab-navigation.x-tab-focus.x-tab-over .x-tab-close-btn {
+    color: #fff;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4177 */
+.x-keyboard-mode .x-tab-bar-plain .x-tab-navigation.x-tab-focus.x-tab-over .x-tab-close-btn {
+    color: #919191;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4188 */
+.x-tab-navigation.x-tab-active .x-tab-close-btn {
+    color: #919191;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4219 */
+.x-keyboard-mode .x-tab-navigation.x-tab-focus.x-tab-active .x-tab-close-btn {
+    color: #919191;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4235 */
+.x-tab-navigation.x-tab-disabled .x-tab-close-btn {
+    color: #fff;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=30)";
+    opacity: 0.3;
+    background-position: 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4240 */
+.x-tab-bar-plain .x-tab-navigation.x-tab-disabled .x-tab-close-btn {
+    color: #919191;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4256 */
+.x-rtl.x-tab-navigation .x-tab-close-btn {
+    right: auto;
+    left: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4262 */
+.x-tab-closable.x-tab-navigation .x-tab-button {
+    padding-right: 16px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Tab.scss:4267 */
+.x-rtl.x-tab-closable.x-tab-navigation .x-tab-button {
+    padding-right: 0px;
+    padding-left: 16px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-navigation-top:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-top-focus-corners.gif), sides:url(images/tab/tab-navigation-top-focus-sides.gif), frame-bg:url(images/tab/tab-navigation-top-focus-fbg.gif), frame:1px 1px 1px 1px, stretch:bottom" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-navigation-right:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-right-focus-corners.gif), sides:url(images/tab/tab-navigation-right-focus-sides.gif), frame-bg:url(images/tab/tab-navigation-right-focus-fbg.gif), frame:1px 1px 1px 1px, stretch:left" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-navigation-bottom:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-bottom-focus-corners.gif), sides:url(images/tab/tab-navigation-bottom-focus-sides.gif), frame-bg:url(images/tab/tab-navigation-bottom-focus-fbg.gif), frame:1px 1px 1px 1px, stretch:top" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-navigation-left:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-left-focus-corners.gif), sides:url(images/tab/tab-navigation-left-focus-sides.gif), frame-bg:url(images/tab/tab-navigation-left-focus-fbg.gif), frame:1px 1px 1px 1px, stretch:right" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-over.x-tab-navigation-top:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-top-over-corners.gif), sides:url(images/tab/tab-navigation-top-over-sides.gif), frame-bg:url(images/tab/tab-navigation-top-over-fbg.gif), frame:1px 1px 1px 1px, stretch:bottom" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-over.x-tab-navigation-right:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-right-over-corners.gif), sides:url(images/tab/tab-navigation-right-over-sides.gif), frame-bg:url(images/tab/tab-navigation-right-over-fbg.gif), frame:1px 1px 1px 1px, stretch:left" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-over.x-tab-navigation-bottom:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-bottom-over-corners.gif), sides:url(images/tab/tab-navigation-bottom-over-sides.gif), frame-bg:url(images/tab/tab-navigation-bottom-over-fbg.gif), frame:1px 1px 1px 1px, stretch:top" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-over.x-tab-navigation-left:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-left-over-corners.gif), sides:url(images/tab/tab-navigation-left-over-sides.gif), frame-bg:url(images/tab/tab-navigation-left-over-fbg.gif), frame:1px 1px 1px 1px, stretch:right" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-active.x-tab-navigation-top:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-top-active-corners.gif), sides:url(images/tab/tab-navigation-top-active-sides.gif), frame-bg:url(images/tab/tab-navigation-top-active-fbg.gif), frame:1px 1px 1px 1px, stretch:bottom" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-active.x-tab-navigation-right:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-right-active-corners.gif), sides:url(images/tab/tab-navigation-right-active-sides.gif), frame-bg:url(images/tab/tab-navigation-right-active-fbg.gif), frame:1px 1px 1px 1px, stretch:left" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-active.x-tab-navigation-bottom:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-bottom-active-corners.gif), sides:url(images/tab/tab-navigation-bottom-active-sides.gif), frame-bg:url(images/tab/tab-navigation-bottom-active-fbg.gif), frame:1px 1px 1px 1px, stretch:top" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-active.x-tab-navigation-left:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-left-active-corners.gif), sides:url(images/tab/tab-navigation-left-active-sides.gif), frame-bg:url(images/tab/tab-navigation-left-active-fbg.gif), frame:1px 1px 1px 1px, stretch:right" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-over.x-tab-navigation-top:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-top-focus-over-corners.gif), sides:url(images/tab/tab-navigation-top-focus-over-sides.gif), frame-bg:url(images/tab/tab-navigation-top-focus-over-fbg.gif), frame:1px 1px 1px 1px, stretch:bottom" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-over.x-tab-navigation-right:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-right-focus-over-corners.gif), sides:url(images/tab/tab-navigation-right-focus-over-sides.gif), frame-bg:url(images/tab/tab-navigation-right-focus-over-fbg.gif), frame:1px 1px 1px 1px, stretch:left" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-over.x-tab-navigation-bottom:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-bottom-focus-over-corners.gif), sides:url(images/tab/tab-navigation-bottom-focus-over-sides.gif), frame-bg:url(images/tab/tab-navigation-bottom-focus-over-fbg.gif), frame:1px 1px 1px 1px, stretch:top" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-over.x-tab-navigation-left:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-left-focus-over-corners.gif), sides:url(images/tab/tab-navigation-left-focus-over-sides.gif), frame-bg:url(images/tab/tab-navigation-left-focus-over-fbg.gif), frame:1px 1px 1px 1px, stretch:right" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-active.x-tab-navigation-top:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-top-focus-active-corners.gif), sides:url(images/tab/tab-navigation-top-focus-active-sides.gif), frame-bg:url(images/tab/tab-navigation-top-focus-active-fbg.gif), frame:1px 1px 1px 1px, stretch:bottom" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-active.x-tab-navigation-right:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-right-focus-active-corners.gif), sides:url(images/tab/tab-navigation-right-focus-active-sides.gif), frame-bg:url(images/tab/tab-navigation-right-focus-active-fbg.gif), frame:1px 1px 1px 1px, stretch:left" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-active.x-tab-navigation-bottom:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-bottom-focus-active-corners.gif), sides:url(images/tab/tab-navigation-bottom-focus-active-sides.gif), frame-bg:url(images/tab/tab-navigation-bottom-focus-active-fbg.gif), frame:1px 1px 1px 1px, stretch:top" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-focus.x-tab-active.x-tab-navigation-left:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-left-focus-active-corners.gif), sides:url(images/tab/tab-navigation-left-focus-active-sides.gif), frame-bg:url(images/tab/tab-navigation-left-focus-active-fbg.gif), frame:1px 1px 1px 1px, stretch:right" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-disabled.x-tab-navigation-top:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-top-disabled-corners.gif), sides:url(images/tab/tab-navigation-top-disabled-sides.gif), frame-bg:url(images/tab/tab-navigation-top-disabled-fbg.gif), frame:1px 1px 1px 1px, stretch:bottom" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-disabled.x-tab-navigation-right:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-right-disabled-corners.gif), sides:url(images/tab/tab-navigation-right-disabled-sides.gif), frame-bg:url(images/tab/tab-navigation-right-disabled-fbg.gif), frame:1px 1px 1px 1px, stretch:left" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-disabled.x-tab-navigation-bottom:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-bottom-disabled-corners.gif), sides:url(images/tab/tab-navigation-bottom-disabled-sides.gif), frame-bg:url(images/tab/tab-navigation-bottom-disabled-fbg.gif), frame:1px 1px 1px 1px, stretch:top" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-disabled.x-tab-navigation-left:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, corners:url(images/tab/tab-navigation-left-disabled-corners.gif), sides:url(images/tab/tab-navigation-left-disabled-sides.gif), frame-bg:url(images/tab/tab-navigation-left-disabled-fbg.gif), frame:1px 1px 1px 1px, stretch:right" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:389 */
+.x-tab-bar-navigation {
+    background-color: #404040;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:428 */
+.x-tab-bar-navigation-top > .x-tab-bar-body-navigation {
+    padding: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:432 */
+.x-tab-bar-navigation-bottom > .x-tab-bar-body-navigation {
+    padding: 0 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:436 */
+.x-tab-bar-navigation-left > .x-tab-bar-body-navigation {
+    padding: 0 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:441 */
+.x-rtl.x-tab-bar-navigation-left > .x-tab-bar-body-navigation {
+    padding: 0 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:446 */
+.x-tab-bar-navigation-right > .x-tab-bar-body-navigation {
+    padding: 0 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:451 */
+.x-rtl.x-tab-bar-navigation-right > .x-tab-bar-body-navigation {
+    padding: 0 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:459 */
+.x-tab-bar-plain.x-tab-bar-navigation-top > .x-tab-bar-body-navigation {
+    padding: 8px 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:463 */
+.x-tab-bar-plain.x-tab-bar-navigation-bottom > .x-tab-bar-body-navigation {
+    padding: 0 0 8px 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:467 */
+.x-tab-bar-plain.x-tab-bar-navigation-left > .x-tab-bar-body-navigation {
+    padding: 0 0 0 8px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:472 */
+.x-rtl.x-tab-bar-plain.x-tab-bar-navigation-left > .x-tab-bar-body-navigation {
+    padding: 0 8px 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:477 */
+.x-tab-bar-plain.x-tab-bar-navigation-right > .x-tab-bar-body-navigation {
+    padding: 0 8px 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:482 */
+.x-rtl.x-tab-bar-plain.x-tab-bar-navigation-right > .x-tab-bar-body-navigation {
+    padding: 0 0 0 8px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:490 */
+.x-tab-bar-plain.x-tab-bar-navigation-horizontal {
+    border-top-color: transparent;
+    border-bottom-color: transparent;
+    border-left-width: 0;
+    border-right-width: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:497 */
+.x-tab-bar-plain.x-tab-bar-navigation-vertical {
+    border-right-color: transparent;
+    border-left-color: transparent;
+    border-top-width: 0;
+    border-bottom-width: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:611 */
+.x-tab-bar-horizontal > .x-tab-bar-body-navigation {
+    min-height: 74px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:614 */
+.x-ie8m .x-tab-bar-horizontal > .x-tab-bar-body-navigation {
+    min-height: 74px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:621 */
+.x-tab-bar-vertical > .x-tab-bar-body-navigation {
+    min-width: 74px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:624 */
+.x-ie8m .x-tab-bar-vertical > .x-tab-bar-body-navigation {
+    min-width: 74px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:182 */
+.x-tab-bar-navigation-scroller .x-box-scroller-body-horizontal {
+    margin-left: 24px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:187 */
+.x-tab-bar-navigation-scroller.x-rtl .x-box-scroller-body-horizontal {
+    margin-left: 0;
+    margin-right: 24px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:195 */
+.x-tab-bar-navigation-vertical-scroller .x-box-scroller-body-vertical {
+    margin-top: 24px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:200 */
+.x-box-scroller-tab-bar-navigation {
+    cursor: pointer;
+    color: #fff;
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=50)";
+    opacity: 0.5;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:210 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-hover {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=60)";
+    opacity: 0.6;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:216 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-pressed {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=70)";
+    opacity: 0.7;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:222 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-disabled {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=25)";
+    opacity: 0.25;
+    cursor: default;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:232 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-left,
+.x-box-scroller-tab-bar-navigation.x-box-scroller-right {
+    width: 24px;
+    height: 24px;
+    top: 50%;
+    margin-top: -12px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:259 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-left {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    font: 16px/24px 'Font Awesome 5 Free';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/etc/mixins/font-icon.scss:132 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-left:before {
+    content: '\f053';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:284 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-right {
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    font: 16px/24px 'Font Awesome 5 Free';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/etc/mixins/font-icon.scss:132 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-right:before {
+    content: '\f054';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:311 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-top,
+.x-box-scroller-tab-bar-navigation.x-box-scroller-bottom {
+    height: 24px;
+    width: 24px;
+    left: 50%;
+    margin-left: -12px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:338 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-top {
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    font: 16px/24px 'Font Awesome 5 Free';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/etc/mixins/font-icon.scss:132 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-top:before {
+    content: '\f077';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/layout/container/Box.scss:363 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-bottom {
+    margin-top: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    font: 16px/24px 'Font Awesome 5 Free';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/etc/mixins/font-icon.scss:132 */
+.x-box-scroller-tab-bar-navigation.x-box-scroller-bottom:before {
+    content: '\f078';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:704 */
+.x-tab-bar-more-icon {
+    font: 16px/1 'Font Awesome 5 Free';
+    color: #f0f0f0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/etc/mixins/font-icon.scss:132 */
+.x-tab-bar-more-icon:before {
+    content: '\f0c9';
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:721 */
+.x-tab-bar-plain.x-tab-bar-navigation-scroller .x-box-scroller-body-horizontal {
+    margin-left: 24px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:727 */
+.x-tab-bar-plain.x-tab-bar-navigation-vertical-scroller .x-box-scroller-body-vertical {
+    margin-top: 16px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:732 */
+.x-tab-bar-plain .x-box-scroller-tab-bar-navigation {
+    color: #919191;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:780 */
+.x-tab-bar-navigation-top .x-box-scroller-tab-bar-navigation {
+    margin-top: -12px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:784 */
+.x-tab-bar-navigation-right .x-box-scroller-tab-bar-navigation {
+    margin-left: -12px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:788 */
+.x-tab-bar-navigation-bottom .x-box-scroller-tab-bar-navigation {
+    margin-top: -12px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:792 */
+.x-tab-bar-navigation-left .x-box-scroller-tab-bar-navigation {
+    margin-left: -12px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:801 */
+.x-box-scroller-tab-bar-navigation {
+    background-color: #404040;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/tab/Bar.scss:807 */
+.x-box-scroller-tab-bar-navigation .x-ie8 .x-box-scroller-plain {
+    background-color: #fff;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-bar-navigation-top:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, stretch:bottom" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-bar-navigation-bottom:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, stretch:top" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-bar-navigation-left:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, stretch:right" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-tab-bar-navigation-right:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, stretch:left" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:799 */
+.x-panel-navigation {
+    border-color: #35baf6;
+    padding: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:802 */
+.x-panel-navigation.x-masked {
+    border-color: #9addfb;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:810 */
+.x-panel-header-navigation {
+    font-size: 20px;
+    border: 1px solid #35baf6;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:836 */
+.x-panel-header-navigation .x-tool-tool-el {
+    background-color: #35baf6;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:842 */
+.x-panel-header-navigation-horizontal {
+    padding: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:846 */
+.x-panel-header-navigation-horizontal .x-panel-header-navigation-tab-bar {
+    margin-top: 0;
+    margin-bottom: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:866 */
+.x-panel-header-navigation-vertical {
+    padding: 0 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:870 */
+.x-panel-header-navigation-vertical .x-panel-header-navigation-tab-bar {
+    margin-right: 0;
+    margin-left: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:891 */
+.x-rtl.x-panel-header-navigation-vertical {
+    padding: 0 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:895 */
+.x-rtl.x-panel-header-navigation-vertical .x-panel-header-navigation-tab-bar {
+    margin-left: 0;
+    margin-right: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:916 */
+.x-panel-header-title-navigation {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif;
+    line-height: 24px;
+    margin: 36px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:929 */
+.x-keyboard-mode .x-panel-header-title-navigation.x-title-focus {
+    outline: 1px solid #fff;
+    outline-offset: 2px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/css-outline.scss:63 */
+.x-ie .x-keyboard-mode .x-panel-header-title-navigation.x-title-focus,
+.x-ie10p .x-keyboard-mode .x-panel-header-title-navigation.x-title-focus,
+.x-edge .x-keyboard-mode .x-panel-header-title-navigation.x-title-focus {
+    outline: none;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/css-outline.scss:39 */
+.x-ie .x-keyboard-mode .x-panel-header-title-navigation.x-title-focus:after,
+.x-ie10p .x-keyboard-mode .x-panel-header-title-navigation.x-title-focus:after,
+.x-edge .x-keyboard-mode .x-panel-header-title-navigation.x-title-focus:after {
+    position: absolute;
+    content: ' ';
+    top: -3px;
+    right: -3px;
+    bottom: -3px;
+    left: -3px;
+    border: 1px solid #fff;
+    pointer-events: none;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:950 */
+.x-panel-header-title-navigation > .x-title-text-navigation {
+    text-transform: none;
+    padding: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:997 */
+.x-panel-header-title-navigation > .x-title-icon-wrap-navigation.x-title-icon-top {
+    height: 39px;
+    padding-bottom: 15px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1002 */
+.x-panel-header-title-navigation > .x-title-icon-wrap-navigation.x-title-icon-right {
+    width: 39px;
+    padding-left: 15px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1007 */
+.x-panel-header-title-navigation > .x-title-icon-wrap-navigation.x-title-icon-right.x-rtl {
+    padding-left: 0;
+    padding-right: 15px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1014 */
+.x-panel-header-title-navigation > .x-title-icon-wrap-navigation.x-title-icon-bottom {
+    height: 39px;
+    padding-top: 15px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1019 */
+.x-panel-header-title-navigation > .x-title-icon-wrap-navigation.x-title-icon-left {
+    width: 39px;
+    padding-right: 15px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1024 */
+.x-panel-header-title-navigation > .x-title-icon-wrap-navigation.x-title-icon-left.x-rtl {
+    padding-right: 0;
+    padding-left: 15px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1031 */
+.x-panel-header-title-navigation > .x-title-icon-wrap-navigation > .x-title-icon-navigation {
+    width: 24px;
+    height: 24px;
+    font-size: 24px;
+    color: #fff;
+    background-position: center center;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1051 */
+.x-ie8 .x-panel-header-title-navigation > .x-title-icon-wrap-navigation > .x-title-icon-navigation.x-title-glyph {
+    color: #fff;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1062 */
+.x-panel-body-navigation {
+    background: #fff;
+    border-color: #d0d0d0;
+    color: #404040;
+    font-size: 13px;
+    font-weight: 400;
+    font-family: 'Open Sans', 'Helvetica Neue', helvetica, arial, verdana, sans-serif;
+    border-width: 1px;
+    border-style: solid;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1226 */
+.x-panel-header-navigation {
+    background-image: none;
+    background-color: #35baf6;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1230 */
+.x-panel-header-navigation-vertical {
+    background-image: none;
+    background-color: #35baf6;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1235 */
+.x-rtl.x-panel-header-navigation-vertical {
+    background-image: none;
+    background-color: #35baf6;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1288 */
+.x-panel .x-panel-header-navigation-collapsed-border-top {
+    border-bottom-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1292 */
+.x-panel .x-panel-header-navigation-collapsed-border-right {
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1296 */
+.x-panel .x-panel-header-navigation-collapsed-border-bottom {
+    border-top-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1300 */
+.x-panel .x-panel-header-navigation-collapsed-border-left {
+    border-right-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-panel-header-navigation-top:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, stretch:bottom" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-panel-header-navigation-bottom:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, stretch:top" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-panel-header-navigation-left:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, stretch:right" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/slicer.scss:83 */
+.x-cmd-slicer.x-panel-header-navigation-right:before {
+    /*<if slicer>*/
+    display: none;
+    content: "x-slicer:, stretch:left" !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1336 */
+.x-panel-header-navigation-horizontal .x-tool-after-title {
+    margin: 0 0 0 6px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1341 */
+.x-panel-header-navigation-horizontal .x-rtl.x-tool-after-title {
+    margin: 0 6px 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1346 */
+.x-panel-header-navigation-horizontal .x-tool-before-title {
+    margin: 0 6px 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1351 */
+.x-panel-header-navigation-horizontal .x-rtl.x-tool-before-title {
+    margin: 0 0 0 6px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1358 */
+.x-panel-header-navigation-vertical .x-tool-after-title {
+    margin: 6px 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1363 */
+.x-panel-header-navigation-vertical .x-rtl.x-tool-after-title {
+    margin: 6px 0 0 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1368 */
+.x-panel-header-navigation-vertical .x-tool-before-title {
+    margin: 0 0 6px 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1373 */
+.x-panel-header-navigation-vertical .x-rtl.x-tool-before-title {
+    margin: 0 0 6px 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1381 */
+.x-keyboard-mode .x-panel-header-navigation .x-tool-focus {
+    outline: 1px solid #fff;
+    outline-offset: 2px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/css-outline.scss:63 */
+.x-ie .x-keyboard-mode .x-panel-header-navigation .x-tool-focus,
+.x-ie10p .x-keyboard-mode .x-panel-header-navigation .x-tool-focus,
+.x-edge .x-keyboard-mode .x-panel-header-navigation .x-tool-focus {
+    outline: none;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/css-outline.scss:39 */
+.x-ie .x-keyboard-mode .x-panel-header-navigation .x-tool-focus:after,
+.x-ie10p .x-keyboard-mode .x-panel-header-navigation .x-tool-focus:after,
+.x-edge .x-keyboard-mode .x-panel-header-navigation .x-tool-focus:after {
+    position: absolute;
+    content: ' ';
+    top: -3px;
+    right: -3px;
+    bottom: -3px;
+    left: -3px;
+    border: 1px solid #fff;
+    pointer-events: none;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1412 */
+.x-rtl.x-panel-header-navigation-collapsed-border-right {
+    border-right-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1415 */
+.x-rtl.x-panel-header-navigation-collapsed-border-left {
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-neutral/sass/var/panel/Panel.scss:1429 */
+.x-panel-navigation-resizable .x-panel-handle {
+    -ms-filter: "progid:DXImageTransform.Microsoft.Alpha(Opacity=0)";
+    opacity: 0;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:2 */
+.x-panel-navigation-outer-border-l {
+    border-left-color: #35baf6 !important;
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:6 */
+.x-panel-navigation-outer-border-b {
+    border-bottom-color: #35baf6 !important;
+    border-bottom-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:10 */
+.x-panel-navigation-outer-border-bl {
+    border-bottom-color: #35baf6 !important;
+    border-bottom-width: 1px !important;
+    border-left-color: #35baf6 !important;
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:16 */
+.x-panel-navigation-outer-border-r {
+    border-right-color: #35baf6 !important;
+    border-right-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:20 */
+.x-panel-navigation-outer-border-rl {
+    border-right-color: #35baf6 !important;
+    border-right-width: 1px !important;
+    border-left-color: #35baf6 !important;
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:26 */
+.x-panel-navigation-outer-border-rb {
+    border-right-color: #35baf6 !important;
+    border-right-width: 1px !important;
+    border-bottom-color: #35baf6 !important;
+    border-bottom-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:32 */
+.x-panel-navigation-outer-border-rbl {
+    border-right-color: #35baf6 !important;
+    border-right-width: 1px !important;
+    border-bottom-color: #35baf6 !important;
+    border-bottom-width: 1px !important;
+    border-left-color: #35baf6 !important;
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:40 */
+.x-panel-navigation-outer-border-t {
+    border-top-color: #35baf6 !important;
+    border-top-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:44 */
+.x-panel-navigation-outer-border-tl {
+    border-top-color: #35baf6 !important;
+    border-top-width: 1px !important;
+    border-left-color: #35baf6 !important;
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:50 */
+.x-panel-navigation-outer-border-tb {
+    border-top-color: #35baf6 !important;
+    border-top-width: 1px !important;
+    border-bottom-color: #35baf6 !important;
+    border-bottom-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:56 */
+.x-panel-navigation-outer-border-tbl {
+    border-top-color: #35baf6 !important;
+    border-top-width: 1px !important;
+    border-bottom-color: #35baf6 !important;
+    border-bottom-width: 1px !important;
+    border-left-color: #35baf6 !important;
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:64 */
+.x-panel-navigation-outer-border-tr {
+    border-top-color: #35baf6 !important;
+    border-top-width: 1px !important;
+    border-right-color: #35baf6 !important;
+    border-right-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:70 */
+.x-panel-navigation-outer-border-trl {
+    border-top-color: #35baf6 !important;
+    border-top-width: 1px !important;
+    border-right-color: #35baf6 !important;
+    border-right-width: 1px !important;
+    border-left-color: #35baf6 !important;
+    border-left-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:78 */
+.x-panel-navigation-outer-border-trb {
+    border-top-color: #35baf6 !important;
+    border-top-width: 1px !important;
+    border-right-color: #35baf6 !important;
+    border-right-width: 1px !important;
+    border-bottom-color: #35baf6 !important;
+    border-bottom-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/ext/classic/theme-base/sass/etc/mixins/border-management.scss:86 */
+.x-panel-navigation-outer-border-trbl {
+    border-color: #35baf6 !important;
+    border-width: 1px !important;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/classic/src/view/workflowmanagement/views/panels/WorkflowStagesTabPnl.scss:64 */
+.x-title-icon-navigation {
+    font-family: FontAwesome;
+    color: #fff;
+    font-size: 24px;
+    line-height: 24px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/classic/src/view/workflowmanagement/views/panels/WorkflowStagesTabPnl.scss:71 */
+.x-tab-icon-el-navigation {
+    font-family: FontAwesome;
+    color: #acacac;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/classic/src/view/workflowmanagement/views/panels/WorkflowStagesTabPnl.scss:75 */
+.x-tab-over .x-tab-icon-el-navigation {
+    color: #c4c4c4;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/classic/src/view/workflowmanagement/views/panels/WorkflowStagesTabPnl.scss:79 */
+.x-tab-active .x-tab-icon-el-navigation {
+    color: #fff;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/classic/src/view/workflowmanagement/views/panels/WorkflowStagesTabPnl.scss:84 */
+.x-panel-header-title-navigation > .x-title-text-navigation:after {
+    top: 30px;
+    right: -24px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/sass/src/Application.scss:3 */
+body.x-ios.x-webview.x-portrait {
+    margin-top: 20px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/sass/src/view/main/Main.scss:1 */
+.nav-tree-badge:after {
+    position: absolute;
+    height: 18px;
+    width: 3.3em;
+    display: inline-block;
+    text-align: center;
+    top: 50%;
+    margin-top: -9px;
+    right: 12px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 10px;
+    line-height: 18px;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/sass/src/view/main/Main.scss:16 */
+.nav-tree-badge-hot:after {
+    content: "HOT";
+    background-color: #e3495a;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/sass/src/view/main/Main.scss:21 */
+.nav-tree-badge-new:after {
+    content: "NEW";
+    background-color: #2eadf5;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/sass/src/view/main/Main.scss:30 */
+.circular {
+    border-radius: 50%;
+}
+/* D:/sys/xamp8.1/htdocs/BOMRA-IRMIS/development/mis/sass/src/view/main/Main.scss:35 */
+.x-fab.fa-google-plus {
+    min-width: 16px;
+    width: auto;
+}

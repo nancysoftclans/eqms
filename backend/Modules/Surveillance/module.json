@@ -1,0 +1,13 @@
+{
+    "name": "Surveillance",
+    "alias": "surveillance",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Surveillance\\Providers\\SurveillanceServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

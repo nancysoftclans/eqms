@@ -1,0 +1,1480 @@
+<?php
+
+namespace Modules\Migrations\Http\Controllers;
+
+use App\Imports\HumanMedsScreeningImport;
+use DateTime;
+use Dotenv\Loader\Loader;
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\File;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+
+
+use Illuminate\Support\Carbon;
+
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File as FacadesFile;
+
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx as ReaderXlsx;
+
+
+class MigrationsController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     * @return Renderable
+     */
+
+
+
+    public function __construct(Request $req)
+    {
+        $is_mobile = $req->input('is_mobile');
+        if (is_numeric($is_mobile) && $is_mobile > 0) {
+            $this->user_id = $req->input('user_id');
+        } else {
+
+            $this->middleware(function ($request, $next) {
+                if (!\Auth::check()) {
+                    $res = array(
+                        'success' => false,
+                        'message' => '<p>NO SESSION, SERVICE NOT ALLOWED!!<br>PLEASE RELOAD THE SYSTEM!!</p>'
+                    );
+                    echo json_encode($res);
+                    exit();
+                }
+                $this->user_id =\Auth::user()->id;
+                $this->branch_id =\Auth::user()->branch_id;
+                return $next($request);
+            });
+        }
+
+    }
+
+    //HUMAN MEDICINES
+
+    //fetch record
+    public function gethmscreeningregister(Request $request){
+        $migrations_db = DB::connection('migrations_db');
+
+        $start = $request->start;
+        $limit = $request->limit;
+        //dd($start, $limit);
+
+        $screeningregister = $migrations_db->table('mg_human_medicines_screening as t1' );
+
+        // dd($screeningregister);
+
+        $whereClauses = array();
+        $filter = $request->filter;
+        //dd($filter);
+        $filter_string = '';
+        if (isset($filter)) {
+            $filters = json_decode($filter);
+            if ($filters != NULL) {
+                foreach ($filters as $filter) {
+                    switch ($filter->property) {
+                        case 'screening_no' :
+                            $whereClauses[] = "screening_no like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'date_received' :
+                            $whereClauses[] = "date_received like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'date_logged_in_rmu' :
+                            $whereClauses[] = "date_logged_in_rmu like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'fee_paid' :
+                            $whereClauses[] = "fee_paid like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'sales_quote' :
+                            $whereClauses[] = "sales_quote like '%" . ($filter->value) . "%'";
+                        break;
+
+                        case 'rep_name' :
+                            $whereClauses[] = "rep_name like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'physical address' :
+                            $whereClauses[] = "physical address like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'applicant' :
+                            $whereClauses[] = "applicant like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'manufacturer' :
+                            $whereClauses[] = "manufacturer like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'product_name' :
+                            $whereClauses[] = "product_name like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'submitted_by' :
+                            $whereClauses[] = "submitted_by like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'logged_by' :
+                            $whereClauses[] = "logged_by like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'comments' :
+                            $whereClauses[] = "comments like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'allocation_date' :
+                            $whereClauses[] = "allocation_date like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'assesor' :
+                            $whereClauses[] = "assesor like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'total_screening_days' :
+                            $whereClauses[] = "total_screening_days like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'letter_ref' :
+                            $whereClauses[] = "letter_ref like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'date_dispatched_and_acknowledged' :
+                            $whereClauses[] = "date_dispatched_and_acknowledged '%" . ($filter->value) . "%'";
+                        break;
+                        case 'results' :
+                            $whereClauses[] = "results like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'deadline' :
+                            $whereClauses[] = "deadline like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'assesment_pathway' :
+                            $whereClauses[] = "assesment_pathway like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'correspondence' :
+                            $whereClauses[] = "correspondence like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'time_to_allocation' :
+                            $whereClauses[] = "time_to_allocation like '%" . ($filter->value) . "%'";
+                        break;
+                        case 'deposit_date' :
+                            $whereClauses[] = "deposit_date like '%" . ($filter->value) . "%'";
+                        break;
+
+
+
+
+
+
+                    }
+                }
+                $whereClauses = array_filter($whereClauses);
+
+
+            }
+
+        }
+        if (!empty($whereClauses))
+            {
+                $filter_string = implode(' AND ', $whereClauses);
+                //dd($filter_string);
+            }
+        if ($filter_string != '')
+            {
+                $screeningregister->whereRAW($filter_string);
+            }
+            $total = $screeningregister->count();
+            if(isset($start)&&isset($limit)){
+                $results = $screeningregister->skip($start)->take($limit)->get();
+            }
+            else{
+                $results=$screeningregister->get();
+            }
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well',
+                'total' => $total
+            );
+
+            return $res;
+
+    }
+
+    public function getresponsetohmscreeningregister(Request $request){
+        // $date = "Friday,July 3,2020";
+        // //dd(date("l ,M j,Y"));
+        // dd(Carbon::createFromFormat('l , M j, Y', $date)->format('m-d-Y'));
+        $migrations_db = DB::connection('migrations_db');
+        try {
+            $screeningregister = $migrations_db->table('mg_response_to_human_medicines_screening')->get();
+
+            $whereClauses = array();
+
+            $filter = $request->input('filter');
+
+            $filter_string = '';
+
+            if(isset($filter)){
+
+                $filters = json_decode($filter);
+                if($filters != NULL){
+                    foreach($filters as $filter){
+                        switch($filter->property){
+
+                            case 'screening_no':
+                                $whereClauses[] = "screening_no like '%" . ($filter->value) . "%'";
+                                break;
+                            case 'rmu_reference':
+                                $whereClauses[] = "rmu_reference like '%" . ($filter->value) . "%'";
+                                break;
+                            case 'comments':
+                                $whereClauses[] = "comments like '%" . ($filter->value) . "%'";
+                                break;
+                            case 'letter_ref':
+                                $whereClauses[] = "letter_ref like '%" . ($filter->value) . "%'";
+                            break;
+                            case 'time_to_allocation':
+                                $whereClauses[] = "time_to_allocation '%" . ($filter->value) . "%'";
+                            break;
+                            case 'total_screening_days':
+                                $whereClauses[] = "total_screening_days like '%" . ($filter->value) . "%'";
+                            break;
+
+
+                        }
+                    }
+                    $whereClauses = array_filter($whereClauses);
+                }
+
+                if (!empty($whereClauses))
+                    {
+                        $filter_string = implode(' AND ', $whereClauses);
+                    }
+                if ($filter_string != '')
+                    {
+                        $screeningregister->whereRAW($filter_string);
+                    }
+
+            }
+
+
+
+            $res = array(
+                'success' => true,
+                'results' => $screeningregister,
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    //update records
+    public function saveDirtyData(Request $request){
+
+        try {
+
+            //fetching the dummy data
+            $dirtyRecords = $request->input('params');
+           // dd($request->input('params'));
+           //conterting to json
+            $params = json_decode($dirtyRecords);
+            //$key_for_params = array_keys($params);
+            // $records = convertStdClassObjToArray($params);
+            $user_id = \Auth::user()->id;
+           //dd($records['id']);
+             $res = array(
+                'success' => false,
+                'message' => 'no data shared',
+            );
+            $migrations_db = DB::connection('migrations_db');
+            foreach($params as $data){
+
+
+
+                $records = convertStdClassObjToArray($data);
+                // dd($records);
+
+                //updateRecord('mg_human_medicines_screening', ['id'=>$records['id']],$records, $user_id, $migrations_db );
+                //dd($res);
+                $migrations_db->table('mg_human_medicines_screening')->where(['id'=>$records['id']])->update($records);
+
+            }
+
+            $res = array(
+                'success' => true,
+                'message' => 'data successfully updated',
+            );
+
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+
+    }
+
+
+
+    public function saveDirtyDataforResponseToHumanMedsScreening(Request $request){
+        try {
+
+            //fetching the dummy data
+            $dirtyRecords = $request->input('params');
+           // dd($request->input('params'));
+           //conterting to json
+            $params = json_decode($dirtyRecords);
+            //$key_for_params = array_keys($params);
+            // $records = convertStdClassObjToArray($params);
+            $user_id = \Auth::user()->id;
+           //dd($records['id']);
+             $res = array(
+                'success' => false,
+                'message' => 'no data shared',
+            );
+            $migrations_db = DB::connection('migrations_db');
+            foreach($params as $data){
+
+
+
+                $records = convertStdClassObjToArray($data);
+                // dd($records);
+
+                //updateRecord('mg_response_to_human_medicines_screening', ['id'=>$records['id']],$records, $user_id, $migrations_db );
+                //dd($res);
+                $migrations_db->table('mg_response_to_human_medicines_screening')->where(['id'=>$records['id']])->update($records);
+
+            }
+
+            $res = array(
+                'success' => true,
+                'message' => 'date successfully updated',
+            );
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    //pick excel sheet form and dump its data to data base
+    public function uploadExcelSheetForHumanMedsScreening(Request $request){
+
+        try {
+            //GETTING DATA FROM THE FIRST SHEET AND SAVING IT TO THE DATA BASE
+            //Step 1 : request file the file from the client side
+            $excelfile = $request->file('excelfile');
+                //Step 2 : get the file name,
+            $excelfilename = $excelfile->getClientOriginalName();
+
+                //Step 3 : create a temporary storage
+            $filestoragepath = storage_path('app');
+            $filecopypath = $excelfile->move($filestoragepath,$excelfilename);
+
+                //Step 4 : loading the file using excel file reader
+            $reader = new ReaderXlsx();
+            //$reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($filecopypath);
+
+
+            $activesheet = $spreadsheet->getSheet(0);
+
+
+
+                //Step 6 : Fetch all the rows
+            $rowswithintheactivesheet = $activesheet->getHighestDataRow();
+            $migrations_db = DB::connection('migrations_db');
+
+            $data_to_be_inserted  = [];
+
+
+            $migrations_db->beginTransaction();
+            DB::beginTransaction();
+            for($row = 2 ; $row <= $rowswithintheactivesheet; $row++)
+            {
+
+
+                $screening_number = ($activesheet->getCell("B{$row}")->getValue() == '' ) ? NULL :$activesheet->getCell("B{$row}")->getValue();
+
+                if($screening_number != ''){
+                    if(!$migrations_db->table('mg_human_medicines_screening')->where('screening_no','=',$screening_number)->exists()){
+
+                        $date_received = ($activesheet->getCell("C{$row}")->getValue() == '' ) ? NULL : $activesheet->getCell("C{$row}")->getFormattedValue();
+
+                        $date_logged_in_rmu = ($activesheet->getCell("D{$row}")->getValue() == '') ? NULL : $activesheet->getCell("D{$row}")->getFormattedValue();
+
+                        $fee_paid = ($activesheet->getCell("E{$row}")->getValue() == '') ? NULL : $activesheet->getCell("E{$row}")->getValue();
+                        $sales_quote = ($activesheet->getCell("F{$row}")->getValue() == '') ? NULL : $activesheet->getCell("F{$row}")->getValue();
+                        $rep_name = ($activesheet->getCell("G{$row}")->getValue() == '') ? NULL : $activesheet->getCell("G{$row}")->getValue();
+                        $rep_email = ($activesheet->getCell("H{$row}")->getValue() == '') ? NULL : $activesheet->getCell("H{$row}")->getValue();
+                        $rep_physical_address = ($activesheet->getCell("I{$row}")->getValue() == '') ? NULL : $activesheet->getCell("I{$row}")->getValue();
+                        $rep_phone = ($activesheet->getCell("J{$row}")->getValue() == '') ? NULL : $activesheet->getCell("J{$row}")->getValue();
+                        $comment = ($activesheet->getCell("K{$row}")->getValue() == '') ? NULL : $activesheet->getCell("K{$row}")->getValue();
+                        $applicant = ($activesheet->getCell("N{$row}")->getValue() == '') ? NULL : $activesheet->getCell("N{$row}")->getValue();
+                        $applicant_email = ($activesheet->getCell("O{$row}")->getValue() == '') ? NULL : $activesheet->getCell("O{$row}")->getValue();
+                        $applicant_physical_address = ($activesheet->getCell("P{$row}")->getValue() == '') ? NULL : $activesheet->getCell("P{$row}")->getValue();
+                        $applicant_telephone_no = ($activesheet->getCell("Q{$row}")->getValue() == '') ? NULL : $activesheet->getCell("Q{$row}")->getValue();
+                        $applicant_country = ($activesheet->getCell("R{$row}")->getValue() == '') ? NULL : $activesheet->getCell("R{$row}")->getValue();
+                        $product_name = ($activesheet->getCell("S{$row}")->getValue() == '') ? NULL : $activesheet->getCell("S{$row}")->getValue();
+                        $common_name = ($activesheet->getCell("T{$row}")->getValue() == '') ? NULL : $activesheet->getCell("T{$row}")->getValue();
+                        $dosage = ($activesheet->getCell("U{$row}")->getValue() == '') ? NULL : $activesheet->getCell("U{$row}")->getValue();
+                        $strength = ($activesheet->getCell("V{$row}")->getValue() == '') ? NULL : $activesheet->getCell("V{$row}")->getValue();
+                        $Route_of_admin = ($activesheet->getCell("W{$row}")->getValue() == '') ? NULL : $activesheet->getCell("W{$row}")->getValue();
+                        $storage_condition = ($activesheet->getCell("X{$row}")->getValue() == '') ? NULL : $activesheet->getCell("X{$row}")->getValue();
+                        $physical_desc = ($activesheet->getCell("Y{$row}")->getValue() == '') ? NULL : $activesheet->getCell("Y{$row}")->getValue();
+                        $Indication = ($activesheet->getCell("Z{$row}")->getValue() == '') ? NULL : $activesheet->getCell("Z{$row}")->getValue();
+                        $shelf_life = ($activesheet->getCell("AA{$row}")->getValue() == '') ? NULL : $activesheet->getCell("AA{$row}")->getValue();
+                        $pack_size = ($activesheet->getCell("AB{$row}")->getValue() == '') ? NULL : $activesheet->getCell("AB{$row}")->getValue();
+                        $country_of_origin = ($activesheet->getCell("AC{$row}")->getValue() == '') ? NULL : $activesheet->getCell("AC{$row}")->getValue();
+                        $manufacturer_name = ($activesheet->getCell("AD{$row}")->getValue() == '') ? NULL : $activesheet->getCell("AD{$row}")->getValue();
+                        $manufacturer_physical_address = ($activesheet->getCell("AE{$row}")->getValue() == '') ? NULL : $activesheet->getCell("AE{$row}")->getValue();
+                        $ingredient = ($activesheet->getCell("AF{$row}")->getValue() == '') ? NULL : $activesheet->getCell("AF{$row}")->getValue();
+                        $closure_container = ($activesheet->getCell("AG{$row}")->getValue() == '') ? NULL : $activesheet->getCell("AG{$row}")->getValue();
+                        
+
+                        // $submitted_by = ($activesheet->getCell("L{$row}")->getValue() == '') ? NULL : $activesheet->getCell("L{$row}")->getValue();
+                        // $logged_by = ($activesheet->getCell("M{$row}")->getValue() == '') ? NULL : $activesheet->getCell("M{$row}")->getValue();
+
+                        // $comments = ($activesheet->getCell("N{$row}")->getValue() == '') ? NULL : $activesheet->getCell("N{$row}")->getValue();
+                        // $allocation_date = ($activesheet->getCell("O{$row}")->getFormattedValue() == '') ? NULL : $activesheet->getCell("O{$row}")->getFormattedValue();
+                        // // // ($allocation_date);
+                        // $assesor = ($activesheet->getCell("P{$row}")->getValue() == '') ? NULL : $activesheet->getCell("P{$row}")->getValue();
+                        // $correspondence = ($activesheet->getCell("Q{$row}")->getFormattedValue() == '') ? NULL : $activesheet->getCell("Q{$row}")->getFormattedValue();
+                        // $time_to_allocate = ($activesheet->getCell("R{$row}")->getCalculatedValue() == '' ) ? NULL : $activesheet->getCell("R{$row}")->getCalculatedValue();
+                        // $total_screening_days = ($activesheet->getCell("S{$row}")->getCalculatedValue() == '') ? NULL :  $activesheet->getCell("S{$row}")->getCalculatedValue();
+                        // $deposit_date = ($activesheet->getCell("T{$row}")->getValue() == '' || $activesheet->getCell("T{$row}")->getValue() ==  'N/A') ? NULL : $activesheet->getCell("T{$row}")->getFormattedValue();
+                        // //dd($deposit_date);
+                        // $letter_ref = ($activesheet->getCell("U{$row}")->getValue() == '') ? NULL : $activesheet->getCell("U{$row}")->getValue();
+
+                        // $date_dispatched_and_acknowledged = ($activesheet->getCell("V{$row}")->getFormattedValue() == '' || $activesheet->getCell("V{$row}")->getFormattedValue() == 'N/A') ? NULL : $activesheet->getCell("V{$row}")->getFormattedValue();
+                        // //dd($date_dispatched_and_acknowledged);
+                        // $results = ($activesheet->getCell("W{$row}")->getValue() == '') ? NULL : $activesheet->getCell("W{$row}")->getValue();
+
+                        // $deadline = ($activesheet->getCell("X{$row}")->getFormattedValue() == '' || $activesheet->getCell("X{$row}")->getFormattedValue() == 'N/A' ) ? NULL : $activesheet->getCell("X{$row}")->getFormattedValue();
+                        // //dd($deadline);
+                        // $assesment_pathway = ($activesheet->getCell("Y{$row}")->getValue() == '' || $activesheet->getCell("Y{$row}")->getValue() == 'N/A' ) ? NULL : $activesheet->getCell("Y{$row}")->getValue();
+
+                        $date_received_converted = strtotime($date_received);
+                        $date_received_fmt = date('Y-m-d',$date_received_converted);
+                        $new_date_received_fmt = ($date_received_fmt == '1970-01-01') ? NULL : $date_received_fmt;
+
+                        $date_logged_in_rmu_converted = strtotime($date_logged_in_rmu);
+                        $date_logged_in_rmu_fmt =   date('Y-m-d',$date_logged_in_rmu_converted);
+                        $new_date_logged_in_rmu_fmt = ($date_logged_in_rmu_fmt == '1970-01-01') ? NULL : $date_logged_in_rmu_fmt;
+
+                        // $allocation_date_converted = strtotime($allocation_date);
+                        // $allocation_date_fmt  = date('Y-m-d', $allocation_date_converted);
+                        // $new_allocation_date_fmt = ($allocation_date_fmt == '1970-01-01') ? NULL : $allocation_date_fmt;
+
+                        // $deposit_date_converted = strtotime($deposit_date);
+                        // $deposit_date_fmt =  date('Y-m-d',$deposit_date_converted);
+                        // $new_deposit_date_fmt = ($deposit_date_fmt == '1970-01-01') ? NULL : $deposit_date_fmt;
+
+                        // $date_dispatched_and_acknowledged_converted = strtotime($date_dispatched_and_acknowledged);
+                        // $date_dispatched_and_acknowledged_fmt =  date('Y-m-d',$date_dispatched_and_acknowledged_converted);
+                        // $new_date_dispatched_and_acknowledged_fmt = ($date_dispatched_and_acknowledged_fmt == '1970-01-01') ? NULL : $date_dispatched_and_acknowledged_fmt;
+
+                        // $deadline_converted = strtotime($deadline);
+                        // $deadline_fmt = date('Y-m-d',$deadline_converted);
+                        // $new_deadline_fmt = ($deadline_fmt == '1970-01-01') ? NULL : $deadline_fmt;
+
+                        // $correspondence_converted = strtotime($correspondence);
+                        // $correspondence_fmt= date('Y-m-d', $correspondence_converted);
+                        // $new_correspondence_fmt = ($correspondence_fmt == '1970-01-01') ? NULL : $correspondence_fmt;
+
+
+                        $data_to_be_inserted [] = [
+
+                            //'id' => $id,
+                            "screening_no" => $screening_number,
+                            "date_received" => $new_date_received_fmt,
+                            "date_logged_in_rmu" => $new_date_logged_in_rmu_fmt,
+                            "fee_paid" => $fee_paid,
+                            "sales_quote" => $sales_quote,
+                            "rep_name" => $rep_name,
+                            "rep_email" => $rep_email,
+                            "rep_phone" => $rep_phone,
+                            "rep_physical_address" => $rep_physical_address,
+                            "applicant_name" => $applicant,
+                            "applicant_email" => $applicant_email,
+                            "applicant_physical_address" => $applicant_physical_address,
+                            "applicant_telephone_no" => $applicant_telephone_no,
+                            "applicant_country" => $applicant_country,
+                            "manufacturer" => $manufacturer_name,
+                            "manufacturer_physical_address" => $manufacturer_physical_address,
+                            "product_name" => $product_name,
+                            "common_name" => $common_name,
+                            "dosage" => $dosage,
+                            "strength" => $strength,
+                            "Route_of_admin" => $Route_of_admin,
+                            "storage_condition" => $storage_condition,
+                            "physical_desc" => $physical_desc,
+                            "indication" => $Indication,
+                            "shelf_life" => $shelf_life,
+                            "pack_size" => $pack_size,
+                            "country_of_origin" => $country_of_origin,
+                            "ingredient" => $ingredient,
+                            "closure_container" => $closure_container,
+                            // "logged_by" => $logged_by,
+                            // "comments" => $comment,
+                            // "allocation_date" => $new_allocation_date_fmt,
+                            // "assesor" => $assesor,
+                            // "time_to_allocation" => $time_to_allocate,
+                            // "total_screening_days" => $total_screening_days,
+                            // "deposit_date" => $new_deposit_date_fmt,
+                            // "letter_ref" => $letter_ref,
+                            // "date_dispatched_and_acknowledged" => $new_date_dispatched_and_acknowledged_fmt,
+                            // "results" => $results,
+                            // "deadline"  => $new_deadline_fmt,
+                            // "assesment_pathway" => $assesment_pathway,
+                            // "correspondence" => $new_correspondence_fmt,
+                        ];
+                    }
+
+                }
+
+            }
+
+            //screening register operations
+            $screening_register_collection = collect($data_to_be_inserted);
+            $screening_register_chunks = $screening_register_collection->chunk(50);
+
+            foreach($screening_register_chunks as $chunk){
+                $migrations_db->table('mg_human_medicines_screening')->insert($chunk->toArray());
+            }
+
+            $res = array(
+                "success" => true,
+                "message" => "Saved Sucessfully",
+                "results" => $data_to_be_inserted
+
+            );
+
+
+
+
+            $migrations_db->commit();
+            DB::commit();
+
+            FacadesFile::delete($filecopypath);
+
+
+        } catch (\Exception $exception) {
+            $migrations_db->rollBack();
+            DB::rollBack();
+
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $migrations_db->rollBack();
+            DB::rollBack();
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+            return \response()->json($res);
+
+
+    }
+    //transer the data to transactional tables
+    public function transferdatatotransactionaltables(Request $request){
+
+        try {
+           $migrations_db = DB::connection('migrations_db');
+
+           DB::beginTransaction();
+
+           $transaction_query = $migrations_db->table('mg_human_medicines_screening')->chunkById(50 , function($screening_register){
+
+            foreach($screening_register as $data){
+
+                //insert product info and get the id
+                //first check if the data has been inserted
+                if(!DB::table('tra_product_applications')->where('tracking_no','=',$data->screening_no)->exists()){
+
+                    //country
+                    if(DB::table('par_countries')->where(['name'=>$data->country_of_origin])->exists()){
+                         $country_of_origin_id = DB::table('par_countries')->where('name','=',$data->country_of_origin)->value('id');
+                    }else{
+                        $country_of_origin_id = 0;
+                    }
+                    //dosage form
+                    if(!DB::table('par_dosage_forms')->where('name','=',$data->dosage)->exists()){
+                        $product_form_id = DB::table('par_dosage_forms')->insertGetId(['name' => $data->dosage, 'is_enabled'=> 1]);
+
+                    }else{
+                        $product_form_id = DB::table('par_dosage_forms')->where('name','=',$data->dosage)->value('id');
+                    }
+                    //par_route_of_administration form
+                    if(!DB::table('par_route_of_administration')->where('name','=',$data->Route_of_admin)->exists()){
+                        $route_of_administration_id = DB::table('par_route_of_administration')->insertGetId(['name' => $data->Route_of_admin, 'is_enabled'=> 1]);
+
+                    }else{
+                        $route_of_administration_id = DB::table('par_route_of_administration')->where('name','=',$data->Route_of_admin)->value('id');
+                    }
+                    //shelf life
+                    $shelf_life = preg_replace('/[^0-9]/', '', $data->shelf_life);
+                    if($shelf_life > 0){
+                        if (strpos($data->shelf_life, 'year') !== false) {
+                            $shelf_life = $shelf_life*12;
+                        }else if (strpos($data->shelf_life, 'day') !== false) {
+                            $shelf_life = $shelf_life/12;
+                        }
+                    }
+                    //local_agent_id
+
+
+                    $product_id = DB::table('tra_product_information')->insertGetId([
+                        "fee_paid" => $data->fee_paid,
+                        "sales_quote" => $data->sales_quote,
+                        "brand_name" => $data->product_name,
+                        "common_name" => $data->common_name,
+                        "strength" => $data->strength,
+                        "storage_condition" => $data->storage_condition,
+                        "physical_description" => $data->physical_desc,
+                        "indications" => $data->indication,
+                        // "submitted_by" => $data->submitted_by,
+                        // "logged_by" => $data->logged_by,
+                        // "comments" => $data->comments, manufacturer_type_id
+                        // "allocation_date" => $data->allocation_date,
+                        // "assesor" => $data->assesor,
+                        // "time_to_allocation" => $data->time_to_allocation,
+                        // "total_screening_days" => $data->total_screening_days,
+                        // "deposit_date" => $data->deposit_date,
+                        "letter_ref" => $data->letter_ref,
+                        "date_dispatched_and_acknowledged" => $data->date_dispatched_and_acknowledged,
+                        "results" => $data->results,
+                        // "deadline"  => $data->deadline,
+                        // "assesment_pathway" => $data->assesment_pathway,
+                        "correspondence" => $data->correspondence,
+
+
+                        'shelf_life' => $shelf_life,
+                        'route_of_administration_id' => $route_of_administration_id,
+                        'country_of_origin_id' => $country_of_origin_id,
+                        'dosage_form_id' => $product_form_id
+
+                    ]);     
+                           
+                     //check if applicant_email exists
+                    if(!DB::table('wb_trader_account')->where('email','=', $data->applicant_email)->exists()){
+                        //get the id of the country of the applicant
+                        if($data->applicant_country == NULL){
+                            $applicant_country_id = NULL;
+                        }
+                        else {
+                            $country = DB::table('par_countries')->where('name','=',$data->applicant_country)->first();
+                            if(isset($country->id)){
+                                $applicant_country_id = $country->id;
+                            }else{
+                                $applicant_country_id = NULL;
+                            }
+                            
+                        }
+                        //get the id of the region
+                        if($data->applicant_region == NULL){
+                            $applicant_region_id = NULL;
+                        }
+                        else{
+                            $region = DB::table('par_regions')->where('name','=',$data->applicant_region)->first();
+                            if(isset($region->id)){
+                                $applicant_region_id = $region->id;
+                            }else{
+                                $applicant_region_id = NULL;
+                            }
+                           
+                        }
+                        //get the trader account type
+
+                        if($data->applicant_trader_account_type == NULL){
+                            //lets fist make the default equate to I
+                            $trader_account_type_id = 1;
+
+                        }else {
+                            // $trader_account_type = DB::table('par_traderaccount_types')->where('name', '=', $data->applicant_trader_account_type)->first();
+                            // $trader_account_type_id = $trader_account_type->id;
+                            $trader_account_type_id = 1;
+                        }
+                        $applicant_id = DB::table('wb_trader_account')->insertGetId([
+                            'name' => $data->applicant_name,
+                            'email' => $data->applicant_email,
+                            'physical_address' => $data->applicant_physical_address,
+                            'country_id' => $applicant_country_id,
+                            'region_id' => $applicant_region_id,
+                            'telephone_no' => $data->applicant_telephone_no,
+                            'postal_address' => $data->applicant_postal_address,
+                            'fax' => $data->applicant_fax,
+                            'website' => $data->applicant_website,
+                            'mobile_no' => $data->applicant_mobile_no,
+                            'identification_no' => $data->applicant_identification_no,
+                            'traderaccount_type_id' => $trader_account_type_id,
+                            'trader_category_id' =>  1,//the category get equated to one i.e Product registrant
+
+
+                        ]);
+                        //dd($applicant_id);
+                    }else {
+                        $applicant = DB::table('wb_trader_account')->where('email','=',$data->applicant_email)->first();
+                        $applicant_id = $applicant->id;
+                        $applicant_country_id =  $applicant->country_id;
+                        $applicant_region_id =  $applicant->region_id;
+                        $trader_account_type_id = 1;
+                    }
+
+
+
+
+                    //Local agent _id
+                    if(!DB::table('wb_trader_account')->where('email','=',$data->rep_email)->exists()){
+                        $local_agent_id = DB::table('wb_trader_account')->insertGetId([
+                            'name' => $data->rep_name,
+                            'email' => $data->rep_email,
+                            'physical_address' => $data->rep_physical_address,
+                            'country_id' => $applicant_country_id,
+                            'region_id' => $applicant_region_id,
+                            'telephone_no' => $data->rep_phone,
+                            'postal_address' => $data->applicant_postal_address,
+                            'mobile_no' => $data->rep_phone,
+                            'traderaccount_type_id' => $trader_account_type_id,
+                            'trader_category_id' =>  1,//the category get equated to one i.e Product registrant
+
+
+                        ]);
+                        //dd($applicant_id);
+                    }else {
+                        $rep = DB::table('wb_trader_account')->where('email','=',$data->rep_email)->first();
+                        $local_agent_id = $rep->id;
+                    }
+                  
+                    //packaging size and closure material
+                            
+                     if(!DB::table('tra_product_packaging')->where(['retail_packaging_size'=>$data->pack_size, 'product_id' => $product_id, 'container_material' => $data->closure_container])->exists()){
+                         DB::table('tra_product_packaging')->insertGetId(['retail_packaging_size' => $data->pack_size, 'product_id'=> $product_id, 'container_material' => $data->closure_container]);
+
+                    }
+                    //ingredients
+                    $ingredient_id = DB::table('par_ingredients_details')->where('name','=',$data->ingredient)->value('id');
+                    if($ingredient_id){
+                       if(!DB::table('tra_product_ingredients')->where(['ingredient_id'=>$ingredient_id, 'product_id' => $product_id])->exists()){
+                             DB::table('tra_product_ingredients')->insertGetId(['ingredient_id' => $ingredient_id, 'product_id'=> $product_id]);
+                        } 
+                    }else{
+                        $ingredient_id = DB::table('par_ingredients_details')->insertGetId(['name' => $data->ingredient]);
+                        DB::table('tra_product_ingredients')->insertGetId(['ingredient_id' => $ingredient_id, 'product_id'=> $product_id]);
+                    }
+                    //manuacturer_id
+                    if(!DB::table('tra_manufacturers_information')->where('name','=',$data->manufacturer)->exists()){
+
+                        //country id
+                        if($data->manufacturer_country == NULL){
+                            $country_id = NULL;
+                        }
+                        else {
+                            $country = DB::table('par_countries')->where('name','=',$data->manufacturer_country)->first();
+                            $country_id = $country->id;
+                        }
+                        //region id
+                        if($data->manufacturer_region == NULL){
+                            $region_id = NULL;
+                        }
+                        else{
+                            $region = DB::table('par_regions')->where('name','=',$data->manufacturer_region)->first();
+                            $region_id = $region->id;
+                        }
+                        //district id
+                        if($data->manufacturer_district == NULL){
+                            $district_id = NULL;
+                        }
+                        else{
+                            $district = DB::table('par_districts')->where('name','=',$data->manufacturer_district)->first();
+                            $district_id = $district->id;
+                        }
+                        $manufacturer_id = DB::table('tra_manufacturers_information')->insertGetId([
+                            'name' => $data->manufacturer,
+                            'email_address' => $data->manufacturer_email,
+                            'physical_address' => $data->manufacturer_physical_address,
+                            'mobile_no' => $data->manufacturer_mobile,
+                            'country_id' => $country_id,
+                            //'manufacturer_type_id' => 1,
+                            'region_id' => $region_id,
+                            'district_id' => $district_id,
+                            'telephone_no' => $data->manufacturer_telephone,
+                            'website' => $data->manufacturer_website,
+                            'tin_no' => $data->manufacturer_tin_no
+
+                        ]);
+                        //dd($applicant_id);
+                    }else {
+                        $manufacturer = DB::table('tra_manufacturers_information')->where('name','=',$data->manufacturer)->first();
+                        $manufacturer_id = $manufacturer->id;
+                    }
+                    //insert product manufacturer
+                    if(!DB::table('tra_product_manufacturers')->where(['manufacturer_id'=>$manufacturer_id, 'product_id' => $product_id])->exists()){
+                         DB::table('tra_product_manufacturers')->insertGetId(['manufacturer_id' => $manufacturer_id, 'product_id'=> $product_id, 'manufacturer_type_id' => 1]);
+
+                    }
+                     //generate application code
+                   $application_code = generateApplicationCode(7,'tra_product_applications');
+                   $view_id = generateApplicationViewID();
+                   
+                    $active_application_id = DB::table('tra_product_applications')->insertGetId([
+                        "date_received" => $data->date_received,
+                        "deposit_date" => $data->deposit_date,
+                        "deadline"  => $data->deadline,
+                        "tracking_no" => $data->screening_no,
+                        "product_id" => $product_id,
+                        "applicant_id" => $applicant_id,
+                        "local_agent_id" => $local_agent_id,
+                        "application_code" => $application_code,
+                        "view_id" => $view_id,
+                        "module_id" => 1,
+                        "sub_module_id" => 7,
+                        "section_id" => 2,
+                        "process_id" => 51 ,
+                        'prodclass_category_id' => 3,
+                        "workflow_stage_id" => 1319,
+                        "is_fast_track" => 2,
+                        "created_on" => Carbon::now()
+                    ]);
+
+                    $submission_params = array(
+                        'application_id' => $active_application_id,
+                        'process_id' => 51,
+                        'application_code' => $application_code,
+                        'prodclass_category_id' => 3,
+                        "tracking_no" => $data->screening_no,
+                        'previous_stage' => 1319,
+                        'current_stage' => 1319,
+                        'module_id' => 1,
+                        'sub_module_id' => 7,
+                        'section_id' => 2,
+                        'application_status_id' => 12,
+                        'urgency' => 1,
+                        'applicant_id' => $applicant_id,
+                        'branch_id' => 1,
+                        'remarks' => $data->comments,
+                        'date_received' => Carbon::now(),
+                        'created_on' => Carbon::now(),
+                        'created_by' => \Auth::user()->id
+                    );
+                    $log = insertRecord('tra_submissions', $submission_params);
+                    if(!$log['success']){
+                        dd($log);
+                    }
+//retail_packaging_size
+                }
+
+
+
+
+
+
+            }
+
+           });
+
+           $res = array(
+            "success" => true,
+            "message" => "Saved Sucessfully",
+            "results" => $transaction_query
+
+        );
+
+        DB::commit();
+
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+
+            DB::rollBack();
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+            return \response()->json($res);
+
+
+    }
+
+    public function uploadExcelSheetForDrugs(Request $request){
+
+        try {
+            //GETTING DATA FROM THE FIRST SHEET
+            $excelfile = $request->file('excelfile');
+                //Step 2 : get the file name,
+            $excelfilename = $excelfile->getClientOriginalName();
+                //Step 3 : create a temporary storage
+            $filestoragepath = storage_path('app');
+            $filecopypath = $excelfile->move($filestoragepath,$excelfilename);
+                //Step 4 : loading the file using excel file reader
+            $reader = new ReaderXlsx();
+            $spreadsheet = $reader->load($filecopypath);
+            $activesheet = $spreadsheet->getSheet(0);
+                //Step 6 : Fetch all the rows
+            $rowswithintheactivesheet = $activesheet->getHighestDataRow();
+            $salt_data = [];
+            $migration_backup_db = DB::connection('migrations_backup_db');
+            //DB::beginTransaction();
+            for($row = 1 ; $row <= $rowswithintheactivesheet ; $row++)
+            {
+                $NextEntry = $this->getNextEntry($activesheet, $row, $rowswithintheactivesheet);
+                $drugname = $activesheet->getCell("A{$row}")->getValue();
+                //insert Drug to register
+
+                if(trim($drugname) != ''){
+                    $controlled_drug_substance_id = $migration_backup_db->table('par_controlled_drugssubstances')->insertGetId(['name'=>$drugname, 'controlleddrug_type_id' => 1]);
+
+                    for ($i=$row; $i <= $NextEntry-1; $i++) {
+                        $saltname = $activesheet->getCell("B{$i}")->getValue();
+                        $saltpercentage = $activesheet->getCell("C{$i}")->getValue();
+                        if($saltname != ''){
+                            $salt_data[] = ['name'=>$saltname, 'controlled_drug_substance_id'=>$controlled_drug_substance_id, 'percentage_within_the_drug' => $saltpercentage];
+                        }
+
+                    }
+                    if(!empty($salt_data)){
+                        $migration_backup_db->table('par_controlleddrugs_basesalts')->insert($salt_data);
+                        $salt_data = [];
+                    }
+                }
+
+            }
+            $res = array(
+                "success" => true,
+                "message" => "Saved Sucessfully"
+
+            );
+            DB::commit();
+
+            FacadesFile::delete($filecopypath);
+
+
+        } catch (\Exception $exception) {
+            ///$migrations_db->rollBack();
+            DB::rollBack();
+            $res = $exception->getMessage();// sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', CLASS), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            //$migrations_db->rollBack();
+            DB::rollBack();
+            $res = $throwable->getMessage(); //sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', CLASS), \Auth::user()->id);
+        }
+            return \response()->json($res);
+    }
+
+    public function getNextEntry($activesheet, $row, $rowswithintheactivesheet){
+        for ($i=$row+1; $i < $rowswithintheactivesheet; $i++) {
+            $drugname = $activesheet->getCell("A{$i}")->getValue();
+
+            if(!empty(trim($drugname))){
+                return $i;
+                break;
+            }
+        }
+    }
+
+
+
+    public function uploadExcelSheetForResponseToHumanMedsScreening(Request $request) {
+
+        try {
+            //GETTING DATA FROM THE FIRST SHEET AND SAVING IT TO THE DATA BASE
+            //Step 1 : request file the file from the client side
+            $excelfile = $request->file('excelfile');
+                //Step 2 : get the file name,
+            $excelfilename = $excelfile->getClientOriginalName();
+
+                //Step 3 : create a temporary storage
+            $filestoragepath = storage_path('app');
+            $filecopypath = $excelfile->move($filestoragepath,$excelfilename);
+
+                //Step 4 : loading the file using excel file reader
+            $reader = new ReaderXlsx();
+            //$reader->setReadDataOnly(FALSE);
+            $spreadsheet = $reader->load($filecopypath);
+
+                //Step 5 get the active sheet whose data we want to capture
+            //$activesheet = $spreadsheet->getSheetByNameOrThrow('RESPONSE TO SCREENING (HUMAN)');
+
+            $activesheet = $spreadsheet->getSheet(1);
+           // $responsetoscreeningsheet = $spreadsheet->getSheet(1);
+
+
+                //Step 6 : Fetch all the rows that contain data
+            $rowswithintheactivesheet = $activesheet->getHighestDataRow();
+            ///$rowswithintheresponsetoscreeningsheet = $responsetoscreeningsheet->getHighestDataRow();
+
+            //Remove this step when you push the changes
+            //DB::table('mg_resopnse_to_human_medicines_screening')->truncate();
+            // $migrations_db = DB::connection('migrations_db');
+            // $migrations_db->beginTransaction)(;)
+            // DB::beginTransaction();
+            $res = array(
+                "success" => true,
+                "message" => "Saved Sucessfully",
+
+
+            );
+            $migrations_db = DB::connection('migrations_db');
+
+            //Step 7 : Dump all the data into the db
+
+            for($row = 2 ; $row < $rowswithintheactivesheet ; $row++)
+            {
+
+                $screening_number = $activesheet->getCell("B{$row}")->getValue();
+                $rmu_ref = $activesheet->getCell("C{$row}")->getValue();
+                $date_received = $activesheet->getCell("D{$row}")->getFormattedValue();
+                // $date_logged_in_rmu = $activesheet->getCell("D{$row}")->getValue();
+                $comments = $activesheet->getCell("N{$row}")->getValue();
+                $correspondence = $activesheet->getCell("Q{$row}")->getFormattedValue();
+                //dd(Carbon::createFromFormat('M/D/Y', $correspondence)->format('M/D/Y'));
+                //$correspondence = $activesheet->getStyle("Q{$row}")->getNumberFormat()->setFormatCode(\PhpOffice\PhpSpreadsheet\Style\NumberFormat::FORMAT_DATE_YYYYMMDDSLASH);
+                //$deposit_date = $activesheet->getCell("R{$row}")->getValue();
+                $letter_ref = $activesheet->getCell("S{$row}")->getValue();
+                //$date_dispatched_and_allocated = $activesheet->getCell("T{$row}")->getValue();
+                $time_to_allocation = $activesheet->getCell("U{$row}")->getValue();
+                $total_screening_days =  $activesheet->getCell("V{$row}")->getValue();
+                $results =  $activesheet->getCell("W{$row}")->getValue();
+                $assesment_pathway =  $activesheet->getCell("X{$row}")->getValue();
+
+                $correspondence_date = Carbon::createFromFormat('l , M j, Y', $correspondence)->format('m-d-Y');
+                $date_received_fmt = Carbon::createFromFormat('l , M j, Y', $date_received)->format('m-d-Y');
+                 // $converted_date_logged_in_rmu = DATE($date_logged_in_rmu);
+                if($rmu_ref != ''){
+                    $migrations_db->table('mg_response_to_human_medicines_screening')->insertGetId([
+
+
+                        //'id' => $id,
+                        "screening_no" => $screening_number,
+                        "rmu_reference" => $rmu_ref,
+                        "date_received" => $date_received_fmt,
+                        // "date_received" => $converted_date_received,
+                        // "date_logged" =>  $converted_date_logged_in_rmu,
+                        "comments" => $comments,
+                        "correspondence" => $correspondence_date,
+                        //"deposit_date" => $deposit_date,
+                        "letter_ref" => $letter_ref,
+                        //"date_dispatched_and_allocated" => $date_dispatched_and_allocated,
+                        "time_to_allocation" => $time_to_allocation,
+                        "total_screening_days" => $total_screening_days,
+                        "results" => $results,
+                        "assesment_pathway" => $assesment_pathway,
+
+                    ]);
+                }
+
+
+                    // if(!validateIsNumeric($result) ){
+                    //     DB::rollBack();
+                    //     return $result;
+                    //     exit();
+
+                    // }
+                }
+            //Part 2 : Updating details
+
+            FacadesFile::delete($filecopypath);
+
+            //DB::commit();
+
+
+        } catch (\Exception $exception) {
+            //DB::rollBack();
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            //DB::rollBack();
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+            return \response()->json($res);
+
+    }
+
+    //COMPLEMENTARY MEDICINES
+
+    //screening
+
+    public function getcomplementarymedicinesscreeningregister(){
+
+        try {
+            $screeningregister = DB::table('mg_complementary_medicines_screening')->get();
+            $res = array(
+                'success' => true,
+                'results' => $screeningregister,
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    //VETETINARY MEDICINES SCREENING
+
+    //fetching the register
+
+    public function getvetinarymedsscreeningregister(){
+
+        try {
+            $screeningregister = DB::table('mg_vetinary_medicines_screening')->get();
+            $res = array(
+                'success' => true,
+                'results' => $screeningregister,
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    //saving the dirty data
+    public function saveDirtyDataForVetinaryMedicinesScreening(Request $request){
+
+        try {
+
+            //fetch the dirty data
+            $dirtyRecords = $request->input('params');
+
+            //dd($dirtyRecords);
+
+            //convet the json data to an array
+            $params = json_decode($dirtyRecords);
+            $user_id = \Auth::user()->id;
+            //dd($params);
+
+            $res = array(
+                'success' => false,
+                'message' => 'no data shared',
+            );
+
+
+            foreach($params as $data){
+
+                $records = convertStdClassObjToArray($data);
+
+
+                $res = updateRecord('mg_vetinary_medicines_screening', ['id'=>$records['id']],$records, $user_id );
+            }
+
+
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+
+
+        return \response()->json($res);
+    }
+
+    //VETINARY MEDICINES VARIATIONS
+
+    //fetch the screening resgister
+
+    public function getvetinarymedicinesvariationsregister(){
+        try {
+            $screeningregister = DB::table('mg_vetinary_medicines_variations')->get();
+            $res = array(
+                'success' => true,
+                'results' => $screeningregister,
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function savedirtydataforvetinarymedicinesvariations(Request $request){
+
+
+        try {
+
+            $dirtyRecords = $request->input('params');
+
+
+            $params = json_decode($dirtyRecords);
+
+            $user_id = \Auth::user()->id;
+            $res = array(
+                'success' => false,
+                'message' => 'no data shared',
+            );
+
+            foreach ($params as $data){
+
+                $records = convertStdClassObjToArray($data);
+
+                $res = updateRecord('mg_vetinary_medicines_variations', ['id'=>$records['id']],$records, $user_id );
+
+            }
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+     public function CleanTables(Request $req)
+    {
+        try{
+            $data = $req->all();
+            $table_list = $data['table_list'];
+            $tableNames= json_decode($table_list);
+            foreach ($tableNames as $name) {
+            $tableNames []= array(
+            'table_list'=> $name,
+                    );
+            $res = DB::table($name)->truncate();
+            }
+        }
+        catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+
+
+        return response()->json($res);
+
+
+
+
+
+
+    }
+
+    //VETIANRY MEDICINES APPLICATIONS
+
+    public function getvetinarymedicinesapplicationsregister(){
+        try {
+            $screeningregister = DB::table('mg_vet_medicines_application')->get();
+            $res = array(
+                'success' => true,
+                'results' => $screeningregister,
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function savedirtydataforvetinarymedicinesapplications(Request $request){
+        try {
+
+            //fetch the dirty data
+            $dirtyRecords = $request->input('params');
+
+            //dd($dirtyRecords);
+
+            //convet the json data to an array
+            $params = json_decode($dirtyRecords);
+            $user_id = \Auth::user()->id;
+            //dd($params);
+
+            $res = array(
+                'success' => false,
+                'message' => 'no data shared',
+            );
+
+
+            foreach($params as $data){
+
+                $records = convertStdClassObjToArray($data);
+
+
+                $res = updateRecord('mg_vet_medicines_application', ['id'=>$records['id']],$records, $user_id );
+            }
+
+
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+
+        return \response()->json($res);
+    }
+
+    //Complementary medicines Applications
+    //REMEMBER TO CREATE A TABLE FOR IT
+    public function getcomplementarymedicinesapplications(){
+
+        try {
+            $screeningregister = DB::table('mg_complementary_medicines_variations')->get();
+            $res = array(
+                'success' => true,
+                'results' => $screeningregister,
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+    }
+
+    //DRUG MASTER FILE
+
+    public function getDrugMasterFileRecord(){
+
+        try {
+            $screeningregister = DB::table('mg_drug_master_file')->get();
+            $res = array(
+                'success' => true,
+                'results' => $screeningregister,
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+
+
+    }
+
+    /* temp migration for medical devices excemptions */
+
+    public function migrateMDexceptions(){
+        try {
+            $migrations_db = DB::connection('mysql');
+
+            DB::beginTransaction();
+
+            $allData = $migrations_db->table('md_excemptions')->get();
+
+                foreach($allData as $data){
+
+                    //insert product info and get the id
+                    //first check if the data has been inserted
+                    if(!DB::table('tra_product_applications')->where('tracking_no','=',$data->Application_Reference_Number)->exists()){
+
+
+                        $product_id = DB::table('tra_product_information')->insertGetId([
+
+                            "brand_name" => $data->Product_Name_,
+                            "model_name" => $data->Model_Name_Number_Brand_Name,
+                            "remarks" => $data->Remarks
+                        ]);
+
+                        //check if applicant_email exists
+
+                        if(!DB::table('wb_trader_account')->where('name','=', $data->Applicant_Name)->exists()){
+
+
+                            $applicant_id = DB::table('wb_trader_account')->insertGetId([
+                                'name' => $data->Applicant_Name,
+                                'physical_address' => $data->Applicant_Address,
+                                'traderaccount_type_id' => 1,
+                                'trader_category_id' =>  1,//the category get equated to one i.e Product registrant
+
+
+                            ]);
+                            //dd($applicant_id);
+                        }else {
+                            $applicant = DB::table('wb_trader_account')->where('name','=',$data->Applicant_Name)->first();
+                            $applicant_id = $applicant->id;
+                        }
+
+
+
+
+
+                        //manuacturer_id
+                        if(!DB::table('tra_manufacturers_information')->where('name','=',$data->Manufacturer_Name)->exists()){
+
+
+                            $manufacturer_id = DB::table('tra_manufacturers_information')->insertGetId([
+                                'name' => $data->Manufacturer_Name,
+                                'physical_address' => $data->Manufacturer_Details
+
+                            ]);
+                            //dd($applicant_id);
+                        }else {
+                            $manufacturer = DB::table('tra_manufacturers_information')->where('name','=',$data->Manufacturer_Name)->first();
+                            $manufacturer_id = $manufacturer->id;
+                        }
+
+                        DB::table('tra_product_applications')->insert([
+                            "tracking_no" => $data->Application_Reference_Number,
+                            "reference_no" => $data->Application_Reference_Number,
+                            "product_id" => $product_id,
+                            "applicant_id" => $applicant_id,
+                            //"manufacturer_id" => $manufacturer_id,
+                            "application_code" => generateApplicationCode(7,'tra_product_applications'),
+                            "module_id" => 1,
+                            "sub_module_id" =>75,
+                            "section_id" => 4,
+                            "process_id" => 56,
+                            "workflow_stage_id" =>524,
+                        ]);
+                    }
+
+
+
+
+
+
+                }
+
+
+            $res = array(
+                "success" => true,
+                "message" => "Saved Sucessfully",
+                "results" => $allData
+
+            );
+
+            DB::commit();
+
+        } catch (\Exception $exception) {
+
+            DB::rollBack();
+
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), '1');
+
+        } catch (\Throwable $throwable) {
+
+            DB::rollBack();
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__),'1');
+        }
+        return \response()->json($res);
+    }
+
+    public function explodeApplicantDetails(){
+        $migrations_db = DB::connection('mysql');
+        $allData = $migrations_db->table('md_excemptions')->get();
+
+        foreach ($allData as $data){
+            $explode_applicant= explode(',', $data->Manufacturer_Details,2);
+            if(count($explode_applicant)>0){
+                //$migrations_db->table('md_excemptions')
+                   // ->where('id', $data->id)
+                    //->update(array('Manufacturer_Name' => $explode_applicant[0]));
+            }
+
+        }
+    }
+}

@@ -1,0 +1,3519 @@
+<?php
+
+namespace Modules\Configurations\Http\Controllers;
+
+use Illuminate\Contracts\Support\Renderable;
+use Illuminate\Http\Request;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Arr;
+
+use PhpOffice\PhpSpreadsheet\Reader\Xlsx as ReaderXlsx;
+use Illuminate\Support\Facades\File as FacadesFile;
+
+class ConfigurationsController extends Controller
+{
+
+    protected $user_id;
+
+    public function __construct(Request $req)
+    {
+        $is_mobile = $req->input('is_mobile');
+        if (is_numeric($is_mobile) && $is_mobile > 0) {
+            $this->user_id = $req->input('user_id');
+        } else {
+            $this->middleware(function ($request, $next) {
+                if (!\Auth::check()) {
+                    $res = array(
+                        'success' => false,
+                        'message' => '<p>NO SESSION, SERVICE NOT ALLOWED!!<br>PLEASE RELOAD THE SYSTEM!!</p>'
+                    );
+                    echo json_encode($res);
+                    exit();
+                }
+                $this->user_id = \Auth::user()->id;
+                return $next($request);
+            });
+        }
+    }
+
+    public function index()
+    {
+        return view('configurations::index');
+    }
+
+    public function saveConfigCommonData(Request $req)
+    {
+        try {
+            $user_id = \Auth::user()->id;
+            $post_data = $req->post();
+            $db_con = 'pgsql';
+            $table_name = $post_data['table_name'];
+            $is_variation = $req->is_variation;
+
+            if (isset($post_data['db_con']) && $post_data['db_con'] != '') {
+                $db_con = $post_data['db_con'];
+            }
+            unset($post_data['db_con']);
+
+            if($table_name == 'tra_element_costs'){
+
+                unset($post_data['section_id']);
+            }
+            //add serial no from last entry
+            if($table_name == 'par_checklist_items'){
+                if(isset($post_data['auto_serial']) && $post_data['auto_serial'] == 1){
+
+                    $items_details = DB::table('par_checklist_items')->count();
+                    $post_data['serial_no'] = $post_data['checklistitem_parent_id'].'.'.$items_details+1;//0.1
+                }
+            }
+            else if($table_name == 'tra_premise_variation_recommendations'){
+                $application_code = $req->application_code;
+                $module_id = $req->module_id;
+                $trans_data = DB::table('tra_submissions as t1')
+                            ->join('wf_workflow_stages as t2', 't1.current_stage', 't2.id')
+                            ->where('application_code', $application_code)
+                            ->where('is_done', 0)
+                            ->orderBy('t1.id', 'DESC')
+                            ->select('t2.stage_category_id')
+                            ->first();
+
+                if(isset($trans_data->stage_category_id)){
+                    $post_data['stage_category_id'] = $trans_data->stage_category_id;
+                }
+            }
+            //application code if its a variation save
+            if(validateIsNumeric($is_variation) && validateIsNumeric($req->premise_id)){
+                $application_code = getSingleRecordColValue('tra_premises_applications', ['premise_id'=> $req->premise_id], 'application_code');
+                $post_data['application_code'] = $application_code;
+            }
+
+            $id = $req->id;
+            $unsetData = $req->input('unset_data');
+            //unset unnecessary values
+            unset($post_data['_token']);
+            unset($post_data['table_name']);
+            unset($post_data['model']);
+            unset($post_data['id']);
+            unset($post_data['unset_data']);
+            unset($post_data['is_variation']);
+            if (isset($unsetData)) {
+                $unsetData = explode(",", $unsetData);
+                $post_data = unsetArrayData($post_data, $unsetData);
+            }
+            $table_data = $post_data;
+            //add extra params
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+            $where = array(
+                'id' => $id
+            );
+            if(validateIsNumeric($is_variation)){
+                $table_name= $table_name.'_variations';
+                
+            }
+            if (validateIsNumeric($id)) {
+
+                if (recordExists($table_name, $where)) {
+                    unset($table_data['created_on']);
+                    unset($table_data['created_by']);
+                    $table_data['dola'] = Carbon::now();
+                    $table_data['altered_by'] = $user_id;
+                    $res = updateRecord($table_name, $where, $table_data);
+                }else{
+                    $res = "Update record not found";
+                }
+            } else {
+
+                $res = insertRecord($table_name, $table_data);
+            }
+        }catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function saveEditedConfigCommonData(Request $request){
+        $request->request->remove('ruleField');
+        return $this->saveConfigCommonData($request);
+
+    }
+    public function saveDocDefinationrequirement(Request $req){
+        try {
+            $user_id = \Auth::user()->id;
+            $post_data = $req->post();
+            $table_name = $post_data['table_name'];
+            $file = $req->file('document_template');
+
+        $document_extension_ids = $req->input('document_extension_ids');
+        $document_extension_ids = json_decode($document_extension_ids);
+            $id = $post_data['id'];
+            $unsetData = $req->input('unset_data');
+            //unset unnecessary values
+            unset($post_data['_token']);
+            unset($post_data['document_template']);
+            unset($post_data['table_name']);
+            unset($post_data['model']);
+            unset($post_data['id']); unset($post_data['document_extension_ids']);
+            unset($post_data['unset_data']);
+            if (isset($unsetData)) {
+                $unsetData = explode(",", $unsetData);
+                $post_data = unsetArrayData($post_data, $unsetData);
+            }
+            $table_data = $post_data;
+            //add extra params
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+            $where = array(
+                'id' => $id
+            );
+            //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
+
+            if (isset($id) && $id != "") {
+                if (recordExists($table_name, $where)) {
+
+                    unset($table_data['created_on']);
+                    unset($table_data['created_by']);
+                    $table_data['dola'] = Carbon::now();
+                    $table_data['altered_by'] = $user_id;
+                    $res = updateRecord($table_name, $where, $table_data);
+                }
+            } else {
+
+                $res = insertRecord($table_name, $table_data);
+
+                $id = $res['record_id'];
+
+            }
+            //save the documetn extension types
+            DB::table('tra_docupload_reqextensions')
+                    ->where('documentupload_requirement_id', $id)
+                    ->delete();
+                if (count($document_extension_ids) > 0) {
+                    foreach ($document_extension_ids as $document_extension_id) {
+                        $params[] = array(
+                            'documentupload_requirement_id' => $id,
+                            'document_extensionstype_id' => $document_extension_id,
+                            'created_on' => Carbon::now(),
+                            'created_by' => \Auth::user()->id
+                        );
+                    }
+                    insertMultipleRecords('tra_docupload_reqextensions', $params);
+                }
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+        //
+
+
+
+        //
+
+    }
+    function uploadDocumentRequirementTemplate($req,$params){
+        $file = $req->file('document_template');
+        $user_id = $this->user_id;
+        if ($req->hasFile('document_template')) {
+
+            $origFileName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $fileSize = $file->getClientSize();
+
+            $origFileName = $file->getClientOriginalName();
+            $extension = $file->getClientOriginalExtension();
+            $fileSize = $file->getClientSize();
+            //$folder = '\resources\uploads';
+            $document_root = $_SERVER['DOCUMENT_ROOT'];
+
+            $upload_directory =     $document_root.'/'.Config('constants.dms.system_uploaddirectory');
+
+            $folder = 'document_requirements';
+
+            $destination = $upload_directory.$folder;
+
+            $savedName = str_random(5) . time() . '.' . $extension;
+
+            if($file->move($destination, $savedName)){
+                    $document_root = $_SERVER['DOCUMENT_ROOT'];
+                    // resize image to fixed size
+
+                    $params['initial_file_name'] = $origFileName;
+                    $params['file_name'] = $savedName;
+                    $params['file_size'] = formatBytes($fileSize);
+                    $params['filetype'] = $extension;
+                    $params['document_folder'] = $folder;
+                    $params['created_on'] = Carbon::now();
+                    $params['created_by'] = $user_id;
+                    $params['uploaded_on'] = Carbon::now();
+                    $params['uploaded_by'] = $user_id;
+
+            }
+
+    }
+    return $params;
+    }
+    public function saveSystemModuleData(Request $req)
+    {
+        try {
+            $user_id = \Auth::user()->id;
+            $post_data = $req->post();
+            $table_name = 'par_modules';
+            $id = $post_data['id'];
+            $unsetData = $req->input('unset_data');
+            //unset unnecessary values
+            unset($post_data['_token']);
+            unset($post_data['model']);
+            unset($post_data['id']);
+            unset($post_data['unset_data']);
+
+            if (isset($unsetData)) {
+                $unsetData = explode(",", $unsetData);
+                $post_data = unsetArrayData($post_data, $unsetData);
+            }
+            $table_data = $post_data;
+            //add extra params
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+            $where = array(
+                'id' => $id
+            );
+            if (isset($id) && $id != "") {
+                if (recordExists($table_name, $where)) {
+                    unset($table_data['created_on']);
+                    unset($table_data['created_by']);
+                    $table_data['dola'] = Carbon::now();
+                    $table_data['altered_by'] = $user_id;
+
+                    $res = updateRecord($table_name, $where, $table_data);
+                }
+            } else {
+                $res = insertRecord($table_name, $table_data);
+            }
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function getConfigParamFromModel(Request $request)
+    {
+        $model_name = $request->input('model_name');
+        $strict_mode = $request->input('strict_mode');
+        try {
+            $model = 'App\\Modules\\Configurations\\Entities\\' . $model_name;
+            if (isset($strict_mode) && $strict_mode == 1) {
+                $results = $model::where('is_enabled', 1)
+                    ->get()
+                    ->toArray();
+            } else {
+                $results = $model::all()
+                    ->toArray();
+            }
+            //$results = decryptArray($results);
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function getChecklistTypes(Request $request)
+    {
+        $checklist_category = $request->input('checklist_category');
+        $module_id = $request->input('module_id');
+        $sub_module_id = $request->input('sub_module_id');
+        $section_id = $request->input('section_id');
+        try {
+            $qry = DB::table('par_checklist_types as t1')
+                ->join('par_checklist_categories as t2', 't1.checklist_category_id', '=', 't2.id')
+                ->join('par_modules as t3', 't1.module_id', '=', 't3.id')
+                ->join('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
+                ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
+                ->leftJoin('par_device_types as t6', 't1.device_type_id', '=', 't6.id')
+                ->select('t1.*', 't2.name as category_name', 't3.name as module', 't4.name as sub_module', 't5.name as section', 't6.name as device_type_name');
+            if (isset($checklist_category) && $checklist_category != '') {
+                $qry->where('t1.checklist_category_id', $checklist_category);
+            }
+            if (isset($module_id) && $module_id != '') {
+                $qry->where('t1.module_id', $module_id);
+            }
+            if (isset($sub_module_id) && $sub_module_id != '') {
+                $qry->where('t1.sub_module_id', $sub_module_id);
+            }
+            if (isset($section_id) && $section_id != '') {
+                $qry->where('t1.section_id', $section_id);
+            }
+            $results = $qry->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+   
+    public function getChecklistItems(Request $request)
+    {
+        $checklist_type = $request->input('checklist_type');
+        $checklist_category_id = $request->input('checklist_category_id');
+        $checklist_type_id = $request->input('checklist_type_id');
+        try {
+            $qry = DB::table('par_checklist_items as t1')
+                ->join('par_checklist_types as t2', 't1.checklist_type_id', '=', 't2.id')
+                ->select('t1.*', 't2.name as type_name','t2.checklist_category_id');
+            if (isset($checklist_type) && $checklist_type != '') {
+                $qry->where('t1.checklist_type_id', $checklist_type);
+            }
+            if(validateIsNumeric($checklist_category_id)){
+                $qry->where('t2.checklist_category_id', $checklist_category_id);
+            }
+            $results = $qry->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function deleteConfigRecord(Request $req)
+    {
+        try {
+            $record_id = $req->input('id');
+            $table_name = $req->input('table_name');
+            $user_id = \Auth::user()->id;
+            $where = array(
+                'id' => $record_id
+            );
+            $res = deleteRecord($table_name, $where, $user_id);
+            if($res['success']){
+                if($table_name == 'par_formfield_designs'){
+                    DB::table('par_formfield_relations')->where('form_fielddesign_id', $record_id)->orWhere('parent_field_id', $record_id)->delete();
+                }
+            }
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+           $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function softDeleteConfigRecord(Request $req)
+    {
+        try {
+            $record_id = $req->input('id');
+            $table_name = $req->input('table_name');
+            $user_id = \Auth::user()->id;
+            $where = array(
+                'id' => $record_id
+            );
+            $res = softDeleteRecord($table_name, $where, $user_id);
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function undoConfigSoftDeletes(Request $req)
+    {
+        try {
+            $record_id = $req->input('id');
+            $table_name = $req->input('table_name');
+            $user_id = \Auth::user()->id;
+            $where = array(
+                'id' => $record_id
+            );
+            $previous_data = getPreviousRecords($table_name, $where);
+            if ($previous_data['success'] == false) {
+                return $previous_data;
+            }
+            $previous_data = $previous_data['results'];
+            $res = undoSoftDeletes($table_name, $previous_data, $where, $user_id);
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function getAllApplicationStatuses(Request $request)
+    {
+        $module_id = $request->input('module_id');
+        try {
+            $qry = DB::table('par_application_statuses as t1')
+                ->join('par_modules as t2', 't1.module_id', '=', 't2.id')
+                ->leftJoin('par_sub_modules as t3', 't1.sub_module_id', '=', 't3.id')
+                ->leftJoin('par_confirmations as t4', 't1.status', '=', 't4.id')
+                ->leftjoin('par_system_statuses as t5', 't1.status_id', '=', 't5.id')
+                ->select('t1.*', 't5.name as status_name', 't2.name as module_name', 't4.name as is_initial','t3.name as sub_module_name');
+            if (validateIsNumeric($module_id)) {
+                $qry->where('t1.module_id', $module_id);
+            }
+            $results = $qry->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => returnMessage($results)
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getPortalAppsInitialStatuses(Request $request)
+    {
+        $module_id = $request->input('module_id');
+        try {
+            $qry = DB::table('par_portalapps_initialmis_statuses as t1')
+                ->join('par_modules as t2', 't1.module_id', '=', 't2.id')
+                //->leftJoin('par_sub_modules as t3', 't1.sub_module_id', '=', 't3.id')
+                ->join('par_system_statuses as t5', 't1.status_id', '=', 't5.id')
+                ->select('t1.*', 't5.name as status_name', 't2.name as module_name');
+            if (validateIsNumeric($module_id)) {
+                $qry->where('t1.module_id', $module_id);
+            }
+            $results = $qry->get();
+            foreach ($results as $key => $result) {
+                $results[$key]->portal_status_type = getSingleRecordColValue('wb_statuses_types', array('id' => $result->portal_statustype_id), 'name', 'portal_db');
+            }
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => returnMessage($results)
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getAlterationParameters()
+    {
+        try {
+            $qry = DB::table('par_alteration_setup as t1')
+                ->join('par_confirmations as t2', 't1.is_form_tied', '=', 't2.id')
+                ->leftJoin('par_key_forms as t3', 't1.form_id', '=', 't3.id')
+                ->join('par_modules as t4', 't1.module_id', '=', 't4.id')
+                ->select('t1.*', 't2.name as form_specific', 't3.name as form_name', 't4.name as module_name');
+            $results = $qry->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    public function getNonrefParameter(Request $req)
+    {
+        try {
+
+            $table_name = $req->table_name . ' as t1';
+
+            $qry = DB::table($table_name)
+                ->select('t1.*');
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+
+    public function getPayingCurrency(Request $req)
+    {
+        try {
+
+            $table_name = $req->table_name . ' as t1';
+
+            $qry = DB::table($table_name)
+                ->select('t1.*')
+                ->where('is_paying_currency', 1);
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    //function to fetch the registration conditions details
+    public function getRegistrationApplicationParameters(Request $req)
+    {
+        try {
+
+            $filters = $req->input('filters');
+            $table_name = $req->table_name . ' as t1';
+
+            if($req->table_name == 'par_product_classificationrules'){
+
+
+                $qry = DB::table($table_name);
+
+                $qry->join('par_classification_rules as t2', 't1.class_rule_id','=','t2.id')
+                                    ->select('t1.*', 't2.name as class_rule', 't2.description as rule_description');
+                                    if ($filters != '') {
+                                        $filters = (array)json_decode($filters);
+                                        $device_type_id = $filters['device_type_id'];
+                                        unset($filters['device_type_id']);
+                                        $results = $qry->where($filters)->where('t1.device_type_id',$device_type_id);
+
+                                    }
+            }
+            else{
+                $qry = DB::table($table_name)
+                             ->select('t1.*');
+                             if ($filters != '') {
+                                $filters = (array)json_decode($filters);
+                                $results = $qry->where($filters);
+
+                            }
+            }
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    //function to retrieve the certification conditions
+    public function getCertificateConditionsApplicationParameters(Request $req)
+    {
+        try {
+
+            $filters = $req->input('filters');
+            $table_name = $req->table_name . ' as t1';
+
+            $qry = DB::table($table_name)
+                ->join('par_sections as t2', 't1.section_id', '=', 't2.id')
+                ->join('par_sub_modules as t3', 'sub_module_id', '=', 't3.id')
+                ->join('par_modules as t4', 't1.module_id', '=', 't4.id')
+                ->join('par_document_types as t5', 't1.document_type_id', '=', 't5.id')
+                ->join('tra_registration_regulations as t6', 't1.regulation_id', '=', 't6.id')
+                ->select('t1.*', 't2.name as section_name', 't3.NAME as sub_module_name', 't4.NAME as module_name', 't5.NAME as document_name', 't6.name as regulation_name');
+
+            if ($filters != '') {
+                $filters = (array)json_decode($filters);
+                $results = $qry->where($filters);
+            }
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getGenericNamesAtcCodes(Request $req)
+    {
+        try {
+            $filters = $req->filters;
+            $common_name_id = $req->common_name_id;
+
+            $qry = DB::table('par_atc_codes as t1')
+                ->select('t1.*')
+                ->where('common_name_id', $common_name_id);
+
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+
+    }
+
+    public function getproductApplicationParameters(Request $req)
+    {
+        try {
+            $filters = $req->filters;
+            $table_name = $req->table_name . ' as t1';
+
+            if ($req->table_name == 'par_common_names') {
+                $qry = DB::table($table_name)
+                    ->leftJoin('par_sections as t2', 't1.section_id', '=', 't2.id')
+                    ->leftJoin('par_atc_codes as t3', 't1.atc_code_id', '=', 't3.id')
+                    ->select('t1.*', 't2.name as section_name', 't3.name as atc_code', 't3.description as atc_code_description');
+
+
+            } else if ($req->table_name == 'par_classifications') {
+                $qry = DB::table($table_name)
+                    ->leftJoin('par_sections as t2', 't1.section_id', '=', 't2.id')
+                    ->leftJoin('par_prodclass_categories as t3', 't1.prodclass_category_id', '=', 't3.id')
+                    ->leftJoin('par_cost_categories as t4','t1.cost_category_id','t4.id')
+                    ->select('t1.*', 't2.name as section_name', 't3.name as product_class_category_name','t4.name as cost_category_name');
+            }else if ($req->table_name == 'par_business_types') {
+                $qry = DB::table($table_name)
+                    ->leftJoin('par_sections as t2', 't1.section_id', '=', 't2.id')
+                    ->leftJoin('par_businesstype_categories as t3', 't1.business_typecategory_id', '=', 't3.id')
+                    ->select('t1.*', 't2.name as section_name', 't3.name as business_typecategory_name');
+            }
+             else {
+
+                $qry = DB::table($table_name)
+                    ->leftJoin('par_sections as t2', 't1.section_id', '=', 't2.id')
+                    ->select('t1.*', 't2.name as section_name');
+
+
+            }
+            if ($req->table_name == 'par_classifications') {
+                if ($filters != '') {
+                    $section_id = 2;
+                    $filters = (array)json_decode($filters);
+                    if($filters['section_id']){
+
+                        $section_id = $filters['section_id'];
+                       // unset($filters['section_id']);
+                       // $filters['t1.section_id'] =  $section_id;
+
+                    }
+                    unset($filters['section_id']);
+                        $filters['t1.section_id'] =  $section_id;
+                    $results = $qry->where($filters);
+                }
+            }
+            else if($req->table_name == 'par_common_names'){
+                if ($filters != '') {
+                    $filters = (array)json_decode($filters);
+                    if($filters['section_id']){
+
+                        $section_id = $filters['section_id'];
+                       // unset($filters['section_id']);
+                       // $filters['t1.section_id'] =  $section_id;
+
+                    }
+                    unset($filters['section_id']);
+                        $filters['t1.section_id'] =  $section_id;
+                    $results = $qry->where($filters);
+                }
+            }
+            else  if ($filters != '') {
+                $filters = (array)json_decode($filters);
+                $results = $qry->where($filters);
+            }
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getConfigParamFromTable(Request $req)
+    {
+        try {
+            $filters = $req->filters;
+            $is_config = $req->is_config;
+            $table_name = $req->table_name;
+            $qry = DB::table($table_name. ' as t1');
+
+            //conditional selection based on table
+            if($table_name == 'par_form_categories'){
+                $qry->Join('par_modules as t4','t1.module_id','=','t4.id')
+                    ->Join('par_sub_modules as t5','t1.sub_module_id','=','t5.id')
+                    ->leftJoin('par_sections as t6','t1.section_id','=','t6.id')
+                    ->leftJoin('par_prodclass_categories as t7','t1.prodclass_category_id','=','t7.id')
+                    ->leftJoin('par_premises_types as t8','t1.premise_type_id','=','t8.id')
+                    ->select('t1.*', 't4.name as module_name', 't5.name as sub_module_name', 't6.name as section_name', 't7.name as section_category', 't8.name as premise_type');
+            }
+            else if($table_name== 'par_maindetails_variation_points'){
+                $qry->Join('par_modules as t4','t1.module_id','=','t4.id')
+                ->Join('par_sub_modules as t5','t1.sub_module_id','=','t5.id')
+                ->leftJoin('par_sections as t6','t1.section_id','=','t6.id')
+                ->leftJoin('par_prodclass_categories as t7','t1.prodclass_category_id','=','t7.id')
+                ->leftJoin('par_premises_types as t8','t1.premise_type_id','=','t8.id')
+                ->leftJoin('par_typeof_variations as t9','t1.variationtype_id','=','t9.id')
+                ->leftJoin('par_form_categories as t10','t1.form_categories_id','=','t10.id')
+                ->leftJoin('par_formfield_designs as t11','t1.form_fields_id','=','t11.id')
+                ->select('t1.*', 't4.name as module_name', 't5.name as sub_module_name', 't6.name as section_name', 't7.name as section_category', 't8.name as premise_type','t9.name as variation_type','t10.name as form_name','t11.field_name as field_name');
+            }
+            else if($table_name == 'par_formtype_fields'){
+                $qry->Join('par_formfield_designs as t4','t1.field_id','=','t4.id')
+                    ->select('t1.*', 't4.label as field_name', 't4.label');
+                //order
+                $qry->orderBy('order_no', 'ASC');
+            }
+            else if($table_name == 'par_formfield_designs'){
+                $qry->Join('par_form_field_types as t5','t1.form_field_type_id','=','t5.id')
+                    ->select('t1.*', 't5.name as field_type');
+            }
+            else if($table_name == 'tra_otherstates_productgmpinspections'){
+                $qry->Join('par_continent_regions as t5','t1.continent_region_id','=','t5.id')
+                    ->Join('par_countries as t6','t1.country_id','=','t6.id')
+                    ->select('t1.*', 't5.name as continent_region', 't6.name as country');
+
+            } else if($table_name == 'tra_variation_requests'){
+               
+                $qry->Join('par_typeof_variations as t5','t1.variation_type_id','=','t5.id')
+                    ->select('t1.*', 't5.name as variation_type');
+                if(validateIsNumeric($req->application_code)){
+                    $qry->where('application_code', $req->application_code);
+                }else{
+                    $qry->whereRaw("0=1");
+                }
+            }
+
+            else if($table_name == 'tra_product_ingredients'){
+                $qry->Join('par_ingredients_details as t5','t1.ingredient_id','=','t5.id')
+                    ->leftjoin('par_inclusions_reasons as t6','t1.inclusion_reason_id','=','t6.id')
+                    ->select('t1.*', 't5.name as ingredient_name', 't1.ingredient_id as active_ingredient_id');
+                if(validateIsNumeric($req->is_active_reason)){
+                    $qry->where('is_active_reason', 1);
+                }
+            }
+            else if($table_name == 'par_ageanalysisdays_span'){
+                $qry->leftjoin('par_modules as t2', 't1.module_id','t2.id')
+                ->select('t1.*','t2.name as module_name') ;
+
+            }
+            else if ($table_name == 'tra_element_costs') {
+                    $qry->leftJoin('par_cost_elements as t3','t1.element_id','=','t3.id')
+                        ->leftJoin('par_currencies as t4','t1.currency_id','=','t4.id')
+                        ->select('t1.*','t3.name as name','t4.name as currency_name');
+
+                }
+            else if ($table_name == 'tra_pharmacy_details') {
+                    $qry->leftJoin('par_regions as t3','t1.region_id','=','t3.id')
+                        ->leftJoin('par_districts as t4','t1.district_id','=','t4.id')
+                        //->leftJoin('par_cities as t5','t1.sub_district_id','=','t5.id')
+                        ->select('t1.*','t3.name as region','t4.name as district');
+
+                }
+            else if ($table_name == 'tra_personnel_qualifications') {
+                    $qry->leftJoin('par_qualifications as t3','t1.qualification_id','=','t3.id')
+                        ->select('t1.*','t3.name as qualification');
+
+                }
+            else if($table_name == 'tra_personnel_information'){
+                    $qry->leftJoin('par_regions as t3','t1.region_id','=','t3.id')
+                        ->leftJoin('par_districts as t4', 't1.district_id', 't4.id')
+                        ->select('t1.*','t1.id as personnel_id','t3.name as region', 't4.name as district');
+                }
+            else if($table_name == 'par_study_sites'){
+                    $qry->leftJoin('par_countries as t6','t1.country_id','=','t6.id')
+                        ->leftJoin('par_regions as t3','t1.region_id','=','t3.id')
+                        ->leftJoin('par_districts as t4', 't1.district_id', 't4.id')
+                        ->select('t1.*','t6.name as country','t3.name as region', 't4.name as district');
+                }
+                else if($table_name == 'par_exceluploads_config'){
+                    $qry->leftjoin('par_modules as t2', 't1.module_id','t2.id')
+                         ->leftjoin('par_sub_modules as t3', 't1.sub_module_id','t3.id')
+                        ->leftJoin('par_adr_types as t4','t1.adrtype_id','=','t4.id')
+                        ->leftJoin('par_exceluploads_config_type as t5','t1.excel_config_type_id','=','t5.id')
+                        ->select('t1.*','t5.name as type_name','t2.name as module_name','t3.name as sub_module_name','t4.name as adr_type' );
+                }
+                else if($table_name == 'tra_impdistributor_details'){
+                    $qry->join('wb_trader_account as t2', 't1.importer_id','t2.id')
+                        ->leftjoin('par_countries as t3', 't2.country_id','t3.id')
+                        ->leftJoin('par_regions as t4','t2.region_id','=','t4.id')
+                        ->leftJoin('par_districts as t5','t2.district_id','=','t5.id')
+                        ->select('t1.*', 't2.*', 't3.name as country', 't4.name as region', 't5.name as district', 't2.id as importer_id', 't2.name as applicant_name', 't2.country_id as app_country_id', 't2.region_id as app_region_id', 't2.district_id as app_district_id', 't2.physical_address as app_physical_address', 't2.postal_address as app_postal_address', 't2.telephone_no as app_telephone', 't2.email as app_email');
+                }
+                // else if($table_name == 'par_medical_device_assesment_answers'){
+                //     $qry->get();
+                // }
+
+            //filters for product related data
+            $product_id= $req->product_id;
+            if(validateIsNumeric($product_id)){
+                $qry->where('product_id', $product_id);
+            }
+            if ($filters != '') {
+                $filters = (array)json_decode($filters);
+                $filters = array_filter($filters);
+
+                //load regions for the local country
+                if($table_name == 'par_regions' && isset($filters['is_local'])){
+                    $qry->join('par_countries as t7', 't1.country_id', 't7.id')->select('t1.*');
+                }
+                //get data
+                $results = $qry->where($filters);
+                // if($table_name == 'par_classifications' && isset($filters['prodclass_category_id'])){
+                //     $qry->leftJoin('par_prodcat_classifications as t2','t1.id', 't2.classification_id')
+                //         ->select('t1.*')
+                //         ->where('t2.prodclass_category_id', $filters['prodclass_category_id']);
+                // }
+
+                // else{
+                //     $results = $qry->where($filters);tra_impdistributor_details
+                // }
+            }
+            if($table_name == 'par_sections'){
+                //$qry->whereIn('id',[2,4, 7]);
+            }
+
+
+
+            if(!validateIsnumeric($is_config)){
+                $qry->where('t1.is_enabled', 1);
+            }
+            $comboFilter = $req->comboFilter;
+            if($comboFilter != ''){
+               $qry->where('t1.code', 'like', '%' . $comboFilter . '%');
+            }
+            // //paginate 
+            $total=$qry->count();
+            $start=$req->start;
+            $limit=$req->limit;
+            if(isset($start)&&isset($limit) && $table_name == 'par_gmdn_codes'){
+                $results = $qry->skip($start)->take($limit)->get();
+             }
+            else{
+                $results=$qry->get();
+             }
+
+            //$results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'total' => $total,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getproductGeneraicNameParameters(Request $req)
+    {
+        try {
+            $filters = $req->filters;
+
+
+            $table_name = $req->table_name . ' as t1';
+
+            $qry = DB::table($table_name)
+                ->join('par_sections as t2', 't1.section_id', '=', 't2.id')
+                ->leftJoin('par_atc_codes as t3', 't1.atc_code_id', '=', 't3.id')
+                ->select('t1.*', 't3.name as atc_code', 't3.description as atc_code_description', 't2.name as section_name');
+
+            if ($filters != '') {
+                $filters = (array)json_decode($filters);
+                $section_id = $filters['section_id'];
+
+                $results = $qry->where(array('t1.section_id' => $section_id));
+            }
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getVariationCategoriesParameters(Request $req)
+    {
+
+        try {
+            $filters = $req->filters;
+
+            $variation_type_id = $req->variation_type_id;
+            $table_name = $req->table_name . ' as t1';
+
+            $qry = DB::table($table_name)
+                ->join('par_typeof_variations as t2', 't1.variation_type_id', '=', 't2.id')
+                ->join('par_modules as t3', 't1.module_id', '=', 't3.id')
+                ->join('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
+                ->join('par_sections as t5', 't1.section_id', '=', 't5.id')
+                ->select('t1.*', 't2.name as type_of_variation', 't3.name as module_name', 't4.name as sub_module_name', 't5.name as section_name');
+
+            if (validateIsNumeric($variation_type_id)) {
+                $results = $qry->where(array('t1.variation_type_id' => $variation_type_id));
+            }
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+    }
+
+    public function getsystemSubModules(Request $req)
+    {
+        try {
+            $filters = $req->input('filters');
+            $module_id = $req->input('module_id');
+            $table_name = $req->input('table_name') . ' as t1';
+
+            $qry = DB::table($table_name)
+                ->join('par_modules as t2', 't1.module_id', '=', 't2.id')
+                ->select(DB::raw("t1.*,t2.name as module_name"));
+
+            if ($filters != '') {
+                $filters = (array)json_decode($filters);
+                $module_id = $filters['module_id'];
+                $qry->where(array('t1.module_id' => $module_id));
+            }
+            if (validateIsnumeric($module_id)) {
+                $qry->where(array('t1.module_id' => $module_id));
+            }
+            $results = $qry->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+    }
+
+    public function getRefnumbersformats(Request $req)
+    {
+        try {
+            $table_name = 'refnumbers_formats as t1';
+            $qry = DB::table($table_name)
+                ->leftJoin('referencenumbers_types as t2', 't1.refnumbers_type_id', '=', 't2.id')
+                ->select('t1.*', 't2.name as refnumbers_type_name');
+            $results = $qry->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+    }
+
+    public function getregistrationexpirytime_span(Request $req)
+    {
+        try {
+            $filters = $req->input('filters');
+            $table_name = 'par_registration_expirytime_span as t1';
+
+            $qry = DB::table($table_name)
+                ->leftJoin('par_modules as t2', 't1.module_id', '=', 't2.id')
+                ->leftJoin('par_sub_modules as t3', 't1.sub_module_id', '=', 't3.id')
+                ->leftJoin('par_sections as t4', 't1.section_id', '=', 't4.id')
+                ->leftJoin('par_timespan_defination as t5', 't1.timespan_defination_id', '=', 't5.id')
+                ->select('t1.*', 't2.name as module_name', 't3.name as sub_module_name', 't4.name as section_name', 't5.name as timespan_defination');
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+    }
+
+    public function getsystemModules(Request $req)
+    {
+        try {
+            $filters = $req->filters;
+
+            $table_name = $req->table_name . ' as t1';
+
+            $qry = DB::table($table_name)
+                ->select('t1.*');
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+    }
+
+    public function getproductSubCategoryParameters(Request $req)
+    {
+        try {
+            $table_name = $req->table_name . ' as t1';
+
+            $qry = DB::table($table_name)
+                ->join('par_prodclass_categories as t3', 't1.prodclass_category_id', '=', 't3.id')
+                ->select('t1.*', 't3.name as product_category');
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getSubmoduleRefFormats(Request $request)
+    {
+        try {
+            $sub_module_id = $request->input('sub_module_id');
+            $qry = DB::table('tra_submodule_referenceformats as t1')
+                ->join('par_sub_modules as t2', 't1.sub_module_id', '=', 't2.id')
+                ->join('referencenumbers_types as t3', 't1.reference_type_id', '=', 't3.id')
+                ->join('refnumbers_formats as t4', 't1.reference_format_id', '=', 't4.id')
+                ->join('par_modules as t5', 't1.module_id', '=', 't5.id')
+                ->select(DB::raw("t1.*,t2.name as sub_module,t3.name as reference_type,t5.name as module,
+                                 CONCAT(t4.name,' (',t4.ref_format,')') as ref_format"));
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getFormFields(Request $request)
+    {
+        try {
+            $filters = $request->filters;
+            $qry = DB::table('par_form_categories as t1')
+                ->leftjoin('par_formtype_fields as t2', 't1.id', '=', 't2.form_category_id')
+                ->leftjoin('par_formfield_designs as t3', 't2.field_id', '=', 't3.id')
+                ->select(DB::raw("t3.*"));
+            $results = $qry->get();
+            if ($filters != '') {
+                $filters = (array)json_decode($filters);
+                $form_category_id = $filters['form_category_id'];
+                $res= $qry->where(array('t2.form_category_id' => $form_category_id));
+              $results=$res->get();
+            }
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    // public function getExcelConfigcolumns(Request $request)
+    // {
+    //     try {
+    //         $filters = $request->filters;
+    //         $qry = DB::table('par_exceluploads_config_type as t1')
+    //             ->leftjoin('par_formtype_fields as t2', 't1.id', '=', 't2.form_category_id')
+    //             ->select(DB::raw("t3.*"));
+    //         $results = $qry->get();
+    //         if ($filters != '') {
+    //             $filters = (array)json_decode($filters);
+    //             $form_category_id = $filters['form_category_id'];
+    //             $res= $qry->where(array('t2.form_category_id' => $form_category_id));
+    //           $results=$res->get();
+    //         }
+    //         $res = array(
+    //             'success' => true,
+    //             'results' => $results,
+    //             'message' => 'All is well'
+    //         );
+    //     } catch (\Exception $exception) {
+    //         $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+    //     } catch (\Throwable $throwable) {
+    //         $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+    //     }
+    //     return \response()->json($res);
+    // }
+    public function getApplicationSections(Request $request)
+    {
+        try {
+            $qry = DB::table('par_application_sections as t1')
+                ->join('par_sub_modules as t2', 't1.sub_module_id', '=', 't2.id')
+                ->join('par_modules as t3', 't1.module_id', '=', 't3.id')
+                ->leftJoin('par_sections as t4', 't1.section_id', '=', 't4.id')
+                ->select(DB::raw("t1.*,t2.name as sub_module,t3.name as module,t4.name as section_name"));
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getUnstructuredQueryChecklistItem(Request $request)
+    {
+
+        $filters = $request->input('filters');
+        $filters = (array)json_decode($filters);
+
+        try {
+
+            $qry = DB::table('par_checklist_items as t1')
+                ->join('par_checklist_types as t2', 't1.checklist_type_id', '=', 't2.id')
+                ->join('par_checklist_categories as t3', 't2.checklist_category_id', '=', 't3.id')
+                ->select(DB::raw(" t1.*, t2.name as checklist_type, t3.name as checklist_category"));
+            if (count((array)$filters) > 0) {
+                $qry->where($filters);
+            }
+
+            $qry->where(array('is_query' => 1));
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getUnstructuredQueryChecklistTypes(Request $request)
+    {
+
+        $filters = $request->input('filters');
+        $filters = (array)json_decode($filters);
+
+        try {
+
+            $qry = DB::table('par_checklist_types as t2')
+                ->join('par_checklist_categories as t3', 't2.checklist_category_id', '=', 't3.id')
+                ->select(DB::raw(" t2.*"));
+            if (count((array)$filters) > 0) {
+                $qry->where($filters);
+            }
+
+            $qry->where(array('is_query' => 1));
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getPersonnelDetails(Request $request)
+    {
+        $table_name = $request->table_name;
+        try {
+            $qry = DB::table($table_name . ' as t1')
+                ->join('par_countries as t2', 't1.country_id', 't2.id')
+                ->join('par_regions as t3', 't1.region_id', 't3.id')
+                ->leftJoin('par_districts as t4', 't1.district_id', 't4.id')
+                ->select(DB::raw("t1.*,t2.name as country,t3.name as region,t4.name as district"));
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getProductClassRules(Request $request)
+    {
+        try {
+            $qry = DB::table('par_product_classificationrules as t1')
+                ->join('par_classifications as t2', 't1.classification_id', 't2.id')
+                ->leftJoin('par_classification_rules as t3','t1.class_rule_id','t3.id')
+                ->leftJoin('par_sections as t5','t1.section_id','t5.id')
+                ->leftjoin('par_device_types as t6','t1.device_type_id','t6.id')
+                ->select('t1.*', 't2.name as classification_name','t3.name as class_rule_name','t5.name as section_name','t6.name as device_type_name');
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    public function getClassRulesParameters(Request $request)
+    {
+        try {
+            $qry = DB::table('par_classification_rules as t1')
+                ->join('par_device_types as t2', 't1.device_type_id', 't2.id')
+                ->select('t1.*', 't2.name as device_type_name');
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    public function getManRolesParameters(Request $request)
+    {
+        try {
+            $qry = DB::table('par_manufacturing_roles as t1')
+                ->join('par_sections as t2', 't1.section_id', 't2.id')
+                ->select('t1.*', 't2.name as section_name');
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    public function getApplicationAmmendment(request $req)
+    {
+        try {
+                $qry = DB::table('par_application_ammendment as t1')
+                    ->join('par_modules as t2', 't1.module_id', 't2.id')
+                    ->join('par_sub_modules as t3', 't1.sub_module_id', 't3.id')
+                    ->select('t1.*', 't2.name as module_name','t3.name as sub_module_name');
+
+                $results = $qry->get();
+
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+
+    function getConfigDirectors(request $req){
+        try {
+            if($req->table_name=='tra_directorate_directors'){
+                $qry=DB::table('tra_directorate_directors as t1')
+                    ->leftJoin('users as t2','t1.user_id','t2.id')
+                    ->leftJoin('par_directorates as t3','t1.directorate_id','t3.id')
+                    ->select(DB::raw("t1.*,CONCAT(decryptval(t2.first_name,".getDecryptFunParams()."),' ',decryptval(t2.last_name,".getDecryptFunParams().")) as user_name,t3.name as directorate_name"));
+
+               }else{
+                $qry=DB::table('authority_directors as t1')
+                    ->Join('tra_directorate_directors as t2','t1.director_id','t2.id')
+                    ->leftJoin('users as t3','t2.user_id','t3.id')
+                    ->leftJoin('par_directorates as t4','t2.directorate_id','t4.id')
+                    ->select(DB::raw("t1.*,CONCAT(decryptval(t3.first_name,".getDecryptFunParams()."),' ',decryptval(t3.last_name,".getDecryptFunParams().")) as user_name,t4.name as directorate_name"));
+                  }
+
+                $results = $qry->get();
+                $results = convertStdClassObjToArray($results);
+                $results = decryptArray($results);
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = array(
+                    'success' => false,
+                    'message' => $exception->getMessage()
+                );
+            } catch (\Throwable $throwable) {
+                $res = array(
+                    'success' => false,
+                    'message' => $throwable->getMessage()
+                );
+            }
+            return response()->json($res);
+        }
+        public function getDirectoratesUnits(Request $request)
+        {
+            try {
+                $directorate_id = $request->directorate_id;
+                $results = DB::table('par_directorates_units as t1')
+                    ->select('t1.*', 't2.name as directorate')
+                    ->join('par_directorates as t2', 't1.directorate_id', '=', 't2.id');
+
+                   if(validateIsNumeric($directorate_id)){
+                        $results->where('t1.directorate_id',$directorate_id);
+                   }
+                    $results =$results->get();
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = array(
+                    'success' => false,
+                    'message' => $exception->getMessage()
+                );
+            } catch (\Throwable $throwable) {
+                $res = array(
+                    'success' => false,
+                    'message' => $throwable->getMessage()
+                );
+            }
+            return $res;
+        }
+
+        public function getRetentionChargesConfig(Request $req){
+        $filters = (array)json_decode($req->filters);
+        $filters=array_filter($filters);
+        try{
+                $qry = DB::table('tra_retentioncharge_config as t1')
+                        ->leftJoin('par_sections as t3','t1.section_id','=','t3.id')
+                        ->leftJoin('par_prodclass_categories as t4','t1.prodclass_category_id','=','t4.id')
+                        ->leftJoin('par_classifications as t5','t1.classification_id','=','t5.id')
+                        ->leftJoin('par_product_types as t6','t1.product_type_id','=','t6.id')
+                        ->leftJoin('par_fee_types as t7','t1.fee_type_id','=','t7.id')
+                        ->leftJoin('tra_element_costs as t8','t1.element_costs_id','=','t8.id')
+                        ->leftJoin('par_cost_elements as t9','t8.element_id','=','t9.id')
+                        ->leftJoin('par_currencies as t10','t8.currency_id','=','t10.id')
+                        ->select('t1.*','t3.name as section_name','t4.name as prodclass_category_name', 't5.name as classification_name','t6.name as product_type_name','t7.name as fee_type_name','t9.name as element_cost_name', DB::raw("CONCAT(t8.cost,' ',t10.name) as cost_amount"));
+
+            if (count((array)$filters) > 0) {
+
+                    $qry->where($filters);
+                }
+
+
+
+            $qry->where('t1.is_enabled',1);
+            $results = $qry->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => returnMessage($results)
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+    //Inserting questions from The Excel file
+    public function saveAllQuestionsForMedicalAssesment(Request $request){
+        try {
+            //GETTING DATA FROM THE FIRST SHEET AND SAVING IT TO THE DATA BASE
+            //Step 1 : request file the file from the client side
+            $excelfile = $request->file('file');
+                //Step 2 : get the file name,
+            $excelfilename = $excelfile->getClientOriginalName();
+            
+                //Step 3 : create a temporary storage
+            $filestoragepath = storage_path('app');
+            $filecopypath = $excelfile->move($filestoragepath,$excelfilename);
+    
+                //Step 4 : loading the file using excel file reader
+            $reader = new ReaderXlsx();
+            //$reader->setReadDataOnly(true);
+            $spreadsheet = $reader->load($filecopypath);
+            
+            $allsheets = $spreadsheet->getSheetCount();
+            // dd($allsheets);
+            // $activesheet = 0;
+            $rowswithintheactivesheet = 0;
+            $data_to_be_inserted = [];
+            // $res = array(
+            //     "success" => false,
+            //     "message" => "Begining Transaction",
+               
+                
+            // );
+            DB::beginTransaction();
+           
+            $activesheet = $spreadsheet->getSheet(4);
+           
+            $rowswithintheactivesheet = $activesheet->getHighestDataRow();
+            
+                //dd($rowswithintheactivesheet);
+            for($row = 1 ; $row <= $rowswithintheactivesheet; $row++)
+            {
+                
+               $question = $activesheet->getCell("A{$row}")->getValue();
+               $is_final_outcome = ($activesheet->getCell("B{$row}")->getValue() == '' ) ? 0 : 1;
+
+                $data_to_be_inserted [] = [
+                   'question' => $question,
+                   'is_final_outcome' => $is_final_outcome,
+                ];
+            }
+           
+            //screening register operations
+            $medical_device_assesment_questions = collect($data_to_be_inserted);
+            $medical_device_assesment_questions_chunks = $medical_device_assesment_questions->chunk(50);
+    
+            foreach($medical_device_assesment_questions_chunks as $chunk){
+                DB::table('par_medical_device_assesment_questions')->insert($chunk->toArray());
+            }
+            $res = array(
+                "success" => true,
+                "message" => "Saved Sucessfully",
+                "results" => $data_to_be_inserted
+                
+            );
+            
+            DB::commit();
+       
+            FacadesFile::delete($filecopypath);
+            
+    
+            //Step 6 : Fetch all the rows
+           
+    
+    
+        } catch (\Exception $exception) {
+            
+            DB::rollBack();
+            
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+    
+        } catch (\Throwable $throwable) {
+           
+            DB::rollBack();
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+            return \response()->json($res);
+    }
+    
+    //Synchronize a question to its Predecessor
+    public function synchronizeAQuestionToItsPredecessor(Request $request){
+
+        try{
+            $current_question_id = $request->input('current_question_id');
+            $preceeding_question_id = $request->input('preceeding_question_id');
+
+
+            $query_response =  DB::table('par_question_tracker')->insert(
+                [
+                    'current_question_id' => $current_question_id,
+                    'preceeding_question_id' => $preceeding_question_id,
+                ]
+            );
+
+            $res = array(
+                'success' => true,
+                'message' => 'data inserted',
+                'results' => $query_response,
+            );
+
+            
+        }
+        catch (\Exception $exception){
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }catch (\Throwable $throwable){
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+
+        return response()->json($res);
+    }
+    public function getProductInvoiceChargesConfig(Request $req){
+        $filters = (array)json_decode($req->filters);
+        $filters=array_filter($filters);
+        try{
+                $qry = DB::table('tra_productregcharge_config as t1')
+                        ->leftJoin('par_sections as t3','t1.section_id','=','t3.id')
+                        ->leftJoin('par_prodclass_categories as t4','t1.prodclass_category_id','=','t4.id')
+                        ->leftJoin('par_classifications as t5','t1.classification_id','=','t5.id')
+                        ->leftJoin('par_product_types as t6','t1.product_type_id','=','t6.id')
+                        ->leftJoin('par_fee_types as t7','t1.fee_type_id','=','t7.id')
+                        ->leftJoin('tra_element_costs as t8','t1.element_costs_id','=','t8.id')
+                        ->leftJoin('par_cost_elements as t9','t8.element_id','=','t9.id')
+                        ->leftJoin('par_currencies as t10','t8.currency_id','=','t10.id')
+                        ->leftJoin('par_modules as t11','t1.module_id','=','t11.id')
+                        ->leftJoin('par_sub_modules as t12','t1.sub_module_id','=','t12.id')
+
+                        ->select('t1.*','t3.name as section_name','t4.name as prodclass_category_name', 't5.name as classification_name','t6.name as product_type_name','t7.name as fee_type_name','t9.name as element_cost_name','t11.name as module_name','t12.name as sub_module_name',DB::raw("CONCAT(t8.cost,' ',t10.name) as cost_amount"));
+
+            if (count((array)$filters) > 0) {
+
+                    $qry->where($filters);
+                }
+
+
+
+            $qry->where('t1.is_enabled',1);
+            $results = $qry->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => returnMessage($results)
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function getPremiseInvoiceChargesConfig(Request $req){
+        $filters = (array)json_decode($req->filters);
+            $filters=array_filter($filters);
+            try{
+                    $qry = DB::table('tra_premiseregcharge_config as t1')
+                            ->leftJoin('par_sections as t3','t1.section_id','=','t3.id')
+                            ->leftJoin('par_fee_types as t7','t1.fee_type_id','=','t7.id')
+                            ->leftJoin('tra_element_costs as t8','t1.element_costs_id','=','t8.id')
+                            ->leftJoin('par_cost_elements as t9','t8.element_id','=','t9.id')
+                            ->leftJoin('par_currencies as t10','t8.currency_id','=','t10.id')
+                            ->leftJoin('par_sub_modules as t12','t1.sub_module_id','=','t12.id')
+
+                            ->select('t1.*','t3.name as section_name','t7.name as fee_type_name','t9.name as element_cost_name','t12.name as sub_module_name',DB::raw("CONCAT(t8.cost,' ',t10.name) as cost_amount"));
+
+                if (count((array)$filters) > 0) {
+
+                        $qry->where($filters);
+                    }
+
+
+
+                $qry->where('t1.is_enabled',1);
+                $results = $qry->get();
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => returnMessage($results)
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+    }
+
+    public function getElementCostWithCurrency(Request $req){
+        $filters = (array)json_decode($req->filters);
+        $filters=array_filter($filters);
+        try{
+            $qry = DB::table('tra_element_costs as t1')
+                    ->leftjoin('par_currencies as t2','t1.currency_id','t2.id')
+                    ->select('t1.*','t2.name as currency_name');
+
+        if (count((array)$filters) > 0) {
+
+                        $qry->where($filters);
+                    }
+
+
+
+                $qry->where('t1.is_enabled',1);
+                $results = $qry->get();
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => returnMessage($results)
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+    }
+
+    public function saveDocumentMasterListConfig(Request $req)
+    {
+        try {
+            $user_id = \Auth::user()->id;
+            $post_data = $req->post();
+            if (!isset($post_data['model'])) {
+                $table_name = $post_data['table_name'];
+
+            } else {
+                $table_name = $post_data['model'];
+
+            }
+
+            $id = $post_data['id'];
+            $unsetData = $req->input('unset_data');
+            //unset unnecessary values
+            unset($post_data['_token']);
+            unset($post_data['table_name']);
+            unset($post_data['model']);
+            unset($post_data['id']);
+            unset($post_data['unset_data']);
+            if (isset($unsetData)) {
+                $unsetData = explode(",", $unsetData);
+                $post_data = unsetArrayData($post_data, $unsetData);
+            }
+            $table_data = $post_data;
+            //add extra params
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+            $where = array(
+                'id' => $id
+            );
+            //generate Code
+            $ref_id = $table_data['ref_format_id'];
+            $controldocument_type_id = $table_data['controldocument_type_id'];
+            $directorate_unit_id = $table_data['directorate_unit_id'];
+            $directorate_id = $table_data['directorate_id'];
+            //zamra|/|doc_type_code|/|directorate_code|/|directorate_unit_code|/|doc_serial_number
+            $doc_type = DB::table('par_controldocument_types')->where('id',$controldocument_type_id)->select('code')->first();
+            $directorate_unit = DB::table('par_directorate_units')->where('id',$directorate_unit_id)->select('code')->first();
+            $directorate = DB::table('par_directorates')->where('id',$directorate_id)->select('code')->first();
+            $codes_array['doc_type_code'] = $doc_type->code;
+            $codes_array['directorate_unit_code'] = $directorate_unit->code;
+            $codes_array['directorate_code'] = $directorate->code;
+            $codes_array['serial_no'] = $table_data['doc_serial_number'];
+
+            $code = generateRefNumber($codes_array, $ref_id);
+
+            $table_data['code']=$code;
+            if (isset($id) && $id != "") {
+                if (recordExists($table_name, $where)) {
+                    unset($table_data['created_on']);
+                    unset($table_data['created_by']);
+                    $table_data['dola'] = Carbon::now();
+                    $table_data['altered_by'] = $user_id;
+                    $res = updateRecord($table_name,  $where, $table_data);
+                }else{
+                    dd('hew');
+                }
+            } else {
+                $res = insertRecord($table_name, $table_data);
+            }
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+    public function getParameterGridColumnsConfig(Request $req)
+    {
+        $def_id = $req->def_id;
+        $param = DB::table('par_parameter_definations')->where('id',$def_id)->first();
+        $param_joins = DB::table('par_parameter_join_tables')->where('param_id',$param->id)->get();
+        $labels = array();
+        foreach ($param_joins as $param_join) {
+            $labels[] = $param_join->table_label;
+        }
+        $param_columns = DB::getSchemaBuilder()->getColumnListing($param->table_name);
+        $join_columns = DB::table('par_parameter_join_tables')->select('param_column_name')->where('param_id',$param->id)->get();
+        $col_diff = array();
+        foreach ($join_columns as $column) {
+            $col_diff[] = $column->param_column_name;
+        }
+
+        $results = array_merge( $param_columns, $labels);
+
+        foreach ($results as $key => $value) {
+            if($value == 'is_enabled'){
+                    unset($results[$key]);
+            }
+            if($value == 'created_on'){
+                    unset($results[$key]);
+            }
+            if($value == 'created_by'){
+                    unset($results[$key]);
+            }
+            if($value == 'dola'){
+                    unset($results[$key]);
+            }
+            if($value == 'altered_by'){
+                    unset($results[$key]);
+            }
+            if($value == 'id'){
+                    unset($results[$key]);
+            }
+            if($value == 'altered_on'){
+                    unset($results[$key]);
+            }
+            if(in_array($value, $col_diff)){
+                unset($results[$key]);
+            }
+        }
+
+        $pure_array = array();
+        foreach ($results as $result) {
+            $pure_array[] = $result;
+        }
+        $res = array(
+                    'success' => true,
+                    'results' => $pure_array,
+                    'title' => $param->param_title,
+                    'table_name'=>$param->table_name,
+                    'message' => 'All is well'
+                );
+            return response()->json($res);
+    }
+
+    public function getParameterGridConfig(Request $req){
+        $def_id = $req->def_id;
+        $param = DB::table('par_parameter_definations')->where('id',$def_id)->first();
+        $param_joins = DB::table('par_parameter_join_tables')->where('param_id',$param->id)->get();
+
+        $qry = DB::table($param->table_name.' as t1')->select('t1.*');
+        $join_columns = DB::table('par_parameter_join_tables')->select('param_column_name')->where('param_id',$param->id)->get();
+        $col_diff = array();
+        foreach ($join_columns as $column) {
+        $col_diff[] = $column->param_column_name;
+        }
+        $t = 2;
+
+        foreach ($param_joins as $joins) {
+        if($joins->join_type_id == 1){
+            $qry->join($joins->join_table_name.' as t'.$t,'t1.'.$joins->param_column_name,'t'.$t.'.'.$joins->join_column_name);
+        }else{
+            $qry->leftJoin($joins->join_table_name.' as t'.$t,'t1.'.$joins->param_column_name,'t'.$t.'.'.$joins->join_column_name);
+        }
+            $qry->addSelect("t".$t.".".$joins->join_disp_column_name." as ".$joins->table_label);
+            $t++;
+        }
+        //checks for adding selects and removing columns
+        if($param->table_name == 'tra_personnel_information'){
+            $qry->addSelect('t1.id as personnel_id','t1.name as personnel_name');
+        }
+        if($param->table_name == 'tra_permitsenderreceiver_data'){
+            $qry->addSelect('t1.id as consignee_id','t1.name as consignee_name');
+        }
+        $results = $qry->get();
+
+
+        $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => 'All is well'
+                );
+        return $res;
+    }
+
+    public function getParameterFormColumnsConfig(Request $req)
+    {
+        $def_id = $req->def_id;
+        $param = DB::table('par_parameter_definations')->where('id',$def_id)->first();
+        $param_joins = DB::table('par_parameter_join_tables')->where('param_id',$param->id)->orderBy('id','ASC')->get();
+        $labels = array();
+        $child = true;
+        $param_column_name='';
+        $logic = '';
+        foreach ($param_joins as $param_join) {
+            if($param_join->is_parent == 1){
+                $logic = $param_join->logic;
+                $labels[] = array('table'=>$param_join->join_table_name, 'column'=>$param_join->join_column_name,'label'=>ucwords($param_join->table_label),'join_disp_column_name'=>$param_join->join_disp_column_name,'param_column_name'=>$param_join->param_column_name,'is_child'=>0, 'is_parent'=>1,'logic'=>$logic);
+                $param_column_name = $param_join->param_column_name;
+                
+            }
+            else if($param_join->is_child == 1){
+                $labels[] = array('table'=>$param_join->join_table_name, 'column'=>$param_join->join_column_name,'label'=>ucwords($param_join->table_label),'join_disp_column_name'=>$param_join->join_disp_column_name,'param_column_name'=>$param_join->param_column_name,'is_child'=>1, 'is_parent'=>0, 'parent_combo_name'=> $param_column_name);
+                $param_column_name = '';
+                $logic = '';
+            }else{
+                $labels[] = array('table'=>$param_join->join_table_name, 'column'=>$param_join->join_column_name,'label'=>ucwords($param_join->table_label),'join_disp_column_name'=>$param_join->join_disp_column_name,'param_column_name'=>$param_join->param_column_name,'is_child'=>0, 'is_parent'=>0);
+            }
+        }
+        $colums = DB::getDoctrineSchemaManager()->listTableColumns($param->table_name);
+        //$colums = DB::select('SHOW COLUMNS FROM '.$param->table_name);
+        $fields = array();
+        foreach ($colums as $column) {
+
+            if($column->getNotnull()){
+                $fields[] = ['field'=>$column->getName(),'label'=>ucwords($column->getName()), 'null'=>false];
+            }else{
+                $fields[] = ['field'=>$column->getName(),'label'=>ucwords($column->getName()),'null'=>true];
+            }
+
+        }
+        //dd($fields);
+        $param_columns = $fields;//DB::getSchemaBuilder()->getColumnListing($param->table_name);
+        $join_columns = DB::table('par_parameter_join_tables')->select('param_column_name')->where('param_id',$param->id)->get();
+        $col_diff = array();
+        foreach ($join_columns as $column) {
+        $col_diff[] = ucwords($column->param_column_name);
+        }
+        foreach ($param_columns as $key => $value) {
+        if($value['label'] == ucwords('is_enabled')){
+                unset($param_columns[$key]);
+        }
+        if($value['label'] == ucwords('created_on')){
+                unset($param_columns[$key]);
+        }
+        if($value['label'] == ucwords('created_by')){
+                unset($param_columns[$key]);
+        }
+        if($value['label'] == ucwords('dola')){
+                unset($param_columns[$key]);
+        }
+        if($value['label'] == ucwords('altered_by')){
+                unset($param_columns[$key]);
+            }
+        if($value['label'] == ucwords('id')){
+                unset($param_columns[$key]);
+        }
+        if($value['label'] == ucwords('altered_on')){
+                unset($param_columns[$key]);
+        }
+        if($value['label'] == ucwords('is_other_config')){
+                unset($param_columns[$key]);
+        }
+        if(in_array($value['label'], $col_diff)){
+            unset($param_columns[$key]);
+        }
+
+    }
+
+
+        $pure_array = array();
+        foreach ($param_columns as $result) {
+            $pure_array[] = $result;
+        }
+        // $labels = array_reverse($labels);
+        $res = array(
+                    'success' => true,
+                    'main_fields' => $pure_array,
+                    'join_fields' => $labels,
+                    'table_name'=>$param->table_name,
+                    'message' => 'All is well'
+                );
+
+            return response()->json($res);
+    }
+    public function getCountryMappedProcedures(Request $req){
+            $assessment_procedure_id = $req->assessment_procedure_id;
+            $category = $req->category;
+            if(validateIsNumeric($assessment_procedure_id)){
+            if(validateIsNumeric($category) && $category == 1){
+            $Countries = DB::table('par_countries as t1')
+                        ->leftjoin('par_assessment_procedures_countries as t2',function ($join) use ($assessment_procedure_id) {
+                            $join->on('t1.id','t2.country_id')
+                                ->where('t2.assessment_procedure_id',$assessment_procedure_id);
+                            })
+                        ->select('t1.id as country_id','t1.name as country_name', 't2.id as is_mapped');
+            }else if(validateIsNumeric($category) && $category == 2){
+            $Countries = DB::table('par_countries as t1')
+                    ->leftjoin('par_gmpassessmentprocedure_countries as t2',function ($join) use ($assessment_procedure_id) {
+                        $join->on('t1.id','t2.country_id')
+                            ->where('t2.gmp_assessment_id',$assessment_procedure_id);
+                        })
+                    ->select('t1.id as country_id','t1.name as country_name', 't2.id as is_mapped');
+                }else{
+                return array(
+                        'success' => false,
+                        'message' => 'Assessment category not set either product/gmp'
+                    );
+                }
+
+            $result = $Countries->get();
+            $res = array(
+                        'success'=>true,
+                        'message'=>'all is well',
+                        'results'=>$result
+                    );
+        }else{
+            $res = array(
+                        'success'=>false,
+                        'message'=>'Please provide an assessment procedure'
+                    );
+        }
+        return json_encode($res);
+    }
+    public function mapProcedureToCountry(Request $req){
+            $selected = $req->input('selected');
+            $assessment_procedure_id = $req->input('assessment_procedure_id');
+            $category = $req->input('category');
+            $user = $this->user_id;
+            $country_idArray = json_decode($selected);
+
+            DB::beginTransaction();
+            try{
+                if(validateIsNumeric($category) && $category == 1){
+                    DB::table('par_assessment_procedures_countries')
+                        ->where('assessment_procedure_id',$assessment_procedure_id)
+                        ->delete();
+                    foreach ($country_idArray as $country_id) {
+
+                                $res = insertRecord('par_assessment_procedures_countries', ['assessment_procedure_id'=>$assessment_procedure_id, 'country_id'=>$country_id], $user);
+
+                        }
+                }
+                else if(validateIsNumeric($category) && $category == 2){
+                    DB::table('par_gmpassessmentprocedure_countries')
+                        ->where('gmp_assessment_id',$assessment_procedure_id)
+                        ->delete();
+                    foreach ($country_idArray as $country_id) {
+
+                                $res = insertRecord('par_gmpassessmentprocedure_countries', ['gmp_assessment_id'=>$assessment_procedure_id, 'country_id'=>$country_id], $user);
+
+                        }
+                }else{
+                    DB::rollBack();
+                    return array(
+                        'success' => false,
+                        'message' => 'Assessment category not set either product/gmp'
+                    );
+                }
+
+
+                $res = array(
+                        'success' => true,
+                        'message' => 'Countries Mapped to Procedure(s) successfully'
+                    );
+            DB::commit();
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+        return json_encode($res);
+
+    }
+    public function getOnlineApplicationStatus(Request $req)
+    {
+        try {
+                    $results = DB::Connection('portal_db')->table('wb_statuses as t1')->where('has_receiving', 1);
+
+
+                    $results =$results->get();
+                    $res = array(
+                        'success' => true,
+                        'results' => $results,
+                        'message' => 'All is well'
+                    );
+                } catch (\Exception $exception) {
+                    $res = array(
+                        'success' => false,
+                        'message' => $exception->getMessage()
+                    );
+                } catch (\Throwable $throwable) {
+                    $res = array(
+                        'success' => false,
+                        'message' => $throwable->getMessage()
+                    );
+                }
+                return $res;
+    }
+    public function saveConfigPortalCommonData(Request $req)
+        {
+            try {
+                $user_id = \Auth::user()->id;
+                $post_data = $req->post();
+                if (!isset($post_data['model'])) {
+                    $table_name = $post_data['table_name'];
+
+                } else {
+                    $table_name = $post_data['model'];
+
+                }
+                $id = $post_data['id'];
+                $unsetData = $req->input('unset_data');
+                //unset unnecessary values
+                unset($post_data['_token']);
+                unset($post_data['table_name']);
+                unset($post_data['model']);
+                unset($post_data['id']);
+                unset($post_data['unset_data']);
+                if (isset($unsetData)) {
+                    $unsetData = explode(",", $unsetData);
+                    $post_data = unsetArrayData($post_data, $unsetData);
+                }
+                $table_data = $post_data;
+                //add extra params
+                $table_data['created_on'] = Carbon::now();
+                $table_data['created_by'] = $user_id;
+                $where = array(
+                    'id' => $id
+                );
+
+                if (validateIsNumeric($id)) {
+
+                    if (recordExists($table_name, $where, 'portal_db')) {
+                        unset($table_data['created_on']);
+                        unset($table_data['created_by']);
+                        $table_data['dola'] = Carbon::now();
+                        $table_data['altered_by'] = $user_id;
+                        $res = updateRecord($table_name, $where, $table_data, 'portal_db');
+                    }else{
+                        $res = "Update record not found";
+                    }
+                } else {
+
+                    $res = insertRecord($table_name, $table_data,  'portal_db');
+                }
+
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+        }
+        public function getConfigParamFromPortalTable(Request $req)
+        {
+            try {
+                $filters = $req->filters;
+                $table_name = $req->table_name . ' as t1';
+
+
+                $qry = DB::Connection('portal_db')->table($table_name)
+                // ->where('is_enabled',1)
+                    ->select('t1.*');
+
+                if ($filters != '') {
+                    $filters = (array)json_decode($filters);
+                    $filters = array_filter($filters);
+                    $results = $qry->where($filters);
+                }
+
+                $results = $qry->get();
+
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        public function saveAuditedTableLogger(Request $req){
+            try {
+                $user_id = \Auth::user()->id;
+                $post_data = $req->post();
+                if (!isset($post_data['model'])) {
+                    $table_name = $post_data['table_name'];
+                } else {
+                    $table_name = $post_data['model'];
+                }
+                $db_con = 'mysql';
+                $id = $post_data['id'];
+                $unsetData = $req->input('unset_data');
+                //unset unnecessary values
+                unset($post_data['_token']);
+                unset($post_data['table_name']);
+                unset($post_data['model']);
+                unset($post_data['id']);
+                unset($post_data['unset_data']);
+                if (isset($unsetData)) {
+                    $unsetData = explode(",", $unsetData);
+                    $post_data = unsetArrayData($post_data, $unsetData);
+                }
+                $table_data = $post_data;
+                //add extra params
+                $table_data['created_on'] = Carbon::now();
+                $table_data['created_by'] = $user_id;
+                $where = array(
+                    'id' => $id
+                );
+
+                if (validateIsNumeric($id)) {
+
+                    if (recordExists($table_name, $where)) {
+                        unset($table_data['created_on']);
+                        unset($table_data['created_by']);
+                        $table_data['dola'] = Carbon::now();
+                        $table_data['altered_by'] = $user_id;
+
+                        $res = updateRecord($table_name, $where, $table_data,  $db_con);
+                    }else{
+                        $res = "Update record not found";
+                    }
+                } else {
+
+                    $res = insertRecord($table_name, $table_data, $db_con);
+
+                }
+
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+        }
+        public function getAppModuleFeeConfig(Request $req)
+        {
+            $user_id = \Auth::user()->id;
+            $module_id = $req->module_id;
+            try{
+                $qry = DB::table('tra_appmodules_feesconfigurations as t1')
+                    ->leftJoin('par_modules as t2', 't1.module_id', 't2.id')
+                    ->leftJoin('par_sub_modules as t3', 't1.sub_module_id', 't3.id')
+                    ->leftJoin('par_sections as t4', 't1.section_id', 't4.id')
+                    ->leftJoin('par_assessmentprocedure_types as t5', 't1.assessmentprocedure_type_id', 't5.id')
+                    ->leftJoin('par_prodclass_categories as t6', 't1.prodclass_category_id', 't6.id')
+                    ->leftJoin('par_product_subcategories as t7', 't1.product_subcategory_id', 't7.id')
+                    ->leftJoin('par_product_origins as t9', 't1.product_origin_id', 't9.id')
+                    ->leftJoin('par_applicationfee_types as t10', 't1.application_feetype_id', 't10.id')
+                    ->leftJoin('par_classifications as t11', 't1.classification_id', 't11.id')
+                    ->leftJoin('tra_element_costs as t12', 't1.element_costs_id', 't12.id')
+                    ->leftJoin('par_currencies as t14', 't12.currency_id', 't14.id')
+                    ->leftJoin('par_fee_types as t15', 't12.fee_type_id', 't15.id')
+                    ->leftJoin('par_cost_categories as t16', 't12.cost_category_id', 't16.id')
+                    ->leftJoin('par_cost_sub_categories as t17', 't12.sub_cat_id', 't17.id')
+                    ->leftJoin('par_cost_elements as t18', 't12.element_id', 't18.id')
+                    ->leftJoin('par_businesstype_class as t19', 't1.businesstype_class_id', 't19.id')
+                    ->leftJoin('par_premises_types as t20', 't1.premise_type_id', 't20.id')
+                    ->leftJoin('par_gmplicensetypes_details as t21', 't1.gmp_type_id', 't21.id')
+                    ->leftJoin('par_importexport_permittypes as t22', 't1.importexport_permittype_id', 't22.id')
+                    ->select('t12.*', 't2.name as module', 't3.name as sub_module', 't4.name as section', 't5.name as assessment_proceduretype', 't6.name as prodclass_category','t18.name as cost_element', 't7.name as product_subcategory', 't9.name as product_origin', 't10.name as applicationfeetype', 't1.*', 't11.name as classification_name','t15.name as fee_type','t16.name as cost_category','t17.name as cost_sub_category', DB::raw("CONCAT(t12.costs,' (',t14.name,')') as element_cost"), 't19.name as business_type_class', 't20.name as premise_type', 't21.name as gmp_type', 't22.name as importexport_permittype');
+                if(validateIsNumeric($module_id)){
+                    $qry->where('t1.module_id', $module_id);
+                }
+                $results = $qry->get();
+                $res = array(
+                    'success'=>true,
+                    'message'=>'All is well',
+                    'results'=>$results
+                );
+            }
+            catch (\Exception $exception) {
+                    $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+                }
+            catch (\Throwable $throwable) {
+                    $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+                }
+            return response()->json($res);
+        }
+        public function getMappedFormFieldCombosTable(Request $req){
+            $form_category_id = $req->form_category_id;
+            try{
+                $qry = DB::table('par_formtype_fields as t1')
+                        ->leftjoin('par_formfield_designs as t2', 't1.field_id', 't2.id')
+                        ->select('t2.*')
+                        ->where(['t1.form_category_id' => $form_category_id])
+                        ->whereIn('t2.form_field_type_id', [6, 7, 9]);
+
+                $results = $qry->get();
+                $res = array(
+                        'success'=>true,
+                        'message'=>'All is well',
+                        'results'=>$results
+                    );
+                }
+
+            catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+                return response()->json($res);
+        }
+        public function getFormFieldRelations(Request $req)
+        {
+        try{
+            $form_category_id = $req->form_category_id;
+            $qry = DB::table('par_form_categories as t1')
+                    ->leftJoin('par_formtype_fields as t2', 't1.id', 't2.form_category_id')
+                    ->leftJoin('par_formfield_designs as t3', 't2.field_id', 't3.id')
+                    //->leftJoin('par_formfield_relations as t4', 't3.id', 't4.form_fielddesign_id')
+                    ->leftJoin('par_formfield_relations as t4', function ($join) use ($form_category_id) {
+                        $join->on("t3.id", "=", "t4.form_fielddesign_id")
+                            ->where("t4.form_category_id", "=", $form_category_id);
+                    })
+                    ->select('t3.*', 't4.*', 't2.field_id')
+                    ->whereIn('t3.form_field_type_id', [ 6, 7, 9])
+                    ->Where('t1.id', $form_category_id);
+
+                $results = $qry->get();
+                $res = array(
+                    'success'=>true,
+                    'message'=>'All is well',
+                    'results'=>$results
+                );
+            }
+            catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+
+        }
+        public function saveFormFieldRelations(Request $req)
+        {
+            try{
+                $relation_details = $req->relation_details;
+                $relation_array = json_decode($relation_details);
+                $table_name = 'par_formfield_relations';
+                $form_category_id = $req->form_category_id;
+                $user_id = \Auth::user()->id;
+                $res = array('success'=>true, 'message'=>'No record to update');
+                foreach ($relation_array as $item) {
+                    $table_data = convertStdClassObjToArray($item);
+                    $where = array('form_fielddesign_id'=>$item->form_fielddesign_id, 'form_category_id' => $form_category_id);
+                    //delete previous entries
+                    deleteRecord($table_name, $where, $user_id);
+                    if($item->bind_column != '' || $item->parent_field_id > 0 || $item->has_logic != ''){
+                        $table_data['form_category_id'] = $form_category_id;
+                        $res = insertRecord($table_name, $table_data, $user_id);
+                    }else{
+                        $res = array('success'=>true, 'message'=>'updated successfully');
+                    }
+                }
+                //delete any orphaned entry
+                    DB::table('par_formfield_relations')->whereRaw('parent_field_id is Null AND has_logic != 1')->delete();
+
+            }
+            catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+
+        }
+        public function prepareInterfaceBasedonConfig(Request $req)
+        {
+            try{
+                $module_id = $req->module_id;
+                $sub_module_id = $req->sub_module_id;
+                $section_id = $req->section_id;
+                $premise_type_id = $req->premise_type_id;
+                $prodclass_category_id = $req->prodclass_category_id;
+                $importexport_permittype_id = $req->importexport_permittype_id;
+            
+                $where = array(
+                    'module_id'=>$module_id,
+                    'sub_module_id'=>$sub_module_id
+                );
+                if(validateIsNumeric($section_id)){
+                    $where['section_id'] = $section_id;
+                }
+                if($module_id == 1 && validateIsnumeric($prodclass_category_id)){
+                    $where['prodclass_category_id'] = $prodclass_category_id;
+                }
+                if($module_id == 2 && validateIsnumeric($premise_type_id)){
+                    $where['premise_type_id'] = $premise_type_id;
+                }
+                if($module_id == 4 && validateIsnumeric($importexport_permittype_id)){
+                    $where['importexport_permittype_id'] = $importexport_permittype_id;
+                }
+                if($module_id == 12 && validateIsnumeric($importexport_permittype_id)){
+                    $where['importexport_permittype_id'] = $importexport_permittype_id;
+                }
+
+                
+                $form_category_id = getSingleRecordColValue('par_form_categories', $where, 'id');
+
+                if(validateIsnumeric($form_category_id)){
+                    $qry = DB::table('par_formtype_fields as t22')
+                        ->Join('par_formfield_designs as t33', 't22.field_id', 't33.id')
+                    // ->leftJoin('par_formfield_relations as t2', 't33.id', 't2.parent_field_id')
+                        ->leftJoin('par_formfield_relations as t2', function ($join) use ($form_category_id) {
+                                $join->on("t33.id", "=", "t2.parent_field_id")
+                                    ->where("t2.form_category_id", "=", $form_category_id);
+                            })
+                        ->leftJoin('par_formfield_designs as t3', 't2.form_fielddesign_id', 't3.id')
+                        ->leftJoin('par_formfield_designs as t4', 't2.parent_field_id', 't4.id')
+                        ->leftJoin('par_form_field_types as t5', 't33.form_field_type_id', 't5.id')
+                        ->leftJoin('par_formfield_relations as t6', function ($join) use ($form_category_id) {
+                                $join->on("t33.id", "=", "t6.form_fielddesign_id")
+                                    ->where("t6.form_category_id", "=", $form_category_id);
+                            })
+                        ->where('t22.form_category_id', $form_category_id)
+                        ->select('t22.column_width','t33.id','t33.displayfield','t33.valuefield','t33.combo_table','t33.form_field_type_id','t33.field_name','t33.def_id','t33.formfield','t22.is_hidden','t33.label','t22.is_enabled','t22.is_mandatory','t22.is_readOnly','t2.has_relation','t2.bind_column', 't3.field_name as child_combo', 't4.field_name as parent_combo','t5.name as xtype','t2.id as is_parent','t6.other_logic', 't6.has_logic');
+                    $qry->orderBy('t22.order_no', 'ASC');
+                    //$qry->unique('t33.id');
+
+                    $results = $qry->get();
+                    foreach ($results as $field) {
+                        if($field->is_parent){
+                            $no_children = DB::table('par_formfield_relations as t1')
+                                            ->leftJoin('par_formfield_designs as t3', 't1.form_fielddesign_id', 't3.id')
+                                            ->select('t1.*','t3.field_name as child_combo')
+                                            ->where(['parent_field_id' => $field->id, 't1.form_category_id'=>$form_category_id])->get();
+
+                            if($no_children->count() > 1){
+                                $i = 0;
+                                $field->is_multiparent = 1;
+                                foreach ($no_children as $child) {
+                                    $bind_column = 'bind_column'.$i;
+                                    $child_combo = 'child_combo'.$i;
+                                    $field->$bind_column = $child->bind_column;
+                                    $field->$child_combo = $child->child_combo;
+                                    $i++;
+                                }
+                                $field->total_children = $i;
+
+                            }
+
+                        }
+                    }
+                    $res = array('success' => true, 'results'=>$results, 'message'=>'All is well');
+                }else{
+                    $res = array('success' => false, 'message'=>'No form setup for the category');
+                }
+
+            }catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+        }
+        public function saveModuleFeeConfigCommonData(Request $req)
+        {
+            try{
+                $user_id = \Auth::user()->id;
+                $post_data = $req->post();
+                $db_con = 'pgsql';
+                $table_name = $post_data['table_name'];
+                if (isset($post_data['db_con']) && $post_data['db_con'] != '') {
+                    $db_con = $post_data['db_con'];
+                }
+                unset($post_data['db_con']);
+                $id = $post_data['id'];
+                $unsetData = $req->input('unset_data');
+                //unset unnecessary values
+                unset($post_data['_token']);
+                unset($post_data['table_name']);
+            //   dd($user_id);
+                unset($post_data['id']);
+                unset($post_data['unset_data']);
+                if (isset($unsetData)) {
+                    $unsetData = explode(",", $unsetData);
+                    $post_data = unsetArrayData($post_data, $unsetData);
+                }
+                $table_data = $post_data;
+                //get mapped element cost
+                $element_where = array(
+                    'fee_type_id' => $table_data['fee_type_id'],
+                    'element_id' => $table_data['element_id'],
+                    'applicationfee_types_id' => $table_data['application_feetype_id'],
+                    'currency_id' => $table_data['currency_id'],
+                    'formula' => $table_data['formula']
+                );
+
+                    //unset cost element items
+                    unset($table_data['fee_type_id']);
+                    unset($table_data['element_id']);
+                    unset($table_data['formula']);
+                    unset($table_data['is_fast_track']);
+                    unset($table_data['currency_id']);
+                    unset($table_data['cost']);
+                    unset($table_data['costs']);
+
+                    unset($table_data['formula_rate']);
+
+                    //add extra params
+                    $table_data['created_on'] = Carbon::now();
+                    $table_data['created_on'] = Carbon::now();
+                    $table_data['element_costs_id'] = $req->element_costs_id;
+                    $where = array(
+                        'id' => $id
+                    );
+
+                    if (validateIsNumeric($id)) {
+
+                        if (recordExists($table_name, $where)) {
+                            unset($table_data['created_on']);
+                            unset($table_data['created_by']);
+                            $table_data['dola'] = Carbon::now();
+                            $table_data['altered_by'] = $user_id;
+                            $res = updateRecord($table_name, $where, $table_data, $db_con);
+                        }else{
+                            $res = "Update record not found";
+                        }
+                    } else {
+                        $res = insertRecord($table_name, $table_data);
+                        // $db_con
+                    }
+
+            }catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+        }
+        public function getNewInvoiceQuotation(Request $req){
+            $module_id = $req->module_id;
+            $sub_module_id = $req->sub_module_id;
+            $section_id = $req->section_id;
+            $assessment_procedure_id = $req->assessment_procedure_id;
+            $classification_id = $req->classification_id;
+            $prodclass_category_id = $req->prodclass_category_id;
+            $prodclass_subcategory_id = $req->prodclass_subcategory_id;
+            $product_origin_id = $req->product_origin_id;
+            $applicationfeetype = $req->applicationfeetype;
+            $element_data = DB::table('tra_element_costs')->first();
+            //where
+            $res = array('success'=>true, 'results'=>$element_data, 'message'=>'all is well');
+            return response()->json($res);
+        }
+        public function getAllAvailableAnswers(){
+            $answers = DB::table('par_medical_device_assesment_answers')->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $answers,
+                'message' => 'All is well',
+                
+            );
+
+            return $res;
+
+        }
+    public function getTableslist(Request $Request){
+            $in_db=$Request->in_db;
+            $prefix=$Request->prefix;
+            if($in_db == 'Portal DB'){
+            $tables = DB::connection('portal_db')->getDoctrineSchemaManager()->listTableNames();
+            }else{
+            $tables = DB::connection()->getDoctrineSchemaManager()->listTableNames();
+            }
+            try {
+                if(validateIsNumeric($prefix)){
+                    $is_filtered = true;
+                    switch ($prefix) {
+                        case 1:
+                            $prefix_txt = 'tra_';
+                            break;
+                        case 2:
+                            $prefix_txt = 'wf_';
+                            break;
+                        case 3:
+                            $prefix_txt = 'par_';
+                            break;
+
+                        default:
+                            $is_filtered = false;
+                            break;
+                    }
+                }else{
+                    $is_filtered = false;
+                }
+
+                foreach ($tables as $table) {
+                    if($is_filtered){
+                        if(strpos(" ".$table, $prefix_txt) == 1) {
+                            $data[] = array('table_name'=>$table);
+                        }
+                    }else{
+                        $data[] = array('table_name'=>$table);
+                    }
+
+                }
+                $res = array(
+                    'success' => true,
+                    'results' => $data,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+
+
+        }
+    public function saveParameterConfig(Request $req)
+        {
+        try{
+            $id = $req->id;
+            //$menu_id = $req->menu_id;
+            $param_title = $req->param_title;
+            $param_name= $req->param_name;
+            $table_name= $req->table_name;
+            $no_joins= $req->no_joins;
+
+            DB::beginTransaction();
+            //insert the defination
+            $user_id = \Auth::user()->id;
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+            //$table_data['menu_id'] = $menu_id;
+            $table_data['param_title'] = $param_title;
+            $table_data['param_name'] = $param_name;
+            $table_data['table_name'] = $table_name;
+            $table_data['no_joins'] = $no_joins;
+            $param_def_table_name = 'par_parameter_definations';
+            $where = array(
+                                'id' => $id
+                            );
+
+                if (isset($id) && $id != "") {
+                    if (recordExists($param_def_table_name, $where)) {
+                        unset($table_data['created_on']);
+                        unset($table_data['created_by']);
+                        $table_data['dola'] = Carbon::now();
+                        $table_data['altered_by'] = $user_id;
+                        $res = updateRecord($param_def_table_name, $where, $table_data);
+                    }
+                } else {
+                    $res = insertRecord($param_def_table_name, $table_data);
+                }
+
+            if($res['success']){
+                $param_id = $res['record_id'];
+                $next_is_child = false;
+                //delete existing trace of the param
+                DB::table('par_parameter_join_tables')->where('param_id',$param_id)->delete();
+                for ($i = $no_joins-1; $i >= 0; $i--) {
+
+                    $join_type_id = $req->input('join_type_id'.$i);
+                    $join_table_name = $req->input('join_table_name'.$i);
+                    $join_column_name = $req->input('join_column_name'.$i);
+                    $param_column_name = $req->input('param_column_name'.$i);
+                    $table_label = $req->input('table_label'.$i);
+                    $join_disp_column_name = $req->input('join_disp_column_name'.$i);
+                    $is_parent = $req->input('is_parent'.$i);
+                    $logic = $req->input('logic'.$i);
+                    if($next_is_child){
+                        $is_child = 1;
+                    }else{
+                        $is_child = 0;
+                    }
+                    if($is_parent == 1){
+                        $next_is_child = true;
+                    }else{
+                        $next_is_child = false;
+                    }
+
+                    //insert tables to depedent
+                    $data = array(
+                        'param_id'=>$param_id,
+                        'join_type_id'=>$join_type_id,
+                        'join_table_name'=>$join_table_name,
+                        'join_column_name'=>$join_column_name,
+                        'join_disp_column_name'=>$join_disp_column_name,
+                        'param_column_name'=>$param_column_name,
+                        'table_label'=>$table_label,
+                        'created_on'=>Carbon::now(),
+                        'created_by'=>$user_id,
+                        'is_parent'=>$is_parent,
+                        'is_child'=>$is_child,
+                        'logic'=>$logic
+                    );
+                    $res = insertRecord('par_parameter_join_tables', $data);
+                    if($res['success'] == false){
+                        return json_encode($res);
+                    }
+            }
+            $res = array(
+                    'success' => true,
+                    'message' => 'Saved successfully'
+                );
+            }
+
+
+            DB::commit();
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__));
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__));
+            }
+        return json_encode($res);
+    }
+    public function getParameterConfig(Request $req)
+    {
+        $def_id = $req->input('def_id');
+            try {
+                $param = DB::table('par_parameter_definations')->where('id',$def_id)->first();
+                $param_joins = DB::table('par_parameter_join_tables')->where('param_id',$param->id)->get();
+                $no_joins = $param->no_joins;
+                $results = array();
+                $i = 0;
+                foreach ($param_joins as $param_join) {
+                    $results['join_type_id'.$i] = $param_join->join_type_id;
+                    $results['join_table_name'.$i] = $param_join->join_table_name;
+                    $results['join_column_name'.$i] = $param_join->join_column_name;
+                    $results['param_column_name'.$i] = $param_join->param_column_name;
+                    $results['join_disp_column_name'.$i] = $param_join->join_disp_column_name;
+                    $results['table_label'.$i] = $param_join->table_label;
+                    $i++;
+                }
+            $results['id'] = $param->id;
+            $results['connection_id'] = $param->connection_id;
+            $results['param_title'] = $param->param_title;
+            $results['param_name'] = $param->param_name;
+            $results['table_name'] = $param->table_name;
+            $results['no_joins'] = $param->no_joins;
+            $results['db_con_name'] = getSingleRecordColValue('par_connections', ['id'=>$param->connection_id], 'config');
+
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'no_joins' => $no_joins,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+    }
+    public function checkParamMenuDefination(Request $req)
+    {
+        $menu_id = $req->menu_id;
+
+        try{
+            $param_def = DB::table('par_parameter_definations')->where('menu_id',$menu_id)->count();
+            if($param_def > 0){
+                $is_defined = 1;
+            }else{
+                $is_defined = 0;
+            }
+            $res = array(
+                    'success' => true,
+                    'is_defined' => $is_defined,
+                    'message' => 'All is well'
+                );
+        }
+            catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return response()->json($res);
+    }
+    public function getTablescolumns(Request $req)
+    {
+        $table_name = $req->table_name;
+        $col = array();
+        if($table_name != ''){
+            $columns = DB::getSchemaBuilder()->getColumnListing($table_name);
+            foreach ($columns as $column) {
+            $col[]=['column_name'=>$column];
+            }
+            return $col;
+        }else{
+            return [];
+
+    }
+        }
+        public function getApplicationApplicantDetails(Request $request)
+        {
+            $application_id = $request->input('application_id');
+            $table_name = $request->input('table_name');
+            $application_code = $request->input('application_code');
+
+            try {
+                $qry = DB::table('wb_trader_account as t1')
+                    ->leftJoin('par_countries as t2', 't1.country_id', 't2.id')
+                    ->leftJoin('par_regions as t3', 't1.region_id', 't3.id')
+                    ->leftJoin('par_districts as t4', 't1.district_id', 't4.id')
+                    ->select('t1.id as applicant_id', 't1.name as applicant_name', 't1.contact_person', 't1.physical_address', 't1.postal_address', 't4.name as district_name', 't3.name as region_name', 't2.name as country_name', 't1.telephone_no')
+                    ->where('t1.id', function ($query) use ($table_name, $application_id, $application_code) {
+                        $query->select(DB::raw('applicant_id'))
+                            ->from($table_name)
+                            ->where('application_code', $application_code);
+                    });
+                $results = $qry->first();
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        public function getApplicationComments(Request $request)
+        {
+            $application_id = $request->input('application_id');
+            $application_code = $request->input('application_code');
+            $workflow_stage_id = $request->input('workflow_stage_id');
+            $comment_type_id = $request->input('comment_type_id');
+            $user_id = $this->user_id;
+            try {
+                $qry = DB::table('tra_evaluation_recommendations as t1')
+                    ->leftJoin('users as t2', 't1.created_by', '=', 't2.id')
+                    ->leftJoin('wf_workflow_stages as t3', 't1.workflow_stage_id', '=', 't3.id')
+                    ->leftJoin('par_recommendations as t4', 't1.recommendation_id', '=', 't4.id')
+                    ->select(DB::raw("t1.*,CONCAT(decryptval(t2.first_name,".getDecryptFunParams()."), ' ', decryptval(t2.last_name,".getDecryptFunParams().")) as author, t3.name as stage_name, t4.name as recommendation,t2.id as author_id, $user_id as current_user"))
+                    ->where('t1.application_code', $application_code);
+
+
+                if (isset($workflow_stage_id) && $workflow_stage_id != '') {
+                    //get stage category
+                    $stage_data = getTableData('wf_workflow_stages', array('id'=>$workflow_stage_id));
+                    $stage_category_id = $stage_data->stage_category_id;
+                    $qry->where('t1.stage_category_id', $stage_category_id);
+                }
+                if (isset($comment_type_id) && $comment_type_id != '') {
+                //  $qry->where('t1.comment_type_id', $comment_type_id);
+                }
+                $results = $qry->get();
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        public function checkApplicationEvaluationOverralRecom(Request $request)
+        {
+            $application_code = $request->input('application_code');
+            $module_id = $request->input('module_id');
+            $workflow_stage_id = $request->input('workflow_stage_id');
+            $comment_type_id = $request->input('comment_type_id');//whether structured or unstructured
+            try {
+            $record = DB::table('tra_evaluation_recommendations')->where(array('application_code'=>$application_code, 'workflow_stage_id'=>$workflow_stage_id))->count();
+
+                if ($record >0) {
+                    $hasRecommendation = 1;
+                } else {
+                    $hasRecommendation = 0;
+                }
+                $res = array(
+                    'success' => true,
+                    'hasRecommendation' => $hasRecommendation
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        public function checkApplicationChecklistUploadDetails(Request $request){
+
+        try {
+
+                $res = $this->validateApplicationChecklistDetails($request);
+                
+            if(!$res['hasValidatedChecklist']){
+                //ceck the documents uploads
+                $res = $this->onValidateApplicationDocumentsUploads($request);
+            }
+
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return \response()->json($res);
+
+
+    }
+    public function onValidateApplicationDocumentsUploads(Request $req)
+    {
+        $application_code = $req->input('application_code');
+        $workflow_stage = $req->input('workflow_stage');
+        $doc_type_id = $req->input('document_type_id');
+        $portal_uploads = $req->input('portal_uploads');
+        $portal_status_id = $req->input('portal_status_id');
+        $section_id = $req->input('section_id');
+        $module_id = $req->input('module_id');
+        $sub_module_id = $req->input('sub_module_id');
+        $prodclass_category_id = $req->input('prodclass_category_id');
+        $hasValidatedChecklist = false;
+        try {
+            $where = array(
+                'module_id' => $module_id,
+                'sub_module_id' => $sub_module_id,
+                'section_id' => $section_id
+            );
+            $process_id = getSingleRecordColValue('wf_processes', $where, 'id');
+            //get applicable document types
+            $qry1 = DB::table('tra_proc_applicable_doctypes')
+                ->select('doctype_id');
+            if (isset($process_id) && $process_id != '') {
+                $qry1->where('process_id', $process_id);
+            }
+            if (isset($workflow_stage) && $workflow_stage != '') {
+                $qry1->where('stage_id', $workflow_stage);
+            }
+            if (validateIsNumeric($doc_type_id)) {
+                $qry1->where('doctype_id', $doc_type_id);
+            }
+            $docTypes = $qry1->get();
+            $docTypes = convertStdClassObjToArray($docTypes);
+            $docTypes = convertAssArrayToSimpleArray($docTypes, 'doctype_id');
+            //get applicable document requirements
+            $qry = DB::table('tra_documentupload_requirements as t1')
+                ->join('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+                ->select(DB::raw("t4.remarks, t1.id as document_requirement_id, t4.application_code,
+                t4.node_ref, t2.name as document_type, t4.id,t4.initial_file_name,t4.file_name, t1.module_id,t1.sub_module_id,t1.section_id,
+                t4.file_type,t3.uploaded_on, CONCAT(decryptval(t5.first_name,".getDecryptFunParams()."),' ',decryptval(t5.last_name,".getDecryptFunParams().")) as uploaded_by,t1.is_mandatory,t3.id as document_id,
+                t1.id as document_requirement_id, t1.document_type_id,t2.name as document_type, t1.name as document_requirement"))
+                ->leftJoin('tra_application_documents as t3', function ($join) use ($application_code) {
+                    $join->on("t1.id", "=", "t3.document_requirement_id")
+                            ->where("t3.application_code", $application_code);
+                })
+                ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code) {
+                    $join->on("t1.id", "=", "t4.document_requirement_id")
+                            ->where("t4.application_code", "=", $application_code);
+                })
+                ->leftJoin('users as t5', 't3.uploaded_by', '=', 't5.id')
+                ->where($where);
+                if (validateIsNumeric($prodclass_category_id)) {
+                    $qry->where('t1.prodclass_category_id', $prodclass_category_id);
+                }
+                if (validateIsNumeric($doc_type_id)) {
+                    $qry->where('t1.document_type_id', $doc_type_id);
+                } //else if(count($docTypes) > 0) {
+                    $qry->whereIn('t1.document_type_id', $docTypes);;
+                // }
+
+                if (isset($portal_uploads) && $portal_uploads == 1) {
+                    $qry->where('t1.portal_uploadable', 1);
+                }
+                if (isset($portal_status_id) && $portal_status_id == 1) {
+                    $qry->where('t1.portal_uploadable', 1);
+                }
+            $results = $qry->get();
+            if(count($results) >0){
+                    // dd($results);
+                    $hasValidatedChecklist = true;
+                    foreach($results as $rec){
+                    $document_id = $rec->document_id;
+                    if(!validateIsnumeric($document_id)){
+                        $hasValidatedChecklist = false;
+                    }
+                }
+
+            }
+            else{
+                    $hasValidatedChecklist = true;
+            }
+            $res = array(
+                    'success' => true,
+                    'hasValidatedChecklist' => $hasValidatedChecklist,
+                    'message' => 'All is well Documents'
+                );
+        } catch (\Exception $e) {
+            $res = array(
+                'success' => false,
+                'message' => $e->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return   $res;
+    }
+    public function validateApplicationChecklistDetails($request){
+                $checklist_type = $request->input('checklist_type');
+                $checklist_category_id = $request->input('checklist_category_id');
+                $application_code = $request->input('application_code');
+                $module_id = $request->input('module_id');
+                $sub_module_id = $request->input('sub_module_id');
+                $section_id = $request->input('section_id');
+                $is_previous = $request->input('is_previous');
+                $workflow_stage = $request->input('workflow_stage');
+                if($module_id == 4){
+                    $sub_module_id = 12;
+                    $section_id = 2;
+
+                }
+                $where2 = array(
+                    'sub_module_id' => $sub_module_id,
+                    'section_id' => $section_id
+                );
+
+                $process_details = getTableData('wf_processes', $where2);
+                $process_id = $process_details->id;
+                $workflow_id = $process_details->workflow_id;
+                $where3 = array(
+                    'workflow_id' => $workflow_id,
+                    'stage_status' => 1
+                );
+
+                $stage_details = getTableData('wf_workflow_stages', $where3);
+
+                $where = array(
+                    'process_id' => $process_id,
+                    'stage_id' => $workflow_stage
+                );
+                if (!validateIsNumeric($workflow_stage)) {
+                    $workflow_stage = $stage_details->id;
+                    $where['stage_id'] = $workflow_stage;
+                }
+                $stage_category_id = getSingleRecordColValue('wf_workflow_stages', ['id'=>$workflow_stage], 'stage_category_id');
+                try {
+
+                    $where2 = array(
+                    // 'module_id' => $module_id,
+                        'sub_module_id' => $sub_module_id,
+                        'section_id' => $section_id
+                    );
+                    //get applicable checklist categories
+                    $qry1 = DB::table('tra_proc_applicable_checklists')
+                        ->select('checklist_category_id')
+                        ->where($where);
+
+                    $checklist_categories = $qry1->get();
+                    $checklist_categoriesdata = $qry1->get();
+
+                    $checklist_categories = convertStdClassObjToArray($checklist_categories);
+                    $checklist_categories = convertAssArrayToSimpleArray($checklist_categories, 'checklist_category_id');
+                    //get applicable checklist types
+                    $qry2 = DB::table('par_checklist_types as t1')
+                        ->select('t1.id')
+                        ->where($where2)
+                        ->whereIn('checklist_category_id', $checklist_categories);
+                    $checklist_types = $qry2->get();
+
+                    $checklist_types = convertStdClassObjToArray($checklist_types);
+                    $checklist_types = convertAssArrayToSimpleArray($checklist_types, 'id');
+
+                    $qry = DB::table('par_checklist_items as t1')
+                        ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $is_previous) {
+                            $join->on('t2.checklist_item_id', '=', 't1.id')
+                                ->where('t2.application_code', $application_code);
+                        })
+                        ->join('par_checklist_types as t3', 't1.checklist_type_id', '=', 't3.id')
+                        ->select(DB::raw("t1.*,t2.id as item_resp_id,t2.pass_status,t2.auditorpass_status,t2.comment,t2.observation,t2.auditor_comment,t3.name as checklist_type,
+                                    $module_id as module_id,$sub_module_id as sub_module_id,$section_id as section_id"));
+
+                    if (isset($checklist_type) && $checklist_type != '') {
+                        $qry->where('t1.checklist_type_id', $checklist_type);
+                    } else {
+                        $qry->whereIn('t1.checklist_type_id', $checklist_types);
+                    }
+                    //check the responses
+                    $results = $qry->get();
+                // $records = DB::table('tra_checklistitems_responses')->where(array('application_code'=>$application_code))->get();
+                
+                    if(count($results) >0){
+                        $hasValidatedChecklist = true;
+                        if (validateIsNumeric($stage_category_id) && $stage_category_id == 13) { //auditor/2 review
+                                foreach($results as $rec){
+                                    $auditorpass_status = $rec->auditorpass_status;
+                                    if( !validateIsnumeric($auditorpass_status) ){
+                                        $hasValidatedChecklist = false;
+                                    }
+                                }
+                        }else{
+                            foreach($results as $rec){
+                                    $item_resp_id = $rec->item_resp_id;
+                                    if( !validateIsnumeric($item_resp_id) ){
+                                        $hasValidatedChecklist = false;
+                                    }
+                                }
+                        }
+                        //  $hasValidatedChecklist = true;
+                    }
+                    else{
+                            $hasValidatedChecklist = true;
+                    }
+
+                    $res = array(
+                        'success' => true,
+                        'hasValidatedChecklist' => $hasValidatedChecklist,
+                        'message' => 'All is well'
+                    );
+                } catch (\Exception $exception) {
+                    $res = array(
+                        'success' => false,
+                        'message' => $exception->getMessage()
+                    );
+                } catch (\Throwable $throwable) {
+                    $res = array(
+                        'success' => false,
+                        'message' => $throwable->getMessage()
+                    );
+                }
+
+
+                return $res;
+    }
+        public function checkApplicationRaisedQueries(Request $request)
+        {
+            $application_code = $request->input('application_code');
+            $module_id = $request->input('module_id');
+            $query_type = $request->input('query_type');//whether structured or unstructured
+            try {
+                $hasUnStructuredQueries = $this->checkUnstructuredApplicationRaisedQueries($application_code, array(1, 3));
+                $hasStructuredQueries = $this->checkChecklistBasedApplicationRaisedQueries($application_code, array(1, 3));
+                if ($hasUnStructuredQueries == 1 || $hasStructuredQueries == 1) {
+                    $hasQueries = 1;
+                } else {
+                    $hasQueries = 0;
+                }
+                $res = array(
+                    'success' => true,
+                    'hasQueries' => $hasQueries
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        public function checkUnstructuredApplicationRaisedQueries($application_code, $whereInArray = array(1, 3))
+        {
+            $hasQueries = 0;
+            $qry = DB::table('tra_application_query_reftracker as t1')
+                ->join('tra_checklistitems_queries as t2', 't1.id', 't2.query_id')
+                ->where('t1.application_code', $application_code)
+                ->whereIn('t2.status', $whereInArray);
+            $queriesCount = $qry->count();
+            if ($queriesCount > 0) {
+                $hasQueries = 1;
+            }
+            return $hasQueries;
+        }
+        public function checkChecklistBasedApplicationRaisedQueries($application_code, $whereInArray = array(1, 3))
+        {
+            $hasQueries = 0;
+            $qry = DB::table('tra_application_query_reftracker as t1')
+                ->join('tra_checklistitems_queries as t2', 't1.id', '=', 't2.query_id')
+                ->where('t1.application_code', $application_code)
+                ->whereIn('t2.status', $whereInArray);
+            $queriesCount = $qry->count();
+            if ($queriesCount > 0) {
+                $hasQueries = 1;
+            }
+            return $hasQueries;
+        }
+    public function getelementcost(request $request){
+            $fee_type_id = $request->input('fee_type_id');
+            $cost_category_id = $request->input('cost_category_id');
+            $sub_cat_id = $request->input('sub_cat_id');
+            $cost_item_id = $request->input('cost_item_id');
+            $application_feetype_id = $request->input('applicationfee_types_id');
+            $currency_id = $request->input('currency_id');
+            $filters = (array)json_decode($request->filters);
+            $filters=array_filter($filters);
+
+            // DB::enableQueryLog();
+        //   {feetype}: {category} : {sub_category} {element} {cost_type} {costs} {currency_name}&nbsp;</div></tpl>';
+        try {
+
+
+            $qry = DB::table('tra_element_costs as t1')
+                ->LeftJoin('par_cost_elements as t2', 't1.element_id', 't2.id')
+                ->LeftJoin('par_cost_sub_categories as t5', 't1.sub_cat_id', 't5.id')
+                ->LeftJoin('par_fee_types as t6', 't1.fee_type_id', 't6.id')
+                ->LeftJoin('par_cost_categories as a7','t5.cost_category_id','a7.id')
+                ->LeftJoin('par_confirmations as t8', 't1.formula','t8.flag')
+                ->LeftJoin('par_gl_accounts as t10','t1.gl_code_id','t10.id')
+                ->LeftJoin('par_currencies as t11','t1.currency_id','t11.id')
+                ->LeftJoin('par_applicationfee_types as t12','t1.application_feetype_id','t12.id')
+                ->LeftJoin('par_modules as t13','t1.module_id','t13.id')
+                ->LeftJoin('par_sub_modules as t14','t1.sub_module_id','t14.id')
+                ->select('t1.*', 't1.id as element_costs_id','t11.name as currency_name', 't2.name as element', 't5.name as sub_category','t6.name as feetype','a7.name as category', 't8.name as formulaflag','t10.name as glcode','t12.name as cost_type', 't2.name as element_desc', 't14.name as sub_module_name','t13.name as module_name');
+
+            if(validateIsNumeric($fee_type_id)){
+                $qry->where('t1.fee_type_id',$fee_type_id);
+                }
+            if(validateIsNumeric($cost_category_id)){
+                $qry->where('t5.cost_category_id',$cost_category_id);
+                }
+            if(validateIsNumeric($sub_cat_id)){
+                $qry->where('t1.sub_cat_id',$sub_cat_id);
+                }
+            if(validateIsNumeric($cost_item_id)){
+                $qry->where('t1.element_id',$cost_item_id);
+                }
+            if(validateIsNumeric($application_feetype_id)){
+                $qry->where('t1.application_feetype_id',$application_feetype_id);
+                }
+                if (count((array)$filters) > 0) {
+                        $qry->where($filters);
+                    }
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            // $last_query = DB::getQueryLog();
+            // dd($last_query);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    public function getCountryRegions(Request $request)
+        {
+            $application_code = $request->input('application_code');
+            $module_id = $request->input('module_id');
+            $query_type = $request->input('query_type');//whether structured or unstructured
+            try {
+                $regions = DB::table('par_countries as t1')
+                        ->leftJoin('par_regions as t2', 't1.id', 't2.country_id')
+                        ->where('t1.is_local', 1)
+                        ->get();
+                $res = array(
+                    'success' => true,
+                    'results' => $regions,
+                    'message' => 'All is well'
+                );
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        public function getMeetingSchedules(Request $req){
+            try{
+                // $data_today = formatDate(Carbon::now());
+                // $user_id = $this->user_id;
+                $qry = DB::table('tc_meeting_details as t1')
+                                // ->join('tc_meeting_participants as t2', 't1.id', 't2.meeting_id')
+                                // ->leftJoin('par_modules as t3', 't1.module_id', 't3.id')
+                                // ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', 't4.id')
+                                // ->leftJoin('tc_meeting_applications as t5', 't1.id', 't5.meeting_id')
+                                ->select('t1.*') ;
+                                $results = $qry->get();
+
+                $res = array(
+                    'success' => true,
+                    'results' => $results,
+                    'message' => 'All is well'
+                );
+
+            } catch (\Exception $exception) {
+                $res = array(
+                    'success' => false,
+                    'message' => $exception->getMessage()
+                );
+            } catch (\Throwable $throwable) {
+                $res = array(
+                    'success' => false,
+                    'message' => $throwable->getMessage()
+                );
+            }
+            return \response()->json($res);
+
+        }
+        public function getGridColumnsFromSchema(Request $req)
+        {
+            $table_name = $req->table_name;
+            $unset = array();
+            try{
+                $columns = DB::getSchemaBuilder()->getColumnListing($table_name);
+            if($table_name == "tra_personnel_information"){
+                    $unset[] = 'region_id';
+                    $columns[]= 'Region';
+                    $unset[] = 'sub_district_id';
+                    $columns[]= 'Area/Town/City';
+                    $unset[] = 'district_id';
+                    $unset[] = 'personnel_type_id';
+                    $unset[] = 'trader_id';
+            }
+                $unset[] = 'created_by';
+                $unset[] = 'created_on';
+                $unset[] = 'altered_by';
+                $unset[] = 'dola';
+                $unset[] = 'id';
+                $unset[] = 'is_enabled';
+
+                foreach ($unset as $value) {
+                if (($key = array_search($value, $columns)) !== false) {
+                        unset($columns[$key]);
+                    }
+                }
+                $columns = array_values($columns);
+
+            $res = array(
+                'success' => true,
+                'results' => $columns,
+                'message' => 'All is well'
+            );
+
+            } catch (\Exception $exception) {
+                $res = array(
+                    'success' => false,
+                    'message' => $exception->getMessage()
+                );
+            } catch (\Throwable $throwable) {
+                $res = array(
+                    'success' => false,
+                    'message' => $throwable->getMessage()
+                );
+            }
+            return \response()->json($res);
+        }
+        public function validateRequiredApplicationDetails($table_name, $application_code, $title){
+            
+            $record = DB::table($table_name)->where('application_code',$application_code)->first();
+            if($record){
+                $res = array('success'=>true, 'message'=>'');
+            }
+            else{
+                $res = array('success'=>false, 'message'=>$title);
+            }
+            return $res;
+        }
+        public function checkApprovalREcommendationDEtails(Request $req){
+            try {
+                    
+                    $res = $this->validateRequiredApplicationDetails('tra_approval_recommendations', $req->application_code, 'Approval Recommendation has been filled successfully');
+
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        public function checkIfHasGeneratedInvoiceDEtails(Request $req){
+            try {
+
+                    $res = $this->validateRequiredApplicationDetails('tra_application_invoices', $req->application_code, 'Generate Application invoice to proceed.');
+
+
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        public function validateHasUploadedDocumentsDetils(Request $req){
+            try {
+                    $res = $this->validateRequiredApplicationDetails('tra_application_uploadeddocuments', $req->application_code, 'Upload te Required Documents');
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            $res = array('success'=>true, 'message'=>'');
+            return \response()->json($res);
+        }
+        public function validateHasImportExportProductDetils(Request $req){
+            try {
+                    $res = $this->validateRequiredApplicationDetails('tra_permits_products', $req->application_code, 'Enter the Import/Export Product Details to proceed');
+
+
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+            return \response()->json($res);
+        }
+        
+    }
+
+

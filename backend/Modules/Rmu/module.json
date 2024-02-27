@@ -1,0 +1,13 @@
+{
+    "name": "Rmu",
+    "alias": "rmu",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Rmu\\Providers\\RmuServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -1,0 +1,5 @@
+{
+    "require": {
+        "elibyy/tcpdf-laravel": "^10.0"
+    }
+}

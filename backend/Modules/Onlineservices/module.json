@@ -1,0 +1,13 @@
+{
+    "name": "Onlineservices",
+    "alias": "onlineservices",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\Onlineservices\\Providers\\OnlineservicesServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

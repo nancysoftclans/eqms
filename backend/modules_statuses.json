@@ -1,0 +1,24 @@
+{
+    "Administration": true,
+    "Auth": true,
+    "Configurations": true,
+    "UserManagement": true,
+    "Workflow": true,
+    "Notifications": true,
+    "AuditTrail": true,
+    "SummaryReport": true,
+    "DocumentManagement": true,
+    "Dashboard": true,
+    
+    "Surveillance": true,
+   
+    "Migrations": true,
+    
+    "Reports": true,
+    "OpenOffice": true,
+    "NewReports": true,
+    
+    "Onlineservices": true,
+   
+    "Integration": true
+}

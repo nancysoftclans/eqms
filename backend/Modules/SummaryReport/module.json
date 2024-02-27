@@ -1,0 +1,13 @@
+{
+    "name": "SummaryReport",
+    "alias": "summaryreport",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\SummaryReport\\Providers\\SummaryReportServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

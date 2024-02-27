@@ -1,0 +1,130 @@
+@include gauge-ui(
+    $ui: 'green',
+
+    $value-fill: #0e0
+);
+@mixin btn-border($background-color) {
+    background-color: $background-color;
+    border-color: $background-color !important;
+
+    .x-btn-inner-default-toolbar-small {
+        color: $lightest-color;
+    }
+
+    &:hover {
+        background-color: transparent;
+
+        .x-btn-inner-default-toolbar-small,
+        .x-btn-inner-default-small {
+            color: $background-color;
+        }
+
+        .x-btn-icon-el-default-small,
+        .x-btn-icon-el-default-toolbar-small {
+            color: $background-color;
+        }
+    }
+}
+
+@mixin border-radius($radius) {
+    -webkit-border-radius: $radius;
+    -moz-border-radius: $radius;
+    -ms-border-radius: $radius;
+    border-radius: $radius;
+}
+
+@mixin box-shadow($h-shadow, $v-shadow, $blur, $spread, $shadow-color) {
+    $value: $h-shadow, $v-shadow, $blur, $spread, $shadow-color;
+    -webkit-box-shadow: $value;
+    -moz-box-shadow: $value;
+    -ms-box-shadow: $value;
+    box-shadow: $value;
+}
+
+.x-menu-header {
+    z-index: 0 !important;
+}
+
+.x-css-shadow{
+     box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 25px !important;
+}
+.x-css-shadow[style] {
+    box-shadow: rgba(0, 0, 0, 0.5) 0px 0px 25px !important;
+}
+.shadow {
+    @include box-shadow(0 1px 2px 0 rgba(0,0,0,0.2));
+}
+
+.x-fa {
+    display: inline-block;
+    font: normal normal normal 14px/1 $font-family;
+}
+
+.alignRight {
+    float: right;
+}
+
+.boldFont {
+    font-weight: bold;
+}
+.wizards .x-panel{
+    background: #fff;
+}
+
+.wizardthree .wizardprogressbar {
+    background-color: $wizard-three-button-background-color;
+}
+
+@include extjs-button-small-ui(
+    $ui: 'wizard-blue',
+    $color: $button-toolbar-color,
+    $color-pressed: $wizard-primary-background-color,
+    $background-color: transparent,
+    $opacity-disabled: 1,
+    $glyph-color: $button-toolbar-glyph-color,
+    $border-width: 0
+);
+
+@include extjs-button-small-ui(
+    $ui: 'wizard-soft-purple',
+    $color: $button-toolbar-color,
+    $color-pressed: #fff,
+    $background-color: transparent,
+    $background-color-pressed: $wizard-two-button-background-color,
+    $opacity-disabled: 1,
+    $glyph-color: $button-toolbar-glyph-color,
+    $border-width: 0
+);
+
+@include extjs-button-small-ui(
+    $ui: 'wizard-soft-blue',
+    $color: #fff,
+    $color-pressed: $color,
+    $background-color: transparent,
+    $opacity-disabled: 1,
+    $glyph-color: #fff,
+    $border-width: 0
+);
+
+// This rule is required because the button mixin does not currently support
+// separate icon colors for each state
+.x-btn-pressed {
+    .x-btn-icon-el-wizard-blue-small {
+        color: $wizard-primary-background-color;
+    }
+
+    &.x-btn-disabled {
+        &.x-btn-wizard-soft-purple-small,
+        .x-btn-wizard-soft-purple-small-mc {
+            background-color: $wizard-two-button-background-color;
+        }
+    }
+
+    .x-btn-icon-el-wizard-soft-purple-small {
+        color: #fff;
+    }
+
+    .x-btn-icon-el-wizard-soft-blue-small {
+        color: $color;
+    }
+}

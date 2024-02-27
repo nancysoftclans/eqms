@@ -1,0 +1,146 @@
+<?xml version='1.0' encoding='UTF-8'?>
+            <!DOCTYPE ichicsr SYSTEM 'http://eudravigilance.ema.europa.eu/dtd/icsr21xml.dtd'>
+            <ichicsr lang='en'>
+            <ichicsrmessageheader>
+                <messagetype>ichicsr</messagetype>
+                <messageformatversion>2.1</messageformatversion>
+                <messageformatrelease>2.0</messageformatrelease>
+                <messagenumb>KU23/AEF33-F1/0005</messagenumb>
+                <messagesenderidentifier>BOMRA</messagesenderidentifier>
+                <messagereceiveridentifier>BRIMS</messagereceiveridentifier>
+                <messagedateformat>204</messagedateformat>
+                <messagedate>20230707091113</messagedate>
+            </ichicsrmessageheader>
+            <safetyreport>
+                <safetyreportversion>1</safetyreportversion> 
+                <safetyreportid>KU23/AEF33-F1/0005</safetyreportid>
+                <primarysourcecountry>BW</primarysourcecountry>
+                <occurcountry>BW</occurcountry>
+                <transmissiondateformat>102</transmissiondateformat>
+                <transmissiondate>20230707</transmissiondate>
+                <reporttype>1</reporttype>
+                <serious>1</serious>
+                <seriousnessdeath>2</seriousnessdeath>
+                <seriousnesslifethreatening>1</seriousnesslifethreatening>
+                <seriousnesshospitalization>2</seriousnesshospitalization>
+                <seriousnessdisabling>2</seriousnessdisabling>
+                <seriousnesscongenitalanomali>2</seriousnesscongenitalanomali>
+                <seriousnessother>2</seriousnessother>
+                <receivedateformat>102</receivedateformat>
+                <receivedate>20230620</receivedate>
+                <receiptdateformat>102</receiptdateformat>
+                <receiptdate>20230620</receiptdate>
+                <additionaldocument>2</additionaldocument>
+                <fulfillexpeditecriteria>1</fulfillexpeditecriteria>
+                <companynumb>KU23/AEF33-F1/0005</companynumb>
+                <primarysource>
+                    <reportertitle></reportertitle>
+                    <reportergivename>PRIVACY</reportergivename>
+                    <reporterfamilyname>PRIVACY</reporterfamilyname>
+                    <reporterorganization>PRIVACY</reporterorganization>
+                    <reportercountry>BW</reportercountry>
+                    <qualification>5</qualification>
+                </primarysource>
+                <sender>
+                    <sendertype>6</sendertype>
+                    <senderorganization>Softclans</senderorganization>
+                    <senderdepartment>Developer</senderdepartment>
+                    <senderstreetaddress>Softclans</senderstreetaddress>
+                    <sendercity>Nairobi</sendercity>
+                    <sendercountrycode>BW</sendercountrycode>
+                    <sendertel>0712345</sendertel>
+                    <sendertelextension>0712345678</sendertelextension>
+                    <sendertelcountrycode>254</sendertelcountrycode>
+                </sender>
+                <receiver>
+                    <receivertype>2</receivertype>
+                    <receiverorganization>BOMRA</receiverorganization>
+                    <receivercountrycode>BW</receivercountrycode>
+                </receiver>
+                <patient>
+                    <patientinitial>Mr.</patientinitial>
+                    <patientonsetage>34</patientonsetage>
+                    <patientonsetageunit>803</patientonsetageunit>
+                    <patientweight>54</patientweight>
+                    <patientsex>2</patientsex>
+                    <lastmenstrualdateformat>102</lastmenstrualdateformat>
+                    <patientlastmenstrualdate>20230706</patientlastmenstrualdate>
+                    <patientmedicalhistorytext>none1</patientmedicalhistorytext>
+                    <patientdeath>
+                    </patientdeath>
+            <reaction>
+                <primarysourcereaction>none2</primarysourcereaction>
+
+                <reactionmeddraversionllt>21.0</reactionmeddraversionllt>
+                <reactionmeddrallt>10033557</reactionmeddrallt>
+
+                <termhighlighted>3</termhighlighted>
+                <reactionstartdateformat>102</reactionstartdateformat>
+                <reactionstartdate>20220601</reactionstartdate>
+                <reactionenddateformat>102</reactionenddateformat>
+                <reactionenddate>20230630</reactionenddate>
+                <reactionoutcome>3</reactionoutcome>
+            </reaction><drug>
+                    <drugcharacterization>3</drugcharacterization>
+                    <medicinalproduct>Other In use</medicinalproduct>
+                    <obtaindrugcountry>BW</obtaindrugcountry>
+                    <drugbatchnumb>BRRR12</drugbatchnumb>
+                    <drugauthorizationcountry></drugauthorizationcountry>
+                    <drugauthorizationholder></drugauthorizationholder>
+                    <drugdosagetext>(1234)</drugdosagetext>
+                    <drugdosageform>(Route of administration is - Oral )</drugdosageform>
+                    <drugstartdateformat>201</drugstartdateformat>
+                    <drugstartdate>20230704</drugstartdate>
+                    <drugenddateformat>201</drugenddateformat>
+                    <drugenddate>20230721</drugenddate>
+                    <actiondrug></actiondrug>              
+                    <activesubstance>
+                        <activesubstancename></activesubstancename>
+                    </activesubstance>
+                    
+                </drug><drug>
+                    <drugcharacterization>1</drugcharacterization>
+                    <medicinalproduct>Oj</medicinalproduct>
+                    <obtaindrugcountry>BW</obtaindrugcountry>
+                    <drugbatchnumb>Ruriru1</drugbatchnumb>
+                    <drugauthorizationcountry></drugauthorizationcountry>
+                    <drugauthorizationholder></drugauthorizationholder>
+                    <drugdosagetext>(every hour)</drugdosagetext>
+                    <drugdosageform>(Route of administration is - Oral tablet )</drugdosageform>
+                    <drugstartdateformat>201</drugstartdateformat>
+                    <drugstartdate>20230706</drugstartdate>
+                    <drugenddateformat>201</drugenddateformat>
+                    <drugenddate>20230707</drugenddate>
+                    <actiondrug></actiondrug>              
+                    <activesubstance>
+                        <activesubstancename></activesubstancename>
+                    </activesubstance>
+                    
+                </drug><drug>
+                    <drugcharacterization>1</drugcharacterization>
+                    <medicinalproduct>Giraga</medicinalproduct>
+                    <obtaindrugcountry>BW</obtaindrugcountry>
+                    <drugbatchnumb>12345</drugbatchnumb>
+                    <drugauthorizationcountry></drugauthorizationcountry>
+                    <drugauthorizationholder></drugauthorizationholder>
+                    <drugdosagetext>(once per day)</drugdosagetext>
+                    <drugdosageform>Mouth(Route of administration is - Mouth )</drugdosageform>
+                    <drugstartdateformat>201</drugstartdateformat>
+                    <drugstartdate>20230706</drugstartdate>
+                    <drugenddateformat>201</drugenddateformat>
+                    <drugenddate>20230705</drugenddate>
+                    <actiondrug></actiondrug>              
+                    <activesubstance>
+                        <activesubstancename></activesubstancename>
+                    </activesubstance>
+                    
+                </drug><summary>
+                <narrativeincludeclinical>
+                Treatment sourced 
+                none3. 
+                Pre-Exisitng conditions 
+                none1.</narrativeincludeclinical>
+            </summary>
+        </patient>
+        </safetyreport>
+    </ichicsr>
