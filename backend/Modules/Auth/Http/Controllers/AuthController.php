@@ -62,6 +62,7 @@ class AuthController extends Controller
             'email' => $email,
             'password' => hashPwd($req->email, $user->uuid, $req->password)
          );
+        //  dd($credentials);
 
         if (Auth::attempt($credentials)) {
             $user = Auth::user();

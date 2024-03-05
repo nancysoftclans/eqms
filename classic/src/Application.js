@@ -7,13 +7,8 @@ Ext.define('Admin.Application', {
     controllers:[
         'SharedUtilitiesCtr',
         'WorkflowManagementCtr',
-        'ProductRegistrationCtr',
         'DashboardCtr',
         'PremiseRegistrationCtr',
-        'GmpApplicationsCtr',
-        'LaboratoryServicesCtr',
-        'MirCtr',
-        'ClinicalTrialCtr',
         'PromoAndAdvertMaterialsController',
         'PvCtr',
         'SurveillanceCtr',
@@ -24,7 +19,8 @@ Ext.define('Admin.Application', {
         'ApplicationAssignmentCtr',
         'NewReportsCtr',
         'PsurCtr',
-        'OnlineServicesCtr'
+        'OnlineServicesCtr',
+       
 
     ],
     defaultToken : system_dashboard,

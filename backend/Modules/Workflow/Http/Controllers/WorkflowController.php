@@ -36,14 +36,14 @@ class WorkflowController extends Controller
     use ProductsNotificationTrait;
     use RevenuemanagementTrait;
     -------------------------------------------------------------------------------*/
-    use ProductsRegistrationTrait;
-    use GmpApplicationsTrait;
-    use PremiseRegistrationTrait;
-    use ClinicalTrialTrait;
-    use PromotionMaterialsTrait;
-    use SurveillanceTrait;
-    use ImportexportpermitsTraits;
-    use EnforcementTrait;
+    // use ProductsRegistrationTrait;
+    // use GmpApplicationsTrait;
+    // use PremiseRegistrationTrait;
+    // use ClinicalTrialTrait;
+    // use PromotionMaterialsTrait;
+    // use SurveillanceTrait;
+    // use ImportexportpermitsTraits;
+    // use EnforcementTrait;
     protected $base_url;
 
     public function __construct(Request $req)
