@@ -14,7 +14,7 @@ return [
     //dms
     'dms' => [
         'dms_adminusr' => env('DMS_ADMINUSR', 'admin'),
-        'dms_adminpassword' => env('DMS_ADMINPASSWORD', 'admin'),
+        'dms_adminpassword' => env('DMS_ADMINPASSWORD', 'Da97vid27'),
         'dms_url' => env('DMS_URL', 'http://localhost:8080/alfresco/'),
         'dms_approotsite' => env('DMS_APPROOTSITE', 'bomra'),
         'dms_approotsitecontainer' => env('DMS_APPROOTSITECONTAINER', 'bomra'),

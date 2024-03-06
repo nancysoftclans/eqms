@@ -1,4 +1,4 @@
-Ext.define('Admin.view.documentControl.views.dashboard.documentControlDashboard', {
+Ext.define('Admin.view.documentControl.views.dashboard.DocumentControlDashboard', {
     extend: 'Ext.Container',
     xtype: 'documentcontrolCtn',
     controller: 'documentcontrolvctr',
@@ -6,13 +6,13 @@ Ext.define('Admin.view.documentControl.views.dashboard.documentControlDashboard'
 
     items: [
         {
-            xtype: 'hiddenField',
+            xtype: 'hiddenfield',
             value:26             
         },
-        // {
-        //     xtype: 'documentControlDashWrapperPnl',
-        //     region: 'center',
-        // },
+        {
+            xtype: 'documentControlDashWrapperPnl',
+            region: 'center',
+        },
         // {
         //     xtype: 'documentControlTb',
         //     region: 'south'
