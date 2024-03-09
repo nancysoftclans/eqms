@@ -3,8 +3,8 @@
 return [
 
     //for passport clients
-    'client_id' => env('PASSPORT_CLIENT_ID', 2),
-    'client_secret' => env('PASSPORT_CLIENT_SECRET', 7),
+    'client_id' => env('PASSPORT_CLIENT_ID', 8),
+    'client_secret' => env('PASSPORT_CLIENT_SECRET', '3bH04wXWBwehb0bdThfNTSgis6ZhR1LfdC6d0Hnm'),
     
     //security
     'encryption_key' => 'ERxNN4ZsK3w4X9ceFZM8DMCUMwV2qYrcHReWy2AJ',

@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'default' => env('DB_CONNECTION', 'pgsql'),
+    'default' => env('DB_CONNECTION', 'mysql'),
 
     /*
     |--------------------------------------------------------------------------
@@ -46,24 +46,19 @@ return [
         'mysql' => [
             'driver' => 'mysql',
             'url' => env('DATABASE_URL'),
-            'host' => env('MIG_TEMP_DB_HOST', '127.0.0.1'),
-            'port' => env('MIG_TEMP_DB_PORT', '3306'),
-            'database' => env('MIG_TEMP_DB_DATABASE', 'mis_qms'),
-            'username' => env('MIG_TEMP_DB_USERNAME', 'root'),
-            'password' => env('MIG_TEMP_DB_PASSWORD', ''),
-            'unix_socket' => env('DB_SOCKET', ''),
-            'charset' => 'utf8mb4',
-            'collation' => 'utf8mb4_unicode_ci',
+            'host' => env('DB_HOST', '127.0.0.1'),
+            'port' => env('DB_PORT', '5432'),
+            'database' => env('DB_DATABASE', 'bomra'),
+            'username' => env('DB_USERNAME', 'root'),
+            'password' => env('DB_PASSWORD', 'root'),
+            'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            'strict' => true,
-            'engine' => null,
-            'options' => extension_loaded('pdo_mysql') ? array_filter([
-                PDO::MYSQL_ATTR_SSL_CA => env('MYSQL_ATTR_SSL_CA'),
-            ]) : [],
+            'schema' => 'public',
+            'sslmode' => 'prefer',
         ],
         'portal_db' => [
-            'driver' => 'pgsql',
+            'driver' => 'mysql',
             'host' =>  env('PORTAL_HOST', '127.0.0.1'),
             'port' =>  env('PORTAL_PORT', '3306'),
             'database' =>  env('PORTAL_DATABASE', 'forge'),
@@ -105,12 +100,12 @@ return [
             'sslmode' => 'prefer',
         ],
         'audit_db' => [
-            'driver' => 'pgsql',
+            'driver' => 'mysql',
             'host' =>  env('AUDIT_HOST', '127.0.0.1'),
             'port' =>  env('AUDIT_PORT', '3306'),
-            'database' =>  env('AUDIT_DATABASE', 'forge'),
-            'username' =>  env('AUDIT_USERNAME', 'forge'),
-            'password' =>  env('AUDIT_PASSWORD', ''),
+            'database' =>  env('AUDIT_DATABASE', 'bomra_audit'),
+            'username' =>  env('AUDIT_USERNAME', 'root'),
+            'password' =>  env('AUDIT_PASSWORD', 'root'),
             'unix_socket' => env('AUDIT_SOCKET', ''),
             'charset' => 'utf8',
             'prefix' => '',

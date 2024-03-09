@@ -38,7 +38,7 @@ if (!function_exists('getDecryptFunParams')) {
 
 
 if (!function_exists('getParameterItgenems')) {
-    function getParameterItems($table_name, $filter, $con = 'pgsql')
+    function getParameterItems($table_name, $filter, $con = 'mysql')
     {
         return DbHelper::getParameterItems($table_name, $filter, $con);
     }
@@ -200,7 +200,7 @@ if (!function_exists('insertRecordNoTransaction')) {
 }
 
 if (!function_exists('insertRecord')) {
-    function insertRecord($table_name, $table_data, $user_id = null, $con = 'pgsql')
+    function insertRecord($table_name, $table_data, $user_id = null, $con = 'mysql')
     {
 
         return DbHelper::insertRecord($table_name, $table_data, $user_id, $con);
@@ -219,7 +219,7 @@ if(!function_exists('sendMailFromNotification')){
     }
 }
 if (!function_exists('updateRecord')) {
-    function updateRecord($table_name, $where, $table_data, $user_id=null, $con = 'pgsql')
+    function updateRecord($table_name, $where, $table_data, $user_id=null, $con = 'mysql')
     {
         return DbHelper::updateRecord($table_name, $where, $table_data, $user_id, $con);
     }
@@ -233,14 +233,14 @@ if (!function_exists('updateRecordNoTransaction')) {
 }
 
 if (!function_exists('deleteRecord')) {
-    function deleteRecord($table_name, $where_data, $user_id = null, $con = 'pgsql')
+    function deleteRecord($table_name, $where_data, $user_id = null, $con = 'mysql')
     {
         return DbHelper::deleteRecord($table_name, $where_data, $user_id, $con);
     }
 }
 
 if (!function_exists('deleteRecordNoTransaction')) {
-    function deleteRecordNoTransaction($table_name, $previous_data, $where_data, $user_id, $con = 'pgsql')
+    function deleteRecordNoTransaction($table_name, $previous_data, $where_data, $user_id, $con = 'mysql')
     {
         return DbHelper::deleteRecordNoTransaction($table_name, $previous_data, $where_data, $user_id, $con);
     }
@@ -289,14 +289,14 @@ if (!function_exists('decryptSimpleArray')) {
 }
 
 if (!function_exists('recordExists')) {
-    function recordExists($table_name, $where, $con = 'pgsql')
+    function recordExists($table_name, $where, $con = 'mysql')
     {
         return DbHelper::recordExists($table_name, $where, $con);
     }
 }
 
 if (!function_exists('getPreviousRecords')) {
-    function getPreviousRecords($table_name, $where, $con = 'pgsql')
+    function getPreviousRecords($table_name, $where, $con = 'mysql')
     {
         return DbHelper::getPreviousRecords($table_name, $where, $con);
     }
@@ -388,14 +388,14 @@ if (!function_exists('converter22')) {
 }
 
 if (!function_exists('getSingleRecord')) {
-    function getSingleRecord($table, $where,$col='pgsql')
+    function getSingleRecord($table, $where,$col='mysql')
     {
         return DbHelper::getSingleRecord($table, $where,$col);
     }
 }
 
 if (!function_exists('getSingleRecordColValue')) {
-    function getSingleRecordColValue($table, $where, $col, $con = 'pgsql')
+    function getSingleRecordColValue($table, $where, $col, $con = 'mysql')
     {
         return DbHelper::getSingleRecordColValue($table, $where, $col, $con);
     }
@@ -530,7 +530,7 @@ if (!function_exists('formatBytes')) {
 }
 
 if (!function_exists('generateApplicationCode')) {
-    function generateApplicationCode($module_id, $table_name, $con='pgsql')
+    function generateApplicationCode($module_id, $table_name, $con='mysql')
     {
         return UtilityHelper::generateApplicationCode($module_id, $table_name, $con);
     }
@@ -579,7 +579,7 @@ if (!function_exists('getApplicationPaymentsRunningBalance')) {
 }
 
 if (!function_exists('getTableData')) {
-    function getTableData($table_name, $where,$col='pgsql')
+    function getTableData($table_name, $where,$col='mysql')
     {
         return DbHelper::getTableData($table_name, $where,$col);
     }
@@ -928,7 +928,7 @@ if (!function_exists('dmsGetNodePreviousVersions')) {
     }
 }
 if (!function_exists('getApplicationSubModuleNodeDetails')) {
-    function getApplicationSubModuleNodeDetails($section_id, $module_id, $sub_module_id, $user_id, $con = 'pgsql')
+    function getApplicationSubModuleNodeDetails($section_id, $module_id, $sub_module_id, $user_id, $con = 'mysql')
     {
         return DMSHelper::getApplicationSubModuleNodeDetails($section_id, $module_id, $sub_module_id, $user_id, $con);
 
@@ -949,7 +949,7 @@ if (!function_exists('getDocumentTypeRootNode')) {
     }
 }
 if (!function_exists('saveApplicationDocumentNodedetails')) {
-    function saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, $tracking_no, $reference_no, $dms_node_id, $user, $con = 'pgsql')
+    function saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, $tracking_no, $reference_no, $dms_node_id, $user, $con = 'mysql')
     {
         return DMSHelper::saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, $tracking_no, $reference_no, $dms_node_id, $user, $con);
 
@@ -1110,7 +1110,7 @@ if (!function_exists('getPermitExpiryDate')) {
     }
 }
 if (!function_exists('getParameterItem')) {
-    function getParameterItem($table_name, $record_id, $con = 'pgsql')
+    function getParameterItem($table_name, $record_id, $con = 'mysql')
     {
         return DbHelper::getParameterItem($table_name, $record_id, $con);
     }
@@ -1456,7 +1456,7 @@ if (!function_exists('getTraderEmail')) {
 }
 //new
 if (!function_exists('insertMultipleRecords')) {
-    function insertMultipleRecords($table_name, $table_data, $user_id = null, $con = 'pgsql')
+    function insertMultipleRecords($table_name, $table_data, $user_id = null, $con = 'mysql')
     {
 
         return DbHelper::insertMultipleRecords($table_name, $table_data, $user_id, $con);

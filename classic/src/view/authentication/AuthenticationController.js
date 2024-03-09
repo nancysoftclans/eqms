@@ -15,62 +15,58 @@ Ext.define('Admin.view.authentication.AuthenticationController', {
             me = this;
         if (frm.isValid()) {
             frm.submit({
-                dataType: 'JSON',
-                url: base_url+'login',
+            dataType: 'JSON',
+            url: base_url+'login',
                 method: 'POST',
-                waitTitle: 'Connecting',
-                waitMsg: 'Authenticating Credentials...',
-                headers: {
+            waitTitle: 'Connecting',
+            waitMsg: 'Authenticating Credentials...',
+            headers: {
                         'Authorization': 'Bearer ' + access_token,
-                        'Accept': 'application/json'
-                    },
+                'Accept': 'application/json'
+            },
                 success: function (form, action) {
                     var response = Ext.decode(action.response.responseText),
-                        message = response.message,
-                        success = response.success;
+                    message = response.message,
+                    success = response.success;
+
                     if(success){
-                        var user = response.user,
-                            token = response.token;
-
-                        // Ext.state.Manager.set('user', {
-                        //       first_name: user.name,
-                        //       access_token: token
-                        //     });
-
-                        // me.redirectTo('dashboard', true);
-
-                        toastr.success(message, "Logged In!!");
-
+                        // var user = response.user,
+                        // token = response.token;
                         setTimeout(function () {
                             location.reload();
                         }, 100);
 
-                    }else{
-                        toastr.success(message, "Authentication Failed!!");
-                    }
-                        
-                },
-                failure: function (form, action) {
-                    var response = Ext.decode(action.response.responseText),
-                        message = response.message,
-                        status = action.response.status;
-                    toastr.error(message, 'Failure Response');
-                    if (status == 400) {
-                        // toastr.error('Reload page', 'Your ');
-                    }
-                    if (action.failureType == 'server') {
-                        //toastr.error(message, 'Login failed!');
-                    }
-                },
-                error: function (jqXHR, textStatus, errorThrown) {
-                    toastr.error('Error: ' + errorThrown, 'Error Response');
+                    toastr.success(message, "Logged In!!");
+
+                    // Redirect to dashboard
+                    window.location.href = '#dashboard'; // Change 'dashboard' to your actual dashboard URL
+                } else {
+                    toastr.error(message, "Authentication Failed!!");
                 }
-            });
-        }else{ 
-             toastr.error('Error check the form', 'Error Response');
-        }
-        
-    },
+            },
+            failure: function(form, action) {
+                var response = Ext.decode(action.response.responseText),
+                    message = response.message,
+                    status = action.response.status;
+
+                toastr.error(message, 'Failure Response');
+
+                if (status == 400) {
+                    toastr.error('Reload page', 'Your ');
+                }
+
+                if (action.failureType == 'server') {
+                    toastr.error(message, 'Login failed!');
+                }
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                toastr.error('Error: ' + errorThrown, 'Error Response');
+            }
+        });
+    } else {
+        toastr.error('Error check the form', 'Error Response');
+    }
+},
 
     onLoginAsButton: function() {
         this.redirectTo('login', true);

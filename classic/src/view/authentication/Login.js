@@ -34,7 +34,7 @@ Ext.define('Admin.view.authentication.Login', {
             items: [
                 {
                     xtype: 'label',
-                    html: '<h1>BOMRA Staff Login</h1>'
+                    html: '<h1>eQMS Login</h1>'
                 },
                 {
                     xtype: 'textfield',

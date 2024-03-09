@@ -1960,7 +1960,7 @@ class UtilityHelper
           $counter =  DB::table('tc_meeting_details as t1')
                     ->join('tc_meeting_participants as t2', 't1.id', 't2.meeting_id')
                     ->where(array('user_id'=>$user_id))
-                    ->whereRaw("to_char(date_requested, 'YYYY-mm-dd') >= '".$data_today."'")->distinct()
+                    ->whereDate("date_requested",'>=' , $data_today)->distinct()
                     ->count('t1.id');
 
         return $counter;

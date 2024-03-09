@@ -72,7 +72,8 @@ class AuthController extends Controller
                 'attempt_status' => 2
             );
             $where = array('account_id'=>$user->id);
-            updateRecord('tra_failed_login_attempts', $where, $update, 1);
+           updateRecord('tra_failed_login_attempts', $where, $update, 1);
+           
             //register with passport authenticator for access token
             $response = $http->post(url('/').'/oauth/token', [
                 'form_params' => [
@@ -84,6 +85,8 @@ class AuthController extends Controller
                     'scope' => '*'
                 ]
             ]);
+             //dd($response);
+
             if($response->getStatusCode() == 200){
                 $res = json_decode((string) $response->getBody(), true);
                 //log successfull login

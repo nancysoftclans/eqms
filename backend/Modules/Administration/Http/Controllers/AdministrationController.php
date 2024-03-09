@@ -58,11 +58,15 @@ class AdministrationController extends Controller
         }else{
             $whereraw_filter = null;
         }
-        $row = $this->getSystemMenuItem(1, 0, $whereraw_filter);
+        $row = $this->getSystemMenuItem(1, 0);
+
+            //dd($row);
+
         $menus = '[';
         if (count($row)) {
             $menu_count = count($row);
             $menu_counter = 0;
+
 
             foreach ($row as $item) {
                 $menu_counter++;
