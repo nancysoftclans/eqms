@@ -34,7 +34,7 @@ Ext.define('Admin.view.main.Main', {
                     xtype: 'component',
                     reference: 'mainLogo',
                     cls: 'sencha-logo',
-                    html: '<div class="main-logo"><img src="resources/images/favicon.ico">BRIMS</div>',
+                    html: '<div class="main-logo"><img src="resources/images/favicon.ico" style="width: 200px; height: 50px; margin-left: 0; margin-top: 0;">eQMS</div>',
                     width: 250
                 },
                 {
@@ -45,33 +45,33 @@ Ext.define('Admin.view.main.Main', {
                     handler: 'onToggleNavigationSize'
                 },
                 '->',
-                {
-                    xtype: 'displayfield',
-                    name: 'lastlogin',
-                    value: 'Last Login:'+ last_login,
-                    fieldStyle: {
-                        'color': '#35baf6',
-                        'font-weight': 'bold',
-                        'font-size': '15px'
-                    },
-                    margin: '0 15 10 10',
+                // {
+                //     xtype: 'displayfield',
+                //     name: 'lastlogin',
+                //     value: 'Last Login:'+ last_login,
+                //     fieldStyle: {
+                //         'color': '#35baf6',
+                //         'font-weight': 'bold',
+                //         'font-size': '15px'
+                //     },
+                //     margin: '0 15 10 10',
             
-                },
-                {
-                    iconCls: 'x-fa fa-edit',
-                    xtype: 'badgebutton',
-                    tooltip: 'Notifications',
-                    name: 'tcmeeting_btn',
-                    badgeText: 12,
-                    //text:' Scheduled Technical Meeting ('+ scheduledtcmeeting_counter +')',
-                    itemId: 'tcmeeting_btn',
-                    bind: {
-                        text: "Scheduled Technical Meeting <span class=\"noti noti_bubble_insp\" style=\"width: 100%\">{meetings}</span>"
-                        // Scheduled Technical Meeting ({meetings})',
-                    },
-                    ui: 'soft-blue',
-                    handler: 'funcViewScheduledTcMeetingDetails',
-                },
+                // },
+                // {
+                //     iconCls: 'x-fa fa-edit',
+                //     xtype: 'badgebutton',
+                //     tooltip: 'Notifications',
+                //     name: 'tcmeeting_btn',
+                //     badgeText: 12,
+                //     //text:' Scheduled Technical Meeting ('+ scheduledtcmeeting_counter +')',
+                //     itemId: 'tcmeeting_btn',
+                //     bind: {
+                //         text: "Scheduled Technical Meeting <span class=\"noti noti_bubble_insp\" style=\"width: 100%\">{meetings}</span>"
+                //         // Scheduled Technical Meeting ({meetings})',
+                //     },
+                //     ui: 'soft-blue',
+                //     handler: 'funcViewScheduledTcMeetingDetails',
+                // },
                 {
                     iconCls: 'x-fa fa-bell',
                     xtype: 'badgebutton',
@@ -109,13 +109,14 @@ Ext.define('Admin.view.main.Main', {
                         iconCls: 'fa fa-power-off',
                         handler: 'Logout'
                     }]
-                },{
-                    xtype: 'image',
-                    cls: 'header-right-profile-image',
-                    height: 35,
-                    width: 35,
-                    src: profile_pic_url
                 }
+                // {
+                //     xtype: 'image',
+                //     cls: 'header-right-profile-image',
+                //     height: 35,
+                //     width: 35,
+                //     src: profile_pic_url
+                // }
             ]
         },
         {

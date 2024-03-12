@@ -14,12 +14,12 @@ return [
     //dms
     'dms' => [
         'dms_adminusr' => env('DMS_ADMINUSR', 'admin'),
-        'dms_adminpassword' => env('DMS_ADMINPASSWORD', 'Da97vid27'),
+        'dms_adminpassword' => env('DMS_ADMINPASSWORD', 'root'),
         'dms_url' => env('DMS_URL', 'http://localhost:8080/alfresco/'),
-        'dms_approotsite' => env('DMS_APPROOTSITE', 'bomra'),
-        'dms_approotsitecontainer' => env('DMS_APPROOTSITECONTAINER', 'bomra'),
+        'dms_approotsite' => env('DMS_APPROOTSITE', 'eqms'),
+        'dms_approotsitecontainer' => env('DMS_APPROOTSITECONTAINER', 'eqms'),
         'dms_approotsitecontainernode' => env('DMS_APPROOTSITECONTAINERNODE', 'documentLibrary'),
-        'dms_approotsite_id' => env('DMS_APPROOTSITE_ID', 1),
+        'dms_approotsite_id' => env('DMS_APPROOTSITE_ID', 3),
         'doc_rootupload' => env('DOC_ROOTUPLOAD', '/public/resources/upload/'),
         'upload_directory' => env('UPLOAD_DIRECTORY'),
         'upload_url' => env('UPLOAD_URL'),
