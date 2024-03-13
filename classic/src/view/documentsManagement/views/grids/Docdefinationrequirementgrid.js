@@ -38,7 +38,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         action: 'add',
         ui: 'soft-blue',
         childXtype: 'docdefinationrequirementfrm',
-        winTitle: 'Documents requirements Defination',
+        winTitle: 'Documents Creation Defination',
         winWidth: '40%',
         handler: 'showAddConfigParamWinFrm',
         stores: '[]'
