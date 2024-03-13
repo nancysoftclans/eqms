@@ -1,6 +1,6 @@
 Ext.define('Admin.view.documentsManagement.views.panels.Documentsdefinationrequirementpnl', {
     extend: 'Ext.panel.Panel',
-    xtype: 'documentsdefinationrequirement',
+    xtype: 'documentsdefinationrequirementpnl',
     title: 'Documents Defination Requiments Setup',
     userCls: 'big-100 small-100',
     controller: 'documentsManagementvctr',

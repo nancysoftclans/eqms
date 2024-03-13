@@ -1,6 +1,6 @@
 Ext.define('Admin.view.documentsManagement.views.panels.Documentsdefinationrequirement', {
     extend: 'Ext.container.Container',
-    xtype: 'documentsdefinationrequirementContainer',
+    xtype: 'documentsdefinationrequirement',
     controller: 'documentsManagementvctr',
     padding: '2 0 0 0',
     layout: {

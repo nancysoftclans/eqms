@@ -22,7 +22,7 @@ Ext.define('Admin.view.main.Main', {
     listeners: {
        render: 'onMainViewRender'
     },
-
+//<img src="resources/images/favicon.ico">
     items: [
         {
             xtype: 'toolbar',
@@ -34,7 +34,7 @@ Ext.define('Admin.view.main.Main', {
                     xtype: 'component',
                     reference: 'mainLogo',
                     cls: 'sencha-logo',
-                    html: '<div class="main-logo"><img src="resources/images/favicon.ico" style="width: 200px; height: 50px; margin-left: 0; margin-top: 0;">eQMS</div>',
+                    html: '<div class="main-logo">eQMS</div>',
                     width: 250
                 },
                 {
