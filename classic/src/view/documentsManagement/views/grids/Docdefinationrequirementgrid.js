@@ -38,7 +38,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         action: 'add',
         ui: 'soft-blue',
         childXtype: 'docdefinationrequirementfrm',
-        winTitle: 'Documents Creation Defination',
+        winTitle: 'Documents Creation',
         winWidth: '40%',
         handler: 'showAddConfigParamWinFrm',
         stores: '[]'
@@ -230,37 +230,43 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         dataIndex: 'document_type',
         text: 'Document Type',
         flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'section_name',
-        text: 'Section Name',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'module_name',
-        text: 'Module Name',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'sub_module',
-        text: 'Sub Module Name',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'prodclass_category',
-        text: 'Product Class Category',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'importexport_permittype',
-        text: 'Import/Export Permit Type',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'premise_type',
-        text: 'Premises Type Type',
-        flex: 1
-    },{
+    },
+    // {
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'section_name',
+    //     text: 'Section Name',
+    //     flex: 1
+    // },
+    // {
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'module_name',
+    //     text: 'Module Name',
+    //     flex: 1
+    // },{
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'sub_module',
+    //     text: 'Sub Module Name',
+    //     flex: 1
+    // },
+    // {
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'prodclass_category',
+    //     text: 'Product Class Category',
+    //     flex: 1
+    // },
+    // {
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'importexport_permittype',
+    //     text: 'Import/Export Permit Type',
+    //     flex: 1
+    // },
+    // {
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'premise_type',
+    //     text: 'Premises Type Type',
+    //     flex: 1
+    // },
+    {
         xtype: 'gridcolumn',
         dataIndex: 'description',
         text: 'Description',
