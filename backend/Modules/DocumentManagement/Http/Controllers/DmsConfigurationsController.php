@@ -125,54 +125,111 @@ class DmsConfigurationsController extends Controller
         return \response()->json($res);
     }
 
-    public function getdocdefinationrequirementDetails(Request $req)
-    {
-    //allowed_extensions
-        $module_id = $req->module_id;
-        $sub_module_id = $req->sub_module_id;
-        $section_id = $req->section_id;
-        $premise_type_id = $req->premise_type_id;
-        $parent_id = $req->node;
-        try {
-            $results = DB::table('tra_documentupload_requirements as t1')
-                ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
-                ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
-                ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
-                ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
-                ->leftJoin('par_prodclass_categories as t6', 't1.prodclass_category_id', '=', 't6.id')
-                ->select(DB::raw("t1.*,case when (select count(id) from tra_documentupload_requirements q where q.docparent_id = t1.id) = 0 then true else false end leaf,t1.name as mtype, t2.name as document_type,t6.name as prodclass_category, t3.name as module_name, t4.name as sub_module, t5.name as section_name, (select string_agg(concat(j.name, '.',j.extension), ',') FROM tra_docupload_reqextensions t INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id WHERE t.documentupload_requirement_id = t1.id) as allowed_extensions"));
-           
-            if(validateIsNumeric($parent_id)){
-               $results->where('t1.docparent_id', $parent_id);
-            }else{
-                $results->whereNull('t1.docparent_id');
-            }
-            if(validateIsNumeric($module_id)){
-                $results->where('t4.module_id',$module_id);   
-            }
-            if(validateIsNumeric($sub_module_id)){
-                $results->where('t1.sub_module_id',$sub_module_id);   
-            }
-            if(validateIsNumeric($section_id)){
-                $results->where('t1.section_id',$section_id);   
-            }
-            if(validateIsNumeric($premise_type_id)){
-                $results->where('t1.premise_type_id',$premise_type_id);   
-            }
+public function getdocdefinationrequirementDetails(Request $req)
+{
+    $module_id = $req->module_id;
+    $sub_module_id = $req->sub_module_id;
+    $section_id = $req->section_id;
+    $premise_type_id = $req->premise_type_id;
+    $parent_id = $req->node;
 
-            $results=$results->get();
-            
-        } catch (\Exception $exception) {
-            $results = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+    try {
+        $results = DB::table('tra_documentupload_requirements as t1')
+            ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+            ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
+            ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
+            ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
+            ->leftJoin('par_prodclass_categories as t6', 't1.prodclass_category_id', '=', 't6.id')
+            ->select(
+                't1.*',
+                DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentupload_requirements q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+                't1.name AS mtype',
+                't2.name AS document_type',
+                't6.name AS prodclass_category',
+                't3.name AS module_name',
+                't4.name AS sub_module',
+                't5.name AS section_name',
+                DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
+                            FROM tra_docupload_reqextensions t 
+                            INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 
+                            WHERE t.documentupload_requirement_id = t1.id) AS allowed_extensions")
+            );
 
-        } catch (\Throwable $throwable) {
-            $results = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        if (validateIsNumeric($parent_id)) {
+            $results->where('t1.docparent_id', $parent_id);
+        } else {
+            $results->whereNull('t1.docparent_id');
         }
-        return $results;
+        if (validateIsNumeric($module_id)) {
+            $results->where('t4.module_id', $module_id);
+        }
+        if (validateIsNumeric($sub_module_id)) {
+            $results->where('t1.sub_module_id', $sub_module_id);
+        }
+        if (validateIsNumeric($section_id)) {
+            $results->where('t1.section_id', $section_id);
+        }
+        if (validateIsNumeric($premise_type_id)) {
+            $results->where('t1.premise_type_id', $premise_type_id);
+        }
 
-        //return \response()->json($results);
-
+        $results = $results->get();
+    } catch (\Exception $exception) {
+        $results = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    } catch (\Throwable $throwable) {
+        $results = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
     }
+    return $results;
+}
+
+    // public function getdocdefinationrequirementDetails(Request $req)
+    // {
+    // //allowed_extensions
+    //     $module_id = $req->module_id;
+    //     $sub_module_id = $req->sub_module_id;
+    //     $section_id = $req->section_id;
+    //     $premise_type_id = $req->premise_type_id;
+    //     $parent_id = $req->node;
+    //     try {
+    //         $results = DB::table('tra_documentupload_requirements as t1')
+    //             ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+    //             ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
+    //             ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
+    //             ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
+    //             ->leftJoin('par_prodclass_categories as t6', 't1.prodclass_category_id', '=', 't6.id')
+    //             ->select(DB::raw("t1.*,case when (select count(id) from tra_documentupload_requirements q where q.docparent_id = t1.id) = 0 then true else false end leaf,t1.name as mtype, t2.name as document_type,t6.name as prodclass_category, t3.name as module_name, t4.name as sub_module, t5.name as section_name, (select string_agg(concat(j.name, '.',j.extension), ',') FROM tra_docupload_reqextensions t INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id WHERE t.documentupload_requirement_id = t1.id) as allowed_extensions"));
+           
+    //         if(validateIsNumeric($parent_id)){
+    //            $results->where('t1.docparent_id', $parent_id);
+    //         }else{
+    //             $results->whereNull('t1.docparent_id');
+    //         }
+    //         if(validateIsNumeric($module_id)){
+    //             $results->where('t4.module_id',$module_id);   
+    //         }
+    //         if(validateIsNumeric($sub_module_id)){
+    //             $results->where('t1.sub_module_id',$sub_module_id);   
+    //         }
+    //         if(validateIsNumeric($section_id)){
+    //             $results->where('t1.section_id',$section_id);   
+    //         }
+    //         if(validateIsNumeric($premise_type_id)){
+    //             $results->where('t1.premise_type_id',$premise_type_id);   
+    //         }
+
+    //         $results=$results->get();
+            
+    //     } catch (\Exception $exception) {
+    //         $results = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+    //     } catch (\Throwable $throwable) {
+    //         $results = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+    //     }
+    //     return $results;
+
+    //     //return \response()->json($results);
+
+    // }
 
     public function getdocumentreposirotystructureDetails()
     {
