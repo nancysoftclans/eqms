@@ -92,6 +92,67 @@ class DmsConfigurationsController extends Controller
 
     }
 
+    public function prepareDocumentCreationReceivingStage(Request $req){
+        $application_id = $req->input('application_id');
+        $application_code = $req->input('application_code');
+        $table_name = $req->input('table_name');
+        try {
+            $main_qry = DB::table('tra_importexport_applications as t1')
+                ->leftJoin('par_system_statuses as q', 't1.application_status_id','=','q.id')
+                ->leftJoin('tra_approval_recommendations as t4', 't1.application_code','t4.application_code')
+                ->leftJoin('tra_prechecking_recommendations as t5', 't1.application_code','t5.application_code')
+                ->leftJoin('tra_managerpermits_review as t6', 't1.application_code','t6.application_code')
+                ->where('t1.id', $application_id);
+
+            $qry1 = clone $main_qry;
+            $qry1->join('wb_trader_account as t3', 't1.applicant_id', '=', 't3.id')
+                
+                ->select('t1.*','q.name as application_status', 't1.id as active_application_id',
+                    't3.name as applicant_name', 't3.contact_person','t4.decision_id as approval_recommendation_id','t5.recommendation_id as prechecking_recommendation_id', 't6.decision_id as review_recommendation_id',
+                    't3.tin_no', 't3.country_id as app_country_id', 't3.region_id as app_region_id', 't3.district_id as app_district_id', 't3.physical_address as app_physical_address',
+                    't3.postal_address as app_postal_address', 't3.telephone_no as app_telephone', 't3.fax as app_fax', 't3.email as app_email', 't3.website as app_website'
+                    );
+
+            $results = $qry1->first();
+            $premise_id = $results->tpin_id;
+            $sender_receiver_id = $results->sender_receiver_id;
+            $qry2 = DB::table('tra_permitsenderreceiver_data as t3')
+                ->select('t3.id as trader_id','t3.id as applicant_id', 't3.name as applicant_name', 't3.contact_person',
+                    't3.tin_no', 't3.country_id as app_country_id', 't3.region_id as app_region_id', 't3.district_id as app_district_id', 't3.physical_address as app_physical_address',
+                    't3.postal_address as app_postal_address', 't3.telephone_no as app_telephone',  't3.email_address as app_email')
+                    ->where(array('id'=>$sender_receiver_id));
+            $senderReceiverDetails = $qry2->first();
+
+            $qry3 = DB::table('tra_premises as t3')
+                ->select('t3.*')
+                    ->where(array('id'=>$premise_id));
+            $premisesDetails = $qry3->first();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'senderReceiverDetails'=>$senderReceiverDetails,
+                'premisesDetails'=>$premisesDetails,
+                'message' => 'All is well'
+            );
+
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return \response()->json($res);
+
+
+    }
+
+
     function getCommonTableData($table_name)
     {
 
@@ -181,6 +242,7 @@ public function getdocdefinationrequirementDetails(Request $req)
     }
     return $results;
 }
+
 
     // public function getdocdefinationrequirementDetails(Request $req)
     // {

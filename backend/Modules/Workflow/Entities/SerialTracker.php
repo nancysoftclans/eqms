@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class SerialTracker extends Model
 {
-    protected $table='processes_serials';
+    protected $table='par_processes_serials';
     protected $guarded=[];
     const UPDATED_AT = 'dola';
     const CREATED_AT = 'created_on';

@@ -16,6 +16,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         ptype: 'cellediting',
         clicksToEdit: 1
     }],
+
     features: [{
         ftype: 'searching',
         minChars: 2,
@@ -38,7 +39,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         action: 'add',
         ui: 'soft-blue',
         childXtype: 'docdefinationrequirementfrm',
-        winTitle: 'Documents Creation',
+        winTitle: 'Documents requirements Defination',
         winWidth: '40%',
         handler: 'showAddConfigParamWinFrm',
         stores: '[]'
@@ -177,7 +178,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
             },
             isLoad: true
         },
-        itemdblclick: 'onMenuItemTreeItemDblClick'
+        itemdblclick: 'onViewDocumentApplication'
     },
    
     bbar: [
@@ -230,43 +231,43 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         dataIndex: 'document_type',
         text: 'Document Type',
         flex: 1
-    },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'section_name',
-    //     text: 'Section Name',
-    //     flex: 1
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'module_name',
-    //     text: 'Module Name',
-    //     flex: 1
-    // },{
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'sub_module',
-    //     text: 'Sub Module Name',
-    //     flex: 1
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'prodclass_category',
-    //     text: 'Product Class Category',
-    //     flex: 1
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'importexport_permittype',
-    //     text: 'Import/Export Permit Type',
-    //     flex: 1
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'premise_type',
-    //     text: 'Premises Type Type',
-    //     flex: 1
-    // },
-    {
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'section_name',
+        hidden: true,
+        text: 'Section Name',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'module_name',
+        hidden: true,
+        text: 'Module Name',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'sub_module',
+        hidden: true,
+        text: 'Sub Module Name',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'prodclass_category',
+        hidden: true,
+        text: 'Product Class Category',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'importexport_permittype',
+        hidden: true,
+        text: 'Import/Export Permit Type',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'premise_type',
+        hidden: true,
+        text: 'Premises Type Type',
+        flex: 1
+    },{
         xtype: 'gridcolumn',
         dataIndex: 'description',
         text: 'Description',
@@ -274,12 +275,14 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
     },{
         xtype: 'gridcolumn',
         dataIndex: 'allowed_extensions',
+        hidden: true,
         text: 'Allowed Extensions',
         tdCls:'wrap-text',
         flex: 1
     },{
         xtype: 'gridcolumn',
         dataIndex: 'is_mandatory',
+        hidden: true,
         text: 'Is Mandatory',
         flex: 0.5,
         renderer: function (value, metaData) {
@@ -293,6 +296,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
     },{
         xtype: 'gridcolumn',
         dataIndex: 'has_document_template',
+        hidden: true,
         text: 'Has Document Template',
         flex: 0.5,
         renderer: function (value, metaData) {
@@ -307,6 +311,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
     },{
         xtype: 'gridcolumn',
         dataIndex: 'portal_uploadable',
+        hidden: true,
         text: 'Portal Uploadable',
         flex: 0.5,
         renderer: function (value, metaData) {

@@ -167,6 +167,157 @@ class DocumentManagementController extends Controller
         return response()->json($res);
     }
 
+public function saveDocDefinationrequirement(Request $request)
+       {
+           try {
+               $active_application_id = $request->input('active_application_id');
+               $process_id = $request->input('process_id');
+               $workflow_stage_id = $request->input('workflow_stage_id');
+               $module_id = 26;
+               $zone_id = $request->input('zone_id');
+               $sub_module_id = 101;
+
+
+                    $user_id = $this->user_id;
+               $app_data = array(
+                            "process_id" => $request->input('process_id'),
+                            "workflow_stage_id" => $request->input('workflow_stage_id'),
+                            "applicant_id" => $request->input('applicant_id'),
+                            "sub_module_id" => $sub_module_id,
+                            "module_id" =>$module_id,
+                            "name" => $request->input('name'),
+                            "document_type_id" => $request->input('document_type_id'),
+                            "has_parent_level" => $request->input('has_parent_level'),
+                            "docparent_id" => $request->input('docparent_id'),
+                            "description" => $request->input('description'),
+                         
+                 );
+
+                 $applications_table = 'tra_documentupload_requirements';
+                 
+   
+               if (validateIsNumeric($active_application_id)) {
+                   //update
+                   $app_data['dola'] = Carbon::now();
+                   $app_data['altered_by'] = $user_id;
+                   $app_details = array();
+                   $where_app = array('id'=>$active_application_id);
+                   if (recordExists($applications_table, $where_app)) {
+                       //$app_details = getTableData($applications_table, $where_app);
+                       $app_details = getPreviousRecords($applications_table, $where_app);
+                       if ($app_details['success'] == false) {
+                           return $app_details;
+                       }
+                       $app_details = $app_details['results'];
+                      
+                       $res =  updateRecord($applications_table, $app_details, $where_app, $app_data, $user_id);
+   
+                   }
+                   
+                   $application_code = $app_details[0]['application_code'];//$app_details->application_code;
+                   $ref_number = $app_details[0]['reference_no'];//$app_details->reference_no;
+   
+                   $res['active_application_id'] = $active_application_id;
+                   $res['application_code'] = $application_code;
+                   $res['ref_no'] = $ref_number;
+    $res['tracking_no'] = $ref_number;
+               } else {
+                       $zone_code = getSingleRecordColValue('par_zones', array('id' => $zone_id), 'zone_code');
+                       $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');
+                       // $apptype_categorycode = getSingleRecordColValue('par_permit_typecategories', array('id' => $import_typecategory_id ), 'code');
+                              
+                    if($sub_module_id == 15){
+                                
+                                $codes_array = array(
+                                    'section_code' => $section_code,
+                                    'zone_code' => $zone_code,
+                                    'apptype_code'=>$apptype_code,
+                                    'app_typecategory'=>$apptype_categorycode
+                                );
+                    }
+                    else{
+                                $codes_array = array(
+                                   // 'section_code' => $section_code,
+                                    'zone_code' => $zone_code,
+                                    'apptype_code'=>$apptype_code
+                                );
+                    }
+   
+                       $application_code = generateApplicationCode($sub_module_id, $applications_table);
+   
+                       $application_status = getApplicationInitialStatus($module_id, $sub_module_id);
+   
+                       $ref_id = getSingleRecordColValue('tra_submodule_referenceformats', array('sub_module_id' => $sub_module_id, 'module_id' => $module_id, 'reference_type_id' => 1), 'reference_format_id');
+                       
+                       $ref_number = generateProductsRefNumber($ref_id, $codes_array, date('Y'), $process_id, $zone_id, $user_id);
+                       $view_id = generateApplicationViewID();
+                       //  'view_id'=>$view_id,
+                       $app_data['view_id'] = $view_id;
+                       $app_data['reference_no'] = $ref_number;
+                       $app_data['tracking_no'] = $ref_number;
+                       $app_data['application_code'] = $application_code;
+                       $app_data['created_by'] = \Auth::user()->id;
+                       $app_data['created_on'] = Carbon::now();
+   
+                      
+                       $res = insertRecord($applications_table, $app_data, $user_id);
+                      
+                      // $active_application_id = $res['record_id'];
+
+                       //add to submissions table
+                       $submission_params = array(
+                           'application_id' => $active_application_id,
+                           'process_id' => $process_id,
+                           'application_code' => $application_code,
+                           'reference_no' => $ref_number,
+                            'tracking_no' => $ref_number,
+                           'usr_from' => $user_id,
+                           'usr_to' => $user_id,
+                           'previous_stage' => $workflow_stage_id,
+                           'current_stage' => $workflow_stage_id,
+                           'module_id' => $module_id,
+                           'sub_module_id' => $sub_module_id,
+                           'application_status_id' => $application_status->status_id,
+                           'urgency' => 1,
+                           'remarks' => 'Initial save of the application',
+                           'date_received' => Carbon::now(),
+                           'created_on' => Carbon::now(),
+                           'created_by' => $user_id
+                       );
+   
+                       insertRecord('tra_submissions', $submission_params, $user_id);
+                       $res['active_application_id'] = $active_application_id;
+                       $res['application_code'] = $application_code;
+                    
+                       $res['ref_no'] = $ref_number;
+                       $res['tracking_no'] = $ref_number;
+                       //dms function 
+                       $nodetracking = str_replace("/", "-", $ref_number);
+                       
+                       $node_details = array(
+                           'name' => $nodetracking,
+                           'nodeType' => 'cm:folder');
+   
+                    //   initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+                  
+   
+   
+               }
+   
+           } catch (\Exception $exception) {
+               $res = array(
+                   'success' => false,
+                   'message' => $exception->getMessage()
+               );
+           } catch (\Throwable $throwable) {
+               $res = array(
+                   'success' => false,
+                   'message' => $throwable->getMessage()
+               );
+           }
+           return \response()->json($res);
+       }
+
     public function onLoadApplicationDocumentsRequirements(Request $req)
     {
         try {

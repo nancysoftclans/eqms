@@ -1,2 +1,2 @@
 // @tag full-page
-// @require C:\xampp\htdocs\eqms\app.js
+// @require C:\xampp8.12\htdocs\eqms\app.js

@@ -5003,7 +5003,9 @@ showPermitApplicationMoreDetails: function (btn) {
             Ext.getBody().unmask();
             //It's a new application
         }
-    }, refreshonlineimportexportappsgrid: function (me) {
+    },
+
+    refreshonlineimportexportappsgrid: function (me) {
         var store = me.store,
             grid = me.up('grid'),
             mainTabPanel = this.getMainTabPanel(),

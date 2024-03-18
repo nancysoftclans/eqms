@@ -17,7 +17,10 @@ class VerifyCsrfToken extends Middleware
         // 'createAccount',
         'administration/logout',
         'administration/logoutWeb',
-        'recoverForgotPassword'
+        'recoverForgotPassword',
+        'configurations/saveConfigCommonData',
+        'configurations/deleteConfigRecord',
+        'administration/saveMenuItem'
         
     ];
 }

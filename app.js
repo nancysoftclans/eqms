@@ -174,6 +174,30 @@ function onLogoutClick(){
         });
 }
 
+function getInitialDocumentCreationWorkflowDetails(module_id, sub_module_id,is_dataammendment_request=null) {
+    var results = [];
+    Ext.Ajax.request({
+        method: 'GET',
+        async: false,
+        url: 'workflow/getInitialDocumentCreationWorkflowDetails',
+        params: {
+            module_id: module_id,
+            sub_module_id: sub_module_id,
+            is_dataammendment_request:is_dataammendment_request
+        },
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
+        success: function (response) {
+            var resp = Ext.JSON.decode(response.responseText),
+                success = resp.success;
+            if (success || success == true || success === true) {
+                results = resp.results;
+            }
+        }
+    });
+    return results;
+}
 
 function checkUserAccountActivities(mins) {
     var runner = new Ext.util.TaskRunner(),

@@ -5446,6 +5446,9 @@ class commonController extends Controller
                 else if($table_name == 'par_containers_types'){
                     $qry->whereIN('id', [1,2]);
                 }
+                else if($table_name == 'par_confirmations'){
+                    $qry->whereIN('id', [1,2]);
+                }
                 else if($table_name == 'tra_otherstates_productregistrations'){
                     $qry->where('application_code', $req->application_code);
                     $qry->Join('par_continent_regions as t5','t1.continent_region_id','=','t5.id')

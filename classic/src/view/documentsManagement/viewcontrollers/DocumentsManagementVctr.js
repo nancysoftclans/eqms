@@ -148,6 +148,10 @@ Ext.define('Admin.view.documentsManagement.viewcontrollers.DocumentsManagementVc
         grid.show();
     },
 
+   onInitiateDocumentApplication: function (btn) {
+        var application_type = btn.app_type;
+        this.fireEvent('onInitiateDocumentApplication', application_type, btn);
+    },
     doCreateConfigParam: function (btn) {
         var me = this,
             action_url = btn.action_url,
@@ -218,6 +222,18 @@ Ext.define('Admin.view.documentsManagement.viewcontrollers.DocumentsManagementVc
                 }
             });
         }
+    },
+    AddFormTypeFields: function (item) {
+        var me = this,
+            btn = item.up('button'),
+            record = btn.getWidgetRecord(),
+            childXtype = item.childXtype,
+            winTitle=item.winTitle,
+            winWidth=item.winWidth,
+            form = Ext.widget(childXtype),
+            form_category_id = record.get('id');
+        form.down('hiddenfield[name=form_category_id]').setValue(form_category_id);
+        funcShowCustomizableWindow(winTitle, winWidth, form, 'customizablewindow');
     },
     doCreateDMSSectionDocConfigParamWin: function (btn) {
         var me = this,
@@ -317,6 +333,85 @@ showEditConfigParamWinFrm: function (item) {
              return false;
          }*/
     },
+    onViewDocumentApplication: function (grid, record) {
+
+        this.fireEvent('viewApplicationDetails', record);
+
+    },
+
+     saveDocumentApplicationReceivingBaseDetails: function (btn) {
+       var wizard = btn.wizardpnl,
+             wizardPnl = btn.up(wizard),
+             action_url = btn.action_url,
+             form_panel = btn.form_panel,
+            mainTabPnl = btn.up('#contentPanel'),
+
+            containerPnl = mainTabPnl.getActiveTab();
+            var process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
+            module_id = containerPnl.down('hiddenfield[name=module_id]').getValue(),
+            sub_module_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
+            active_application_id = containerPnl.down('hiddenfield[name=active_application_id]').getValue(),
+            workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            docdefinationrequirementfrm = containerPnl.down('docdefinationrequirementfrm');
+
+           // docdefinationrequirementfrm = docdefinationrequirementfrm.getForm();
+           
+        // if (!applicant_id) {
+        //     //
+        //     toastr.warning('Please select applicant!!', 'Warning Response');
+        //     return false;
+        // }
+        // // if (!sender_receiver_id) {
+        //     //sender_receiver_id
+        //     toastr.warning('Please select sender/Receiver details!!', 'Warning Response');
+        //     return false;
+        // }
+       
+        if (docdefinationrequirementfrm.isValid()) {
+            docdefinationrequirementfrm.submit({
+                url: 'documentmanagement/'+action_url,
+                waitMsg: 'Please wait...',
+                params: {
+                    process_id: process_id,
+                    workflow_stage_id: workflow_stage_id,
+                    active_application_id: active_application_id,
+                    module_id: module_id,
+                    sub_module_id: sub_module_id,
+                    '_token': token
+                },
+
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message,
+                        success = resp.success,
+                        active_application_id = resp.active_application_id,
+                        application_code = resp.application_code,
+                        product_id = resp.product_id,
+                        tracking_no = resp.tracking_no;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                            containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
+                            containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                      
+
+                    } else {
+                        toastr.error(message, "Failure Response");
+                    }
+                },
+                failure: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message;
+                    toastr.error(message, "Failure Response");
+                }
+            });
+
+        } else {
+            toastr.warning('Please fill all the required fields!!', 'Warning Response');
+        }
+    }, 
 
     
     // showAddConfigParamWinFrm: function (btn) {
@@ -417,42 +512,82 @@ showEditConfigParamWinFrm: function (item) {
         view.unmask();
     },
     quickNavigation: function (btn) {
-        var step = btn.step,
-            formPnl = btn.up('directorateSectionsDocDefinationWizardfrm'),
-            motherPnl = formPnl.up('sectionsDocumentDefinationpnl');
+         var step = btn.step,
+            wizard = btn.wizard,
+            max_step = btn.max_step,
+            wizardPnl = btn.up(wizard);
+            
+            motherPnl = wizardPnl;
+            panel = motherPnl.up('panel'),
+            application_id = motherPnl.down('hiddenfield[name=sub_module_id]').getValue(),
+            progress = wizardPnl.down('#progress_tbar'),
+            progressItems = progress.items.items;
 
-        if (step == 2) {
-            motherPnl.getViewModel().set('atEnd', true);
-        } else {
-            motherPnl.getViewModel().set('atEnd', false);
-        }
-        if (step == 2) {
-            //check if its an edit
-            // this.prepareContactDetails();
+        if (step == 1) {
+            var thisItem = progressItems[step];
+            if (!application_id) {
+                thisItem.setPressed(false);
+                toastr.warning('Please save document details first!!', 'Warning Response');
+                return false;
+            }
         }
         if (step == 0) {
-            motherPnl.getViewModel().set('atBeginning', true);
+            motherPnl.down('button[name=save_btn]').setVisible(true);
+            panel.getViewModel().set('atBeginning', false);
+            panel.getViewModel().set('atEnd', true);
+            if(wizardPnl.down('button[name=prechecking_recommendation]')){
+
+                wizardPnl.down('button[name=prechecking_recommendation]').setVisible(false);
+            }
+          
+            if(wizardPnl.down('button[name=process_submission_btn]')){
+                wizardPnl.down('button[name=process_submission_btn]').setVisible(false);
+            }
+        } else if (step == max_step) {
+            
+            motherPnl.down('button[name=save_btn]').setVisible(false);
+            panel.getViewModel().set('atBeginning', true);
+            panel.getViewModel().set('atEnd', false);
+            if(wizardPnl.down('button[name=prechecking_recommendation]')){
+
+                wizardPnl.down('button[name=prechecking_recommendation]').setVisible(true);
+            }
+          
+            if(wizardPnl.down('button[name=process_submission_btn]')){
+                wizardPnl.down('button[name=process_submission_btn]').setVisible(true);
+            }
         } else {
-            motherPnl.getViewModel().set('atBeginning', false);
+            panel.getViewModel().set('atBeginning', false);
+            panel.getViewModel().set('atEnd', false);
+            if(wizardPnl.down('button[name=save_btn]')){
+
+                wizardPnl.down('button[name=save_btn]').setVisible(false);
+            }
+            
+            if(wizardPnl.down('button[name=prechecking_recommendation]')){
+
+                wizardPnl.down('button[name=prechecking_recommendation]').setVisible(false);
+            }
+          
+            if(wizardPnl.down('button[name=process_submission_btn]')){
+                wizardPnl.down('button[name=process_submission_btn]').setVisible(false);
+            }
         }
 
 
-        formPnl.getLayout().setActiveItem(step);
-        var layout = formPnl.getLayout(),
-            progress = formPnl.down('#progress_tbar'),
-            model = motherPnl.getViewModel(),
-            progressItems = progress.items.items,
+        wizardPnl.getLayout().setActiveItem(step);
+        var layout = wizardPnl.getLayout(),
             item = null,
             i = 0,
-            activeItem = layout.getActiveItem(),
-            activeIndex = formPnl.items.indexOf(activeItem);
+            activeItem = layout.getActiveItem();
 
         for (i = 0; i < progressItems.length; i++) {
             item = progressItems[i];
 
             if (step === item.step) {
                 item.setPressed(true);
-            } else {
+            }
+            else {
                 item.setPressed(false);
             }
 
@@ -490,8 +625,8 @@ showEditConfigParamWinFrm: function (item) {
     },
 
     onNextCardClick: function (btn) {
-        var wizardPnl = btn.up('workflowwizardfrm'),
-            motherPnl = wizardPnl.up('sectionsDocumentDefinationpnl');
+        var wizardPnl = btn.up('docdefinationrequirementfrm'),
+            motherPnl = wizardPnl.up('documentdetailspnl');
         motherPnl.getViewModel().set('atBeginning', false);
         this.navigate(btn, wizardPnl, 'next');
     },

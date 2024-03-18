@@ -11,6 +11,8 @@ use PDF;
 use Illuminate\Support\Facades\DB;
 use SAPb1\SAPClient;
 use SAPb1\SAPException;
+use Modules\Workflow\Entities\SerialTracker;
+use Modules\Workflow\Entities\TrackingNoSerialTracker;
 class UtilityHelper
 {
 
@@ -563,32 +565,26 @@ class UtilityHelper
         return $ref_number;
     }
 
-    static function generateProductsRefNumber($ref_id, $codes_array, $year, $process_id, $branch_id, $user_id)
+   static function generateProductsRefNumber($ref_id, $codes_array, $year, $process_id, $zone_id, $user_id)
     {
         $where = array(
             'year' => $year,
             'process_id' => $process_id,
-
+            
                 'reference_type_id' => 1,
-            'branch_id' => $branch_id
+            'zone_id' => $zone_id
         );
-        $serial_num_tracker = DB::table('par_processes_serials');
+        $serial_num_tracker = new SerialTracker();
         $serial_track = $serial_num_tracker->where($where)->first();
         if ($serial_track == '' || is_null($serial_track)) {
             $current_serial_id = 1;
-            //payload
-            $serial_data = array(
-                'year' => $year,
-                'process_id' => $process_id,
-                'branch_id' => $branch_id,
-                'created_by' => $user_id,
-                'reference_type_id' => $reference_type_id,
-                'last_serial_no' => $current_serial_id
-            );
-            $ins_res = insertRecord('par_processes_serials', $serial_data);
-            if(!isset($ins_res)){
-                dd($ins_res);
-            }
+            $serial_num_tracker->year = $year;
+            $serial_num_tracker->process_id = $process_id;
+            $serial_num_tracker->zone_id = $zone_id;
+            $serial_num_tracker->created_by = $user_id;
+            $serial_num_tracker->last_serial_no = $current_serial_id;
+            $serial_num_tracker->reference_type_id = 1;
+            $serial_num_tracker->save();
         } else {
             $last_serial_id = $serial_track->last_serial_no;
             $current_serial_id = $last_serial_id + 1;
@@ -596,7 +592,7 @@ class UtilityHelper
                 'last_serial_no' => $current_serial_id,
                 'altered_by' => $user_id
             );
-            updateRecord('par_processes_serials', $where,  $update_data);
+            $serial_num_tracker->where($where)->update($update_data);
         }
         $serial_no = str_pad($current_serial_id, 4, 0, STR_PAD_LEFT);
         $reg_year = substr($year, -2);

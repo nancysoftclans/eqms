@@ -1,7 +1,7 @@
-Ext.define('Admin.view.configurations.views.forms.FormCategoryFrm', {
+Ext.define('Admin.view.documentsManagement.views.forms.DocumentTypeForm',{
     extend: 'Ext.form.Panel',
-    xtype: 'formCategoryFrm',
-    controller: 'configurationsvctr',
+    xtype: 'documenttypeform',
+    controller: 'documentsManagementvctr',
     autoScroll: true,
     layout: 'form',
     frame: true,
@@ -31,7 +31,7 @@ Ext.define('Admin.view.configurations.views.forms.FormCategoryFrm', {
         allowBlank: true
     },{
         xtype: 'textfield',
-        fieldLabel: 'Form Name',
+        fieldLabel: 'Dcument Name',
         margin: '0 20 20 0',
         name: 'name',
         allowBlank: false
@@ -58,6 +58,7 @@ Ext.define('Admin.view.configurations.views.forms.FormCategoryFrm', {
                    },
               isLoad: true
             },
+        
             // change: function(combo, newVal, oldval, eopts){
             //     var form = combo.up('form'),
             //         sub_moduleStr = form.down('combo[name=sub_module_id]').getStore(),
@@ -106,32 +107,61 @@ Ext.define('Admin.view.configurations.views.forms.FormCategoryFrm', {
         }
     },
     {
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Sub Module',
+        xtype: 'tagfield',
+        fieldLabel: 'Allowed Document Extensions',
         margin: '0 20 20 0',
-        name: 'sub_module_id',
-        valueField: 'id',
-        allowBlank: true,
-        hidden: true,
-        displayField: 'name',
+        name: 'document_extension_ids',
+        allowBlank: false,
         forceSelection: true,
+        filterPickList: true,
+        encodeSubmitValue: true,
+        emptyText: 'Select Document Extensions',
+        growMax: 100,
         queryMode: 'local',
+        valueField: 'id',
+        displayField: 'extension',
         listeners: {
             beforerender: {
-                fn: 'setCompStore',
+                fn: 'setWorkflowCombosStore',
                 config: {
+                    pageSize: 1000,
                     proxy: {
-                        
+                        url: 'configurations/getConfigParamFromTable',
                         extraParams: {
-                            table_name: 'par_sub_modules'
+                            table_name: 'par_document_extensionstypes'
                         }
                     }
-                   },
-              isLoad: true,
-            },   
+                },
+                isLoad: true
+            }
         }
     },
-    //{
+    // {
+    //     xtype: 'combo', anyMatch: true,
+    //     fieldLabel: 'Sub Module',
+    //     margin: '0 20 20 0',
+    //     name: 'sub_module_id',
+    //     valueField: 'id',
+    //     allowBlank: true,
+    //     hidden: true,
+    //     displayField: 'name',
+    //     forceSelection: true,
+    //     queryMode: 'local',
+    //     listeners: {
+    //         beforerender: {
+    //             fn: 'setCompStore',
+    //             config: {
+    //                 proxy: {
+                        
+    //                     extraParams: {
+    //                         table_name: 'par_sub_modules'
+    //                     }
+    //                 }
+    //                },
+    //           isLoad: true,
+    //         },   
+    //     }
+    // },{
     //     xtype: 'combo', anyMatch: true,
     //     fieldLabel: 'Section',
     //     margin: '0 20 20 0',

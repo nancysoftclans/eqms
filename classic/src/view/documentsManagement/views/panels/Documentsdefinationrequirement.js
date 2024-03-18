@@ -1,15 +1,26 @@
 Ext.define('Admin.view.documentsManagement.views.panels.Documentsdefinationrequirement', {
-    extend: 'Ext.container.Container',
+    extend: 'Ext.Container',
     xtype: 'documentsdefinationrequirement',
+    itemId: 'documentsdefinationrequirement',
     controller: 'documentsManagementvctr',
-    padding: '2 0 0 0',
-    layout: {
-        type: 'fit'
-    },
-    items: [{
-            xtype: 'documentsdefinationrequirementpnl',
-            flex: 0.8,
-            resizable: true,
-            split: true
-     }]
-});//
+    layout: 'border',
+    items: [
+        {
+            xtype: 'hiddenfield',
+            name: 'module_id',
+            value: 26
+        },{
+            xtype: 'hiddenfield',
+            name: 'sub_module_id',
+            value: 101
+        },
+        {
+            xtype: 'documentapplicationwrapper',
+            region: 'center'
+        },
+        {
+            xtype: 'documenttypetb',
+            region: 'south'
+        }
+    ]
+});

@@ -43,11 +43,13 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::post('saveDMSNoStructuredDocDefinationDetails', [DmsConfigurationsController::class, 'saveDMSNoStructuredDocDefinationDetails']);
     
     Route::post('uploadProductImages', [DocumentManagementController::class, 'uploadProductImages']);
+    Route::post('saveDocDefinationrequirement', [DocumentManagementController::class, 'saveDocDefinationrequirement']);
     Route::post('onApplicationDocumentDelete', [DocumentManagementController::class, 'onApplicationDocumentDelete']);
     Route::post('onDeleteProductImages', [DocumentManagementController::class, 'onDeleteProductImages']);
     Route::post('onDeleteNonStructureApplicationDocument', [DocumentManagementController::class, 'onDeleteNonStructureApplicationDocument']);
     
     Route::get('getDocumentsTypes', [DmsConfigurationsController::class, 'getDocumentsTypes']);
+    Route::get('prepareDocumentCreationReceivingStage', [DmsConfigurationsController::class, 'prepareDocumentCreationReceivingStage']);
     Route::get('getDocumentsSubTypes', [DmsConfigurationsController::class, 'getDocumentsSubTypes']);
     Route::get('getParameterstableSchema', [DmsConfigurationsController::class, 'getParameterstableSchema']);
     Route::get('getdocdefinationrequirementDetails', [DmsConfigurationsController::class, 'getdocdefinationrequirementDetails']);

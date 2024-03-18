@@ -251,7 +251,70 @@ Ext.define('Admin.view.administration.views.forms.SystemMenusFrm', {
                 isLoad: true
             }
         }
-    }
+    },
+    {
+
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Is Tied to Module',
+        displayField: 'name',
+        valueField: 'id',
+        name: 'has_module',
+        forceSelection: true,
+        allowBlank: true,
+        queryMode: 'local',
+        listeners: {
+            beforerender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 100,
+                    proxy: {
+                        url: base_url + 'configurations/getConfigParamFromTable',
+                         extraParams: {
+                         table_name: 'par_confirmations'
+                        }
+                    }
+                },
+                isLoad: true
+            },
+            change: function(combo, newVal, oldVal){
+                if(newVal == 1){
+                    var form = combo.up('form'),
+                        parametercb = form.down('combo[name=tied_module_id]');
+                    parametercb.setVisible(true);
+                }else{
+                    var form = combo.up('form'),
+                    parametercb = form.down('combo[name=tied_module_id]');
+                    parametercb.setHidden(true); 
+                }
+                
+            }
+        }
+    }, {
+        xtype: 'combo',
+        fieldLabel: 'Module',
+        displayField: 'name',
+        valueField: 'id',
+        allowBlank: true,
+        name: 'tied_module_id',
+        forceSelection: true,
+        hidden: true,
+        queryMode: 'local',
+       listeners: {
+            beforerender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 1000,
+                    proxy: {
+                        url: base_url + 'configurations/getConfigParamFromTable',
+                        extraParams: {
+                            table_name: 'par_modules'
+                        }
+                    }
+                },
+                isLoad: true
+            }
+        }
+    },
     ],
     dockedItems:[
         {

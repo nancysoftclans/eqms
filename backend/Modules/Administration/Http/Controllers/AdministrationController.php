@@ -83,6 +83,8 @@ class AdministrationController extends Controller
                 $routeId = $item['routeId'];
                 $order_no = $item['order_no'];
                 $is_menu = $item['is_menu'];
+                $has_module = $item['has_module'];
+                $tied_module_id = $item['tied_module_id'];
                 $is_disabled = $item['is_disabled'];
                 $workflow_id = $item['workflow_id'];
                 $parameter_id = $item['parameter_id'];
@@ -103,6 +105,8 @@ class AdministrationController extends Controller
                 $menus .= '"level": "' . $level . '",';
                 $menus .= '"order_no": "' . $order_no . '",';
                 $menus .= '"is_menu": "' . $is_menu . '",';
+                $menus .= '"has_module": "' . $has_module . '",';
+                $menus .= '"tied_module_id": "' . $tied_module_id . '",';
                 $menus .= '"workflow_id": "' . $workflow_id . '",';
                 $menus .= '"is_disabled": "' . $is_disabled . '",';
                 $menus .= '"parameter_id": "' . $parameter_id . '",';
@@ -126,6 +130,8 @@ class AdministrationController extends Controller
                         $child_route = $child['routeId'];
                         $child_order_no = $child['order_no'];
                         $child_is_menu = $child['is_menu'];
+                        $child_has_module = $child['has_module'];
+                        $child_tied_module_id = $child['tied_module_id'];
                         $child_is_disabled = $child['is_disabled'];
                         $child_parent_id = $child['parent_id'];
                         $child_workflow_id = $child['workflow_id'];
@@ -151,6 +157,8 @@ class AdministrationController extends Controller
                         $menus .= '"level": "' . $child_level . '",';
                         $menus .= '"order_no": "' . $child_order_no . '",';
                         $menus .= '"is_menu": "' . $child_is_menu . '",';
+                        $menus .= '"has_module": "' . $child_has_module . '",';
+                        $menus .= '"tied_module_id": "' . $child_tied_module_id . '",';
                         $menus .= '"is_disabled": "' . $child_is_disabled . '",';
                         $menus .= '"workflow_id": "' . $child_workflow_id . '",';
                         $menus .= '"parameter_id": "' . $child_parameter_id . '",';
@@ -175,6 +183,8 @@ class AdministrationController extends Controller
                                 $grandchild_route = $grandchild['routeId'];
                                 $grandchild_order_no = $grandchild['order_no'];
                                 $grandchild_is_menu = $grandchild['is_menu'];
+                                $grandchild_has_module = $grandchild['has_module'];
+                                $grandchild_tied_module_id = $grandchild['tied_module_id'];
                                 $grandchild_is_disabled = $grandchild['is_disabled'];
                                 $grandchild_parent_id = $child['parent_id'];
                                 $grandchild_child_id = $grandchild['parent_id'];
@@ -210,6 +220,8 @@ class AdministrationController extends Controller
                                 $menus .= '"level": "' . $grandchild_level . '",';
                                 $menus .= '"order_no": "' . $grandchild_order_no . '",';
                                 $menus .= '"is_menu": "' . $grandchild_is_menu . '",';
+                                $menus .= '"has_module": "' . $grandchild_has_module . '",';
+                                $menus .= '"tied_module_id": "' . $grandchild_tied_module_id . '",';
                                 $menus .= '"is_disabled": "' . $grandchild_is_disabled . '",';
                                 $menus .= '"parent_id": ' . $grandchild_parent_id . ',';
                                 $menus .= '"child_id": ' . $grandchild_child_id . ',';
@@ -461,6 +473,7 @@ class AdministrationController extends Controller
             $parent_id = $post_data['parent_id'];
             $child_id = $post_data['child_id'];
 
+
             if ($level > 2) {
                 $parent_id = $child_id;
             }
@@ -473,6 +486,7 @@ class AdministrationController extends Controller
             unset($post_data['child_id']);
             unset($post_data['parent_id']);
             $table_data = $post_data;
+
             //add extra params
             $table_data['tab_title'] = $post_data['name'];
             $table_data['created_on'] = Carbon::now();

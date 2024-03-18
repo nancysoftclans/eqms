@@ -682,6 +682,9 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             'pmsSampleMeetingGrid': {
                 refresh: 'addApplicationWorkflowParams'
             },
+            // 'documentapplicationreceivingwizard': {
+            //     afterrender: 'prepapreDocumentCreationReceiving'
+            //  },
             'approvalscancellationgrid button[action=process_submission_btn]': {
                 click: 'showManagerApplicationSubmissionWinGeneric'
             },
@@ -947,7 +950,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 printFacilityInspectionReport: 'printFacilityInspectionReport',
                 printFacilityInspectionReportFromGrid: 'printFacilityInspectionReportFromGrid',
                 autoGenerateChecklistBasedQueries: 'autoGenerateChecklistBasedQueries',
-                updateProductReviewBaseDetails: 'updateProductReviewBaseDetails'
+                updateProductReviewBaseDetails: 'updateProductReviewBaseDetails',
+                onInitiateDocumentApplication: 'onInitiateDocumentApplication'
             }
         }
     },
@@ -1675,7 +1679,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('displayfield[name=workflow_stage]').setValue(workflow_stage);
         tab.down('displayfield[name=application_status]').setValue(application_status);
         tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
-        tab.down('displayfield[name=reference_no]').setValue(reference_no);
+      //  tab.down('displayfield[name=reference_no]').setValue(reference_no);
     },
     showPreviousUploadedDocsGeneric: function (btn, section_id, module_id, sub_module_id, workflow_stage, application_code) {
         var childXtype = btn.childXtype,
@@ -1765,6 +1769,46 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             }
         });
     },
+
+     onInitiateDocumentApplication: function (sub_module_id, btn) {
+        Ext.getBody().mask('Loading Please wait...');
+        var me = this,
+        is_dataammendment_request = btn.is_dataammendment_request,
+            mainTabPanel = me.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            dashboardWrapper = activeTab.down('#documentapplicationwrapper'),
+            module_id = activeTab.down('hiddenfield[name=module_id]').getValue();
+
+              workflow_details = getInitialDocumentCreationWorkflowDetails(module_id, sub_module_id, is_dataammendment_request, ''); 
+
+        if (!workflow_details) {
+            Ext.getBody().unmask();
+            toastr.warning('Problem encountered while fetching workflow details-->Possibly workflow not set!!', 'Warning Response');
+            return false;
+        }
+        dashboardWrapper.removeAll();
+        var workflowContainer = Ext.widget(workflow_details.viewtype);
+        workflowContainer.down('displayfield[name=process_name]').setValue(workflow_details.processName);
+        workflowContainer.down('displayfield[name=workflow_stage]').setValue(workflow_details.initialStageName);
+        workflowContainer.down('displayfield[name=application_status]').setValue(workflow_details.applicationStatus);
+        workflowContainer.down('hiddenfield[name=process_id]').setValue(workflow_details.processId);
+        workflowContainer.down('hiddenfield[name=workflow_stage_id]').setValue(workflow_details.initialStageId);
+        workflowContainer.down('hiddenfield[name=module_id]').setValue(module_id);
+        workflowContainer.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+        dashboardWrapper.add(workflowContainer);
+
+
+        if(dashboardWrapper.down('premisedetailscmnfrm')){
+        dashboardWrapper.down('premisedetailscmnfrm').down('button[action=search_premise]').enable();
+        }
+        Ext.Function.defer(function () {
+            Ext.getBody().unmask();
+        }, 300);
+
+        //load the stores
+
+    },
+
     findAndAttachAppCodetoStr: function(caller, table_name){
         var grid = caller.up('grid'),
                 store = caller.getStore(),
@@ -4200,6 +4244,92 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 toastr.error('Error: ' + errorThrown, 'Error Response');
             }
         });
+    },
+
+    prepapreDocumentCreationReceiving: function (pnl) {
+
+         Ext.getBody().mask('Please wait...');
+        var me = this,
+            activeTab = pnl;
+            application_status_id = activeTab.down('hiddenfield[name=application_status_id]').getValue(),
+           // applicantFrm = activeTab.down('importexportapplicantdetailsfrm'),
+            //senderreceiverdetailsfrm = activeTab.down('#senderreceiverdetailsfrm'),
+            //application_id = activeTab.down('hiddenfield[name=active_application_id]').getValue(),
+            documentdetailsfrm = activeTab.down('docdefinationrequirementfrm'),
+            process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
+            sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
+            section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
+            zone_cbo = activeTab.down('combo[name=zone_id]');
+            filter = { section_id: section_id },
+            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
+
+            
+        if (application_status_id == 4 || application_status_id === 4) {
+            activeTab.down('button[name=queries_responses]').setVisible(true);
+        }
+if (sub_module_id) {
+            Ext.Ajax.request({
+                method: 'GET',
+                url: 'documentmanagement/prepareDocumentCreationReceivingStage',
+                params: {
+                    sub_module_id: sub_module_id
+                },
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (response) {
+                    Ext.getBody().unmask();
+                    var resp = Ext.JSON.decode(response.responseText),
+                        message = resp.message,
+                        success = resp.success,
+                        results = resp.results,
+                        zone_id = results.zone_id,
+                        model = Ext.create('Ext.data.Model', results);
+
+                    if (success == true || success === true) {
+                        documentdetailsfrm.loadRecord(model);
+
+                        zone_cbo.setValue(zone_id);
+
+                        activeTab.down('displayfield[name=application_status]').setValue(results.application_status);
+
+                        activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
+                        activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);
+                        
+                        var parent_pnl = pnl.up('panel');
+                            parent_pnl.getViewModel().set('isReadOnly', false);
+                            if(activeTab.down('button[action=search_premise]')){
+                               activeTab.down('button[action=search_premise]').setDisabled(true);
+                            }
+
+                            if(activeTab.down('button[action=link_applicant]')){
+                            activeTab.down('button[action=link_applicant]').setDisabled(true);
+                            }
+                            
+                            if( activeTab.down('combo[name=sub_module_id]')){
+                                activeTab.down('combo[name=sub_module_id]').setDisabled(true);
+                            }
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (response) {
+                    Ext.getBody().unmask();
+                    var resp = Ext.JSON.decode(response.responseText),
+                        message = resp.message,
+                        success = resp.success;
+                    toastr.error(message, 'Failure Response');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    Ext.getBody().unmask();
+                    toastr.error('Error: ' + errorThrown, 'Error Response');
+                }
+            });
+        } else {
+            Ext.getBody().unmask();
+            //It's a new application
+                          
+        }
     },
     prepareInterfaceBasedonConfig: function(me){//me - the form
          var frm_cont = me.up('panel'),

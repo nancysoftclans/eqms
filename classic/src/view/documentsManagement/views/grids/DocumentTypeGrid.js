@@ -1,7 +1,7 @@
-Ext.define('Admin.view.configurations.views.grids.FormCategoryGrid', {
+Ext.define('Admin.view.documentsManagement.views.grids.DocumentTypeGrid',  {
     extend: 'Ext.grid.Panel',
-    controller: 'configurationsvctr',
-    xtype: 'formCategoryGrid',
+    controller: 'documentsManagementvctr',
+    xtype: 'documenttypegrid',
     viewModel: 'configurationsvm',
     cls: 'dashboard-todo-list',
     autoScroll: true,
@@ -32,7 +32,7 @@ dockedItems: [
                 iconCls: 'x-fa fa-plus',
                 action: 'add',
                 ui: 'soft-blue',
-                childXtype: 'formCategoryFrm',
+                childXtype: 'documenttypeform',
                 winTitle: 'Form Category',
                 winWidth: '40%',
                 handler: 'showAddConfigParamWinFrm',
@@ -483,7 +483,7 @@ dockedItems: [
                     text: 'Add Fields',
                     tooltip: 'Add Fields',
                     iconCls: 'x-fa fa-plus',
-                    childXtype: 'formTypeFieldsGrid',
+                    childXtype: 'documenttypefieldgrid',
                     winTitle: 'Form Type Fields',
                     winWidth: '70%',
                     handler: 'AddFormTypeFields'

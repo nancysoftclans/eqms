@@ -120,6 +120,78 @@ class WorkflowController extends Controller
         return response()->json($res);
     }
 
+public function getInitialDocumentCreationWorkflowDetails(Request $request)
+    {
+        $module_id = $request->input('module_id');
+        $sub_module_id = $request->input('sub_module_id');
+        $is_dataammendment_request = $request->input('is_dataammendment_request');
+
+        try {
+            //get workflow id
+
+            if($sub_module_id == 81){
+                $where = array(
+                't1.module_id' => $module_id,
+                't1.importexport_applicationtype_id' => $is_licenced,
+                't1.sub_module_id' => $sub_module_id
+
+
+            );
+
+
+            }else{
+                $where = array(
+                't1.module_id' => $module_id,
+                't1.sub_module_id' => $sub_module_id
+            );
+            }
+            
+            if(validateIsNumeric($is_dataammendment_request)){
+               
+                $where['t1.is_dataammendment_request'] = $is_dataammendment_request; 
+            }
+           
+            // if(validateIsNumeric($is_licenced)){
+            //     $where['t1.importexport_applicationtype_id'] = $is_licenced; 
+            // }
+            $qry = DB::table('wf_processes as t1')
+                ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
+                ->join('wf_workflow_stages as t3', function ($join) {
+                    $join->on('t2.id', '=', 't3.workflow_id')
+                        ->on('t3.stage_status', '=', DB::raw(1));
+                })
+                ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
+                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId');
+
+
+
+            $qry->where($where);
+
+            $results = $qry->first();
+            //initial status details
+            $statusDetails = getApplicationInitialStatus($module_id, $sub_module_id);
+
+            $results->initialAppStatus = $statusDetails->name;
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return response()->json($res);
+    }
     public function getWorkflowParamFromModel(Request $request)
     {
         $model_name = $request->input('model_name');

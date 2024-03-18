@@ -46,6 +46,7 @@ Route::group(['prefix' => 'workflow','middleware' => ['auth:api', 'web']], funct
     Route::get('getProcessApplicableChecklistCategories', [WorkflowController::class, 'getProcessApplicableChecklistCategories']);
     Route::get('getProcessEditableFormFields', [WorkflowController::class, 'getProcessEditableFormFields']);
     Route::get('getProcessEditableOtherParts', [WorkflowController::class, 'getProcessEditableOtherParts']);
+    Route::get('getInitialDocumentCreationWorkflowDetails', [WorkflowController::class, 'getInitialDocumentCreationWorkflowDetails']);
     //Route::get('getProcessApplicableChecklistTypes', [WorkflowController::class, 'getProcessApplicableChecklistTypes']);
     //Route::get('getProcessApplicableChecklistItems', [WorkflowController::class, 'getProcessApplicableChecklistItems']);
     Route::post('syncProcessApplicableChecklistCategories', [WorkflowController::class, 'syncProcessApplicableChecklistCategories']);

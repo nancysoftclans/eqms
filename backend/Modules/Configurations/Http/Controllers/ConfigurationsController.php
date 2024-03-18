@@ -49,9 +49,11 @@ class ConfigurationsController extends Controller
         try {
             $user_id = \Auth::user()->id;
             $post_data = $req->post();
-            $db_con = 'pgsql';
+            $db_con = 'mysql';
             $table_name = $post_data['table_name'];
             $is_variation = $req->is_variation;
+
+
 
             if (isset($post_data['db_con']) && $post_data['db_con'] != '') {
                 $db_con = $post_data['db_con'];
@@ -109,6 +111,7 @@ class ConfigurationsController extends Controller
                 $table_data['action_by'] = $this->user_id;
 
             }
+
             //application code if its a variation save
             if(validateIsNumeric($is_variation) && validateIsNumeric($req->premise_id)){
                 $application_code = getSingleRecordColValue('tra_premises_applications', ['premise_id'=> $req->premise_id], 'application_code');
@@ -117,6 +120,7 @@ class ConfigurationsController extends Controller
 
             $id = $req->id;
             $unsetData = $req->input('unset_data');
+
             //unset unnecessary values
             unset($post_data['_token']);
             unset($post_data['table_name']);
@@ -131,6 +135,7 @@ class ConfigurationsController extends Controller
                 $post_data = unsetArrayData($post_data, $unsetData);
             }
             $table_data = $post_data;
+
             //add extra params
             $table_data['created_on'] = Carbon::now();
             $table_data['created_by'] = $user_id;
@@ -179,6 +184,7 @@ class ConfigurationsController extends Controller
 
         $document_extension_ids = $req->input('document_extension_ids');
         $document_extension_ids = json_decode($document_extension_ids);
+
             $id = $post_data['id'];
             $unsetData = $req->input('unset_data');
             //unset unnecessary values
@@ -873,11 +879,11 @@ class ConfigurationsController extends Controller
             }
             else if($table_name == 'par_form_categories'){
                 $qry->Join('par_modules as t4','t1.module_id','=','t4.id')
-                    ->Join('par_sub_modules as t5','t1.sub_module_id','=','t5.id')
-                    ->leftJoin('par_sections as t6','t1.section_id','=','t6.id')
-                    ->leftJoin('par_prodclass_categories as t7','t1.prodclass_category_id','=','t7.id')
-                    ->leftJoin('par_premises_types as t8','t1.premise_type_id','=','t8.id')
-                    ->select('t1.*', 't4.name as module_name', 't5.name as sub_module_name', 't6.name as section_name', 't7.name as section_category', 't8.name as premise_type');
+                    // ->Join('par_sub_modules as t5','t1.sub_module_id','=','t5.id')
+                    // ->leftJoin('par_sections as t6','t1.section_id','=','t6.id')
+                    // ->leftJoin('par_prodclass_categories as t7','t1.prodclass_category_id','=','t7.id')
+                    // ->leftJoin('par_premises_types as t8','t1.premise_type_id','=','t8.id')
+                    ->select('t1.*', 't4.name as module_name');
             }
             else if($table_name== 'par_maindetails_variation_points'){
                 $qry->Join('par_modules as t4','t1.module_id','=','t4.id')
@@ -936,6 +942,7 @@ class ConfigurationsController extends Controller
                         ->select('t1.*','t3.name as name','t4.name as currency_name');
 
                 }
+                
             else if ($table_name == 'tra_pharmacy_details') {
                     $qry->leftJoin('par_regions as t3','t1.region_id','=','t3.id')
                         ->leftJoin('par_districts as t4','t1.district_id','=','t4.id')
