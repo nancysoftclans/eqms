@@ -1652,11 +1652,15 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             workflow_stage = record.get('workflow_stage'),
             application_status = record.get('application_status'),
             tracking_no = record.get('tracking_no'),
+            name = record.get('name'),
+            document_type_id = record.get('document_type_id'),
+            has_parent_level = record.get('has_parent_level'),
+            docparent_id = record.get('docparent_id'),
+            description = record.get('description'),
             reference_no = record.get('reference_no'),
             process_id = record.get('process_id'),
             module_id = record.get('module_id'),
             sub_module_id = record.get('sub_module_id'),
-            section_id = record.get('section_id'),
             workflow_stage_id = record.get('workflow_stage_id'),
             application_status_id = record.get('application_status_id');
             
@@ -1674,12 +1678,16 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('hiddenfield[name=application_status_id]').setValue(application_status_id);
         tab.down('hiddenfield[name=module_id]').setValue(module_id);
         tab.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
-        tab.down('hiddenfield[name=section_id]').setValue(section_id);
         tab.down('displayfield[name=process_name]').setValue(process_name);
         tab.down('displayfield[name=workflow_stage]').setValue(workflow_stage);
         tab.down('displayfield[name=application_status]').setValue(application_status);
         tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
-      //  tab.down('displayfield[name=reference_no]').setValue(reference_no);
+        tab.down('textfield[name=name]').setValue(name);
+        tab.down('textfield[name=document_type_id]').setValue(document_type_id);
+        tab.down('textfield[name=has_parent_level]').setValue(has_parent_level);
+        tab.down('textfield[name=docparent_id]').setValue(docparent_id);
+        tab.down('textfield[name=description]').setValue(description);
+      //tab.down('displayfield[name=reference_no]').setValue(reference_no);
     },
     showPreviousUploadedDocsGeneric: function (btn, section_id, module_id, sub_module_id, workflow_stage, application_code) {
         var childXtype = btn.childXtype,

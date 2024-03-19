@@ -201,6 +201,9 @@ public function getdocdefinationrequirementDetails(Request $req)
             ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
             ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
             ->leftJoin('par_prodclass_categories as t6', 't1.prodclass_category_id', '=', 't6.id')
+            ->leftJoin('wf_processes as t7', 't1.process_id', '=', 't7.id')
+            ->leftJoin('par_form_categories as t8', 't1.document_type_id', '=', 't8.id')
+            ->leftJoin('par_confirmations as t9', 't1.has_parent_level', '=', 't9.id')
             ->select(
                 't1.*',
                 DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentupload_requirements q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
@@ -210,6 +213,10 @@ public function getdocdefinationrequirementDetails(Request $req)
                 't3.name AS module_name',
                 't4.name AS sub_module',
                 't5.name AS section_name',
+                't7.name AS process_name',
+                't8.name AS document_type',
+                't9.name AS parent_level',
+
                 DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
                             FROM tra_docupload_reqextensions t 
                             INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 

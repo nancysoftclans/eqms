@@ -2593,9 +2593,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
             $transitions = DB::table('wf_workflow_transitions as t1')
                 ->join('wf_workflow_actions as t2', 't1.action_id', '=', 't2.id')
-                ->select(DB::raw("t1.stage_id as from,t1.nextstage_id as to,t2.name as text"))
+                ->select(DB::raw("t1.stage_id as `from`, t1.nextstage_id as `to`, t2.name as text"))
                 ->where('t1.workflow_id', $workflow_id)
                 ->get();
+
 
 
             $diagramDataArray = array(

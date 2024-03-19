@@ -17,14 +17,13 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentDetailsPnl', {
             xtype: 'docdefinationrequirementfrm',
             autoScroll: true, 
             title: 'DOCUMENT DETAILS'
-          //   items:[
-          //   {
-          //   xtype: 'docdefinationrequirementfrm',
-          //   autoScroll: true,
-          //   title: 'DOCUMENT DETAILS'
-          //   }
-          // ]
-        },{
+           },
+            {
+            xtype: 'documenttypeform',
+            autoScroll: true,
+            title: 'DOCUMENT DETAILS'
+            },
+        {
         xtype: 'hiddenfield',
         name: '_token',
         value: token

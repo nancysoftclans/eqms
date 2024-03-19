@@ -38,6 +38,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         iconCls: 'x-fa fa-plus',
         action: 'add',
         ui: 'soft-blue',
+        hidden: true,
         childXtype: 'docdefinationrequirementfrm',
         winTitle: 'Documents requirements Defination',
         winWidth: '40%',
@@ -51,6 +52,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         displayField: 'name',
         forceSelection: true,
         allowBlank: false,
+        hidden: true,
         width: 250,
         labelWidth: 80,
         queryMode: 'local',
@@ -82,6 +84,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         fieldLabel: 'Sub Module',
         name: 'sub_module_id',
         valueField: 'id',
+        hidden: true,
         displayField: 'name',
         forceSelection: true,
         width: 250,
@@ -114,6 +117,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         valueField: 'id',
         displayField: 'name',
         forceSelection: true,
+        hidden: true,
         allowBlank: false,
         queryMode: 'local',
         width: 250,
@@ -143,6 +147,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         displayField: 'name',
         forceSelection: true,
         allowBlank: false,
+        hidden: true,
         queryMode: 'local',
         width: 250,
         labelWidth: 80,
@@ -233,9 +238,21 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'section_name',
+        dataIndex: 'parent_level',
+        text: 'Has Parent',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'name',
+        text: 'Parent Name',
+        tdCls:'wrap-text',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'allowed_extensions',
         hidden: true,
-        text: 'Section Name',
+        text: 'Allowed Extensions',
+        tdCls:'wrap-text',
         flex: 1
     },{
         xtype: 'gridcolumn',
@@ -271,13 +288,6 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         xtype: 'gridcolumn',
         dataIndex: 'description',
         text: 'Description',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'allowed_extensions',
-        hidden: true,
-        text: 'Allowed Extensions',
-        tdCls:'wrap-text',
         flex: 1
     },{
         xtype: 'gridcolumn',

@@ -9,9 +9,9 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
         'Ext.layout.container.*',
         'Ext.toolbar.Fill'
     ],
-    // viewModel: {
-    //     type: 'importexportpermitsvm'
-    // },
+    viewModel: {
+        type: 'documentcreationvm'
+    },
     reference: 'wizardpnl',
     layout: 'card',
     bodyPadding: 3,
