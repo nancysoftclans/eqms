@@ -1657,6 +1657,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             has_parent_level = record.get('has_parent_level'),
             docparent_id = record.get('docparent_id'),
             description = record.get('description'),
+            application_code = record.get('application_code'),
             reference_no = record.get('reference_no'),
             process_id = record.get('process_id'),
             module_id = record.get('module_id'),
@@ -1687,6 +1688,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('textfield[name=has_parent_level]').setValue(has_parent_level);
         tab.down('textfield[name=docparent_id]').setValue(docparent_id);
         tab.down('textfield[name=description]').setValue(description);
+        tab.down('hiddenfield[name=application_code]').setValue(application_code);
       //tab.down('displayfield[name=reference_no]').setValue(reference_no);
     },
     showPreviousUploadedDocsGeneric: function (btn, section_id, module_id, sub_module_id, workflow_stage, application_code) {

@@ -45,6 +45,7 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                 }, {
                     xtype: 'displayfield',
                     name: 'workflow_stage',
+                    hidden: true,
                     fieldLabel: 'Application Status',
                     fieldStyle: {
                         'color': 'green',
@@ -57,6 +58,7 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                 }, {
                     xtype: 'displayfield',
                     name: 'application_status',
+                    hidden: true,
                     fieldLabel: 'App Status',
                     fieldStyle: {
                         'color': 'green',

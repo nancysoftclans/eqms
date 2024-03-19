@@ -170,7 +170,7 @@ class DocumentManagementController extends Controller
 public function saveDocDefinationrequirement(Request $request)
        {
            try {
-               $active_application_id = $request->input('active_application_id');
+               $application_code = $request->input('application_code');
                $process_id = $request->input('process_id');
                $workflow_stage_id = $request->input('workflow_stage_id');
                $module_id = 26;
@@ -193,34 +193,41 @@ public function saveDocDefinationrequirement(Request $request)
                          
                  );
 
+
+
                  $applications_table = 'tra_documentupload_requirements';
                  
    
-               if (validateIsNumeric($active_application_id)) {
+               if (validateIsNumeric($application_code)) {
                    //update
                    $app_data['dola'] = Carbon::now();
                    $app_data['altered_by'] = $user_id;
                    $app_details = array();
-                   $where_app = array('id'=>$active_application_id);
+                   $where_app['application_code'] = $application_code;
+
+
                    if (recordExists($applications_table, $where_app)) {
+                  
                        //$app_details = getTableData($applications_table, $where_app);
                        $app_details = getPreviousRecords($applications_table, $where_app);
+
+                    
                        if ($app_details['success'] == false) {
                            return $app_details;
                        }
                        $app_details = $app_details['results'];
-                      
-                       $res =  updateRecord($applications_table, $app_details, $where_app, $app_data, $user_id);
-   
-                   }
+                        
+              
+                       $res =  updateRecord($applications_table,  $where_app, $app_data, $user_id);
+                     
+         }
                    
                    $application_code = $app_details[0]['application_code'];//$app_details->application_code;
                    $ref_number = $app_details[0]['reference_no'];//$app_details->reference_no;
-   
-                   $res['active_application_id'] = $active_application_id;
+
                    $res['application_code'] = $application_code;
                    $res['ref_no'] = $ref_number;
-    $res['tracking_no'] = $ref_number;
+                   $res['tracking_no'] = $ref_number;
                } else {
                        $zone_code = getSingleRecordColValue('par_zones', array('id' => $zone_id), 'zone_code');
                        $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');
@@ -285,7 +292,8 @@ public function saveDocDefinationrequirement(Request $request)
                            'created_by' => $user_id
                        );
    
-                       insertRecord('tra_submissions', $submission_params, $user_id);
+                      insertRecord('tra_submissions', $submission_params, $user_id);
+
                        $res['active_application_id'] = $active_application_id;
                        $res['application_code'] = $application_code;
                     

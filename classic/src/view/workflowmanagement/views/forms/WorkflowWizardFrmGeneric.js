@@ -72,6 +72,7 @@ Ext.define('Admin.view.workflowmanagement.views.forms.WorkflowWizardFrmGeneric',
                     step: 1,
                     iconCls: 'fa fa-arrows',
                     enableToggle: true,
+                    pressed: true,
                     text: 'WORKFLOW TRANSITIONS',
                     action: 'quickNav',
                     handler: 'quickNavigationGeneric'

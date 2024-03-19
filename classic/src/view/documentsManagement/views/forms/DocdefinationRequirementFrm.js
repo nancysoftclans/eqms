@@ -30,6 +30,9 @@
         name: 'sub_module_id'
     },{
         xtype: 'hiddenfield',
+        name: 'application_code'
+    },{
+        xtype: 'hiddenfield',
         margin: '0 20 20 0',
         name: '_token',
         value: token,
@@ -42,7 +45,7 @@
         allowBlank: true
     }, {
         xtype: 'textfield',
-        fieldLabel: 'Name',
+        fieldLabel: 'Document Title',
         margin: '0 20 20 0',
         name: 'name'
     },{
