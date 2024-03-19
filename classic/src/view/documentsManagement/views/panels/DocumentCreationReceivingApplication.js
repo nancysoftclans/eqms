@@ -2,13 +2,14 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentCreationReceivin
   extend: 'Ext.panel.Panel',
   xtype: 'documentcreationreceivingapplication',
   controller: 'documentsManagementvctr',
-  // viewModel: {
-  //     type: 'importexportpermitsvm'
-  // },
+  viewModel: {
+      type: 'documentcreationvm'
+  },
   layout: 'fit',
   items: [
       {
           xtype: 'documentapplicationreceivingwizard'
+         
       }
   ]
 });

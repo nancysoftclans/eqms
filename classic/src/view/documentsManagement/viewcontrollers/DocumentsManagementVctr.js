@@ -338,6 +338,77 @@ showEditConfigParamWinFrm: function (item) {
         this.fireEvent('viewApplicationDetails', record);
 
     },
+    quickNavigationPOE: function (btn) {
+        var step = btn.step,
+            wizard = btn.wizard,
+            wizardPnl = btn.up(wizard);
+           
+            if(wizardPnl.up('panel')){
+                motherPnl = wizardPnl.up('panel');
+
+            }
+            else{
+                motherPnl = wizardPnl;
+
+            }
+            
+        var
+            progress = wizardPnl.down('#progress_tbar'),
+            document_type_id = motherPnl.down('combo[name=document_type_id]').getValue(),
+            progressItems = progress.items.items;
+
+            if(document_type_id == ''){
+               
+                toastr.error('Please select a Permit Application and save inspection entry before you proceed for inspection!!', 'Failure');
+                return;
+            } 
+
+        if (step ==1) {
+            var thisItem = progressItems[step];
+            
+        }
+        if (step == 0) {
+            
+            motherPnl.getViewModel().set('atBeginning', false);
+            
+            wizardPnl.down('button[name=process_submission_btn]').setVisible(false);
+            
+        }
+         else if (step == max_step) {
+            motherPnl.getViewModel().set('atBeginning', true);
+            motherPnl.getViewModel().set('atEnd', false);
+            wizardPnl.down('button[name=process_submission_btn]').setVisible(true);
+            
+        } 
+        else {
+           
+            motherPnl.getViewModel().set('atBeginning', false);
+            motherPnl.getViewModel().set('atEnd', false);
+        }
+
+
+        wizardPnl.getLayout().setActiveItem(step);
+        var layout = wizardPnl.getLayout(),
+            item = null,
+            i = 0,
+            activeItem = layout.getActiveItem();
+
+        for (i = 0; i < progressItems.length; i++) {
+            item = progressItems[i];
+
+            if (step === item.step) {
+                item.setPressed(true);
+            }
+            else {
+                item.setPressed(false);
+            }
+
+            if (Ext.isIE8) {
+                item.btnIconEl.syncRepaint();
+            }
+        }
+        activeItem.focus();
+    },
 
      saveDocumentApplicationReceivingBaseDetails: function (btn) {
        var wizard = btn.wizardpnl,
@@ -511,6 +582,62 @@ showEditConfigParamWinFrm: function (item) {
     onDocumentSave: function (view) {
         view.unmask();
     },
+
+
+     navigate: function (button, wizardPanel, direction) {
+        var layout = wizardPanel.getLayout(),
+            progress = this.lookupReference('progress'),
+            motherPnl = wizardPanel.up('panel'),
+          //  application_id = motherPnl.down('hiddenfield[name=active_application_code]').getValue(),
+            sub_module_id = motherPnl.down('hiddenfield[name=sub_module_id]').getValue(),
+            model = motherPnl.getViewModel(),
+            progressItems = progress.items.items,
+            item, i, activeItem, activeIndex,
+            end = 1,
+            nextStep = wizardPanel.items.indexOf(layout.getNext());
+
+        if(sub_module_id == ''){
+               
+            toastr.error('Search Import/Export Permit Application before you proceed for inspection!!', 'Failure');
+            return;
+        }  layout[direction]();
+        activeItem = layout.getActiveItem();
+        activeIndex = wizardPanel.items.indexOf(activeItem);
+        //
+        if (activeIndex == 0) {
+            
+            model.set('atBeginning', true);
+            model.set('atEnd', false);
+            motherPnl.down('button[name=process_submission_btn]').setVisible(false);
+        } else if (activeIndex == end) {
+            
+                model.set('atEnd', false);
+                model.set('atBeginning', true);
+                
+                motherPnl.down('button[name=process_submission_btn]').setVisible(true);
+            
+            
+        } else {
+            model.set('atEnd', false);
+            model.set('atBeginning', false);
+        }
+        for (i = 0; i < progressItems.length; i++) {
+            item = progressItems[i];
+
+            if (activeIndex === item.step) {
+                item.setPressed(true);
+            }
+            else {
+                item.setPressed(false);
+            }
+
+            if (Ext.isIE8) {
+                item.btnIconEl.syncRepaint();
+            }
+        }
+        activeItem.focus();
+        
+    },
     quickNavigation: function (btn) {
          var step = btn.step,
             wizard = btn.wizard,
@@ -532,46 +659,24 @@ showEditConfigParamWinFrm: function (item) {
             }
         }
         if (step == 0) {
-            motherPnl.down('button[name=save_btn]').setVisible(true);
+            motherPnl.down('button[name=save]').setVisible(true);
             panel.getViewModel().set('atBeginning', false);
             panel.getViewModel().set('atEnd', true);
-            if(wizardPnl.down('button[name=prechecking_recommendation]')){
-
-                wizardPnl.down('button[name=prechecking_recommendation]').setVisible(false);
-            }
-          
-            if(wizardPnl.down('button[name=process_submission_btn]')){
-                wizardPnl.down('button[name=process_submission_btn]').setVisible(false);
-            }
+            wizardPnl.down('button[name=process_submission_btn]').setVisible(false);
         } else if (step == max_step) {
             
-            motherPnl.down('button[name=save_btn]').setVisible(false);
+            motherPnl.down('button[name=save]').setVisible(false);
             panel.getViewModel().set('atBeginning', true);
-            panel.getViewModel().set('atEnd', false);
-            if(wizardPnl.down('button[name=prechecking_recommendation]')){
-
-                wizardPnl.down('button[name=prechecking_recommendation]').setVisible(true);
-            }
-          
-            if(wizardPnl.down('button[name=process_submission_btn]')){
-                wizardPnl.down('button[name=process_submission_btn]').setVisible(true);
-            }
+            wizardPnl.down('button[name=process_submission_btn]').setVisible(true);
         } else {
             panel.getViewModel().set('atBeginning', false);
             panel.getViewModel().set('atEnd', false);
-            if(wizardPnl.down('button[name=save_btn]')){
+            if(wizardPnl.down('button[name=save]')){
 
-                wizardPnl.down('button[name=save_btn]').setVisible(false);
-            }
-            
-            if(wizardPnl.down('button[name=prechecking_recommendation]')){
-
-                wizardPnl.down('button[name=prechecking_recommendation]').setVisible(false);
+                wizardPnl.down('button[name=save]').setVisible(false);
             }
           
-            if(wizardPnl.down('button[name=process_submission_btn]')){
                 wizardPnl.down('button[name=process_submission_btn]').setVisible(false);
-            }
         }
 
 
@@ -618,15 +723,17 @@ showEditConfigParamWinFrm: function (item) {
         panel.add(containerPnl);
     },
     onPrevCardClick: function (btn) {
-        var wizardPnl = btn.up('workflowwizardfrm'),
-            motherPnl = wizardPnl.up('sectionsDocumentDefinationpnl');
-        motherPnl.getViewModel().set('atEnd', false);
+        var wizard = btn.wizard,
+            wizardPnl = btn.up(wizard);
+            wizardPnl.getViewModel().set('atEnd', false);
         this.navigate(btn, wizardPnl, 'prev');
     },
 
     onNextCardClick: function (btn) {
-        var wizardPnl = btn.up('docdefinationrequirementfrm'),
-            motherPnl = wizardPnl.up('documentdetailspnl');
+        var wizard = btn.wizard,
+            wizardPnl = btn.up(wizard);
+            motherPnl = wizardPnl.up('panel');
+
         motherPnl.getViewModel().set('atBeginning', false);
         this.navigate(btn, wizardPnl, 'next');
     },

@@ -2364,7 +2364,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
     refreshApplicationDocUploadsGrid: function (me) {
         var store = me.store,
             grid = me.up('treepanel'),
-            document_type_id = grid.down('combo[name=applicable_documents]').getValue(),
+           // document_type_id = grid.down('combo[name=applicable_documents]').getValue(),
             mainTabPanel = this.getMainTabPanel(),
             activeTab = mainTabPanel.getActiveTab(),
             application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
@@ -2394,7 +2394,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             store.getProxy().extraParams = {
                 application_code: application_code,
                 // table_name: table_name,
-                document_type_id: document_type_id,
+               // document_type_id: document_type_id,
                 process_id: process_id,
                 section_id: section_id,
                 module_id: module_id,

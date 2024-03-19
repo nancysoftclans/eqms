@@ -75,7 +75,8 @@ Ext.define('Admin.view.commoninterfaces.forms.ApplicationDocUploadsFrm', {
         {
             xtype: 'combo', anyMatch: true,
             name: 'doctype_id',
-            allowBlank: false,
+            hidden: true,
+            allowBlank: true,
             forceSelection: true,
             fieldLabel: 'Document Type',
             queryMode: 'local',
@@ -136,7 +137,8 @@ Ext.define('Admin.view.commoninterfaces.forms.ApplicationDocUploadsFrm', {
         {
             xtype: 'combo', anyMatch: true,
             name: 'document_requirement_id',
-            allowBlank: false,
+            allowBlank: true,
+            hidden: true,
             forceSelection: true,
             fieldLabel: 'Document Requirement',
             queryMode: 'local',
@@ -155,29 +157,32 @@ Ext.define('Admin.view.commoninterfaces.forms.ApplicationDocUploadsFrm', {
                     isLoad: false
                 }
             }
-        },{
-            xtype: 'combo', anyMatch: true,
-            queryMode: 'local',
-            forceSelection: true,
-            allowBlank: true,
-            valueField: 'id',
-            value: user_id,
-            displayField: 'name',
-            fieldLabel: 'Uploaded/Report Prepared By',
-            name: 'assessment_by',
-            listeners: {
-                beforerender: {
-                    fn: 'setConfigCombosStore',
-                    config: {
-                        pageSize: 100,
-                        proxy: {
-                            url: 'usermanagement/getUserList',
-                        }
-                    },
-                    isLoad: true
-                }
-            }
-        },{
+        },
+        // {
+        //     xtype: 'combo', anyMatch: true,
+        //     queryMode: 'local',
+        //     forceSelection: true,
+        //     allowBlank: true,
+        //     hidden: true,
+        //     valueField: 'id',
+        //     value: user_id,
+        //     displayField: 'name',
+        //     fieldLabel: 'Uploaded/Report Prepared By',
+        //     name: 'assessment_by',
+        //     listeners: {
+        //         beforerender: {
+        //             fn: 'setConfigCombosStore',
+        //             config: {
+        //                 pageSize: 100,
+        //                 proxy: {
+        //                     url: 'usermanagement/getUserList',
+        //                 }
+        //             },
+        //             isLoad: true
+        //         }
+        //     }
+        // },
+        {
             xtype: 'datefield',
             name: 'assessment_start_date',
             format: 'Y-m-d H:i:s',
@@ -204,12 +209,14 @@ Ext.define('Admin.view.commoninterfaces.forms.ApplicationDocUploadsFrm', {
             xtype: 'textarea',
             fieldLabel: 'Remarks',
             name: 'description',
+            hidden: true,
             allowBlank: true
         },
         {
             xtype: 'component',
+            fieldLabel: 'File Name',
+            allowBlank: false,
             name: 'name',
-            fieldLabel: 'Remarks',
             html: '<input type="text" id="fileName" style="width: 70%;padding: 10px;margin: 8px 0px;display: inline-block;box-sizing: border-box;background: #f1f1f1;outline: 0;border-width: 0 0 2px;border-color: #4664ab;"placeholder="select file" name="uname" readonly><a href="#" style="background-color: #35BAF6;box-shadow: 0 2px 0 darkblue;color: white;padding: 10px;position: relative;width: 30%;text-decoration: none;margin: 8px 0px;"id="browseButton">Select files</a>',
         }
     ],

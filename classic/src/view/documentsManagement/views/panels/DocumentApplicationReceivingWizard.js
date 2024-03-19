@@ -14,70 +14,84 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
     },
     reference: 'wizardpnl',
     layout: 'card',
-    bodyPadding: 3,
+    //bodyPadding: 3,
     flex: 1,
     autoScroll: true,
     cls: 'wizard three shadow',
-    colorScheme: 'soft-purple',
+    colorScheme: 'soft-blue',
     dockedItems: [
         {
             xtype: 'toolbar',
             dock: 'top',
             ui: 'footer',
-            height: 55,
+            height: 60,
             defaults: {
-                labelAlign: 'top',
-                margin: '-10 5 0 5',
-                labelStyle: "color:#595959;font-size:13px"
+                labelAlign: 'left',
+                margin: '-12 5 0 5',
+                labelStyle: "color:#595959;font-size:10px"
             },
-            items: ['->', {
+            items: ['->',  {
                 xtype: 'displayfield',
                 name: 'process_name',
+                margin: '0 0 0 0',
+                padding: '0 0 0 0',
                 fieldLabel: 'Process',
                 fieldStyle: {
                     'color': 'green',
                     'font-weight': 'bold',
-                    'font-size': '12px',  'margin-top': '-2px'
+                    'font-size': '10px'
                 }
             }, {
                     xtype: 'tbseparator',
-                    width: 20
+                    width: 5
                 }, {
                     xtype: 'displayfield',
                     name: 'workflow_stage',
-                    hidden: true,
-                    fieldLabel: 'Application Status',
+                     hidden: true,
+                    fieldLabel: 'Workflow Stage',
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',
-                        'font-size': '12px',  'margin-top': '-2px'
+                        'font-size': '10px'
                     }
                 }, {
                     xtype: 'tbseparator',
-                    width: 20
+                    hidden: true,
+                    width: 5
                 }, {
                     xtype: 'displayfield',
                     name: 'application_status',
-                    hidden: true,
+                     hidden: true,
                     fieldLabel: 'App Status',
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',
-                        'font-size': '12px',  'margin-top': '-2px'
+                        'font-size': '10px'
                     }
                 }, {
                     xtype: 'tbseparator',
-                    width: 20
-                }, {
+                     hidden: true,
+                    width: 5
+                },{
                     xtype: 'displayfield',
                     name: 'tracking_no',
                     fieldLabel: 'Tracking No',
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',
-                        'font-size': '12px',  'margin-top': '-2px'
+                        'font-size': '10px'
                     }
                 },  {
+                    xtype: 'displayfield',
+                    name: 'reference_no',
+                     hidden: true,
+                    fieldLabel: 'Ref No',
+                    fieldStyle: {
+                        'color': 'green',
+                        'font-weight': 'bold',
+                        'font-size': '10px'
+                    }
+                }, {
                     xtype: 'hiddenfield',
                     name: 'process_id'
                 }, {
@@ -100,6 +114,7 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                     name: 'application_status_id'
                 }]
         }
+
     ],
     items: [{
             xtype: 'documentdetailspnl',
@@ -109,84 +124,12 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                     ui: 'footer',
                     dock: 'top',
                     margin: 3,
-                    items: [
-                        {
-                            xtype: 'tbseparator',
-                            width: 2
-                        },
-                        // {
-                        //     xtype: 'combo',
-                        //     fieldLabel: 'Zone',
-                        //     labelWidth: 50,
-                        //     width: 400,
-                        //     name: 'zone_id',
-                        //     valueField: 'id',
-                        //     displayField: 'name',
-                        //     queryMode: 'local',
-                        //     forceSelection: true,
-                        //     listeners: {
-                        //         beforerender: {
-                        //             fn: 'setOrgConfigCombosStore',
-                        //             config: {
-                        //                 pageSize: 1000,
-                        //                 proxy: {
-                        //                     extraParams: {
-                        //                         model_name: 'Zone'
-                        //                     }
-                        //                 }
-                        //             },
-                        //             isLoad: true
-                        //         }
-                        //     },
-                        //     labelStyle: 'font-weight:bold'
-                        // }
-                        // '->',{
-                        //     xtype: 'fieldcontainer',
-                        //     layout: 'column',
-                           
-                        //     items: [
-                        //         {
-                        //             xtype: 'textfield',
-                        //             name: 'reference_no',
-                        //             hidden: false,fieldLabel: 'Visa Application Details',
-                        //             readOnly: true,
-                        //             columnWidth: 0.9
-                        //         },
-                        //         {
-                        //             xtype: 'button',
-                        //             iconCls: 'x-fa fa-search',
-                        //             columnWidth: 0.1,
-                        //             hidden: false,
-                        //             text: 'Search',
-                        //             tooltip: 'Select Application',
-                        //             name: 'select_applications',
-                        //             childXtype: 'allapprovedvisaapplicationsgrid',
-                        //             winTitle:'Approved Visa Applications',
-                        //             winWidth:'70%',
-                        //             handler: 'showIEApplicationsSelectionList'
-                        //         }
-                        //     ]
-                        // }
-                    ]
                 }
             ],
-        },
-        // {
-        //     xtype: 'licensepermitsproductsgrid',
-        //     title: 'Permit Products Details',
-        //  },
-          {
+        }, {
             xtype: 'docuploadsgrid',
             title: 'Document Upload'
-         },
-        //{
-        //     xtype: 'productscreeninggrid',
-        //     title: 'Import/Export Permit Prechecking'
-        // },
-        // {
-        //     xtype: 'appinvoicepaymentspanel'
-           
-        // },
+        },
         {
             xtype: 'hiddenfield',
             name: 'active_application_id'
@@ -197,66 +140,38 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
         this.tbar = {
             reference: 'progress',
             itemId: 'progress_tbar',
-            defaultButtonUI: 'wizard-' + this.colorScheme,
+            defaultButtonUI: 'wizard-blue',
             cls: 'wizardprogressbar',
             style: {
-                "background-color": "#90c258"
+                "color": "#90c258"
             },
-            bodyStyle: {
-                "background-color": "#90c258"
+            bodystyle: {
+                "color": "#90c258"
             },
             layout: {
                 pack: 'center'
             },
             items: [
-               
+                
                 {
                     step: 0,
                     iconCls: 'fa fa-university',
-                    enableToggle: true,iconAlign: 'top',
-                    text: 'Document Creation Application Details',max_step:1,
+                    enableToggle: true,
+                    pressed: true,
+                    text: 'Document Creation Application Details',
+                    max_step:1,
                     action: 'quickNav', wizard: 'documentapplicationreceivingwizard',
-                    handler: 'quickNavigation',
-                    fieldStyle: {
-                        'font-weight': 'bold',
-                        'font-size': '12px',  'margin-top': '-2px'
-                    }
-                },
-                // {
-                //     step: 1,
-                //     iconCls: 'fa fa-university',
-                //     enableToggle: true,iconAlign: 'top',
-                //     text: 'License Product Details',max_step:4,
-                //     action: 'quickNav', wizard: 'documentapplicationreceivingwizard',
-                //     handler: 'quickNavigation'
-                // }, 
-                {
+                    handler: 'quickNavigation'
+                }, {
                     step: 1,
-                    iconCls: 'fa fa-upload',
-                    enableToggle: true,max_step: 1,
+                    iconCls: 'fa fa-product-hunt',
+                    enableToggle: true,
+                    max_step:1,
                     text: 'Document Upload',
-                    action: 'quickNav', iconAlign: 'top',
+                    action: 'quickNav', 
                     wizard: 'documentapplicationreceivingwizard',
                     handler: 'quickNavigation'
-                }, 
-                // {
-                //     step: 3,
-                //     iconCls: 'fa fa-product-hunt',
-                //     enableToggle: true,max_step: 4,
-                //     text: 'License Prechecking Checklist',
-                //     action: 'quickNav', iconAlign: 'top',
-                //     wizard: 'documentapplicationreceivingwizard',
-                //     handler: 'quickNavigation'
-                // // },
-                // {
-                //     step: 2,
-                //     iconCls: 'fa fa-dollar',
-                //     enableToggle: true,max_step: 2,
-                //     text: 'Invoice & Payment Details',
-                //     action: 'quickNav',iconAlign: 'top',
-                //     wizard: 'documentapplicationreceivingwizard',
-                //     handler: 'quickNavigation',
-                // }
+                }
             ]
         };
         this.bbar = {
@@ -273,15 +188,15 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                 '->',
                 {
                     text: 'Previous',
-                    ui: 'soft-blue',max_step:1,
+                    ui: 'soft-blue',
                     iconCls: 'fa fa-arrow-left',
+                    max_step:1,
                     bind: {
                         disabled: '{atBeginning}'
                     },
                     wizard:'documentapplicationreceivingwizard',
                     handler: 'onPrevCardClick'
-                },
-                {
+                },{
                     text: 'Save Details',
                     ui: 'soft-blue',
                     iconCls: 'fa fa-save',
@@ -308,8 +223,8 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                     ui: 'soft-blue',
                     reference: 'nextbutton',
                     iconCls: 'fa fa-arrow-right',
-                    max_step:1,
                     iconAlign: 'right',
+                    max_step:1,
                     bind: {
                         disabled: '{atEnd}'
                     },wizard:'documentapplicationreceivingwizard',

@@ -18,11 +18,6 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentDetailsPnl', {
             autoScroll: true, 
             title: 'DOCUMENT DETAILS'
            },
-            {
-            xtype: 'documenttypeform',
-            autoScroll: true,
-            title: 'DOCUMENT DETAILS'
-            },
         {
         xtype: 'hiddenfield',
         name: '_token',
