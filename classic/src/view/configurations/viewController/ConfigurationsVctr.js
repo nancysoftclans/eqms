@@ -920,6 +920,8 @@ doDeleteConfigWidgetParam: function (item) {
             storeID = btn.storeID,
             store = Ext.getStore(storeID);
 
+            console.log(form_xtype);
+
         //for variations calls add flag
         var is_variation = form_xtype.is_variation
         var frm = form_xtype.getForm();

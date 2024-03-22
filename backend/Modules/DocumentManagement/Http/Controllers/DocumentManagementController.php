@@ -194,8 +194,6 @@ public function saveDocDefinationrequirement(Request $request)
                          
                  );
 
-
-
                  $applications_table = 'tra_documentupload_requirements';
                  
    
@@ -267,11 +265,13 @@ public function saveDocDefinationrequirement(Request $request)
                        $app_data['reference_no'] = $ref_number;
                        $app_data['tracking_no'] = $ref_number;
                        $app_data['application_code'] = $application_code;
+                       $app_data['reg_serial'] = $application_code;
                        $app_data['created_by'] = \Auth::user()->id;
                        $app_data['created_on'] = Carbon::now();
-   
                       
                        $res = insertRecord($applications_table, $app_data, $user_id);
+
+
                       
                        $active_application_id = $res['record_id'];
 
@@ -416,6 +416,7 @@ public function saveDocDefinationrequirement(Request $request)
 
      public function onLoadApplicationDocumentsUploads(Request $req)
     {
+
         $application_code = $req->input('application_code');
         $workflow_stage = $req->input('workflow_stage');
         $doc_type_id = $req->input('document_type_id');
@@ -486,6 +487,7 @@ public function saveDocDefinationrequirement(Request $request)
             // dd($where);
 
             //get documents based on
+
             if(validateIsNumeric($parent_id)){
                 $qry = DB::table('tra_application_uploadeddocuments as t1')
                     ->leftJoin('tra_application_documents as t2', 't1.application_document_id', 't2.id')
@@ -495,6 +497,8 @@ public function saveDocDefinationrequirement(Request $request)
                     ->select(DB::raw("t2.*, t1.*,t2.application_code, t1.initial_file_name as file_name, t2.remarks, t4.module_id, t4.sub_module_id,t4.section_id,t1.file_type, t2.uploaded_on, CONCAT(decryptval(t5.first_name,".getDecryptFunParams()."),' ',decryptval(t5.last_name,".getDecryptFunParams().")) as uploaded_by,t4.is_mandatory, t4.document_type_id,t3.name as document_type, t4.name as document_requirement, case when (select count(id) from tra_application_uploadeddocuments q where q.parent_id = t1.id) = 0 then true else false end leaf"))
                     ->where('t1.parent_id', $parent_id)
                     ->where('t4.is_enabled', 1);
+
+                    dd($qry);
                 $results = $qry->get();
             }else{
                 $doc_requirments = DB::table('tra_documentupload_requirements as t1')
@@ -807,9 +811,6 @@ public function saveDocDefinationrequirement(Request $request)
             $app_rootnode = getApplicationRootNode($application_code);
 
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
-            dd($app_rootnode);
-
-            dd($app_rootnode);
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
             $reg_serial = 0;
@@ -850,11 +851,12 @@ public function saveDocDefinationrequirement(Request $request)
                         'assessment_by'=>$assessment_by,
                         'reg_serial' => $reg_serial
                     );
-                    $where = array('id'=>$record_id);
+
+
+                    $where = array('application_code'=>$application_code);
                     $table_name = 'tra_application_documents';
 
                     if (recordExists('tra_application_uploadeddocuments', $where)) {
-
 						//dump revision
                         $prev_file_data = DB::table('tra_application_uploadeddocuments')->where($where)->first();
                         //delete the old copy
@@ -879,7 +881,9 @@ public function saveDocDefinationrequirement(Request $request)
 						$where = array('id'=>$prev_file_data->application_document_id);
                         $res = updateRecord($table_name, $where, $doc_app_details);
                     }else{
+                       
                         $res = insertRecord($table_name, $doc_app_details);
+
                     }
  
                     if(isset($res['success']) && $res['success']==true){
@@ -1957,7 +1961,6 @@ public function saveDocDefinationrequirement(Request $request)
         //upload to alfresco
         //return $this->uploadApplicationDocumentFile($request, $file);
         return $this->uploadMultipleFiles($request, $file);
-        dd('dd');
         // delete chunked file
         unlink($file->getPathname());
         // return [
@@ -1965,7 +1968,6 @@ public function saveDocDefinationrequirement(Request $request)
         //     'filename' => $fileName
         // ];
     }
-    dd($is_allowedextension);
 
     // otherwise return percentage information
     // $handler = $fileReceived->handler();
