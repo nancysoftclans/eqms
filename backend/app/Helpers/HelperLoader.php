@@ -1131,9 +1131,9 @@ if (!function_exists('createInitialRegistrationRecord')) {
 }
 
 if (!function_exists('initializeApplicationDMS')) {
-    function initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id)
+    function initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id)
     {
-        DMSHelper::initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+        DMSHelper::initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
     }
 }
 if (!function_exists('getApplicationExpiryDate')) {

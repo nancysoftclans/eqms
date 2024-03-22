@@ -1183,7 +1183,7 @@ class DMSHelper
 
     }
 
-    static function getApplicationSubModuleNodeDetails($section_id, $module_id, $sub_module_id, $user_id, $con = 'pgsql')
+    static function getApplicationSubModuleNodeDetails($module_id, $sub_module_id, $user_id, $con = 'mysql')
     {
         $root_site_id = Config('constants.dms.dms_approotsite_id');
 
@@ -1191,23 +1191,28 @@ class DMSHelper
             ->select('t1.node_ref')
             ->join('tra_sections_docdefination as t2', 't1.doc_section_id', '=', 't2.id')
             ->join('tra_dmsdocument_sites as t3', 't2.dms_site_id', '=', 't3.id')
-            ->where(array('t2.section_id' => $section_id, 't3.site_id' => $root_site_id, 't1.sub_module_id' => $sub_module_id))
+            ->where(array('t3.site_id' => $root_site_id, 't1.sub_module_id' => $sub_module_id))
             ->first();
+
+            
         if ($rec) {
             $record = $rec;
         } else {
+
             //createa node for the module and submodule 
             //root site node ref
             $table_name = 'tra_sections_docdefination';
-            $where_section = array('section_id' => $section_id, 'dms_site_id' => $root_site_id);
+            $where_section = array('dms_site_id' => $root_site_id);
             $record = getPreviousRecords($table_name, $where_section);
+            
             if (count($record['results']) > 0) {
                 $section_node_ref = $record['results']['0']['node_ref'];
                 $doc_section_id = $record['results']['0']['id'];
             } else {
                 //create a node and save informaiton
                 $site_node_ref = getSingleRecordColValue('tra_dmsdocument_sites', array('id' => 2), 'node_ref');
-                $table_data = array('section_id' => $section_id, 'dms_site_id' => $root_site_id);
+                $table_data = array('dms_site_id' => $root_site_id);
+                $section_id = '';
                 $resp = self::funcCreatApplicationNode($table_name, $where_section, $section_id, 'par_sections', $site_node_ref, $table_data, $user_id);
                 $section_node_ref = $resp['node_ref'];
                 $doc_section_id = $resp['record_id'];
@@ -1222,12 +1227,12 @@ class DMSHelper
             }
             
             if (count($record['results']) > 0) {
-
                 $module_node_ref = $record['results']['0']['node_ref'];
                 $doc_module_id = $record['results']['0']['id'];
             } else {
                 //create a node and save informaiton
                 $table_data = array('doc_section_id' => $doc_section_id, 'module_id' => $module_id);
+                $where_module = array('module_id' => $module_id);
                 $resp = self::funcCreatApplicationNode($table_name, $where_module, $module_id, 'par_modules', $section_node_ref, $table_data, $user_id);
                 $module_node_ref = $resp['node_ref'];
                 $doc_module_id = $resp['record_id'];
@@ -1237,6 +1242,8 @@ class DMSHelper
             $table_name = 'tra_sectionssubmodule_docdefination';
             $where_submodule = array('sub_module_id' => $sub_module_id, 'doc_module_id' => $doc_module_id);
             $record = getPreviousRecords($table_name, $where_submodule);
+
+
             if (count($record['results']) > 0) {
                 $record = $record['results']['0'];
             } else {
@@ -1246,6 +1253,7 @@ class DMSHelper
                     'module_id' => $module_id,
                     'sub_module_id' => $sub_module_id);
                 $resp = self::funcCreatApplicationNode($table_name, $where_submodule, $sub_module_id, 'par_sub_modules', $module_node_ref, $table_data, $user_id);
+
                 $sub_module_node_ref = $resp['node_ref'];
 
                 $record = array('node_ref' => $sub_module_node_ref);
@@ -1288,7 +1296,7 @@ class DMSHelper
 
     static function getApplicationRootNode($application_code)
     {
-        $rec = DB::connection('pgsql')->table('tra_application_documentsdefination as t1')
+        $rec = DB::connection('mysql')->table('tra_application_documentsdefination as t1')
             ->select('t1.*')
             ->where(array('t1.application_code' => $application_code))
             ->first();
@@ -1303,7 +1311,7 @@ class DMSHelper
 
     static function getNonStructuredDestinationNode($auth_ticket, $document_type_id, $document_site_id, $trader_email = 'dms')
     {
-        $rec = DB::connection('pgsql')->table('tra_nonstructured_docdefination as t1')
+        $rec = DB::connection('mysql')->table('tra_nonstructured_docdefination as t1')
             ->select('t1.*')
             ->where(array('t1.document_type_id' => $document_type_id, 't1.dms_site_id' => $document_site_id))
             ->first();
@@ -1312,10 +1320,10 @@ class DMSHelper
         } else {
 
             //get the documetn Type Name
-            $parentnode = getSingleRecord('tra_dmsdocument_sites', array('id' => $document_site_id), 'pgsql');
+            $parentnode = getSingleRecord('tra_dmsdocument_sites', array('id' => $document_site_id), 'mysql');
 
             $parentnode_ref = $parentnode->node_ref;
-            $document_type = getParameterItem('par_document_types', $document_type_id, 'pgsql');
+            $document_type = getParameterItem('par_document_types', $document_type_id, 'mysql');
             $node_name = $document_type;
             $node_details = array(
                 'name' => $node_name . str_random(5),
@@ -1329,7 +1337,7 @@ class DMSHelper
                 'node_ref' => $dms_node_id,
                 'created_by' => $trader_email,
                 'created_on' => Carbon::now());
-            $response = insertRecord('tra_nonstructured_docdefination', $dmsapp_data, $trader_email, 'pgsql');
+            $response = insertRecord('tra_nonstructured_docdefination', $dmsapp_data, $trader_email, 'mysql');
             $record = (object)$dmsapp_data;
 
         }
@@ -1340,7 +1348,7 @@ class DMSHelper
     static function getDocumentTypeRootNode($parentnode_ref, $application_code, $document_type_id, $trader_email)
     {
         $record = '';
-        $rec = DB::connection('pgsql')->table('tra_application_documentstypedefination as t1')
+        $rec = DB::connection('mysql')->table('tra_application_documentstypedefination as t1')
             ->select('t1.*')
             ->where(array('t1.application_code' => $application_code, 't1.document_type_id' => $document_type_id))
             ->first();
@@ -1348,7 +1356,7 @@ class DMSHelper
             $record = $rec;
         } else {
             //get the documetn Type Name
-            $document_type = getParameterItem('par_document_types', $document_type_id, 'pgsql');
+            $document_type = getParameterItem('par_document_types', $document_type_id, 'mysql');
             //create nore
             $node_name = $document_type;
             $node_details = array(
@@ -1365,7 +1373,7 @@ class DMSHelper
                     'created_on' => Carbon::now());
 
 
-                $response = insertRecord('tra_application_documentstypedefination', $dmsapp_data, $trader_email, 'pgsql');
+                $response = insertRecord('tra_application_documentstypedefination', $dmsapp_data, $trader_email, 'mysql');
                 $record = (object)$dmsapp_data;
 
             }
@@ -1388,7 +1396,7 @@ class DMSHelper
 
             if ($node_ref == '') {
 
-                $document_type = getParameterItem('par_document_types', $document_type_id, 'pgsql');
+                $document_type = getParameterItem('par_document_types', $document_type_id, 'mysql');
                 //create nore
                 $node_name = $document_type;
                 $node_details = array(
@@ -1421,7 +1429,7 @@ class DMSHelper
 
     }
 
-    static function saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, $tracking_no, $reference_no, $dms_node_id, $user, $con = 'pgsql')
+    static function saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, $tracking_no, $reference_no, $dms_node_id, $user, $con = 'mysql')
     {
         $dmsapp_data = array(
             'application_code' => $application_code,
@@ -1436,15 +1444,13 @@ class DMSHelper
         return $resp;
     }
 
-    static function initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id)
+    static function initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id)
     {
         //check if node exists tra_application_documentsdefination
         $exists = recordExists('tra_application_documentsdefination', ['application_code'=>$application_code]);
-        if(!validateIsNumeric($section_id)){
-            $section_id = 8;
-        }
+       
         if(!$exists){
-            $dms_node_details = self::getApplicationSubModuleNodeDetails($section_id, $module_id, $sub_module_id, $user_id);
+            $dms_node_details = self::getApplicationSubModuleNodeDetails($module_id, $sub_module_id, $user_id);
             $nodeTracking = str_replace("/", "-", $ref_number);
             $parentNode_ref = $dms_node_details->node_ref;//
             $node_details = array(

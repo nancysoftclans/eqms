@@ -165,6 +165,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
     },{
         xtype: 'gridcolumn',
         dataIndex: 'document_type',
+        hidden: true,
         text: 'Document Type',
         hidden: true,
         tdCls: 'wrap',
@@ -172,6 +173,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
     },{
         xtype: 'gridcolumn',
         dataIndex: 'document_requirement',
+        hidden: true,
         text: 'Required Document(s)',
         // hidden: true,
         tdCls: 'wrap',
@@ -194,12 +196,13 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
     }, {
         xtype: 'gridcolumn',
         dataIndex: 'initial_file_name',
-        // hidden: true,
+        hidden: true,
         text: 'Initial File Name',
         flex: 1
     }, {
         xtype: 'gridcolumn',
         dataIndex: 'uploaded_by',
+        hidden: true,
         text: 'Upload By',
         flex: 1,
     }, {

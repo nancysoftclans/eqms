@@ -1,7 +1,7 @@
-Ext.define('Admin.view.documentsManagement.views.panels.Documentsdefinationrequirement', {
+Ext.define('Admin.view.documentsManagement.views.panels.DocumentsCreationApplication', {
     extend: 'Ext.Container',
-    xtype: 'documentsdefinationrequirement',
-    itemId: 'documentsdefinationrequirement',
+    xtype: 'documentscreationapplication',
+    itemId: 'documentscreationapplication',
     controller: 'documentsManagementvctr',
     layout: 'border',
     items: [

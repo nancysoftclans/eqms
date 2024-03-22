@@ -169,6 +169,7 @@ class DocumentManagementController extends Controller
 
 public function saveDocDefinationrequirement(Request $request)
        {
+
            try {
                $application_code = $request->input('application_code');
                $process_id = $request->input('process_id');
@@ -224,6 +225,8 @@ public function saveDocDefinationrequirement(Request $request)
                    
                    $application_code = $app_details[0]['application_code'];//$app_details->application_code;
                    $ref_number = $app_details[0]['reference_no'];//$app_details->reference_no;
+                  
+ 
 
                    $res['application_code'] = $application_code;
                    $res['ref_no'] = $ref_number;
@@ -257,6 +260,7 @@ public function saveDocDefinationrequirement(Request $request)
                        $ref_id = getSingleRecordColValue('tra_submodule_referenceformats', array('sub_module_id' => $sub_module_id, 'module_id' => $module_id, 'reference_type_id' => 1), 'reference_format_id');
                        
                        $ref_number = generateProductsRefNumber($ref_id, $codes_array, date('Y'), $process_id, $zone_id, $user_id);
+
                        $view_id = generateApplicationViewID();
                        //  'view_id'=>$view_id,
                        $app_data['view_id'] = $view_id;
@@ -269,7 +273,7 @@ public function saveDocDefinationrequirement(Request $request)
                       
                        $res = insertRecord($applications_table, $app_data, $user_id);
                       
-                      // $active_application_id = $res['record_id'];
+                       $active_application_id = $res['record_id'];
 
                        //add to submissions table
                        $submission_params = array(
@@ -292,7 +296,7 @@ public function saveDocDefinationrequirement(Request $request)
                            'created_by' => $user_id
                        );
    
-                      insertRecord('tra_submissions', $submission_params, $user_id);
+                      $res = insertRecord('tra_submissions', $submission_params, $user_id);
 
                        $res['active_application_id'] = $active_application_id;
                        $res['application_code'] = $application_code;
@@ -305,11 +309,14 @@ public function saveDocDefinationrequirement(Request $request)
                        $node_details = array(
                            'name' => $nodetracking,
                            'nodeType' => 'cm:folder');
+
+                       if ($res['success']) {
+                      initializeApplicationDMS( $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
    
-                    //   initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-                  
-   
-   
+                       } else {
+                           $res = $response;
+                       }
+                     
                }
    
            } catch (\Exception $exception) {
@@ -738,16 +745,27 @@ public function saveDocDefinationrequirement(Request $request)
     function validateDocumentExtension($extension,$document_requirement_id){
             //get all the file types under the said requiredment
 
-            $records = DB::table('tra_docupload_reqextensions as t1')
-                                            ->join('par_document_extensionstypes as t2', 't1.document_extensionstype_id', 't2.id')
-                                            ->where(array('documentupload_requirement_id'=>$document_requirement_id))
-											->where('extension', 'ILIKE', $extension)
-                                            ->first();
+            // $records = DB::table('tra_docupload_reqextensions as t1')
+            //                                 ->join('par_document_extensionstypes as t2', 't1.document_extensionstype_id', 't2.id')
+            //                                 ->where(array('documentupload_requirement_id'=>$document_requirement_id))
+			// 								->where('extension', 'ILIKE', $extension)
+            //                                 ->first();
+        $records = DB::table('tra_docupload_reqextensions as t1')
+    ->join('par_document_extensionstypes as t2', 't1.document_extensionstype_id', 't2.id')
+    ->where('documentupload_requirement_id', $document_requirement_id)
+    ->where('extension', 'LIKE', '%' . $extension . '%')
+    ->first();
+
             if($records){
                 $response = array('is_allowedextension'=>true);
             }
             else{
-                $record = DB::select("(select string_agg(concat(j.name,'.',j.extension),',') as allowed_filetypes FROM tra_docupload_reqextensions t INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id WHERE t.documentupload_requirement_id = $document_requirement_id) limit 1");
+               $record = DB::select("(SELECT GROUP_CONCAT(CONCAT(j.name,'.',j.extension) SEPARATOR ',') AS allowed_filetypes FROM tra_docupload_reqextensions t INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id WHERE t.documentupload_requirement_id = :document_requirement_id) LIMIT 1", ['document_requirement_id' => $document_requirement_id]);
+
+
+
+                // $record = DB::select("(select string_agg(concat(j.name,'.',j.extension),',') as allowed_filetypes FROM tra_docupload_reqextensions t INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id WHERE t.documentupload_requirement_id = $document_requirement_id) limit 1");
+
                 $allowed_filetypes = $record[0]->allowed_filetypes;
 
                 if(isset($record[0]) &&  $allowed_filetypes != ''){
@@ -787,7 +805,11 @@ public function saveDocDefinationrequirement(Request $request)
 
             DB::beginTransaction();
             $app_rootnode = getApplicationRootNode($application_code);
+
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
+            dd($app_rootnode);
+
+            dd($app_rootnode);
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
             $reg_serial = 0;
@@ -1896,6 +1918,7 @@ public function saveDocDefinationrequirement(Request $request)
     $fileReceived = $receiver->receive(); // receive file
     //get handler class
     $handler = $fileReceived->handler();
+
     //check if its the first chunk
     $currentChunk = $handler->getCurrentChunk();
 
@@ -1903,6 +1926,7 @@ public function saveDocDefinationrequirement(Request $request)
 
         //check if allowed
         $docextension_check = $this->validateDocumentExtension($fileReceived->getClientOriginalExtension(), $request->document_requirement_id);
+
         $is_allowedextension = $docextension_check['is_allowedextension'];
 
         if(!$is_allowedextension){
@@ -1917,7 +1941,9 @@ public function saveDocDefinationrequirement(Request $request)
     }
 
     if ($fileReceived->isFinished()) { // file uploading is complete / all chunks are uploaded
+
         $file = $fileReceived->getFile(); // get file
+
         // $extension = $file->getClientOriginalExtension();
         // $fileName = str_replace('.'.$extension, '', $file->getClientOriginalName()); //file name without extenstion
         // $fileName .= '.' . $extension; // a unique file name
@@ -1931,6 +1957,7 @@ public function saveDocDefinationrequirement(Request $request)
         //upload to alfresco
         //return $this->uploadApplicationDocumentFile($request, $file);
         return $this->uploadMultipleFiles($request, $file);
+        dd('dd');
         // delete chunked file
         unlink($file->getPathname());
         // return [
@@ -1938,6 +1965,7 @@ public function saveDocDefinationrequirement(Request $request)
         //     'filename' => $fileName
         // ];
     }
+    dd($is_allowedextension);
 
     // otherwise return percentage information
     // $handler = $fileReceived->handler();
