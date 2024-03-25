@@ -236,7 +236,7 @@ class ConfigurationsController extends Controller
                             'created_by' => \Auth::user()->id
                         );
                     }
-                    insertMultipleRecords('tra_docupload_reqextensions', $params);
+                     insertMultipleRecords('tra_docupload_reqextensions', $params);
                 }
 
         } catch (\Exception $exception) {
@@ -877,13 +877,29 @@ class ConfigurationsController extends Controller
             if($table_name == 'wb_bomraprocesses'){
                 $qry = DB::connection('portal_db')->table('wb_bomraprocesses as t1');
             }
+
+            // DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
+            //                 FROM tra_docupload_reqextensions t 
+            //                 INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 
+            //                 WHERE t.documentupload_requirement_id = t1.id) AS allowed_extensions")
+
+
             else if($table_name == 'par_form_categories'){
                 $qry->Join('par_modules as t4','t1.module_id','=','t4.id')
                     // ->Join('par_sub_modules as t5','t1.sub_module_id','=','t5.id')
                     // ->leftJoin('par_sections as t6','t1.section_id','=','t6.id')
                     // ->leftJoin('par_prodclass_categories as t7','t1.prodclass_category_id','=','t7.id')
                     // ->leftJoin('par_premises_types as t8','t1.premise_type_id','=','t8.id')
-                    ->select('t1.*', 't4.name as module_name');
+                    ->select('t1.*', 
+                         DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentupload_requirements q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+              
+                't4.name AS sub_module',
+                't4.name as module_name',
+
+                DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
+                            FROM tra_docupload_reqextensions t 
+                            INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 
+                            WHERE t.documentupload_requirement_id = t1.id) AS allowed_extensions"));
             }
             else if($table_name== 'par_maindetails_variation_points'){
                 $qry->Join('par_modules as t4','t1.module_id','=','t4.id')

@@ -418,6 +418,12 @@ dockedItems: [
         dataIndex: 'module_name',
         text: 'Module',
         flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'allowed_extensions',
+        text: 'Allowed Extensions',
+        tdCls:'wrap-text',
+        flex: 1
     },
     //{
     //     xtype: 'gridcolumn',
@@ -492,7 +498,7 @@ dockedItems: [
                     iconCls: 'x-fa fa-edit',
                     tooltip: 'Edit Record',
                     action: 'edit',
-                    childXtype: 'formCategoryFrm',
+                    childXtype: 'documenttypeform',
                     winTitle: 'Form Category',
                     winWidth: '40%',
                     handler: 'showEditConfigParamWinFrm',bind: {

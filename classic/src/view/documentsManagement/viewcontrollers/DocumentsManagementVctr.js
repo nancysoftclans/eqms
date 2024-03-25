@@ -749,7 +749,11 @@ showEditConfigParamWinFrm: function (item) {
             
             form.down('hiddenfield[name=doc_section_id]').setValue(doc_section_id);
             funcShowCustomizableWindow(title, '55%', form, 'customizablewindow');
+    },
 
+    showReceivingApplicationSubmissionWin: function (btn) {
+
+        this.fireEvent('showReceivingApplicationSubmissionWin', btn);
     },
     showSectionsDocDefDetailsToDashboard: function (btn) {
         var currentPnl = btn.up('directorateSectionsDocDefinationpnl'),
