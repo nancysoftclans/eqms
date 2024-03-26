@@ -3069,28 +3069,20 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             winWidth = btn.winWidth,
             activeTab = mainTabPanel.getActiveTab(),
             workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(),
-            application_id = activeTab.down('hiddenfield[name=active_application_id]').getValue(),
+            document_id = activeTab.down('combo[name=document_type_id]').getValue(),
             application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
             module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
             process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
-            section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
+            //section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
            // premise_id = activeTab.down('hiddenfield[name=premise_id]').getValue(),
             // storeID = getApplicationStore(module_id, section_id),
-            valid = this.validateNewIMPReceivingSubmission(),
-            // validateInvoicing = validateHasInvoiceGeneration(application_code,sub_module_id),
-            validatePermitsProducts = validateHasImportExportProductDetils(application_code),
-           // hasQueries = checkApplicationRaisedQueries(application_code, module_id),
-            validateHasDocuments = validateHasUploadedDocumentsDetils(application_code, module_id,sub_module_id,section_id,0,workflow_stage_id,process_id);
+            valid = this.validateNewReceivingSubmission(),
+        
+            validateHasDocuments = validateHasUploadedDocumentsDetils(application_code);
             
             if(!validateHasDocuments){
                 toastr.error('Response: Please Upload the required documents to proceed.'); 
-                Ext.getBody().unmask();
-                return;
-            }
-            if(!validatePermitsProducts){
-
-                toastr.error('Response: Please add the Permits products details to proceed.'); 
                 Ext.getBody().unmask();
                 return;
             }
@@ -3111,7 +3103,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
            
         Ext.Ajax.request({
             method: 'POST',
-            url: 'importexportpermits/validateImportExportAppReceiving',
+            url: 'documentmanagement/validateImportExportAppReceiving',
             params: {
                 application_code: application_code,
                 workflow_stage_id:workflow_stage_id,
@@ -3131,7 +3123,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                         field_name: 'has_queries',
                        // value: hasQueries
                     }];
-                    showWorkflowSubmissionWin(application_id, application_code, table_name, 'workflowsubmissionsreceivingfrm', winWidth, storeID,extraParams,'');
+                    showWorkflowSubmissionWin(document_id, application_code, table_name, 'workflowsubmissionsreceivingfrm', winWidth, storeID,extraParams,'');
 
                 } else {
                     toastr.error(message, 'Failure Response');
@@ -3156,6 +3148,28 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             toastr.warning('Please Enter All the required Product Details!!', 'Warning Response');
             return;
         }
+    },
+
+    validateNewReceivingSubmission: function (btn) {
+        var mainTabPanel = this.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            applicantFrm = activeTab.down('docdefinationrequirementfrm'),
+            document_id = applicantFrm.down('combo[name=document_type_id]').getValue();
+           
+        if (!document_id) {
+            toastr.warning('Please Save Application Details!!', 'Warning Response');
+            return false;
+        }
+        if (!document_id) {
+            toastr.warning('Please Select Applicant!!', 'Warning Response');
+            return false;
+        }
+        if (!applicantFrm.isValid()) {
+           // toastr.warning('Please Enter All the required Permits Details!!', 'Warning Response');
+           // return false;
+        }
+        
+        return true;
     },
     addTcMeetingParticipants: function (btn) {
         var grid = btn.up('grid'),

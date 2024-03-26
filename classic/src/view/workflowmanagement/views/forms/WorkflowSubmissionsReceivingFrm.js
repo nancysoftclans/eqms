@@ -44,6 +44,9 @@ Ext.define('Admin.view.workflowmanagement.views.forms.WorkflowSubmissionsReceivi
         name: 'has_queries'
     }, {
         xtype: 'hiddenfield',
+        name: 'document_type_id'
+    },{
+        xtype: 'hiddenfield',
         name: 'is_dataammendment_request'
     },{
         xtype: 'hiddenfield',
@@ -297,12 +300,12 @@ Ext.define('Admin.view.workflowmanagement.views.forms.WorkflowSubmissionsReceivi
                     name: 'app_submission_btn',
                     action: 'submit',
                     formBind: true,
-                    ui: 'soft-purple',
+                    ui: 'soft-blue',
                     action_url: 'workflow/handleApplicationSubmission'
                 }, {
                     text: 'Close',
                     iconCls: 'x-fa fa-close',
-                    ui: 'soft-purple',
+                    ui: 'soft-blue',
                     handler: function (btn) {
                         btn.up('window').close();
                     }

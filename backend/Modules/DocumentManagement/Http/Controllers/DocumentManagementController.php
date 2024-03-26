@@ -1702,6 +1702,36 @@ public function saveDocDefinationrequirement(Request $request)
 
 
     }
+
+    public function validateImportExportAppReceivingDetails(Request $req){
+        try {
+            $application_code = $req->application_code;
+            $workflow_stage_id = $req->workflow_stage_id;
+            $application_feetype_id = 1;
+            $record = DB::table('tra_documentupload_requirements')
+                ->where('application_code', $application_code)
+                ->first();
+            if($record){
+              //  $importexport_permittype_id = $record->importexport_permittype_id;
+
+                //validate the documetns submissions
+                $where = array('application_code'=>$application_code,
+                    'workflow_stage_id'=>$workflow_stage_id,
+                );
+                // validateDocumentUploadSubmission($where);
+                $res = array('success'=>true, 'message'=>'validated');
+
+            }
+            //check for the invoice generation
+
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        } return \response()->json($res);
+    }
     public function getApplicationDocumentDownloadurl(Request $req)
     {
         try {
