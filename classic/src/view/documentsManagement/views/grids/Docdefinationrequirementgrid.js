@@ -225,7 +225,13 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
             iconCls: 'x-fa fa-save',
             handler: 'updateSystemNavigationAccessRoles'
         }],
-    columns: [{
+    columns: [
+    {
+        xtype: 'gridcolumn',
+        dataIndex: 'tracking_no',
+        text: 'Has Parent',
+        flex: 1
+    },{
         xtype: 'treecolumn',
         dataIndex: 'name',
         text: 'Document Title',
@@ -238,17 +244,6 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'parent_level',
-        text: 'Has Parent',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'name',
-        text: 'Parent Name',
-        tdCls:'wrap-text',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
         dataIndex: 'allowed_extensions',
         hidden: true,
         text: 'Allowed Extensions',
@@ -256,33 +251,9 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'module_name',
-        hidden: true,
-        text: 'Module Name',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'sub_module',
-        hidden: true,
-        text: 'Sub Module Name',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'prodclass_category',
-        hidden: true,
-        text: 'Product Class Category',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'importexport_permittype',
-        hidden: true,
-        text: 'Import/Export Permit Type',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'premise_type',
-        hidden: true,
-        text: 'Premises Type Type',
+        dataIndex: 'created_on',
+        text: 'Date Received',
+        tdCls:'wrap-text',
         flex: 1
     },{
         xtype: 'gridcolumn',

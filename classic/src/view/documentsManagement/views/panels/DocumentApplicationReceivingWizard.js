@@ -61,8 +61,7 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                 }, {
                     xtype: 'displayfield',
                     name: 'application_status',
-                     hidden: true,
-                    fieldLabel: 'App Status',
+                    fieldLabel: 'Status',
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',

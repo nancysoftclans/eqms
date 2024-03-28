@@ -194,6 +194,7 @@ class ConfigurationsController extends Controller
             unset($post_data['model']);
             unset($post_data['id']); unset($post_data['document_extension_ids']);
             unset($post_data['unset_data']);
+
             if (isset($unsetData)) {
                 $unsetData = explode(",", $unsetData);
                 $post_data = unsetArrayData($post_data, $unsetData);

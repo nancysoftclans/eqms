@@ -5,6 +5,9 @@
     height: Ext.Element.getViewportHeight() - 118,
     controller: 'documentsManagementvctr',
     autoScroll: true,
+    viewModel: {
+        type: 'documentcreationvm'
+    },
     layout: {
         type: 'column'
     },
@@ -72,236 +75,8 @@
                 isLoad: true
             }
         }
-    }, {
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Module',
-        margin: '0 20 20 0',
-        name: 'module_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        hidden: true,
-        allowBlank: true,
-        queryMode: 'local',
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                        extraParams: {
-                            table_name: 'par_modules'
-                        }
-                    }
-                },
-                isLoad: true
-            },
-            change: 'funcChangeDocumentReqmodule'
-        }
-    }, {
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Sub Module',
-        margin: '0 20 20 0',
-        name: 'sub_module_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        hidden: true,
-        allowBlank: true,
-        queryMode: 'local',
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                        extraParams: {
-                            table_name: 'par_sub_modules'
-                        }
-                    }
-                },
-                isLoad: false
-            },
-            change: 'funcChangeParentDocumentNode'
-        }
-    }, {
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Section',
-        margin: '0 20 20 0',
-        name: 'section_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        hidden: true,
-        allowBlank: true,
-        queryMode: 'local',
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                        extraParams: {
-                            table_name: 'par_sections'
-                        }
-                    }
-                },
-                isLoad: true
-            },
-            change: function(combo, newVal, oldVal, eopts) {
-                var form = combo.up('form'),
-                    pcc = form.down('combo[name=prodclass_category_id]').getStore(),
-                    premise_type_id = form.down('combo[name=premise_type_id]').getStore(), 
-                    filters = JSON.stringify({'section_id': newVal});
-                pcc.removeAll();
-                pcc.load({params:{filters: filters}});
-                premise_type_id.removeAll();
-                premise_type_id.load({params:{filters: filters}});
-            }
-        }
     },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Product Class Categories',
-        margin: '0 20 20 0',
-        name: 'prodclass_category_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        allowBlank: true,
-        hidden: true,
-        queryMode: 'local',
-        listeners: {
-            beforerender: {
-                fn: 'setCompStore',
-                config: {
-                    proxy: {
-                       
-                        extraParams: {
-                            table_name: 'par_prodclass_categories'
-                        }
-                    }
-                   },
-              isLoad: true
-            }
-        }
-    },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Import Export Permit Type',
-        margin: '0 20 20 0',
-        name: 'importexport_permittype_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        allowBlank: true,
-        hidden: true,
-        queryMode: 'local',
-        listeners: {
-            beforerender: {
-                fn: 'setCompStore',
-                config: {
-                    proxy: {
-                        
-                        extraParams: {
-                            table_name: 'par_importexport_permittypes'
-                        }
-                    }
-                   },
-              isLoad: true
-            }
-        }
-    },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Premises Type',
-        margin: '0 20 20 0',
-        name: 'premise_type_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        allowBlank: true,
-        hidden: true,
-        queryMode: 'local',
-        listeners: {
-            beforerender: {
-                fn: 'setCompStore',
-                config: {
-                    proxy: {
-                       
-                        extraParams: {
-                            table_name: 'par_premises_types'
-                        }
-                    }
-                   },
-              isLoad: true
-            }
-        }
-    },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Has Parent',
-        margin: '0 20 20 0',
-        name: 'has_parent_level',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        allowBlank: true,
-        queryMode: 'local',
-        listeners: {
-            beforerender: {
-                fn: 'setCompStore',
-                config: {
-                    proxy: {
-                       
-                        extraParams: {
-                            table_name: 'par_confirmations'
-                        }
-                    }
-                   },
-              isLoad: true
-            },
-            change: 'showHideParent'
-        }
-    },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Parent Document',
-        margin: '0 20 20 0',
-        name: 'docparent_id',
-        valueField: 'id',
-        hidden: true,
-        displayField: 'name',
-        forceSelection: true,
-        allowBlank: true,
-        queryMode: 'local',
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                       
-                        extraParams: {
-                            table_name: 'tra_documentupload_requirements'
-                        }
-                     }
-                },
-                isLoad: true
-            }
-        }
-    },{
-        xtype: 'checkbox',
-        fieldLabel: 'Is Mandatory',
-        name: 'is_mandatory',
-        inputValue: 1,
-        hidden: true,
-        uncheckedValue: 0
-    },{
-        xtype: 'checkbox',
-        fieldLabel: 'Portal Uploadable',
-        name: 'portal_uploadable',
-        hidden: true,
-        inputValue: 1,
-        uncheckedValue: 0,
-        align: 'center'
-    },{
-        xtype: 'tagfield',
+      xtype: 'tagfield',
         fieldLabel: 'Allowed Document Extensions',
         margin: '0 20 20 0',
         name: 'document_extension_ids',
@@ -330,6 +105,72 @@
                 isLoad: true
             }
         }
+    },{
+        xtype: 'textfield',
+        fieldLabel: 'Version',
+        margin: '0 20 20 0',
+        name: 'version'
+    },{
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Document Owner',
+        margin: '0 20 20 0',
+        name: 'document_owner_id',
+        valueField: 'id',
+        displayField: 'name',
+        forceSelection: true,
+        allowBlank: false,
+        queryMode: 'local',
+        listeners: {
+            afterrender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 10000,
+                    proxy: {
+                        extraParams: {
+                            table_name: 'par_form_categories'
+                        }
+                    }
+                },
+                isLoad: true
+            }
+        }
+    },{
+        xtype: 'datefield',
+        name: 'assessment_date',bind: {
+            readOnly: '{isReadOnly}'
+        },
+        format:'Y-m-d',
+        altFormats: 'd,m,Y|d.m.Y|Y-m-d|d/m/Y/d-m-Y|d,m,Y 00:00:00|Y-m-d 00:00:00|d.m.Y 00:00:00|d/m/Y 00:00:00',
+        fieldLabel: 'Assessment Date',
+    },{
+        xtype:'fieldset',
+        columnWidth: 1,
+        title: 'Related Fields',
+        collapsible: true,
+        defaults: {
+            labelAlign: 'top',
+            allowBlank: false,
+            labelAlign: 'top',
+            margin: 5,
+            allowBlank: true,
+            columnWidth: 1,
+        },
+        layout: 'column',
+        items :[
+            {
+                // xtype: 'htmleditor',
+                // fieldLabel: 'Status of development Details',
+                // name: 'pacra_reg_no',
+                // allowBlank: true,
+                // labelAlign: 'top'
+            }]
+    },{
+        xtype: 'htmleditor',
+        fieldLabel: 'Description',
+        name: 'description',
+        allowBlank: true,
+        columnWidth: 1,
+        labelAlign: 'top'
     },{
         xtype: 'combo', anyMatch: true,
         name: 'has_document_template',
@@ -365,13 +206,7 @@
     //     hidden: true,
     //     name: 'document_template'
     // },
-    {
-        xtype: 'textarea',
-        fieldLabel: 'Description',
-        name: 'description',
-        allowBlank: true
-        
-    }]
+   ]
     //dockedItems:[
     // {
     //         xtype: 'toolbar',

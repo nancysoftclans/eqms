@@ -887,6 +887,9 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
              'meetingGroupSelectionGrid': {
                 itemdblclick: 'onMeetingGroupSelectionListDblClick'
             },
+            'documentapplicationreceivingwizard':{
+                afterrender: 'prepapreDocumentApplicationReceiving'
+            },
             // 'secondReviewscreeninggrid': {
             //     beforerender: 'prepareChecklistsCategories'
             // }
@@ -1653,12 +1656,12 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             workflow_stage = record.get('workflow_stage'),
             application_status = record.get('application_status'),
             tracking_no = record.get('tracking_no'),
-            name = record.get('name'),
-            document_type_id = record.get('document_type_id'),
-            has_parent_level = record.get('has_parent_level'),
-            docparent_id = record.get('docparent_id'),
-            description = record.get('description'),
-            application_code = record.get('application_code'),
+            //name = record.get('name'),
+            // document_type_id = record.get('document_type_id'),
+            // has_parent_level = record.get('has_parent_level'),
+            // docparent_id = record.get('docparent_id'),
+            // description = record.get('description'),
+            // application_code = record.get('application_code'),
             reference_no = record.get('reference_no'),
             process_id = record.get('process_id'),
             module_id = record.get('module_id'),
@@ -1683,12 +1686,9 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('displayfield[name=process_name]').setValue(process_name);
         tab.down('displayfield[name=workflow_stage]').setValue(workflow_stage);
         tab.down('displayfield[name=application_status]').setValue(application_status);
-        tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
-        tab.down('textfield[name=name]').setValue(name);
-        tab.down('textfield[name=document_type_id]').setValue(document_type_id);
-        tab.down('textfield[name=has_parent_level]').setValue(has_parent_level);
-        tab.down('textfield[name=docparent_id]').setValue(docparent_id);
-        tab.down('textfield[name=description]').setValue(description);
+        // tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
+        // tab.down('textfield[name=name]').setValue(name);
+        // tab.down('textfield[name=document_type_id]').setValue(document_type_id);
         tab.down('hiddenfield[name=application_code]').setValue(application_code);
       //tab.down('displayfield[name=reference_no]').setValue(reference_no);
     },
@@ -2886,6 +2886,69 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 toastr.error('Error: ' + errorThrown, 'Error Response');
             }
         });
+    },
+
+    prepapreDocumentApplicationReceiving: function (pnl) {
+
+        Ext.getBody().mask('Please wait...');
+        var me = this,
+            activeTab = pnl;
+            application_status_id = activeTab.down('hiddenfield[name=application_status_id]').getValue(),
+            docdefinationrequirementfrm = activeTab.down('docdefinationrequirementfrm'),
+            application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
+            process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
+            sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
+            reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
+            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
+       
+        if (application_code) {
+            Ext.Ajax.request({
+                method: 'GET',
+                url: 'documentmanagement/prepapreDocumentApplicationReceiving',
+                params: {
+                    application_code: application_code
+                },
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (response) {
+                    Ext.getBody().unmask();
+                    var resp = Ext.JSON.decode(response.responseText),
+                        message = resp.message,
+                        success = resp.success,
+                        results = resp.results,
+                        model = Ext.create('Ext.data.Model', results);
+
+                    if (success == true || success === true) {
+                        
+                        docdefinationrequirementfrm.loadRecord(model);
+
+                        //activeTab.down('displayfield[name=application_status]').setValue(results.application_status);
+
+                        activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
+                        activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);
+
+                        console.log(reference_no);
+                        
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (response) {
+                    Ext.getBody().unmask();
+                    var resp = Ext.JSON.decode(response.responseText),
+                        message = resp.message,
+                        success = resp.success;
+                    toastr.error(message, 'Failure Response');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    Ext.getBody().unmask();
+                    toastr.error('Error: ' + errorThrown, 'Error Response');
+                }
+            });
+        } else {
+            Ext.getBody().unmask();                    
+        }
     },
     uploadApplicationFile: function (btn) {
         var me = this,

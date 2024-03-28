@@ -53,11 +53,13 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('getDocumentsSubTypes', [DmsConfigurationsController::class, 'getDocumentsSubTypes']);
     Route::get('getParameterstableSchema', [DmsConfigurationsController::class, 'getParameterstableSchema']);
     Route::get('getdocdefinationrequirementDetails', [DmsConfigurationsController::class, 'getdocdefinationrequirementDetails']);
+    Route::get('getdoctypesDetails', [DmsConfigurationsController::class, 'getdoctypesDetails']);
     Route::get('docdefinationrequirementfilterdetails', [DmsConfigurationsController::class, 'docdefinationrequirementfilterdetails']);
     Route::get('getdocumentreposirotystructureDetails', [DmsConfigurationsController::class, 'getdocumentreposirotystructureDetails']);
     Route::get('getdocumentsectionsrepstructure', [DmsConfigurationsController::class, 'getdocumentsectionsrepstructure']);
     Route::get('getRepositoryrootfolderDetails', [DmsConfigurationsController::class, 'getRepositoryrootfolderDetails']);
     Route::get('dmsAuthentication', [DmsConfigurationsController::class, 'dmsAuthentication']);
+    Route::get('prepapreDocumentApplicationReceiving', [DocumentManagementController::class, 'prepapreDocumentApplicationReceiving']);
     Route::get('getDMSSiteDefinationDetails', [DmsConfigurationsController::class, 'getDMSSiteDefinationDetails']);
     Route::get('getDMSSectionsDefinationDetails', [DmsConfigurationsController::class, 'getDMSSectionsDefinationDetails']);
     Route::get('getDMSSectionsModulesDefinationDetails', [DmsConfigurationsController::class, 'getDMSSectionsModulesDefinationDetails']);

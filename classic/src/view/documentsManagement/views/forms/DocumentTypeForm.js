@@ -161,6 +161,57 @@ Ext.define('Admin.view.documentsManagement.views.forms.DocumentTypeForm',{
               isLoad: true,
             },   
         }
+    },{
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Has Parent',
+        margin: '0 20 20 0',
+        name: 'has_parent_level',
+        valueField: 'id',
+        displayField: 'name',
+        forceSelection: true,
+        allowBlank: true,
+        queryMode: 'local',
+        listeners: {
+            beforerender: {
+                fn: 'setCompStore',
+                config: {
+                    proxy: {
+                       
+                        extraParams: {
+                            table_name: 'par_confirmations'
+                        }
+                    }
+                   },
+              isLoad: true
+            },
+            change: 'showHideParent'
+        }
+    },{
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Parent Document',
+        margin: '0 20 20 0',
+        name: 'docparent_id',
+        valueField: 'id',
+        hidden: true,
+        displayField: 'name',
+        forceSelection: true,
+        allowBlank: true,
+        queryMode: 'local',
+        listeners: {
+            afterrender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 10000,
+                    proxy: {
+                       
+                        extraParams: {
+                            table_name: 'par_form_categories'
+                        }
+                     }
+                },
+                isLoad: true
+            }
+        }
     },
     //{
     //     xtype: 'combo', anyMatch: true,

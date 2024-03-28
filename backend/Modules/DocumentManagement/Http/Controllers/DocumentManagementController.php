@@ -191,6 +191,9 @@ public function saveDocDefinationrequirement(Request $request)
                             "has_parent_level" => $request->input('has_parent_level'),
                             "docparent_id" => $request->input('docparent_id'),
                             "description" => $request->input('description'),
+                            "document_owner_id" => $request->input('document_owner_id'),
+                            "version" => $request->input('version'),
+                            "assessment_date" => $request->input('assessment_date'),
                          
                  );
 
@@ -332,6 +335,34 @@ public function saveDocDefinationrequirement(Request $request)
            }
            return \response()->json($res);
        }
+
+        public function prepapreDocumentApplicationReceiving(Request $req){
+        $application_id = $req->input('application_id');
+        $application_code = $req->input('application_code');
+        $table_name = $req->input('table_name');
+        try {
+            $main_qry = DB::table('tra_documentupload_requirements as t1')
+                ->where('t1.application_code', $application_code);
+
+
+            $results = $main_qry->first();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+
+    }
 
     public function onLoadApplicationDocumentsRequirements(Request $req)
     {
@@ -694,7 +725,6 @@ public function saveDocDefinationrequirement(Request $request)
 
 
                     if($res->isEmpty()){
-                        dd('dd');
                         $res = DB::table('tra_documentupload_requirements as t1')
                                 ->join('par_document_types as t3', 't1.document_type_id', 't3.id')
                                 ->where('t1.id', $doc_req->id)
