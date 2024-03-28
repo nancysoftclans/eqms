@@ -50,6 +50,7 @@
     var tracking_no = '';
     var esign_url = '<?php echo $esign_url; ?>';
     var Ext = Ext || {}; // Ext namespace won't be defined yet...
+    
 
     // This function is called by the Microloader after it has performed basic
     // device detection. The results are provided in the "tags" object. You can
@@ -90,7 +91,7 @@
         //};
     };
 </script>
-<div class="loader"><img src="resources/images/bomra_svn.svg"></div>
+<div class="loader"><img src="resources/images/eqms-logo.png"></div>
 <script type="text/javascript" src="{{asset('resources/js/jquery-3.6.0.min.js')}}"></script>
 <script type="text/javascript" src="{{asset('resources/js/toastr.js')}}"></script>
 <script type="text/javascript" src="{{asset('resources/js/resumable.min.js')}}"></script>

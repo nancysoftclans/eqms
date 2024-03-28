@@ -661,11 +661,11 @@ function showWorkflowSubmissionRevenueWin( application_code, workflow_stage_id, 
     });
 }
          
-function showWorkflowSubmissionWin(application_id, application_code, table_name, form_xtype, win_width, storeID, extraParams, gridXtype, applicationSelectionMode,workflow_stage_id,is_dataammendment_request,stage_status=null
+function showWorkflowSubmissionWin(document_id, application_code, table_name, form_xtype, win_width, storeID, extraParams, gridXtype, applicationSelectionMode,workflow_stage_id,is_dataammendment_request,stage_status=null
     ) {
     Ext.getBody().mask('Loading submission window');
     var form = Ext.widget(form_xtype);
-    form.down('hiddenfield[name=application_id]').setValue(application_id);
+    form.down('hiddenfield[name=document_type_id]').setValue(document_id);
     form.down('hiddenfield[name=application_code]').setValue(application_code);
     form.down('hiddenfield[name=is_dataammendment_request]').setValue(is_dataammendment_request);
     form.down('hiddenfield[name=table_name]').setValue(table_name);

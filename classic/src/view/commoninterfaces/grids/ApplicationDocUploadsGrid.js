@@ -276,6 +276,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
                 }, {
                     text: 'Preview Previous Version',
                     iconCls: 'x-fa fa-eye',
+                    hidden: true,
                     storeId: 'previousDocumentsUploads',
                     childXtype: 'previousDocumentVersionsGrid',
                     winTitle: 'Document Previous Versions',

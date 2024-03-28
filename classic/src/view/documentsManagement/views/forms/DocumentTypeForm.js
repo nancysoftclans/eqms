@@ -15,7 +15,7 @@ Ext.define('Admin.view.documentsManagement.views.forms.DocumentTypeForm',{
         xtype: 'hiddenfield',
         margin: '0 20 20 0',
         name: 'table_name',
-        value: 'par_form_categories',
+       value: 'par_form_categories',
         allowBlank: true
     }, {
         xtype: 'hiddenfield',
@@ -29,7 +29,7 @@ Ext.define('Admin.view.documentsManagement.views.forms.DocumentTypeForm',{
         margin: '0 20 20 0',
         name: 'id',
         allowBlank: true
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Dcument Name',
         margin: '0 20 20 0',
@@ -59,50 +59,50 @@ Ext.define('Admin.view.documentsManagement.views.forms.DocumentTypeForm',{
               isLoad: true
             },
         
-            // change: function(combo, newVal, oldval, eopts){
-            //     var form = combo.up('form'),
-            //         sub_moduleStr = form.down('combo[name=sub_module_id]').getStore(),
-            //         premise_type_id = form.down('combo[name=premise_type_id]'),
-            //         prodclass_category_id = form.down('combo[name=prodclass_category_id]'),
-            //         importexport_permittype_id = form.down('combo[name=importexport_permittype_id]'),
-            //         filters = JSON.stringify({'module_id': newVal});
-            //         sub_moduleStr.removeAll();
-            //         sub_moduleStr.load({params: {filters: filters}});
-            //     if(newVal == 1){
-            //         prodclass_category_id.setVisible(true);
-            //         premise_type_id.setVisible(false);
-            //         importexport_permittype_id.setVisible(false);
-            //         prodclass_category_id.validate();
-            //         //------//
-            //         prodclass_category_id.allowBlank = false;
-            //         premise_type_id.allowBlank = true;
-            //         importexport_permittype_id.allowBlank = true;
+            change: function(combo, newVal, oldval, eopts){
+                var form = combo.up('form'),
+                    sub_moduleStr = form.down('combo[name=sub_module_id]').getStore(),
+                    premise_type_id = form.down('combo[name=premise_type_id]'),
+                    prodclass_category_id = form.down('combo[name=prodclass_category_id]'),
+                    importexport_permittype_id = form.down('combo[name=importexport_permittype_id]'),
+                    filters = JSON.stringify({'module_id': newVal});
+                    sub_moduleStr.removeAll();
+                    sub_moduleStr.load({params: {filters: filters}});
+                if(newVal == 1){
+                    prodclass_category_id.setVisible(true);
+                    premise_type_id.setVisible(false);
+                    importexport_permittype_id.setVisible(false);
+                    prodclass_category_id.validate();
+                    //------//
+                    prodclass_category_id.allowBlank = false;
+                    premise_type_id.allowBlank = true;
+                    importexport_permittype_id.allowBlank = true;
                     
-            //     }
-            //     else if(newVal == 2){
-            //         premise_type_id.setVisible(true);
-            //         prodclass_category_id.setVisible(false);
-            //         importexport_permittype_id.setVisible(false);
-            //         premise_type_id.validate();
-            //         //------//
-            //         premise_type_id.allowBlank = false;
-            //         prodclass_category_id.allowBlank = true;
-            //         importexport_permittype_id.allowBlank = true;
-            //     }
-            //     else if(newVal == 4 || newVal == 12){
-            //         importexport_permittype_id.setVisible(true);
-            //         premise_type_id.setVisible(false);
-            //         prodclass_category_id.setVisible(false);
-            //         importexport_permittype_id.validate();
-            //         //------//
-            //         importexport_permittype_id.allowBlank = false;
-            //         prodclass_category_id.allowBlank = true;
-            //         premise_type_id.allowBlank = true;
-            //     }
-            //     else{
-            //         //no effects
-            //     }
-            // }
+                }
+                else if(newVal == 2){
+                    premise_type_id.setVisible(true);
+                    prodclass_category_id.setVisible(false);
+                    importexport_permittype_id.setVisible(false);
+                    premise_type_id.validate();
+                    //------//
+                    premise_type_id.allowBlank = false;
+                    prodclass_category_id.allowBlank = true;
+                    importexport_permittype_id.allowBlank = true;
+                }
+                else if(newVal == 4 || newVal == 12){
+                    importexport_permittype_id.setVisible(true);
+                    premise_type_id.setVisible(false);
+                    prodclass_category_id.setVisible(false);
+                    importexport_permittype_id.validate();
+                    //------//
+                    importexport_permittype_id.allowBlank = false;
+                    prodclass_category_id.allowBlank = true;
+                    premise_type_id.allowBlank = true;
+                }
+                else{
+                    //no effects
+                }
+            }
            
         }
     },
@@ -136,32 +136,84 @@ Ext.define('Admin.view.documentsManagement.views.forms.DocumentTypeForm',{
             }
         }
     },
-    // {
-    //     xtype: 'combo', anyMatch: true,
-    //     fieldLabel: 'Sub Module',
-    //     margin: '0 20 20 0',
-    //     name: 'sub_module_id',
-    //     valueField: 'id',
-    //     allowBlank: true,
-    //     hidden: true,
-    //     displayField: 'name',
-    //     forceSelection: true,
-    //     queryMode: 'local',
-    //     listeners: {
-    //         beforerender: {
-    //             fn: 'setCompStore',
-    //             config: {
-    //                 proxy: {
+    {
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Sub Module',
+        margin: '0 20 20 0',
+        name: 'sub_module_id',
+        valueField: 'id',
+        allowBlank: true,
+        hidden: false,
+        displayField: 'name',
+        forceSelection: true,
+        queryMode: 'local',
+        listeners: {
+            beforerender: {
+                fn: 'setCompStore',
+                config: {
+                    proxy: {
                         
-    //                     extraParams: {
-    //                         table_name: 'par_sub_modules'
-    //                     }
-    //                 }
-    //                },
-    //           isLoad: true,
-    //         },   
-    //     }
-    // },{
+                        extraParams: {
+                            table_name: 'par_sub_modules'
+                        }
+                    }
+                   },
+              isLoad: true,
+            },   
+        }
+    },{
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Has Parent',
+        margin: '0 20 20 0',
+        name: 'has_parent_level',
+        valueField: 'id',
+        displayField: 'name',
+        forceSelection: true,
+        allowBlank: true,
+        queryMode: 'local',
+        listeners: {
+            beforerender: {
+                fn: 'setCompStore',
+                config: {
+                    proxy: {
+                       
+                        extraParams: {
+                            table_name: 'par_confirmations'
+                        }
+                    }
+                   },
+              isLoad: true
+            },
+            change: 'showHideParent'
+        }
+    },{
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Parent Document',
+        margin: '0 20 20 0',
+        name: 'docparent_id',
+        valueField: 'id',
+        hidden: true,
+        displayField: 'name',
+        forceSelection: true,
+        allowBlank: true,
+        queryMode: 'local',
+        listeners: {
+            afterrender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 10000,
+                    proxy: {
+                       
+                        extraParams: {
+                            table_name: 'par_form_categories'
+                        }
+                     }
+                },
+                isLoad: true
+            }
+        }
+    },
+    //{
     //     xtype: 'combo', anyMatch: true,
     //     fieldLabel: 'Section',
     //     margin: '0 20 20 0',
@@ -302,10 +354,11 @@ Ext.define('Admin.view.documentsManagement.views.forms.DocumentTypeForm',{
                     iconCls: 'x-fa fa-save',
                     action: 'save',
                     table_name: 'par_form_categories',
-                    storeID: 'formCategoryStr',
+                    storeID: 'docdefinationrequirementstr',
                     formBind: true,
                     ui: 'soft-blue',
-                    action_url: 'configurations/saveConfigCommonData',
+                    //action_url: 'configurations/saveConfigCommonData',
+                    action_url: 'configurations/saveDocDefinationrequirement',
                     handler: 'doCreateConfigParamWin'
                 }
             ]

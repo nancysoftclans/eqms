@@ -887,6 +887,9 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
              'meetingGroupSelectionGrid': {
                 itemdblclick: 'onMeetingGroupSelectionListDblClick'
             },
+            'documentapplicationreceivingwizard':{
+                afterrender: 'prepapreDocumentApplicationReceiving'
+            },
             // 'secondReviewscreeninggrid': {
             //     beforerender: 'prepareChecklistsCategories'
             // }
@@ -951,7 +954,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 printFacilityInspectionReportFromGrid: 'printFacilityInspectionReportFromGrid',
                 autoGenerateChecklistBasedQueries: 'autoGenerateChecklistBasedQueries',
                 updateProductReviewBaseDetails: 'updateProductReviewBaseDetails',
-                onInitiateDocumentApplication: 'onInitiateDocumentApplication'
+                onInitiateDocumentApplication: 'onInitiateDocumentApplication',
+                showReceivingApplicationSubmissionWin: 'showReceivingApplicationSubmissionWin'
             }
         }
     },
@@ -1652,12 +1656,12 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             workflow_stage = record.get('workflow_stage'),
             application_status = record.get('application_status'),
             tracking_no = record.get('tracking_no'),
-            name = record.get('name'),
-            document_type_id = record.get('document_type_id'),
-            has_parent_level = record.get('has_parent_level'),
-            docparent_id = record.get('docparent_id'),
-            description = record.get('description'),
-            application_code = record.get('application_code'),
+            //name = record.get('name'),
+            // document_type_id = record.get('document_type_id'),
+            // has_parent_level = record.get('has_parent_level'),
+            // docparent_id = record.get('docparent_id'),
+            // description = record.get('description'),
+            // application_code = record.get('application_code'),
             reference_no = record.get('reference_no'),
             process_id = record.get('process_id'),
             module_id = record.get('module_id'),
@@ -1683,11 +1687,6 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('displayfield[name=workflow_stage]').setValue(workflow_stage);
         tab.down('displayfield[name=application_status]').setValue(application_status);
         tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
-        tab.down('textfield[name=name]').setValue(name);
-        // tab.down('textfield[name=document_type_id]').setValue(document_type_id);
-        // tab.down('textfield[name=has_parent_level]').setValue(has_parent_level);
-        // tab.down('textfield[name=docparent_id]').setValue(docparent_id);
-        // tab.down('textfield[name=description]').setValue(description);
         tab.down('hiddenfield[name=application_code]').setValue(application_code);
       //tab.down('displayfield[name=reference_no]').setValue(reference_no);
     },
@@ -2886,6 +2885,69 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             }
         });
     },
+
+    prepapreDocumentApplicationReceiving: function (pnl) {
+
+        Ext.getBody().mask('Please wait...');
+        var me = this,
+            activeTab = pnl;
+            application_status_id = activeTab.down('hiddenfield[name=application_status_id]').getValue(),
+            docdefinationrequirementfrm = activeTab.down('docdefinationrequirementfrm'),
+            application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
+            process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
+            sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
+            reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
+            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
+       
+        if (application_code) {
+            Ext.Ajax.request({
+                method: 'GET',
+                url: 'documentmanagement/prepapreDocumentApplicationReceiving',
+                params: {
+                    application_code: application_code
+                },
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (response) {
+                    Ext.getBody().unmask();
+                    var resp = Ext.JSON.decode(response.responseText),
+                        message = resp.message,
+                        success = resp.success,
+                        results = resp.results,
+                        model = Ext.create('Ext.data.Model', results);
+
+                    if (success == true || success === true) {
+                        
+                        docdefinationrequirementfrm.loadRecord(model);
+
+                        //activeTab.down('displayfield[name=application_status]').setValue(results.application_status);
+
+                        activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
+                        activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);
+
+                        console.log(reference_no);
+                        
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (response) {
+                    Ext.getBody().unmask();
+                    var resp = Ext.JSON.decode(response.responseText),
+                        message = resp.message,
+                        success = resp.success;
+                    toastr.error(message, 'Failure Response');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    Ext.getBody().unmask();
+                    toastr.error('Error: ' + errorThrown, 'Error Response');
+                }
+            });
+        } else {
+            Ext.getBody().unmask();                    
+        }
+    },
     uploadApplicationFile: function (btn) {
         var me = this,
             form = btn.up('form'),
@@ -3059,6 +3121,116 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             }
         });
 
+    },
+     showReceivingApplicationSubmissionWin: function (btn) {
+        Ext.getBody().mask('Please wait...');
+        var mainTabPanel = this.getMainTabPanel(),
+            storeID = btn.storeID,
+            table_name = btn.table_name,
+            winWidth = btn.winWidth,
+            activeTab = mainTabPanel.getActiveTab(),
+            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            document_id = activeTab.down('combo[name=document_type_id]').getValue(),
+            application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
+            module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
+            sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
+            process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
+            //section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
+           // premise_id = activeTab.down('hiddenfield[name=premise_id]').getValue(),
+            // storeID = getApplicationStore(module_id, section_id),
+            valid = this.validateNewReceivingSubmission(),
+        
+            validateHasDocuments = validateHasUploadedDocumentsDetils(application_code);
+            
+            if(!validateHasDocuments){
+                toastr.error('Response: Please Upload the required documents to proceed.'); 
+                Ext.getBody().unmask();
+                return;
+            }
+            // if(!validateInvoicing){
+            //     toastr.warning('Please Generate Proforma Invoice Or Upload Proof of Payment to proceed!!', 'Warning Response');
+           
+            //     Ext.getBody().unmask();
+            //     return;
+            // }
+            // if(!premise_id){
+            //     toastr.warning('Please provide the premise/facility details!!', 'Warning Response');
+           
+            //     Ext.getBody().unmask();
+            //     return;
+            // }
+
+        if (valid) {
+           
+        Ext.Ajax.request({
+            method: 'POST',
+            url: 'documentmanagement/validateImportExportAppReceiving',
+            params: {
+                application_code: application_code,
+                workflow_stage_id:workflow_stage_id,
+                _token: token
+            },
+            headers: {
+                'Authorization': 'Bearer ' + access_token
+            },
+            success: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText),
+                    message = resp.message,
+                    success = resp.success;
+                if (success == true || success === true) {
+                    extraParams =[{
+                        field_type: 'hiddenfield',
+                        field_name: 'has_queries',
+                       // value: hasQueries
+                    }];
+                    showWorkflowSubmissionWin(document_id, application_code, table_name, 'workflowsubmissionsreceivingfrm', winWidth, storeID,extraParams,'');
+
+                } else {
+                    toastr.error(message, 'Failure Response');
+                }
+            },
+            failure: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText),
+                    message = resp.message,
+                    success = resp.success;
+                toastr.error(message, 'Failure Response');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Ext.getBody().unmask();
+                toastr.error('Error: ' + errorThrown, 'Error Response');
+            }
+        });
+           
+        }
+        else {
+            Ext.getBody().unmask();
+            toastr.warning('Please Enter All the required Product Details!!', 'Warning Response');
+            return;
+        }
+    },
+
+    validateNewReceivingSubmission: function (btn) {
+        var mainTabPanel = this.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            applicantFrm = activeTab.down('docdefinationrequirementfrm'),
+            document_id = applicantFrm.down('combo[name=document_type_id]').getValue();
+           
+        if (!document_id) {
+            toastr.warning('Please Save Application Details!!', 'Warning Response');
+            return false;
+        }
+        if (!document_id) {
+            toastr.warning('Please Select Applicant!!', 'Warning Response');
+            return false;
+        }
+        if (!applicantFrm.isValid()) {
+           // toastr.warning('Please Enter All the required Permits Details!!', 'Warning Response');
+           // return false;
+        }
+        
+        return true;
     },
     addTcMeetingParticipants: function (btn) {
         var grid = btn.up('grid'),

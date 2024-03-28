@@ -2535,8 +2535,15 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $stage_groups = convertAssArrayToSimpleArray($stage_groups, 'group_id');
                 //query 2
 
-                $qry2 = DB::table('users as t2')
-                    ->select(DB::raw("t2.id,CONCAT(decryptval(t2.first_name,".getDecryptFunParams()."),' ',decryptval(t2.last_name,".getDecryptFunParams().")) as name"))
+                // $qry2 = DB::table('users as t2')
+                //     ->select(DB::raw("t2.id,CONCAT(decrypt(t2.first_name,".getDecryptFunParams()."),' ',decrypt(t2.last_name,".getDecryptFunParams().")) as name"))
+                //     ->whereIn('t2.id', function ($query) use ($stage_groups) {
+                //         $query->select(DB::raw('t3.user_id'))
+                //             ->from('tra_user_group as t3')
+                //             ->whereIn('t3.group_id', $stage_groups);
+                //     })
+                 $qry2 = DB::table('users as t2')
+                    ->select(DB::raw("t2.id,CONCAT_WS(' ',decrypt(t2.first_name),decrypt(t2.last_name)) as name"))
                     ->whereIn('t2.id', function ($query) use ($stage_groups) {
                         $query->select(DB::raw('t3.user_id'))
                             ->from('tra_user_group as t3')
@@ -2549,7 +2556,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                             ->whereRaw("acting_date_to >= '".formatDate($date_today)."' ")
                             ->whereIn('t4.group_id', $stage_groups);
                     });
+
                 $results = $qry2->get();
+                dd($results);
             }
             //return
             $res = array(
@@ -2631,7 +2640,6 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
         $table_name = returnTableNamefromModule($table_name,$module_id);
 
-
         $module_id = $request->input('module_id');
         if ($module_id == 1) {//PRODUCT REGISTRATION
             $this->processProductsApplicationSubmission($request);
@@ -2678,6 +2686,8 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         } else if ($module_id == 16) {//Revenue management
             $this->processNormalApplicationSubmission($request);
         }else if ($module_id == 25) {//Psur Applications
+            $this->processNormalApplicationSubmission($request);
+        }else if($module_id == 26){
             $this->processNormalApplicationSubmission($request);
         }else if ($module_id == 34) {//Issue Management Applications
             $this->processNormalApplicationSubmission($request);
@@ -2819,7 +2829,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
     public function processNormalApplicationSubmission(Request $request, $keep_status = false)
     {
-        $application_id = $request->input('application_id');
+        $application_code = $request->input('application_code');
         $table_name = $request->input('table_name');
         $module_id = $request->input('module_id');
         $prev_stage = $request->input('curr_stage_id');
@@ -2832,7 +2842,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         try {
             //get application_details
             //notify submission
+
             if(validateIsNumeric($request->responsible_user)){
+                   dd('ff');
                 $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name');
                 $process_name = getSingleRecordColValue('wf_processes', array('id'=>$request->process_id), 'name');
                 $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id'=>$to_stage), 'name');
@@ -2857,8 +2869,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             }
 
             $application_details = DB::table($table_name)
-                ->where('id', $application_id)
+                ->where('application_code', $application_code)
                 ->first();
+
             if (is_null($application_details)) {
                 $res = array(
                     'success' => false,
@@ -2873,7 +2886,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $application_status_id = $application_details->application_status_id;
             }
             $where = array(
-                'id' => $application_id
+                'application_code' => $application_code
             );
             if($is_dataammendment_request != 1){
                 $app_update = array(
@@ -4785,7 +4798,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             //application details
             $application_code = $application_details->application_code;
             $ref_no = $application_details->reference_no;
-            $is_fast_track = $application_details->is_fast_track;
+           // $is_fast_track = $application_details->is_fast_track;
             $view_id = $application_details->view_id;
             $tracking_no = $application_details->tracking_no;
             $applicant_id = $application_details->applicant_id;
@@ -4856,14 +4869,14 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'created_on' => Carbon::now(),
                 'created_by' => $user_id
             );
-            insertRecord('tra_applications_transitions', $transition_params);
+             insertRecord('tra_applications_transitions', $transition_params);
+
             // DB::table('tra_applications_transitions')
             //     ->insert($transition_params);
             //submissions
             $submission_params = array(
                 'application_id' => $application_id,
                 'process_id' => $process_id,
-                'is_fast_track' => $is_fast_track,
                 'view_id' => $view_id,
                 'application_code' => $application_code,
                 'reference_no' => $ref_no,

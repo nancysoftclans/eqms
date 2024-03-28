@@ -53,11 +53,13 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('getDocumentsSubTypes', [DmsConfigurationsController::class, 'getDocumentsSubTypes']);
     Route::get('getParameterstableSchema', [DmsConfigurationsController::class, 'getParameterstableSchema']);
     Route::get('getdocdefinationrequirementDetails', [DmsConfigurationsController::class, 'getdocdefinationrequirementDetails']);
+    Route::get('getdoctypesDetails', [DmsConfigurationsController::class, 'getdoctypesDetails']);
     Route::get('docdefinationrequirementfilterdetails', [DmsConfigurationsController::class, 'docdefinationrequirementfilterdetails']);
     Route::get('getdocumentreposirotystructureDetails', [DmsConfigurationsController::class, 'getdocumentreposirotystructureDetails']);
     Route::get('getdocumentsectionsrepstructure', [DmsConfigurationsController::class, 'getdocumentsectionsrepstructure']);
     Route::get('getRepositoryrootfolderDetails', [DmsConfigurationsController::class, 'getRepositoryrootfolderDetails']);
     Route::get('dmsAuthentication', [DmsConfigurationsController::class, 'dmsAuthentication']);
+    Route::get('prepapreDocumentApplicationReceiving', [DocumentManagementController::class, 'prepapreDocumentApplicationReceiving']);
     Route::get('getDMSSiteDefinationDetails', [DmsConfigurationsController::class, 'getDMSSiteDefinationDetails']);
     Route::get('getDMSSectionsDefinationDetails', [DmsConfigurationsController::class, 'getDMSSectionsDefinationDetails']);
     Route::get('getDMSSectionsModulesDefinationDetails', [DmsConfigurationsController::class, 'getDMSSectionsModulesDefinationDetails']);
@@ -77,8 +79,10 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('LoadAllApplicationUploadedDocuments', [DocumentManagementController::class, 'LoadAllApplicationUploadedDocuments']);
     Route::get('onLoadOnlineProductImagesUploads', [DocumentManagementController::class, 'onLoadOnlineProductImagesUploads']);
     Route::get('onLoadUnstructureApplicationDocumentsUploads', [DocumentManagementController::class, 'onLoadUnstructureApplicationDocumentsUploads']);
+    Route::post('validateImportExportAppReceiving', [DocumentManagementController::class, 'validateImportExportAppReceivingDetails']);
     Route::post('getDocumentArchive', [DocumentManagementController::class, 'getDocumentArchive']);
     Route::post('dmsUpdateAccountPassword', [DmsConfigurationsController::class, 'dmsUpdateAccountPassword']);
 
     });
+
 

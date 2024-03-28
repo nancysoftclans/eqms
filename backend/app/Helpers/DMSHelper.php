@@ -1194,7 +1194,7 @@ class DMSHelper
             ->where(array('t3.site_id' => $root_site_id, 't1.sub_module_id' => $sub_module_id))
             ->first();
 
-            
+           
         if ($rec) {
             $record = $rec;
         } else {
@@ -1460,6 +1460,7 @@ class DMSHelper
             $dms_res = self::dmsCreateAppRootNodesChildren($parentNode_ref, $node_details);
             if ($dms_res['success']) {
                 $dms_node_id = $dms_res['node_details']->id;
+
                 return self::saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, '', $ref_number, $dms_node_id, $user_id);
             }
         }else{
