@@ -12,15 +12,16 @@ class VerifyCsrfToken extends Middleware
      * @var array<int, string>
      */
     protected $except = [
-        //
-        'login',
-        // 'createAccount',
-        'administration/logout',
-        'administration/logoutWeb',
-        'recoverForgotPassword',
-        'configurations/saveConfigCommonData',
-        'configurations/deleteConfigRecord',
-        'administration/saveMenuItem'
+        '/*'
+        // 'login',
+        // // 'createAccount',
+        // 'administration/logout',
+        // 'administration/logoutWeb',
+        // 'recoverForgotPassword',
+        // 'configurations/saveConfigCommonData',
+        // 'configurations/deleteConfigRecord',
+        // 'administration/saveMenuItem',
+        // 'workflow/saveWorkflowCommonData'
         
     ];
 }

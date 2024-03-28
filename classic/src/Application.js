@@ -20,6 +20,7 @@ Ext.define('Admin.Application', {
         'NewReportsCtr',
         'PsurCtr',
         'OnlineServicesCtr',
+        'IssueMgmtCtr',
        
 
     ],

@@ -728,6 +728,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 
             $qry->where($where);
             $results = $qry->first();
+
             //initial status details
             $statusDetails = getApplicationInitialStatus($module_id, $sub_module_id);
             if(!is_null($results)){
@@ -2677,6 +2678,8 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         } else if ($module_id == 16) {//Revenue management
             $this->processNormalApplicationSubmission($request);
         }else if ($module_id == 25) {//Psur Applications
+            $this->processNormalApplicationSubmission($request);
+        }else if ($module_id == 34) {//Issue Management Applications
             $this->processNormalApplicationSubmission($request);
         }
         else {

@@ -74,6 +74,8 @@ function setTimeDuration(){
         }
     });
 }
+
+
 function setupTimers () {
     document.addEventListener("mousemove", resetTimer, false);
     document.addEventListener("mousedown", resetTimer, false);
@@ -524,7 +526,7 @@ function getBasicWorkflowDetails(module_id, section_id, sub_module_id) {
     return results;
 }
 
-function getInitialWorkflowDetails(module_id, section_id, sub_module_id,is_dataammendment_request=null, prodclass_category_id=null, importexport_permittype_id=null, premise_type_id=null) {
+function getInitialWorkflowDetails(module_id, section_id, sub_module_id) {
     var results = [];
     Ext.Ajax.request({
         method: 'GET',
@@ -534,10 +536,10 @@ function getInitialWorkflowDetails(module_id, section_id, sub_module_id,is_dataa
             module_id: module_id,
             section_id: section_id,
             sub_module_id: sub_module_id,
-            prodclass_category_id: prodclass_category_id,
-            importexport_permittype_id:importexport_permittype_id,
-            premise_type_id: premise_type_id,
-            is_dataammendment_request:is_dataammendment_request
+            // prodclass_category_id: prodclass_category_id,
+            // importexport_permittype_id:importexport_permittype_id,
+            // premise_type_id: premise_type_id,
+            // is_dataammendment_request:is_dataammendment_request
         },
         headers: {
             'Authorization': 'Bearer ' + access_token

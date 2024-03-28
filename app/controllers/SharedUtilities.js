@@ -1684,10 +1684,10 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('displayfield[name=application_status]').setValue(application_status);
         tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
         tab.down('textfield[name=name]').setValue(name);
-        tab.down('textfield[name=document_type_id]').setValue(document_type_id);
-        tab.down('textfield[name=has_parent_level]').setValue(has_parent_level);
-        tab.down('textfield[name=docparent_id]').setValue(docparent_id);
-        tab.down('textfield[name=description]').setValue(description);
+        // tab.down('textfield[name=document_type_id]').setValue(document_type_id);
+        // tab.down('textfield[name=has_parent_level]').setValue(has_parent_level);
+        // tab.down('textfield[name=docparent_id]').setValue(docparent_id);
+        // tab.down('textfield[name=description]').setValue(description);
         tab.down('hiddenfield[name=application_code]').setValue(application_code);
       //tab.down('displayfield[name=reference_no]').setValue(reference_no);
     },
