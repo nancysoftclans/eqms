@@ -21,6 +21,7 @@ Ext.define('Admin.Application', {
         'PsurCtr',
         'OnlineServicesCtr',
         'IssueMgmtCtr',
+        'QualityManagementCtr',
        
 
     ],

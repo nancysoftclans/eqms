@@ -16,5 +16,6 @@
     "NewReports": true,
     "Onlineservices": true,
     "Integration": true,
-    "IssueManagement": true
+    "IssueManagement": true,
+    "AuditManagmement": true
 }
