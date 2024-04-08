@@ -3,7 +3,7 @@ Ext.define('Admin.view.QMS.auditManagement.views.panels.NewAuditTypePnl', {
     xtype: 'newAuditTypePnl',
     controller: 'auditMgmntVctr',
     height: Ext.Element.getViewportHeight() - 118,
-
+    
     autoScroll: true,
     scrollable: true,
     defaults:{
@@ -16,5 +16,10 @@ Ext.define('Admin.view.QMS.auditManagement.views.panels.NewAuditTypePnl', {
     items: [{
         xtype: 'newAuditTypeDetailsFrm',
         title: 'Audit Type'
-    }]
+    },
+    // {
+    //     xtype: 'auditTypeMetaDataGrd',
+    //     title: 'Audit MetaData'
+    // }
+    ]
 })

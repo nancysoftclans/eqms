@@ -13,6 +13,6 @@ use Illuminate\Http\Request;
 |
 */
 
-Route::middleware('auth:api')->get('/auditmanagmement', function (Request $request) {
+Route::middleware('auth:api')->get('/auditmanagement', function (Request $request) {
     return $request->user();
 });

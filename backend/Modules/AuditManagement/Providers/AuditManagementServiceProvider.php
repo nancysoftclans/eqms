@@ -1,21 +1,21 @@
 <?php
 
-namespace Modules\AuditManagmement\Providers;
+namespace Modules\AuditManagement\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Database\Eloquent\Factory;
 
-class AuditManagmementServiceProvider extends ServiceProvider
+class AuditManagementServiceProvider extends ServiceProvider
 {
     /**
      * @var string $moduleName
      */
-    protected $moduleName = 'AuditManagmement';
+    protected $moduleName = 'AuditManagement';
 
     /**
      * @var string $moduleNameLower
      */
-    protected $moduleNameLower = 'auditmanagmement';
+    protected $moduleNameLower = 'auditmanagement';
 
     /**
      * Boot the application events.

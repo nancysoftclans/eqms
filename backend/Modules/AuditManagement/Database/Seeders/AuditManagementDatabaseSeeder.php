@@ -1,11 +1,11 @@
 <?php
 
-namespace Modules\AuditManagmement\Database\Seeders;
+namespace Modules\AuditManagement\Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Model;
 
-class AuditManagmementDatabaseSeeder extends Seeder
+class AuditManagementDatabaseSeeder extends Seeder
 {
     /**
      * Run the database seeds.

@@ -1205,9 +1205,9 @@
   array (
     'name' => 'Administration',
   ),
-  'auditmanagmement' => 
+  'auditmanagement' => 
   array (
-    'name' => 'AuditManagmement',
+    'name' => 'AuditManagement',
   ),
   'audittrail' => 
   array (

@@ -17,7 +17,7 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
             text: 'Create New Audit Type',
             ui: 'soft-blue',
             winTitle: 'Audit Type',
-            width: '70%',
+            width: '20%',
             iconCls: 'x-fa fa-plus',
             ui: 'soft-blue',
 
@@ -56,15 +56,22 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
             displayInfo: true,
             displayMsg: 'Showing {0} - {1} of {2} total records',
             emptyMsg: 'No Records',
+            beforeLoad: function () {
+                // this.up('grid').fireEvent('refresh', this.up('grid'));
+                store = this.getStore();
+
+            }
         }
     ],
     listeners: {
         beforesender: {
             fn: 'setGridStore',
             config: {
-                pageSize: 200,
-                remoteFilter: true,
-
+                pageSize: 1000,
+                autoLoad: false,
+                defaultRootId: 'root',
+                storeId: 'auditTypesStr',
+                enablePaging: true, 
                 proxy: {
                     url: 'auditManagement/getAuditTypes',
                 }

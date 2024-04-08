@@ -1,11 +1,11 @@
 {
-    "name": "AuditManagmement",
-    "alias": "auditmanagmement",
+    "name": "AuditManagement",
+    "alias": "auditmanagement",
     "description": "",
     "keywords": [],
     "priority": 0,
     "providers": [
-        "Modules\\AuditManagmement\\Providers\\AuditManagmementServiceProvider"
+        "Modules\\AuditManagement\\Providers\\AuditManagementServiceProvider"
     ],
     "aliases": {},
     "files": [],
