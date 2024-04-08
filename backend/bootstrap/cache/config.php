@@ -1205,6 +1205,10 @@
   array (
     'name' => 'Administration',
   ),
+  'auditmanagmement' => 
+  array (
+    'name' => 'AuditManagmement',
+  ),
   'audittrail' => 
   array (
     'name' => 'AuditTrail',

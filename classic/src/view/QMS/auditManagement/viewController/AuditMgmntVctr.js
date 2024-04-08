@@ -16,7 +16,25 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
         Audit Types
      */
     showAuditTypesRecords: function(btn){
-         
+         console.log(btn);
+
+        var grid = Ext.widget('auditTypesGrid');
+        
+        funcShowCustomizableWindow('Audit Types Selection','90%',grid,'customizablewindow');
+    },
+
+    funcBeforeShowAuditTypeMetadata: function(frm) {
+        
+        var id  = frm.down('hiddenfield[name=id]').getValue();
+
+        if(id) {
+            return true;
+        }
+        else {
+            frm.setActiveTab(0);
+            toastr.warning("Please save the details of the Audit Type First", "Unsaved Changes");
+            return false;
+        }
     },
     /**
      * New Audit Plan
