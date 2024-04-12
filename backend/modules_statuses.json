@@ -9,16 +9,13 @@
     "SummaryReport": true,
     "DocumentManagement": true,
     "Dashboard": true,
-    
     "Surveillance": true,
-   
     "Migrations": true,
-    
     "Reports": true,
     "OpenOffice": true,
     "NewReports": true,
-    
     "Onlineservices": true,
-   
-    "Integration": true
+    "Integration": true,
+    "IssueManagement": true,
+    "AuditManagement": true
 }

@@ -1,0 +1,13 @@
+{
+    "name": "IssueManagement",
+    "alias": "issuemanagement",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\IssueManagement\\Providers\\IssueManagementServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

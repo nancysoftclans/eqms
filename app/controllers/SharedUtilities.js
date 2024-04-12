@@ -1802,6 +1802,10 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('displayfield[name=process_name]').setValue(process_name);
         tab.down('displayfield[name=workflow_stage]').setValue(workflow_stage);
         tab.down('displayfield[name=application_status]').setValue(application_status);
+<<<<<<< HEAD
+=======
+        tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
+>>>>>>> a9daa885d01810e785c18399ec8162e5c0505d3e
         tab.down('hiddenfield[name=application_code]').setValue(application_code);
       //tab.down('displayfield[name=reference_no]').setValue(reference_no);
     },

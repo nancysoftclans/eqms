@@ -437,7 +437,7 @@ class UtilityHelper
                     $file_no = $codes_array['file_no'];
                 }
             }
-
+            
             //get ref id
             $ref_id = DB::table('tra_submodule_referenceformats')
                 ->where('sub_module_id', $sub_module_id)
@@ -445,6 +445,8 @@ class UtilityHelper
                 ->where('reference_type_id', $reference_type_id)
                 ->value('reference_format_id');
             // dd($sub_module_id);
+
+            //dd($sub_module_id, $section_id, $reference_type_id);
 
             // dd($ref_id);
 

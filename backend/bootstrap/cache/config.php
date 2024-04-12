@@ -1,16 +1,16 @@
 <?php return array (
   'app' => 
   array (
-    'name' => 'TFDA MIS',
+    'name' => 'BRIMS QMS',
     'env' => 'local',
     'debug' => true,
-    'url' => 'http://localhost:91/tfda_mis_2018/trunk/mis/development2',
+    'url' => '',
     'asset_url' => NULL,
     'timezone' => 'Africa/Gaborone',
     'locale' => 'en',
     'fallback_locale' => 'en',
     'faker_locale' => 'en_US',
-    'key' => 'base64:G86/XTkg1B1HFe3Z9/nHm69Ty+K8JIboSZ5T8m10DRA=',
+    'key' => 'base64:aq8LFgAkUE1sKnsQ10+0Fv4KvyNuNGxnNgnrKF5lnhg=',
     'cipher' => 'AES-256-CBC',
     'providers' => 
     array (
@@ -192,7 +192,7 @@
       'file' => 
       array (
         'driver' => 'file',
-        'path' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\framework/cache/data',
+        'path' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\framework/cache/data',
       ),
       'memcached' => 
       array (
@@ -236,7 +236,7 @@
         'driver' => 'octane',
       ),
     ),
-    'prefix' => 'tfda_mis_cache',
+    'prefix' => 'brims_qms_cache',
   ),
   'chunk-upload' => 
   array (
@@ -290,18 +290,18 @@
       'dms_approotsite' => 'eqms',
       'dms_approotsitecontainer' => 'eqms',
       'dms_approotsitecontainernode' => 'documentLibrary',
-      'dms_approotsite_id' => '3',
+      'dms_approotsite_id' => 3,
       'doc_rootupload' => '/public/resources/upload/',
-      'upload_directory' => 'http://localhost:81/eqms/system_documents/uploaded_documents',
-      'upload_url' => 'http://localhost:81/eqms/system_documents/uploaded_documents',
+      'upload_directory' => NULL,
+      'upload_url' => NULL,
       'system_uploaddirectory' => NULL,
       'system_uploadurl' => NULL,
     ),
     'esign' => 
     array (
       'base_url' => 'https://testbrimsesign.bomra.co.bw/public/api',
-      'certificate' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\esgin_ssl/bomrabw.crt',
-      'cert_key' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\esgin_ssl/BoMRARSA.key',
+      'certificate' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\esgin_ssl/bomrabw.crt',
+      'cert_key' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\esgin_ssl/BoMRARSA.key',
       'web_url' => 'https://testbrimsesign.bomra.co.bw',
     ),
     'jasper' => 
@@ -361,7 +361,7 @@
         'port' => '3306',
         'database' => 'bomra',
         'username' => 'root',
-        'password' => 'root',
+        'password' => '',
         'charset' => 'utf8',
         'prefix' => '',
         'prefix_indexes' => true,
@@ -373,9 +373,9 @@
         'driver' => 'mysql',
         'host' => '127.0.0.1',
         'port' => '3306',
-        'database' => 'live_portal',
-        'username' => 'root',
-        'password' => 'root',
+        'database' => 'forge',
+        'username' => 'forge',
+        'password' => '',
         'unix_socket' => '',
         'charset' => 'utf8',
         'prefix' => '',
@@ -406,7 +406,7 @@
         'port' => '3306',
         'database' => 'bomra',
         'username' => 'root',
-        'password' => 'root',
+        'password' => '',
         'charset' => 'utf8',
         'prefix' => '',
         'prefix_indexes' => true,
@@ -420,7 +420,7 @@
         'port' => '3306',
         'database' => 'bomra_audit',
         'username' => 'root',
-        'password' => 'root',
+        'password' => '',
         'unix_socket' => '',
         'charset' => 'utf8',
         'prefix' => '',
@@ -479,7 +479,7 @@
         'port' => '3306',
         'database' => 'bomra',
         'username' => 'root',
-        'password' => 'root',
+        'password' => '',
         'charset' => 'utf8',
         'prefix' => '',
         'prefix_indexes' => true,
@@ -492,7 +492,7 @@
       'options' => 
       array (
         'cluster' => 'redis',
-        'prefix' => 'tfda_mis_database_',
+        'prefix' => 'brims_qms_database_',
       ),
       'default' => 
       array (
@@ -520,13 +520,13 @@
       'local' => 
       array (
         'driver' => 'local',
-        'root' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\app',
+        'root' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\app',
       ),
       'public' => 
       array (
         'driver' => 'local',
-        'root' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\app/public',
-        'url' => 'http://localhost:91/tfda_mis_2018/trunk/mis/development2/storage',
+        'root' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\app/public',
+        'url' => '/storage',
         'visibility' => 'public',
       ),
       's3' => 
@@ -543,7 +543,7 @@
     ),
     'links' => 
     array (
-      'C:\\xampp8.12\\htdocs\\eqms\\backend\\public\\storage' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\app/public',
+      'C:\\xampp\\htdocs\\eqms\\backend\\public\\storage' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\app/public',
     ),
   ),
   'hashing' => 
@@ -578,13 +578,13 @@
       'single' => 
       array (
         'driver' => 'single',
-        'path' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\logs/laravel.log',
+        'path' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\logs/laravel.log',
         'level' => 'debug',
       ),
       'daily' => 
       array (
         'driver' => 'daily',
-        'path' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\logs/laravel.log',
+        'path' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\logs/laravel.log',
         'level' => 'debug',
         'days' => 14,
       ),
@@ -635,7 +635,7 @@
       ),
       'emergency' => 
       array (
-        'path' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\logs/laravel.log',
+        'path' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\logs/laravel.log',
       ),
     ),
   ),
@@ -667,7 +667,7 @@
       'theme' => 'default',
       'paths' => 
       array (
-        0 => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\resources\\views/vendor/mail',
+        0 => 'C:\\xampp\\htdocs\\eqms\\backend\\resources\\views/vendor/mail',
       ),
     ),
   ),
@@ -677,7 +677,7 @@
     'stubs' => 
     array (
       'enabled' => false,
-      'path' => 'C:\\xampp8.12\\htdocs\\eqms\\backend/vendor/nwidart/laravel-modules/src/Commands/stubs',
+      'path' => 'C:\\xampp\\htdocs\\eqms\\backend/vendor/nwidart/laravel-modules/src/Commands/stubs',
       'files' => 
       array (
         'routes/web' => 'Routes/web.php',
@@ -741,9 +741,9 @@
     ),
     'paths' => 
     array (
-      'modules' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\Modules',
-      'assets' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\public\\modules',
-      'migration' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\database/migrations',
+      'modules' => 'C:\\xampp\\htdocs\\eqms\\backend\\Modules',
+      'assets' => 'C:\\xampp\\htdocs\\eqms\\backend\\public\\modules',
+      'migration' => 'C:\\xampp\\htdocs\\eqms\\backend\\database/migrations',
       'generator' => 
       array (
         'config' => 
@@ -932,7 +932,7 @@
       'enabled' => false,
       'paths' => 
       array (
-        0 => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\vendor/*/*',
+        0 => 'C:\\xampp\\htdocs\\eqms\\backend\\vendor/*/*',
       ),
     ),
     'composer' => 
@@ -961,7 +961,7 @@
       'file' => 
       array (
         'class' => 'Nwidart\\Modules\\Activators\\FileActivator',
-        'statuses-file' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\modules_statuses.json',
+        'statuses-file' => 'C:\\xampp\\htdocs\\eqms\\backend\\modules_statuses.json',
         'cache-key' => 'activator.installed',
         'cache-lifetime' => 604800,
       ),
@@ -1031,7 +1031,6 @@
       2 => '127.0.0.1',
       3 => '127.0.0.1:8000',
       4 => '::1',
-      5 => 'localhost',
     ),
     'guard' => 
     array (
@@ -1069,7 +1068,7 @@
     'lifetime' => '120',
     'expire_on_close' => false,
     'encrypt' => false,
-    'files' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\framework/sessions',
+    'files' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\framework/sessions',
     'connection' => NULL,
     'table' => 'sessions',
     'store' => NULL,
@@ -1078,7 +1077,7 @@
       0 => 2,
       1 => 100,
     ),
-    'cookie' => 'tfda_mis_session',
+    'cookie' => 'brims_qms_session',
     'path' => '/',
     'domain' => NULL,
     'secure' => false,
@@ -1089,9 +1088,9 @@
   array (
     'paths' => 
     array (
-      0 => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\resources\\views',
+      0 => 'C:\\xampp\\htdocs\\eqms\\backend\\resources\\views',
     ),
-    'compiled' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\framework\\views',
+    'compiled' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\framework\\views',
   ),
   'pdf' => 
   array (
@@ -1124,7 +1123,7 @@
     array (
     ),
     'auto_language_detection' => false,
-    'temp_dir' => 'C:\\xampp8.12\\htdocs\\eqms\\backend\\storage\\app',
+    'temp_dir' => 'C:\\xampp\\htdocs\\eqms\\backend\\storage\\app',
     'pdfa' => false,
     'pdfaauto' => false,
     'use_active_forms' => false,
@@ -1206,6 +1205,10 @@
   array (
     'name' => 'Administration',
   ),
+  'auditmanagement' => 
+  array (
+    'name' => 'AuditManagement',
+  ),
   'audittrail' => 
   array (
     'name' => 'AuditTrail',
@@ -1225,6 +1228,10 @@
   'integration' => 
   array (
     'name' => 'Integration',
+  ),
+  'issuemanagement' => 
+  array (
+    'name' => 'IssueManagement',
   ),
   'migrations' => 
   array (
