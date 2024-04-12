@@ -200,7 +200,6 @@ public function getdocdefinationrequirementDetails(Request $req)
             ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
             ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
             ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
-            ->leftJoin('par_prodclass_categories as t6', 't1.prodclass_category_id', '=', 't6.id')
             ->leftJoin('wf_processes as t7', 't1.process_id', '=', 't7.id')
             ->leftJoin('par_form_categories as t8', 't1.document_type_id', '=', 't8.id')
             ->leftJoin('par_confirmations as t9', 't1.has_parent_level', '=', 't9.id')
@@ -209,7 +208,6 @@ public function getdocdefinationrequirementDetails(Request $req)
                 DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentupload_requirements q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
                 't1.name AS mtype',
                 't2.name AS document_type',
-                't6.name AS prodclass_category',
                 't3.name AS module_name',
                 't4.name AS sub_module',
                 't5.name AS section_name',

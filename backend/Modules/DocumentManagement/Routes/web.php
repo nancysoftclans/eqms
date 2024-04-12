@@ -60,6 +60,7 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('getRepositoryrootfolderDetails', [DmsConfigurationsController::class, 'getRepositoryrootfolderDetails']);
     Route::get('dmsAuthentication', [DmsConfigurationsController::class, 'dmsAuthentication']);
     Route::get('prepapreDocumentApplicationReceiving', [DocumentManagementController::class, 'prepapreDocumentApplicationReceiving']);
+    Route::get('prepapreDocumentApplicationScreening', [DocumentManagementController::class, 'prepapreDocumentApplicationScreening']);
     Route::get('getDMSSiteDefinationDetails', [DmsConfigurationsController::class, 'getDMSSiteDefinationDetails']);
     Route::get('getDMSSectionsDefinationDetails', [DmsConfigurationsController::class, 'getDMSSectionsDefinationDetails']);
     Route::get('getDMSSectionsModulesDefinationDetails', [DmsConfigurationsController::class, 'getDMSSectionsModulesDefinationDetails']);
@@ -79,8 +80,10 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('LoadAllApplicationUploadedDocuments', [DocumentManagementController::class, 'LoadAllApplicationUploadedDocuments']);
     Route::get('onLoadOnlineProductImagesUploads', [DocumentManagementController::class, 'onLoadOnlineProductImagesUploads']);
     Route::get('onLoadUnstructureApplicationDocumentsUploads', [DocumentManagementController::class, 'onLoadUnstructureApplicationDocumentsUploads']);
-    Route::post('validateImportExportAppReceiving', [DocumentManagementController::class, 'validateImportExportAppReceivingDetails']);
+    Route::post('validateDocumentAppReceivingDetails', [DocumentManagementController::class, 'validateDocumentAppReceivingDetails']);
     Route::post('getDocumentArchive', [DocumentManagementController::class, 'getDocumentArchive']);
+    Route::post('saveDocumentRecommendationComments', [DocumentManagementController::class, 'saveDocumentRecommendationComments']);
+    Route::post('saveDocumentApplicationRecommendationDetails', [DocumentManagementController::class, 'saveDocumentApplicationRecommendationDetails']);
     Route::post('dmsUpdateAccountPassword', [DmsConfigurationsController::class, 'dmsUpdateAccountPassword']);
 
     });

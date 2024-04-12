@@ -6,7 +6,6 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Http\Response;
-
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 // use Pion\Laravel\ChunkUpload\Config\AbstractConfig;
@@ -174,10 +173,10 @@ public function saveDocDefinationrequirement(Request $request)
                $application_code = $request->input('application_code');
                $process_id = $request->input('process_id');
                $workflow_stage_id = $request->input('workflow_stage_id');
+               $application_status_id = $request->input('application_status_id');
                $module_id = 26;
                $zone_id = $request->input('zone_id');
                $sub_module_id = 101;
-
 
                     $user_id = $this->user_id;
                $app_data = array(
@@ -194,6 +193,7 @@ public function saveDocDefinationrequirement(Request $request)
                             "document_owner_id" => $request->input('document_owner_id'),
                             "version" => $request->input('version'),
                             "assessment_date" => $request->input('assessment_date'),
+                            "application_status_id" => $request->input('application_status_id'),
                          
                  );
 
@@ -336,12 +336,193 @@ public function saveDocDefinationrequirement(Request $request)
            return \response()->json($res);
        }
 
+       public function saveDocumentRecommendationComments(Request $req)
+    {
+        try {
+            $user_id = \Auth::user()->id;
+            $post_data = $req->all();
+            $table_name = 'tra_evaluation_recommendations';
+            $id = $post_data['id'];
+            $workflow_stage_id = $post_data['workflow_stage_id'];
+            //unset unnecessary values
+            unset($post_data['_token']);
+            unset($post_data['table_name']);
+            unset($post_data['model']);
+            unset($post_data['id']);
+            unset($post_data['unset_data']);
+            $unsetData = $req->input('unset_data');
+            if (isset($unsetData)) {
+                $unsetData = explode(",", $unsetData);
+                $post_data = unsetArrayData($post_data, $unsetData);
+            }
+
+            $table_data = $post_data;
+            //add extra params
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+            $where = array(
+                'id' => $id
+            );
+            $res = array();
+            //check stage category
+            if(!validateIsNumeric($workflow_stage_id)){
+                return array('success'=>false, 'message'=> "Faild to fetch stage details");
+            }
+            $stage_data = getTableData('wf_workflow_stages', array('id'=>$workflow_stage_id));
+            $stage_category_id = $stage_data->stage_category_id;
+            $table_data['stage_category_id'] = $stage_category_id;
+            if (isset($id) && $id != "") {
+                if (recordExists($table_name, $where)) {
+                    unset($table_data['created_on']);
+                    unset($table_data['created_by']);
+                    $table_data['dola'] = Carbon::now();
+                    $table_data['altered_by'] = $user_id;
+                    $res = updateRecord($table_name, $where, $table_data);
+                }
+            } else {
+                $res = insertRecord($table_name, $table_data);
+            }
+        } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+           $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+    }
+
+       public function saveDocumentApplicationRecommendationDetails(Request $request)
+    {
+         try {
+$table_name = $request->input('table_name');
+        $application_id = $request->input('application_id');
+        $application_code = $request->input('application_code');
+
+
+        return DB::transaction(function () use ($application_code, $table_name, $request) {
+            $id = $request->input('recommendation_id');
+            $permit_release_remarks = $request->input('permit_release_remarks');
+
+            $decision_id = $request->input('decision_id');
+            $approval_date = $request->input('approval_date');
+            $permit_signatory = $request->input('permit_signatory');
+            $dg_signatory = $request->input('dg_signatory');
+
+            // Ensure $permit_signatory is properly set
+            $user_id = $this->user_id;
+            if (empty($permit_signatory)) {
+                $permit_signatory = $user_id;
+            }
+
+            $params = [
+                'application_code' => $application_code,
+                'decision_id' => $decision_id,
+                'approval_date' => $approval_date,
+                'permit_signatory' => $permit_signatory,
+                'dg_signatory' => $dg_signatory,
+                'permit_release_remarks' => $permit_release_remarks,
+                'created_by' => $user_id,
+                'created_on' => Carbon::now()
+            ];
+         
+
+            if (validateIsNumeric($id)) {
+                // Update existing record
+                $where = ['id' => $id];
+                $params['dola'] = Carbon::now();
+                $params['altered_by'] = $user_id;
+                updateRecord('tra_permitsrelease_recommendation', [], $where, $params, $user_id);
+            } else {
+                // Insert new record
+                $res = insertRecord('tra_permitsrelease_recommendation', $params, $user_id);
+                $id = $res['record_id'];
+
+                // Insert into manager permits review
+              $res = insertRecord('tra_managerpermits_review', $params, $user_id);
+
+               
+            }
+
+            // Update manager permits review
+            $record = DB::table('tra_managerpermits_review')
+                ->where('application_code', $application_code)
+                ->first();
+
+            if ($record) {
+                $prevdecision_id = $record->decision_id;
+                $where = ['id' => $record->id, 'application_code' => $application_code];
+                $data = [
+                  //  'permit_no' => ($decision_id == 1 && $prevdecision_id != 2) ? $reference_no : '',
+                    'approval_date' => $approval_date,
+                    'decision_id' => $decision_id,
+                ];
+
+              
+                $res = updateRecord('tra_managerpermits_review', $where, $data, $user_id);
+
+            
+            }
+            // Prepare response
+            $approval_decision = getSingleRecordColValue('par_approval_decisions', ['id' => $decision_id], 'name');
+
+
+            $message = ($decision_id == 1)
+                ? "This is to notify you that the Application for the Document Recommendation has been Granted, Submit for Approval."
+                : "This is to notify you that the Application for the Document Recommendation has been rejected.";
+
+            // Send mail notification
+           // sendMailNotification($rec->name, $rec->email, "{$rec->reference_no} Permit Approval Recommendation: {$approval_decision}", $message);
+
+            return response()->json(['success' => true, 'message' => 'Document Recommendation saved successfully']);
+        });
+    } catch (\Exception $exception) {
+        return response()->json(['success' => false, 'message' => $exception->getMessage()]);
+    } catch (\Throwable $throwable) {
+        return response()->json(['success' => false, 'message' => $throwable->getMessage()]);
+    }
+
+     return \response()->json($res);
+    }
+
+        public function prepapreDocumentApplicationScreening(Request $req){
+        $application_id = $req->input('application_id');
+        $application_code = $req->input('application_code');
+        $table_name = $req->input('table_name');
+        try {
+            $main_qry = DB::table('tra_documentupload_requirements as t1')
+                ->leftJoin('wf_workflow_stages as t2', 't1.application_status_id' ,'=', 't2.id')
+                ->leftJoin('tra_managerpermits_review as t3', 't1.application_code' ,'=', 't3.application_code')
+                ->select('t1.*', 't2.name as application_status', 't3.decision_id')
+                ->where('t1.application_code', $application_code);
+
+
+            $results = $main_qry->first();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+
+
+    }
+
+
         public function prepapreDocumentApplicationReceiving(Request $req){
         $application_id = $req->input('application_id');
         $application_code = $req->input('application_code');
         $table_name = $req->input('table_name');
         try {
             $main_qry = DB::table('tra_documentupload_requirements as t1')
+                ->leftJoin('wf_workflow_stages as t2', 't1.application_status_id' ,'=', 't2.id')
+                ->select('t1.*', 't2.name as application_status')
                 ->where('t1.application_code', $application_code);
 
 
@@ -1733,7 +1914,7 @@ public function saveDocDefinationrequirement(Request $request)
 
     }
 
-    public function validateImportExportAppReceivingDetails(Request $req){
+    public function validateDocumentAppReceivingDetails(Request $req){
         try {
             $application_code = $req->application_code;
             $workflow_stage_id = $req->workflow_stage_id;

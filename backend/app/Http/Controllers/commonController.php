@@ -604,7 +604,6 @@ class commonController extends Controller
             ->where('application_code', $application_code);
 
         $app_details = $qry->first();
-// dd($app_details);
         if (is_null($app_details)) {
             $res = array(
                 'success' => false,
@@ -639,6 +638,10 @@ class commonController extends Controller
             $res = $this->saveDisposalpApplicationRecommendationDetails($request, $sub_module_id, $app_details);
         } else if ($module_id == 20) {//promotion and advertisement
             $res = $this->saveImpExpApplicationRecommendationDetails($request, $sub_module_id, $app_details);
+        }else if ($module_id == 20) {//promotion and advertisement
+            $res = $this->saveImpExpApplicationRecommendationDetails($request, $sub_module_id, $app_details);
+        }else if ($module_id == 26) {
+            $res = $this->saveDocumentApplicationRecommendationDetails($request, $sub_module_id, $app_details);
         }
 		else if ($module_id == 24) {//RMU Administrative
             $res = $this->saveResponseApproval($request, $approved_by = null);

@@ -229,7 +229,7 @@ Ext.define('Admin.view.documentsManagement.views.grids.Docdefinationrequirementg
     {
         xtype: 'gridcolumn',
         dataIndex: 'tracking_no',
-        text: 'Has Parent',
+        text: 'Tracking Number',
         flex: 1
     },{
         xtype: 'treecolumn',

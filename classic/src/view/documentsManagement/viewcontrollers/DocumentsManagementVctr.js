@@ -338,6 +338,9 @@ showEditConfigParamWinFrm: function (item) {
         this.fireEvent('viewApplicationDetails', record);
 
     },
+    getDocumentReleaseRecommendationDetails: function (btn) {
+        this.fireEvent('getDocumentReleaseRecommendationDetails', btn);
+    },
     quickNavigationPOE: function (btn) {
         var step = btn.step,
             wizard = btn.wizard,
@@ -422,6 +425,7 @@ showEditConfigParamWinFrm: function (item) {
             module_id = containerPnl.down('hiddenfield[name=module_id]').getValue(),
             sub_module_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
             active_application_id = containerPnl.down('hiddenfield[name=active_application_id]').getValue(),
+            application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
             workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
             docdefinationrequirementfrm = containerPnl.down('docdefinationrequirementfrm');
 
@@ -446,6 +450,7 @@ showEditConfigParamWinFrm: function (item) {
                     process_id: process_id,
                     workflow_stage_id: workflow_stage_id,
                     active_application_id: active_application_id,
+                    application_status_id: application_status_id,
                     module_id: module_id,
                     sub_module_id: sub_module_id,
                     '_token': token

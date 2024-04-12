@@ -3166,12 +3166,20 @@ class ConfigurationsController extends Controller
             $comment_type_id = $request->input('comment_type_id');
             $user_id = $this->user_id;
             try {
+                // $qry = DB::table('tra_evaluation_recommendations as t1')
+                //     ->leftJoin('users as t2', 't1.created_by', '=', 't2.id')
+                //     ->leftJoin('wf_workflow_stages as t3', 't1.workflow_stage_id', '=', 't3.id')
+                //     ->leftJoin('par_recommendations as t4', 't1.recommendation_id', '=', 't4.id')
+                //     ->select(DB::raw("t1.*,CONCAT(decryptval(t2.first_name,".getDecryptFunParams()."), ' ', decryptval(t2.last_name,".getDecryptFunParams().")) as author, t3.name as stage_name, t4.name as recommendation,t2.id as author_id, $user_id as current_user"))
+                //     ->where('t1.application_code', $application_code);
+
                 $qry = DB::table('tra_evaluation_recommendations as t1')
-                    ->leftJoin('users as t2', 't1.created_by', '=', 't2.id')
-                    ->leftJoin('wf_workflow_stages as t3', 't1.workflow_stage_id', '=', 't3.id')
-                    ->leftJoin('par_recommendations as t4', 't1.recommendation_id', '=', 't4.id')
-                    ->select(DB::raw("t1.*,CONCAT(decryptval(t2.first_name,".getDecryptFunParams()."), ' ', decryptval(t2.last_name,".getDecryptFunParams().")) as author, t3.name as stage_name, t4.name as recommendation,t2.id as author_id, $user_id as current_user"))
-                    ->where('t1.application_code', $application_code);
+                ->join('users as t2', 't1.created_by', '=', 't2.id')
+                ->join('wf_workflow_stages as t3', 't1.workflow_stage_id', '=', 't3.id')
+                ->leftJoin('par_recommendations as t4', 't1.recommendation_id', '=', 't4.id')
+                ->select(DB::raw("t1.*, CONCAT_WS(' ',decrypt(t2.first_name),decrypt(t2.last_name)) as author, t3.name as stage_name,t3.name as workflow_stage, t4.name as recommendation"))
+                ->where('t1.application_id', $application_id)
+                ->where('t1.application_code', $application_code);
 
 
                 if (isset($workflow_stage_id) && $workflow_stage_id != '') {

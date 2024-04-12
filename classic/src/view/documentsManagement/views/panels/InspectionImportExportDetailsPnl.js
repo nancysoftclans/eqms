@@ -1,6 +1,6 @@
 
 /**
- * Created by Softclans on 11/12/2018.
+ * Created by Softclans
  */
 Ext.define('Admin.view.documentsManagement.views.panels.InspectionImportExportDetailsPnl', {
     extend: 'Ext.tab.Panel',

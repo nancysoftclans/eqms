@@ -80,12 +80,14 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationCommentsGrid', {
     }, {
         xtype: 'datecolumn',
         dataIndex: 'assessment_start_date',
+        hidden: true,
         text: 'Assessment Start Date',
         flex: 1,
         // renderer: Ext.util.Format.dateRenderer('Y/m/d H:i:s')
     }, {
         xtype: 'datecolumn',
         dataIndex: 'assessment_end_date',
+        hidden: true,
         text: 'Asessment End Date',
         flex: 1,
         // renderer: Ext.util.Format.dateRenderer('Y/m/d H:i:s')

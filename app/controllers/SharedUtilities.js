@@ -415,7 +415,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             'drugnewauditingpnl button[name=prev_comments]': {
                 click: 'showApplicationCommentsWin'
             },
-            'importexportpermitmanagerreviewwizard button[name=prev_comments]': {
+            'documentsubmissionpnl button[name=recommendation]': {
                 click: 'showApplicationCommentsWin'
             },
             'drugnewauditingpnl toolbar menu menuitem[name=comments_btn]': {
@@ -582,6 +582,9 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         },
             'productApprovalRecommFrm button[name=save_recommendation]': {
                 click: 'saveApplicationApprovalDetails'
+            },
+            'documentreviewrecommfrm button[name=save_recommendation]': {
+                click: 'saveDocumentReviewRecommendationDetails'
             },
             'approvalrecommendationfrm button[name=save_recommendation]': {
                 click: 'saveApplicationApprovalDetails'
@@ -890,6 +893,14 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             'documentapplicationreceivingwizard':{
                 afterrender: 'prepapreDocumentApplicationReceiving'
             },
+            'documentsubmissionpnl':{
+                afterrender: 'prepapreDocumentApplicationScreening'
+            },
+             'documenttypetb button[name=disposalpermitstbRegHomeBtn]': {
+                click: 'documenttypeRegHome'
+            },'applicationcommentsFrm button[name=save_comment]': {
+                click: 'saveApplicationComment'
+            },
             // 'secondReviewscreeninggrid': {
             //     beforerender: 'prepareChecklistsCategories'
             // }
@@ -955,7 +966,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 autoGenerateChecklistBasedQueries: 'autoGenerateChecklistBasedQueries',
                 updateProductReviewBaseDetails: 'updateProductReviewBaseDetails',
                 onInitiateDocumentApplication: 'onInitiateDocumentApplication',
-                showReceivingApplicationSubmissionWin: 'showReceivingApplicationSubmissionWin'
+                showReceivingApplicationSubmissionWin: 'showReceivingApplicationSubmissionWin',
+                getDocumentReleaseRecommendationDetails: 'getDocumentReleaseRecommendationDetails'
             }
         }
     },
@@ -1062,6 +1074,17 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
       });
             mainPanel.setActiveTab(childXtype);
     
+    },
+            documenttypeRegHome: function (btn) {
+        var me = this,
+            mainTabPanel = me.getMainTabPanel(),
+            sec_dashboard = btn.sec_dashboard,
+            activeTab = mainTabPanel.getActiveTab(),
+            dashboardWrapper = activeTab.down('#documentapplicationwrapper');
+        if (!dashboardWrapper.down(sec_dashboard)) {
+            dashboardWrapper.removeAll();
+            dashboardWrapper.add({xtype: sec_dashboard});
+        }
     },
     uploadExcelFile: function (btn) {
         var me = this,
@@ -1229,6 +1252,104 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 //
             }
         });
+    },
+    getDocumentReleaseRecommendationDetails:function(btn){
+        Ext.getBody().mask('Please wait...');
+        var me = this,
+            mainTabPanel = this.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            application_id = activeTab.down('hiddenfield[name=active_application_id]').getValue(),
+            application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
+            reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
+            tracking_no = activeTab.down('displayfield[name=tracking_no]').getValue(),
+            process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
+            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            is_siginig = btn.is_siginig,
+            approval_frm ='documentreviewrecommfrm',
+            table_name = 'tra_documentupload_requirements',
+            vwcontroller= 'documentsManagementvctr',
+            stores ='["productApprovalDecisionsStr"]',
+            form = Ext.widget(approval_frm),
+            storeArray = eval(stores),
+            arrayLength = storeArray.length;
+          
+        if (arrayLength > 0) {
+            me.fireEvent('refreshStores', storeArray);
+        }
+        if(is_siginig ==1){
+            hasApprovalRec = checkApprovalRecDetails(application_code, application_id);
+            if(!hasApprovalRec){
+                toastr.warning('Add recommendation First!!', 'Warning Response');
+                Ext.getBody().unmask();
+                return false;
+            }
+        }
+        form.down('hiddenfield[name=table_name]').setValue(table_name);
+        Ext.Ajax.request({
+            method: 'GET',
+            url: 'common/getPermitReleaseRecommendationDetails',
+            params: {
+                application_id: application_id,
+                application_code: application_code
+            },
+            headers: {
+                'Authorization': 'Bearer ' + access_token
+            },
+            success: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText),
+                    success = resp.success,
+                    message = resp.message,
+                    results = resp.results,
+                    model = Ext.create('Ext.data.Model', results);
+                if (success == true || success === true) {
+                    if(results){
+                        permit_no = results.permit_no;
+                        expiry_date = results.expiry_date;
+                    }
+                    else{
+                        permit_no = '';
+                        expiry_date = ''; 
+                    }
+                    form.loadRecord(model);
+                    form.down('hiddenfield[name=application_id]').setValue(application_id);
+                    form.down('hiddenfield[name=application_code]').setValue(application_code);
+                    form.down('textfield[name=certificate_no]').setValue(permit_no);
+                    form.down('datefield[name=expiry_date]').setValue(expiry_date);
+                    form.down('hiddenfield[name=process_id]').setValue(process_id);
+                    form.down('hiddenfield[name=workflow_stage_id]').setValue(workflow_stage_id);
+                    //hide fields
+                    if(is_siginig ==0){
+                        form.down('textfield[name=certificate_no]').setHidden(true); 
+                        form.down('textfield[name=sign_file]').setHidden(true); 
+                        form.down('combo[name=dg_signatory]').setHidden(true);
+                        form.down('combo[name=permit_signatory]').setHidden(true);
+                        form.down('button[name=signature_btn]').setHidden(true);
+                        form.down('fieldset[name=sign_container]').setHidden(true); 
+                        form.down('datefield[name=expiry_date]').setHidden(true);
+                    }
+                    else if(is_siginig ==1){
+                        form.down('button[name=save_recommendation]').setHidden(true);
+                        form.down('combo[name=permit_signatory]').setHidden(true);
+                        form.down('combo[name=dg_signatory]').setHidden(true);
+                    }
+                    funcShowCustomizableWindow('Document Approval Recommendation', '40%', form, 'customizablewindow');
+                } else {
+                    toastr.error(message, 'Failure Response');
+                }
+            },
+            failure: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText),
+                    message = resp.message;
+                toastr.error(message, 'Failure Response');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Ext.getBody().unmask();
+                toastr.error('Error: ' + errorThrown, 'Error Response');
+            }
+        });
+
     },
      renderParameterMenu: function(parameter_id){
        var def_id = parameter_id,
@@ -1656,12 +1777,6 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             workflow_stage = record.get('workflow_stage'),
             application_status = record.get('application_status'),
             tracking_no = record.get('tracking_no'),
-            //name = record.get('name'),
-            // document_type_id = record.get('document_type_id'),
-            // has_parent_level = record.get('has_parent_level'),
-            // docparent_id = record.get('docparent_id'),
-            // description = record.get('description'),
-            // application_code = record.get('application_code'),
             reference_no = record.get('reference_no'),
             process_id = record.get('process_id'),
             module_id = record.get('module_id'),
@@ -1682,13 +1797,11 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('hiddenfield[name=workflow_stage_id]').setValue(workflow_stage_id);
         tab.down('hiddenfield[name=application_status_id]').setValue(application_status_id);
         tab.down('hiddenfield[name=module_id]').setValue(module_id);
+        tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
         tab.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
         tab.down('displayfield[name=process_name]').setValue(process_name);
         tab.down('displayfield[name=workflow_stage]').setValue(workflow_stage);
         tab.down('displayfield[name=application_status]').setValue(application_status);
-        // tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
-        // tab.down('textfield[name=name]').setValue(name);
-        // tab.down('textfield[name=document_type_id]').setValue(document_type_id);
         tab.down('hiddenfield[name=application_code]').setValue(application_code);
       //tab.down('displayfield[name=reference_no]').setValue(reference_no);
     },
@@ -1801,17 +1914,14 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         var workflowContainer = Ext.widget(workflow_details.viewtype);
         workflowContainer.down('displayfield[name=process_name]').setValue(workflow_details.processName);
         workflowContainer.down('displayfield[name=workflow_stage]').setValue(workflow_details.initialStageName);
-        workflowContainer.down('displayfield[name=application_status]').setValue(workflow_details.applicationStatus);
+        workflowContainer.down('displayfield[name=application_status]').setValue(workflow_details.initialStageName);
         workflowContainer.down('hiddenfield[name=process_id]').setValue(workflow_details.processId);
         workflowContainer.down('hiddenfield[name=workflow_stage_id]').setValue(workflow_details.initialStageId);
         workflowContainer.down('hiddenfield[name=module_id]').setValue(module_id);
         workflowContainer.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+        workflowContainer.down('hiddenfield[name=application_status_id]').setValue(workflow_details.initialStageId);
         dashboardWrapper.add(workflowContainer);
 
-
-        if(dashboardWrapper.down('premisedetailscmnfrm')){
-        dashboardWrapper.down('premisedetailscmnfrm').down('button[action=search_premise]').enable();
-        }
         Ext.Function.defer(function () {
             Ext.getBody().unmask();
         }, 300);
@@ -2365,7 +2475,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
     refreshApplicationDocUploadsGrid: function (me) {
         var store = me.store,
             grid = me.up('treepanel'),
-           // document_type_id = grid.down('combo[name=applicable_documents]').getValue(),
+            decision_id = grid.down('combo[name=review_recommendation_id]').getValue(),
+            approval_id = grid.down('combo[name=recommendation_id]').getValue(),
             mainTabPanel = this.getMainTabPanel(),
             activeTab = mainTabPanel.getActiveTab(),
             application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
@@ -2375,10 +2486,23 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
             workflow_stage = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(),
             premise_type_id,prodclass_category_id;
-           
-            // if(grid.document_type_id){
-            //     document_type_id = grid.document_type_id;
-            // }
+
+
+            if(workflow_stage_id == 1442 || workflow_stage_id === 1442){
+                activeTab.down('combo[name=recommendation_id]').setVisible(false)
+                activeTab.down('combo[name=review_recommendation_id]').setVisible(true)
+                activeTab.down('button[name=add_upload]').setVisible(false)
+            }else if(workflow_stage_id == 1441 || workflow_stage_id === 1441){
+                activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+                activeTab.down('combo[name=recommendation_id]').setVisible(true)
+                activeTab.down('button[name=add_upload]').setVisible(false)
+
+            }else{
+                activeTab.down('combo[name=recommendation_id]').setVisible(false)
+                activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+                activeTab.down('button[name=add_upload]').setVisible(false)
+
+            }
             if(module_id == 1){
                 if(!prodclass_category_id){
                     if(activeTab.down('hiddenfield[name=prodclass_category_id]')){
@@ -2417,6 +2541,46 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         child.down('hiddenfield[name=workflow_stage_id]').setValue(workflow_stage_id);
 
         funcShowCustomizableWindow('Checklist Revisions', '70%', child, 'customizablewindow');
+    },
+    saveApplicationComment: function (btn) {
+        var mainTabPanel = this.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(), 
+            module_id = activeTab.down('hiddenfield[name=module_id]').getValue(), 
+            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(), 
+            formPnl = btn.up('form'),
+            frm = formPnl.getForm(),
+            store = Ext.getStore(btn.storeID),
+            win = formPnl.up('window');
+
+        if (frm.isValid()) {
+            frm.submit({
+                url: 'documentmanagement/saveDocumentRecommendationComments',
+                params: {
+                    application_code: application_code,
+                    module_id: module_id,
+                    workflow_stage_id: workflow_stage_id
+                },
+                waitMsg: 'Please wait...',
+                success: function (form, action) {
+                    var response = Ext.decode(action.response.responseText),
+                        success = response.success,
+                        message = response.message;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                        store.removeAll();
+                        store.load();
+                        win.close();
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (form, action) {
+                    var resp = action.result;
+                    toastr.error(resp.message, 'Failure Response');
+                }
+            });
+        }
     },
     showApplicationDocUploadWin: function (btn) {
         var mainTabPanel = this.getMainTabPanel(),
@@ -2888,6 +3052,109 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         });
     },
 
+    prepapreDocumentApplicationScreening: function (pnl) {
+
+        Ext.getBody().mask('Please wait...');
+        var me = this,
+            activeTab = pnl;
+            application_status_id = activeTab.down('hiddenfield[name=application_status_id]').getValue(),
+            docdefinationrequirementfrm = activeTab.down('docdefinationrequirementfrm'),
+            application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
+            process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
+            sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
+            reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
+            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
+
+            if(workflow_stage_id == 1442 || workflow_stage_id === 1442){
+                activeTab.down('button[name=recommendation]').setVisible(false)
+                activeTab.down('button[name=approval]').setVisible(true)
+                activeTab.down('combo[name=recommendation_id]').setVisible(false)
+                activeTab.down('combo[name=review_recommendation_id]').setVisible(true)
+                activeTab.down('button[name=add_upload]').setVisible(false)
+            }else if(workflow_stage_id == 1441 || workflow_stage_id === 1441){
+                activeTab.down('button[name=approval]').setVisible(false)
+                activeTab.down('button[name=recommendation]').setVisible(true)
+                activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+                activeTab.down('combo[name=recommendation_id]').setVisible(true)
+                activeTab.down('button[name=add_upload]').setVisible(false)
+
+            }else{
+              activeTab.down('button[name=recommendation]').setVisible(false)
+              activeTab.down('button[name=approval]').setVisible(false)
+              activeTab.down('combo[name=recommendation_id]').setVisible(false)
+                activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+                activeTab.down('button[name=add_upload]').setVisible(false)
+
+            }
+
+
+
+            // if(workflow_stage_id == 1442 || workflow_stage_id === 1442){
+            //     activeTab.down('combo[name=recommendation_id]').setVisible(false)
+            //     activeTab.down('combo[name=review_recommendation_id]').setVisible(true)
+            //     activeTab.down('button[name=add_upload]').setVisible(false)
+            // }else if(workflow_stage_id == 1441 || workflow_stage_id === 1441){
+            //     activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+            //     activeTab.down('combo[name=recommendation_id]').setVisible(true)
+            //     activeTab.down('button[name=add_upload]').setVisible(false)
+
+            // }else{
+            //     activeTab.down('combo[name=recommendation_id]').setVisible(false)
+            //     activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+            //     activeTab.down('button[name=add_upload]').setVisible(false)
+
+            // }
+       
+        if (application_code) {
+            Ext.Ajax.request({
+                method: 'GET',
+                url: 'documentmanagement/prepapreDocumentApplicationScreening',
+                params: {
+                    application_code: application_code
+                },
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (response) {
+                    Ext.getBody().unmask();
+                    var resp = Ext.JSON.decode(response.responseText),
+                        message = resp.message,
+                        success = resp.success,
+                        results = resp.results,
+                        model = Ext.create('Ext.data.Model', results);
+
+                    if (success == true || success === true) {
+                        
+                        docdefinationrequirementfrm.loadRecord(model);
+
+                        activeTab.down('displayfield[name=application_status]').setValue(results.application_status);
+
+                        //activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
+                        activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);
+                        activeTab.down('combo[name=review_recommendation_id]').setValue(results.decision_id);
+
+                        
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (response) {
+                    Ext.getBody().unmask();
+                    var resp = Ext.JSON.decode(response.responseText),
+                        message = resp.message,
+                        success = resp.success;
+                    toastr.error(message, 'Failure Response');
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                    Ext.getBody().unmask();
+                    toastr.error('Error: ' + errorThrown, 'Error Response');
+                }
+            });
+        } else {
+            Ext.getBody().unmask();                    
+        }
+    },
+
     prepapreDocumentApplicationReceiving: function (pnl) {
 
         Ext.getBody().mask('Please wait...');
@@ -2900,6 +3167,19 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
             reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
             workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
+
+            if(workflow_stage_id == 1442 || workflow_stage_id === 1442){
+                activeTab.down('button[name=recommendation]').setVisible(false)
+                activeTab.down('button[name=approval]').setVisible(true)
+            }else if(workflow_stage_id == 1441 || workflow_stage_id === 1441){
+                activeTab.down('button[name=approval]').setVisible(false)
+                activeTab.down('button[name=recommendation]').setVisible(true)
+
+            }else{
+              activeTab.down('button[name=recommendation]').setVisible(false)
+              activeTab.down('button[name=approval]').setVisible(false)
+
+            }
        
         if (application_code) {
             Ext.Ajax.request({
@@ -2923,12 +3203,10 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                         
                         docdefinationrequirementfrm.loadRecord(model);
 
-                        //activeTab.down('displayfield[name=application_status]').setValue(results.application_status);
+                        activeTab.down('displayfield[name=application_status]').setValue(results.application_status);
 
-                        activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
+                      //  activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
                         activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);
-
-                        console.log(reference_no);
                         
                     } else {
                         toastr.error(message, 'Failure Response');
@@ -3166,7 +3444,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
            
         Ext.Ajax.request({
             method: 'POST',
-            url: 'documentmanagement/validateImportExportAppReceiving',
+            url: 'documentmanagement/validateDocumentAppReceivingDetails',
             params: {
                 application_code: application_code,
                 workflow_stage_id:workflow_stage_id,
@@ -3798,6 +4076,54 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 toastr.error('Error: ' + errorThrown, 'Error Response');
             }
         });
+    },
+
+    saveDocumentReviewRecommendationDetails: function (btn) {
+        var me = this,
+            mainTabPanel = me.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            form = btn.up('form'),
+            decision_id = form.down('combo[name=decision_id]').getValue(),
+            module_id = activeTab.down('hiddenfield[name=module_id]').getValue();
+            console.log(module_id);
+            console.log(decision_id);
+            frm = form.getForm(),
+            win = form.up('window'),
+            action_url = 'documentmanagement/saveDocumentApplicationRecommendationDetails';
+        if (frm.isValid()) {
+            frm.submit({
+                url: action_url,
+                headers: {
+                    'Authorization': 'Bearer ' + access_token,
+                    'X-CSRF-Token': token
+                },
+                params: {
+                    //module_id: module_id
+                },
+                waitMsg: 'Please wait...',
+                success: function (fm, action) {
+                    var response = Ext.decode(action.response.responseText),
+                        success = response.success,
+                        message = response.message;
+                    if (success == true || success === true) {
+                        if(activeTab.down('combo[name=review_recommendation_id]')){
+                            activeTab.down('combo[name=review_recommendation_id]').setValue(decision_id);
+                        }
+                        else{
+                            mainStore.load();
+                        }
+                        toastr.success(message, "Success Response");
+                        win.close();
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (fm, action) {
+                    var resp = action.result;
+                    toastr.error(resp.message, 'Failure Response');
+                }
+            });
+        }
     },
     showPromotionMaterialApplicationMoreDetailsGeneric:function(application_id,application_code, applicant_id, ref_no, process_id, workflow_stage_id, module_id, sub_module_id, section_id, isReadOnly,view){
         Ext.getBody().mask('Please wait...');

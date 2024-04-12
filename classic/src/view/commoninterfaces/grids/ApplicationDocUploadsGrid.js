@@ -17,9 +17,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         emptyText: 'Nothing to display',
         getRowClass: function (record, rowIndex, rowParams, store) {
             var file_type = record.get('file_type');
-            // console.log(file_type);
             if (file_type) {
-                console.log(file_type);
                 return 'valid-row';
             }else{
                 return 'invalid-row';
@@ -60,7 +58,89 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         bind: {
             hidden: '{isReadOnly}'
         }
-    }, {
+    }, '->',{
+        xtype: 'combo', anyMatch: true,
+        queryMode: 'local',
+        forceSelection: true,
+        valueField: 'id',
+        columnWidth: 1,
+        displayField: 'name',
+        fieldLabel: 'Recommendation',
+        name: 'recommendation_id',
+        listeners: {
+            beforerender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 100,
+                    storeId:'configurations/getNonrefParameter',
+                    proxy: {
+                        extraParams:{
+                             table_name: "par_permits_reviewrecommendations"
+                         }
+                    }
+                },
+                isLoad: true
+            },
+            change: function (cmb, newVal) {
+
+               var grid = this.up('treepanel'),
+                    store = grid.getStore();
+                store.load();
+
+              // var recommendation = grid.down('combo[name=review_recommendation_id]');
+              //   if (newVal == 1 || newVal === 1 || newVal == 3 || newVal === 3) {
+              //       recommendation.setVisible(true);
+            
+              //   }else if (newVal == 2 || newVal === 2) {
+              //        recommendation.setVisible(false);
+          
+              //   }else{
+              //       recommendation.setVisible(false);
+              //   }
+            }
+        }
+    },{
+        xtype: 'combo', anyMatch: true,
+        queryMode: 'local',
+        forceSelection: true,
+        valueField: 'id',
+        columnWidth: 1,
+        displayField: 'name',
+        fieldLabel: 'Approval Status',
+        name: 'review_recommendation_id',
+        listeners: {
+            beforerender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 100,
+                    storeId:'configurations/getNonrefParameter',
+                    proxy: {
+                        extraParams:{
+                             table_name: "par_permits_reviewrecommendations"
+                         }
+                    }
+                },
+                isLoad: true
+            },
+            change: function (cmb, newVal) {
+
+               var grid = this.up('treepanel'),
+                    store = grid.getStore();
+                store.load();
+
+              // var recommendation = grid.down('combo[name=review_recommendation_id]');
+              //   if (newVal == 1 || newVal === 1 || newVal == 3 || newVal === 3) {
+              //       recommendation.setVisible(true);
+            
+              //   }else if (newVal == 2 || newVal === 2) {
+              //        recommendation.setVisible(false);
+          
+              //   }else{
+              //       recommendation.setVisible(false);
+              //   }
+            }
+        }
+    },{
         xtype: 'exportbtn',
         hidden: true
     }, {

@@ -24,7 +24,7 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
             xtype: 'toolbar',
             dock: 'top',
             ui: 'footer',
-            height: 60,
+            height: 55,
             defaults: {
                 labelAlign: 'left',
                 margin: '-12 5 0 5',
@@ -33,8 +33,6 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
             items: ['->',  {
                 xtype: 'displayfield',
                 name: 'process_name',
-                margin: '0 0 0 0',
-                padding: '0 0 0 0',
                 fieldLabel: 'Process',
                 fieldStyle: {
                     'color': 'green',
@@ -60,7 +58,7 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                     width: 5
                 }, {
                     xtype: 'displayfield',
-                    name: 'application_status',
+                    name: 'application_status',    
                     fieldLabel: 'Status',
                     fieldStyle: {
                         'color': 'green',
@@ -69,7 +67,6 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                     }
                 }, {
                     xtype: 'tbseparator',
-                     hidden: true,
                     width: 5
                 },{
                     xtype: 'displayfield',
@@ -216,6 +213,29 @@ Ext.define('Admin.view.documentsManagement.views.panels.DocumentApplicationRecei
                     table_name: 'tra_documentupload_requirements',
                     winWidth: '50%',
                     handler: 'showReceivingApplicationSubmissionWin'
+                },
+                {
+                    text: 'Add Approval Decision',
+                    iconCls: 'fa fa-plus',
+                    name: 'approval',
+                    handler: 'getDocumentReleaseRecommendationDetails',
+                    approval_frm: 'documentreviewrecommfrm',
+                    vwcontroller: 'documentsManagementvctr',
+                    stores: '["productApprovalDecisionsStr"]',
+                    table_name: 'tra_documentupload_requirements',
+                    is_siginig:0
+                },
+
+                {
+                    text: 'Recommendations & Comments',
+                    ui: 'soft-blue', 
+                    iconCls: 'fa fa-clipboard-check',
+                    childXtype: 'applicationcommentspnl',
+                    winTitle: 'Process Comments',
+                    winWidth: '60%',
+                    name:'recommendation',
+                    comment_type_id: 3,
+                    stores: '[]'
                 },
                 {
                     text: 'Next',

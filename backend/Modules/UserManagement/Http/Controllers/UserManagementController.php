@@ -192,57 +192,22 @@ class UserManagementController extends Controller
          return response()->json($res);
      }
 
-    public function getActiveSystemUsers(Request $request)
+     public function getActiveSystemUsers(Request $request)
     {
         $group_id = $request->input('group_id');
         $department_id = $request->input('department_id');
         $directorate_id = $request->input('directorate_id');
-        $filters = $request->input('filters');
-        $filters = (array)json_decode($filters);
-        $filters=array_filter($filters);
-
         try {
-            // DB::enableQueryLog();
             $qry = DB::table('users as t1')
                 ->leftJoin('par_titles as t2', 't1.title_id', '=', 't2.id')
                 ->leftJoin('par_user_images as t3', 't1.id', '=', 't3.user_id')
                 ->leftJoin('par_departments as t4', 't1.department_id', '=', 't4.id')
-                ->leftJoin('par_branches as t5', 't1.branch_id', '=', 't5.id')
+             
                 ->leftJoin('tra_blocked_accounts as t6', 't1.id', '=', 't6.account_id')
                 ->leftJoin('tra_user_group as t7','t1.id','t7.user_id')
-                ->leftJoin('tra_login_logs as t8', function($query) {
-                   $query->on('t1.id','=','t8.user_id')
-                   ->whereRaw('t8.id IN (select MAX(l1.id) from tra_login_logs as l1 inner join users as u2 on u2.id = l1.user_id group by u2.id)');
-                })
-                ->leftJoin('par_gender as t9', 't1.gender_id', '=', 't9.id')
-                ->select(DB::raw("t1.*, t1.email as email,t8.login_time,t3.saved_name,t4.name as department_name,
-                t5.name as zone_name, t7.id as group_id, t2.name as title, t9.name as gender,
-                CONCAT(decryptval(t1.first_name,".getDecryptFunParams()."),' ', decryptval(t1.last_name,".getDecryptFunParams().")) as fullnames,
-                decryptval(t1.phone,".getDecryptFunParams().") as phone, decryptval(t1.mobile,".getDecryptFunParams().") as mobile, decryptval(t1.first_name,".getDecryptFunParams().") as first_name,
-                decryptval(t1.last_name,".getDecryptFunParams().") as last_name"))
+                ->select(DB::raw("t1.*,CONCAT_WS(' ',t2.name,decrypt(t1.first_name),decrypt(t1.last_name)) as fullnames,decrypt(t1.email) as email,
+                                  t3.saved_name,t4.name as department_name, t7.id as group_id"))
                 ->whereNull('t6.id');
-
-            if (isset($filter)) {
-                if ($filters != NULL) {
-                    foreach ($filters as $filter) {
-                        switch ($filter->property) {
-                            case 'email' :
-                                $whereClauses[] = "(t1.email ILIKE '%" . ($filter->value) . "%' OR t1.reference_no ILIKE '%" . ($filter->value) . "%' )";
-                                break;
-                            case 'fullnames' :
-                                $whereClauses[] = "(t1.email ILIKE '%" . ($filter->value) . "%' OR t1.reference_no ILIKE '%" . ($filter->value) . "%' )";
-                                break;
-
-                        }
-                    }
-                    $whereClauses = array_filter($whereClauses);
-                }
-                if (!empty($whereClauses)) {
-                    $filter_string = implode(' AND ', $whereClauses);
-
-                }
-            }
-        //group filtering
             if (isset($group_id) && $group_id != '') {
                 $users = DB::table('tra_user_group')
                     ->select('user_id')
@@ -252,7 +217,7 @@ class UserManagementController extends Controller
                 $users = convertAssArrayToSimpleArray($users, 'user_id');
                 $qry->whereIn('t1.id', $users);
             }
-        //other filters
+
             if(validateIsNumeric($department_id)){
                 $qry->where('t1.department_id',$department_id);
             }
@@ -260,19 +225,23 @@ class UserManagementController extends Controller
                 $qry->where('t1.directorate_id',$directorate_id);
             }
             $results = $qry->get();
-            //$results = decryptUserCollection($results);
             $results = convertStdClassObjToArray($results);
+            $results = decryptArray($results);
             $res = array(
                 'success' => true,
                 'results' => $results,
                 'message' => 'All is well'
             );
-
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
-
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
         }
         return response()->json($res);
     }
