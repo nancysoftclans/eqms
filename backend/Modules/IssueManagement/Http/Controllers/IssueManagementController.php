@@ -83,11 +83,10 @@ class IssueManagementController extends Controller
                     'complaint_id' => $complaint_id
                 );
                 
-                dd($application_params);
+                // dd($application_params);
                 $app_details = array();
 // results
-
-                if(recordExists($complaint_details_table, $where_complaint)) {
+                    if(recordExists($complaint_details_table, $where_complaint)) {
                     $complaint_details_params['dola'] = Carbon::now();
                     $complaint_details_params['altered_by'] = $user_id;
                     $previous_data = getPreviousRecords($complaint_details_table, $where_complaint);
