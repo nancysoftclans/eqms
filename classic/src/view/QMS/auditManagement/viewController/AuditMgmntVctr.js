@@ -16,8 +16,9 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
         Audit Types
      */
     showAuditTypesRecords: function(btn){
-        var grid = Ext.widget('auditTypesGrid');
-        funcShowCustomizableWindow('Audit Types Selection','90%',grid,'customizablewindow');
+        var grid = Ext.widget('auditTypesGrid'),
+        form = btn.up('form');
+        funcShowCustomizableWindowWithObject('Audit Types Selection','90%',grid,'customizablewindow',form);
     },
 
     saveAuditType: function(btn) {
@@ -57,6 +58,15 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
         }
     },
 
+    onSelectAuditType:function(grid ,record) {
+        console.log(grid) 
+        console.log(record);  
+        
+       var me = this,
+           data = record.data
+    },
+
+
     funcBeforeShowAuditTypeMetadata: function(frm) {
         
         var id  = frm.down('hiddenfield[name=id]').getValue();
@@ -86,8 +96,12 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
     },
 
     onAuditPlanSchedule: function(btn) {
-        console.log(btn);
+        // console.log(btn);
     },
+
+    saveNewAuditPlanDetails:function(btn) {
+        // console.log(btn);
+    }
 
 
 })

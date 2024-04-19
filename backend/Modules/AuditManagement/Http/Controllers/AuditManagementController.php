@@ -114,10 +114,14 @@ class AuditManagementController extends Controller
          
         try{
            
-            $audit_types_data = DB::table('qms_audit_types')->get();
-
+            $audit_types_data = DB::table('qms_audit_types as t1')
+            ->leftJoin('par_audit_types as t2','t1.audit_prefix_id','t2.id')
+            ->select(DB::raw('t1.*,t2.name as audit_prefix_type'))
+            ->get();
+            
             $res = array(
-                'data' => $audit_types_data,
+                'success' => true,
+                'results' => $audit_types_data,
             );
 
         }

@@ -1,18 +1,42 @@
 Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
     extend: 'Ext.grid.Panel',
     xtype: 'auditTypesGrid',
-    
-    autoScroll: true,
-    autoHeight: true,
-    width: '100%',
-
-    viewConfig: {
-        deferEmptyText: false,
-        emptyText: 'Nothing to display',
-
+    controller: 'auditMgmntVctr',
+    listeners: {
+        beforerender: {
+            fn: 'setGridStore',
+            config: {
+                pageSize: 100,
+                storeId: 'auditTypesStr',
+                remoteFilter: true,
+                enablePaging: true,
+                proxy: {
+                    url: 'auditManagement/getAuditTypes', 
+                }
+            }
+        },
+        itemdblclick: 'onSelectAuditType'
     },
-
+    plugins:[
+        {
+            ptype: 'filterfield'
+        }
+    ],
+    bbar: [
+        {
+            xtype: 'pagingtoolbar',
+            width: '100%',
+            displayInfo: true,
+            displayMsg: 'Showing {0} - {1} of {2} total records',
+            emptyMsg: 'No Records',
+           
+        }
+    ],
     tbar: [
+        {
+            xtype: 'hiddenfield',
+            name: 'isReadOnly' 
+        },
         {
             text: 'Create New Audit Type',
             ui: 'soft-blue',
@@ -29,10 +53,6 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
             }
         },
         {
-            xtype: 'tbspacer',
-            width: 20
-        },
-        {
             xtype: 'displayfield',
             value: 'Double click to select!!',
             fieldStyle: {
@@ -42,47 +62,13 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
         {xtype:'tbfill'},
         
     ],
-    plugins:[
-        {
-            ptype: 'filterfield'
-        },{
-            ptype: 'gridexporter'
-        }
-    ],
-    bbar: [
-        {
-            xtype: 'pagingtoolbar',
-            width: '100%',
-            displayInfo: true,
-            displayMsg: 'Showing {0} - {1} of {2} total records',
-            emptyMsg: 'No Records',
-            beforeLoad: function () {
-                // this.up('grid').fireEvent('refresh', this.up('grid'));
-                store = this.getStore();
-
-            }
-        }
-    ],
-    listeners: {
-        beforesender: {
-            fn: 'setGridStore',
-            config: {
-                pageSize: 1000,
-                autoLoad: false,
-                defaultRootId: 'root',
-                storeId: 'auditTypesStr',
-                enablePaging: true, 
-                proxy: {
-                    url: 'auditManagement/getAuditTypes',
-                }
-            },
-            isLoad: true
-        }
-    },
+   
+   
+   
     columns: [{
         xtype: 'gridcolumn',
-        dataIndex: 'audit_code',
         text: 'Code',
+        dataIndex: 'audit_type_code',
         flex: 1,
 
         filter: {

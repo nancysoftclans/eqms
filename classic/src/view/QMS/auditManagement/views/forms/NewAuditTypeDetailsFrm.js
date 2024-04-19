@@ -68,8 +68,5 @@ Ext.define('Admin.view.QMS.auditManagement.views.forms.NewAuditTypeDetailsFrm',{
             formBind: true,
             handler: 'saveAuditType'
        },
-       {
-       
-       }
     ]
 })
