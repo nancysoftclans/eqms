@@ -81,7 +81,10 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
         }
     },
     showAddAuditMetaDataDetailsFrm: function(btn) {
-         
+        console.log(btn);
+        var childXtype = btn.childXtype;
+        child = Ext.widget(childXtype);
+        funcShowCustomizableWindow('Custom Fields','90%',child,'customizablewindow');
     },
     /**
      * New Audit Plan
@@ -101,6 +104,32 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
 
     saveNewAuditPlanDetails:function(btn) {
         // console.log(btn);
+    },
+
+    showEditAuditType: function(btn) {
+       var button = btn.up('button'),
+       grid = button.up('grid'),
+       record = button.getWidgetRecord(),
+       //record_id = record.get('id')
+       panelObject = Ext.widget(btn.panelXtype),
+       frm = panelObject.down('form');
+
+       console.log(panelObject);
+       console.log(frm);
+
+
+       frm.loadRecord(record);
+      
+       
+
+        // form.reset();
+        // form.loadRecord(record);
+
+        // console.log(form);
+        // console.log(record);
+        
+        funcShowCustomizableWindow('Audit Type','90%',panelObject,'customizablewindow');
+    
     }
 
 

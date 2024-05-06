@@ -13,7 +13,8 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
                 proxy: {
                     url: 'auditManagement/getAuditTypes', 
                 }
-            }
+            },
+            isLoad: true,
         },
         itemdblclick: 'onSelectAuditType'
     },
@@ -49,16 +50,10 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
                 var winWidth = btn.winWidth,
                 winTitle = btn.winTitle,
                 newAuditTypePanel = Ext.widget('newAuditTypePnl');
-                funcShowCustomizableWindow(winTitle, winWidth, newAuditTypePanel, 'customizablewindow');
+                funcShowCustomizableWindow(winTitle, '90%', newAuditTypePanel, 'customizablewindow');
             }
         },
-        {
-            xtype: 'displayfield',
-            value: 'Double click to select!!',
-            fieldStyle: {
-                'color':'green'
-            }
-        },
+       
         {xtype:'tbfill'},
         
     ],
@@ -90,6 +85,29 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
         text: 'Prefix Type',
         flex: 1,
         
+    },
+    {
+        text: 'Options',
+        xtype: 'widgetcolumn',
+        width: 90,
+        widget: {
+            width: 75,
+            textAlign: 'left',
+            xtype: 'splitbutton',
+            iconCls: 'x-fa fa-th-list',
+            ui: 'gray',
+            menu: {
+                xtype: 'menu',
+                items: [{
+                    text: 'Edit',
+                    iconCls: 'x-fa fa-edit',
+                    tooltip: 'Edit Record',
+                    action: 'edit',
+                    panelXtype: 'newAuditTypePnl',
+                    handler: 'showEditAuditType'
+                }]
+            }
+        }
     }
 ]
 })
