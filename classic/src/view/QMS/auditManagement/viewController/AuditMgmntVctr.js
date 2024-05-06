@@ -40,6 +40,8 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
                     record_id = response.record_id,
                     message = response.message;
 
+
+
                     if(success == true || success === true) { 
                         toastr.success(message, "Success Response");
                         f.down('hiddenfield[name=id]').setValue(record_id);
@@ -83,7 +85,18 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
     showAddAuditMetaDataDetailsFrm: function(btn) {
         console.log(btn);
         var childXtype = btn.childXtype;
-        child = Ext.widget(childXtype);
+
+        var child = Ext.widget(childXtype);
+        var grid = btn.up('grid');
+        var panel = grid.up('panel');
+        var audit_type_id = panel.down('hiddenfield[name=id]').getValue();
+        
+        if(child.down('hiddenfield[name=audit_type_id]')) {
+            child.down('hiddenfield[name=audit_type_id]').setValue(audit_type_id);
+        }
+
+        
+
         funcShowCustomizableWindow('Custom Fields','90%',child,'customizablewindow');
     },
     /**
@@ -130,6 +143,43 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
         
         funcShowCustomizableWindow('Audit Type','90%',panelObject,'customizablewindow');
     
+    },
+
+    saveAuditTypeMetaData: function(btn) {
+        var form = btn.up('form'),
+        frm = form.getForm(),
+        f = form;
+
+        if(frm.isValid()) {
+            frm.submit({
+                url: 'auditManagement/saveAuditTypeMetaData',
+                waitMsg: 'Please wait...',
+                headers: {
+                    'Authorization': 'Bearer ' + access_token,
+                    'X-CSRF-Token': token 
+                },
+                success: function(form, action) {
+                    var response = Ext.decode(action.response.responseText),
+                    success = response.success,
+                    record_id = response.record_id,
+                    message = response.message;
+
+
+
+                    if(success == true || success === true) { 
+                        toastr.success(message, "Success Response");
+                        // f.down('hiddenfield[name=id]').setValue(record_id);
+                        
+                    }else {
+                        toastr.error(message, 'Failure Response'); 
+                    }
+                },
+                failure: function (form, action) {
+                    var resp = action.result;
+                    toastr.error(resp.message, 'Failure Response');
+                }
+            })
+        }
     }
 
 

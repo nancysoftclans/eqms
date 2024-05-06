@@ -10,7 +10,7 @@ Ext.define('Admin.view.QMS.auditManagement.views.panels.NewAuditTypePnl', {
         margin: 3
     },
     listeners: {
-        // beforetabchange: 'funcBeforeShowAuditTypeMetadata'
+        beforetabchange: 'funcBeforeShowAuditTypeMetadata'
     },
     
     items: [{

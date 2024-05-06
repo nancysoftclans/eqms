@@ -91,7 +91,7 @@ class AuditManagementController extends Controller
                     $res = array(
                         'success' => false,
                         'message' => 'record not updated',
-                        'error' => $resp['error']
+                        'error' => $resp['message']
                     );
                     $con->rollBack();
                 }
@@ -124,6 +124,89 @@ class AuditManagementController extends Controller
                 'results' => $audit_types_data,
             );
 
+        }
+        catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+   
+    public function getAuditTypeMetadata(Request $req) {
+        $audit_type_id = $req->audit_type_id;
+        try{
+            $audit_type_meta_data = DB::table('par_audit_custom_form_fields as t1')->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $audit_type_meta_data);
+        }catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    public function saveAuditTypeMetaData(Request $req) {
+        $user_id = \Auth::user()->id;
+        $record_id = $req->id;
+        $table_name = 'par_audit_custom_form_fields';
+        $data = array (
+
+            'audit_type_id' => $req->audit_type_id,
+            'field_name' => $req->field_name,
+            'label' => $req->label,
+            'form_field_type_id' => $req->form_field_type_id
+        );
+        try{
+            DB::beginTransaction();
+
+            if(validateIsNumeric($record_id)) {
+                $where_clause  = array('id' => $record_id);
+                $resp = updateRecord($table_name,$where_clause,$data,$user_id);
+
+                if($resp['success'] == false) {
+
+                    DB::rollBack();
+                    $res = array(   
+                        'success' => false,
+                        'message' => 'Details Not Updated',
+                        'error' => $resp['message']
+                    );
+                }
+                else {
+                    DB::commit();
+                    $res = array(
+                        'success' => true,
+                        'message' => 'Details SuccessFully Updated',
+                        'record_id' => $record_id
+                    );
+                }
+            }
+            else {
+                $resp = insertRecord($table_name,$data,$user_id);
+
+                if($resp['success'] == false) {
+
+                    DB::rollBack();
+                    $res = array(   
+                        'success' => false,
+                        'message' => 'Details Not Saved',
+                        'error' => $resp['message']
+                    );
+                }
+                else {
+                    DB::commit();
+                    $res = array(
+                        'success' => true,
+                        'message' => 'Details SuccessFully Saved',
+                        'record_id' => $record_id
+                    );
+                }
+            }
         }
         catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);

@@ -9,6 +9,20 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypeCustomFormsGrd',
         deferEmptyText: false,
         emptyText: 'Nothing to display'
     },
+    listeners: {
+        beforerender: {
+            fn: 'setGridStore',
+            config: {
+                pageSize: 100,
+                // remoteFilter: true,
+                // enablePaging: true,
+                proxy: {
+                    url: 'auditManagement/getAuditTypesMetadata', 
+                }
+            },
+            isLoad: true,
+        },
+    },
     tbar: [
         {
             xtype: 'button',
@@ -17,6 +31,7 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypeCustomFormsGrd',
             action: 'add',
             ui: 'soft-blue',
             childXtype: 'auditTypeCustomFieldsFrm',
+            winWidth: '60%',
             handler: 'showAddAuditMetaDataDetailsFrm',
 
         },
@@ -48,19 +63,19 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypeCustomFormsGrd',
     columns: [{
         xtype: 'gridcolumn',
         text: 'Title',
-        dataIndex: 'custom_field_title',
+        dataIndex: 'field_name',
         flex: 1,
     },
     {
        xtype:'gridcolumn',
        text: 'Label',
-       dataIndex: 'custom_field_label',
+       dataIndex: 'label',
        flex: 1,
     }, 
     {
        xtype:'gridcolumn',
        text: 'Field Type',
-       dataIndex: 'custom_field_type',
+       dataIndex: 'field_type',
        flex: 1,
     }]
 })

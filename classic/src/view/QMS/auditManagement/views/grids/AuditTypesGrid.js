@@ -16,7 +16,7 @@ Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypesGrid', {
             },
             isLoad: true,
         },
-        itemdblclick: 'onSelectAuditType'
+        // itemdblclick: 'onSelectAuditType'
     },
     plugins:[
         {

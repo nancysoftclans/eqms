@@ -126,7 +126,7 @@ $include-admin-view-qms-auditmanagement-panels-auditplanningpnl: dynamic(true);;
 $include-admin-view-qms-auditmanagement-panels-auditplanningwizardpnl: dynamic(true);;
 $include-admin-view-qms-auditmanagement-viewcontroller-auditmgmntvctr: dynamic(true);;
 $include-admin-view-qms-auditmanagement-views-dashboard-auditmgmntdashcnt: dynamic(true);;
-$include-admin-view-qms-auditmanagement-views-forms-audittypecustomfields: dynamic(true);;
+$include-admin-view-qms-auditmanagement-views-forms-audittypecustomfieldsfrm: dynamic(true);;
 $include-admin-view-qms-auditmanagement-views-forms-newaudittypedetailsfrm: dynamic(true);;
 $include-admin-view-qms-auditmanagement-views-grids-auditmgmntgrid: dynamic(true);;
 $include-admin-view-qms-auditmanagement-views-grids-audittypecustomformsgrd: dynamic(true);;
