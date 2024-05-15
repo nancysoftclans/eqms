@@ -3865,7 +3865,7 @@ public function getUploadedDocumentPerApplication(request $request){
        
        if(isset($application_code)){
        $qry=DB::table('tra_application_uploadeddocuments as t2')
-             ->leftJoin('tra_documentupload_requirements as t3','t2.document_requirement_id','t3.id')
+             ->leftJoin('tra_documentmanager_application as t3','t2.document_requirement_id','t3.id')
              ->leftJoin('wb_trader_account as t4','t2.uploaded_by','t4.id')
              ->leftJoin('par_document_types as t5','t3.document_type_id','t5.id')
              ->where('t2.application_code',$application_code)

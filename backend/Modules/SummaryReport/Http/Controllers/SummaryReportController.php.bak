@@ -1172,7 +1172,7 @@ class SummaryReportController extends Controller
 //        $sub_module_id=$request->sub_module_id;
        
 //        $qry=DB::table('tra_application_uploadeddocuments as t1')
-//              ->leftJoin('tra_documentupload_requirements as t3','t1.document_requirement_id','t3.id')
+//              ->leftJoin('tra_documentmanager_application as t3','t1.document_requirement_id','t3.id')
 //              ->leftJoin('tra_application_documentsdefination as t44','t1.application_code','t44.application_code')
 //              ->leftJoin('wb_trader_account as t4','t1.uploaded_by','t4.id')
 //              ->leftJoin('par_document_types as t5','t3.document_type_id','t5.id')
@@ -1233,7 +1233,7 @@ class SummaryReportController extends Controller
 //        if(isset($Reference) || isset($doc_type)){
 //        $qry=DB::table($table.' as t1')
 //              ->join('tra_application_uploadeddocuments as t2','t1.application_code','t2.application_code')
-//              ->leftJoin('tra_documentupload_requirements as t3','t2.document_requirement_id','t3.id')
+//              ->leftJoin('tra_documentmanager_application as t3','t2.document_requirement_id','t3.id')
 //              ->leftJoin('wb_trader_account as t4','t2.uploaded_by','t4.id')
 //              ->leftJoin('par_document_types as t5','t3.document_type_id','t5.id')
 //              ->select('t1.application_code','t1.reference_no','t2.node_ref','t2.file_name','t2.initial_file_name','t2.file_type','t2.remarks','t2.uploaded_on','t5.name as document_type','t4.name as uploaded_by','t5.name as doc_type');
@@ -12367,7 +12367,7 @@ class SummaryReportController extends Controller
        if(isset($application_code)){
        $qry=DB::table('tra_application_documents as t1')
              ->join('tra_application_uploadeddocuments as t2','t2.application_document_id','t1.id')
-             ->leftJoin('tra_documentupload_requirements as t3','t2.document_requirement_id','t3.id')
+             ->leftJoin('tra_documentmanager_application as t3','t2.document_requirement_id','t3.id')
              ->leftJoin('wb_trader_account as t4','t1.uploaded_by','t4.id')
              ->leftJoin('par_document_types as t5','t3.document_type_id','t5.id')
              ->where('t1.application_code',$application_code)

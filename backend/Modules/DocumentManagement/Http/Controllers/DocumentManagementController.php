@@ -77,7 +77,7 @@ class DocumentManagementController extends Controller
             }
             $qry = DB::table('tra_proc_applicable_doctypes as t1')
                 ->join('par_document_types as t2', 't1.doctype_id', '=', 't2.id')
-                ->join('tra_documentupload_requirements as t3', 't2.id', '=', 't3.document_type_id')
+                ->join('tra_documentmanager_application as t3', 't2.id', '=', 't3.document_type_id')
                 ->select('t2.id', 't2.name', 't2.is_assessment_doc');
             /*-------------------------------------------------------
                 For Document originating from query window identified by
@@ -130,14 +130,14 @@ class DocumentManagementController extends Controller
             't1.sub_module_id' => $sub_module_id
         );
         try {
-            $qry = DB::table('tra_documentupload_requirements as t1')
+            $qry = DB::table('tra_documentmanager_application as t1')
                 ->join('wf_processes as t2', function ($join) {
                     $join->on("t1.module_id", "=", "t2.module_id")
                         ->on("t1.sub_module_id", "=", "t2.sub_module_id");
                 })
                 ->select('t1.id', 't1.name', 't2.id as process','t1.prodclass_category_id')
                 ->where('t1.document_type_id', $docType_id)
-                ->whereRaw("(select count(a.id) from tra_documentupload_requirements a where a.docparent_id = t1.id) = 0")
+                ->whereRaw("(select count(a.id) from tra_documentmanager_application a where a.docparent_id = t1.id) = 0")
                ->where($where);
 
             if(validateIsNumeric($process_id)){
@@ -197,7 +197,7 @@ public function saveDocDefinationrequirement(Request $request)
                          
                  );
 
-                 $applications_table = 'tra_documentupload_requirements';
+                 $applications_table = 'tra_documentmanager_application';
                  
    
                if (validateIsNumeric($application_code)) {
@@ -488,10 +488,11 @@ $table_name = $request->input('table_name');
         $application_code = $req->input('application_code');
         $table_name = $req->input('table_name');
         try {
-            $main_qry = DB::table('tra_documentupload_requirements as t1')
-                ->leftJoin('wf_workflow_stages as t2', 't1.application_status_id' ,'=', 't2.id')
+            $main_qry = DB::table('tra_documentmanager_application as t1')
+                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
                 ->leftJoin('tra_managerpermits_review as t3', 't1.application_code' ,'=', 't3.application_code')
-                ->select('t1.*', 't2.name as application_status', 't3.decision_id')
+                ->leftJoin('tra_evaluation_recommendations as t4', 't1.application_code' ,'=', 't4.application_code')
+                ->select('t1.*','t2.name as workflow_stage','t3.decision_id', 't4.recommendation_id')
                 ->where('t1.application_code', $application_code);
 
 
@@ -520,13 +521,13 @@ $table_name = $request->input('table_name');
         $application_code = $req->input('application_code');
         $table_name = $req->input('table_name');
         try {
-            $main_qry = DB::table('tra_documentupload_requirements as t1')
-                ->leftJoin('wf_workflow_stages as t2', 't1.application_status_id' ,'=', 't2.id')
-                ->select('t1.*', 't2.name as application_status')
+            $main_qry = DB::table('tra_documentmanager_application as t1')
+                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
+                ->select('t1.*','t2.name as workflow_stage')
                 ->where('t1.application_code', $application_code);
 
-
             $results = $main_qry->first();
+
 
             $res = array(
                 'success' => true,
@@ -564,7 +565,7 @@ $table_name = $request->input('table_name');
             $docTypes = convertStdClassObjToArray($docTypes);
             $docTypes = convertAssArrayToSimpleArray($docTypes, 'doctype_id');
             //get applicable document requirements
-            $qry = DB::table('tra_documentupload_requirements as t1')
+            $qry = DB::table('tra_documentmanager_application as t1')
                 ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
                 ->select('t1.id', 't1.name')
                 ->join($table_name . ' as t3', function ($join) {
@@ -673,7 +674,7 @@ $table_name = $request->input('table_name');
            
 
     //         //get applicable document types
-    //         $qry1 = DB::table('tra_documentupload_requirements')
+    //         $qry1 = DB::table('tra_documentmanager_application')
     //             ->select('*');
 
     //         if (isset($process_id) && $process_id != '') {
@@ -709,7 +710,7 @@ $table_name = $request->input('table_name');
     //         if(validateIsNumeric($parent_id)){
     //             $qry = DB::table('tra_application_uploadeddocuments as t1')
     //                 ->leftJoin('tra_application_documents as t2', 't1.application_document_id', 't2.id')
-    //                 ->leftJoin('tra_documentupload_requirements as t4', 't2.document_requirement_id', 't4.id')
+    //                 ->leftJoin('tra_documentmanager_application as t4', 't2.document_requirement_id', 't4.id')
     //                 ->leftJoin('par_document_types as t3', 't4.document_type_id', 't3.id')
     //                 ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
     //                 ->select(DB::raw("t2.*, t1.*,t2.application_code, t1.initial_file_name as file_name, t2.remarks, t4.module_id, t4.sub_module_id,t4.section_id,t1.file_type, t2.uploaded_on, CONCAT(decryptval(t5.first_name,".getDecryptFunParams()."),' ',decryptval(t5.last_name,".getDecryptFunParams().")) as uploaded_by,t4.is_mandatory, t4.document_type_id,t3.name as document_type, t4.name as document_requirement, case when (select count(id) from tra_application_uploadeddocuments q where q.parent_id = t1.id) = 0 then true else false end leaf"))
@@ -719,7 +720,7 @@ $table_name = $request->input('table_name');
     //                 dd($qry);
     //             $results = $qry->get();
     //         }else{
-    //             $doc_requirments = DB::table('tra_documentupload_requirements as t1')
+    //             $doc_requirments = DB::table('tra_documentmanager_application as t1')
     //                             ->where($where)
     //                             ->whereIn('document_type_id', $docTypes)
     //                             ->get();
@@ -727,7 +728,7 @@ $table_name = $request->input('table_name');
 
     //             foreach ($doc_requirments as $doc_req) {
     //                 $qry = DB::table('tra_application_documents as t1')
-    //                     ->join('tra_documentupload_requirements as t2', 't1.document_requirement_id', 't2.id')
+    //                     ->join('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
     //                     ->join('par_document_types as t3', 't2.document_type_id', 't3.id')
     //                     ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code,$isvalidate_uploaded_by,$uploaded_by, $reg_serial) {
     //                         if(validateIsNumeric($reg_serial)){
@@ -751,7 +752,7 @@ $table_name = $request->input('table_name');
 
     //                     dd($res);
     //                 if($res->isEmpty()){
-    //                     $res = DB::table('tra_documentupload_requirements as t1')
+    //                     $res = DB::table('tra_documentmanager_application as t1')
     //                             ->join('par_document_types as t3', 't1.document_type_id', 't3.id')
     //                             ->where('t1.id', $doc_req->id)
     //                             ->selectRaw("t1.name as file_name, true as leaf, t1.name as document_requirement, t3.name as document_type")
@@ -838,7 +839,7 @@ $table_name = $request->input('table_name');
             }
          
             //get applicable document types
-            $qry1 = DB::table('tra_documentupload_requirements')
+            $qry1 = DB::table('tra_documentmanager_application')
                 ->select('*');
             if (validateIsNumeric($process_id)) {
                 
@@ -866,7 +867,7 @@ $table_name = $request->input('table_name');
             if(validateIsNumeric($application_code)){
                 $qry = DB::table('tra_application_uploadeddocuments as t1')
                     ->Join('tra_application_documents as t2', 't1.application_code', 't2.application_code')
-                   // ->leftJoin('tra_documentupload_requirements as t4', 't2.document_requirement_id', 't4.id')
+                   // ->leftJoin('tra_documentmanager_application as t4', 't2.document_requirement_id', 't4.id')
                    // ->leftJoin('par_document_types as t3', 't4.document_type_id', 't3.id')
                     ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
                     ->select(DB::raw("t2.*, t1.*,t1.initial_file_name as file_name, t2.remarks,t1.file_type, t2.uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by, case when (select count(id) from tra_application_uploadeddocuments q where q.application_code = t1.application_code) = 0 then false else true end leaf"))
@@ -875,14 +876,14 @@ $table_name = $request->input('table_name');
                 $results = $qry->get();
             }else{
 
-                $doc_requirments = DB::table('tra_documentupload_requirements as t1')
+                $doc_requirments = DB::table('tra_documentmanager_application as t1')
                                 ->where($where)
                                 ->whereIn('document_type_id', $docTypes)
                                 ->get();
 
                 foreach ($doc_requirments as $doc_req) {
                     $qry = DB::table('tra_application_documents as t1')
-                        ->join('tra_documentupload_requirements as t2', 't1.document_requirement_id', 't2.id')
+                        ->join('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
                         ->join('par_document_types as t3', 't2.document_type_id', 't3.id')
                         ->Join('tra_application_uploadeddocuments as t4', function ($join) use ($application_code,$isvalidate_uploaded_by,$uploaded_by, $documentreg_serialno) {
                             if(validateIsNumeric($documentreg_serialno)){
@@ -906,7 +907,7 @@ $table_name = $request->input('table_name');
 
 
                     if($res->isEmpty()){
-                        $res = DB::table('tra_documentupload_requirements as t1')
+                        $res = DB::table('tra_documentmanager_application as t1')
                                 ->join('par_document_types as t3', 't1.document_type_id', 't3.id')
                                 ->where('t1.id', $doc_req->id)
                                 ->selectRaw("t1.name as file_name, true as leaf,t1.is_mandatory, t1.name as document_requirement, t3.name as document_type")
@@ -950,7 +951,7 @@ $table_name = $request->input('table_name');
             //get applicable document requirements
             $qry = DB::table('tra_application_uploadeddocuments as t1')
                     ->leftJoin('tra_application_documents as t2', 't1.application_document_id', 't2.id')
-                    ->leftJoin('tra_documentupload_requirements as t4', 't2.document_requirement_id', 't4.id')
+                    ->leftJoin('tra_documentmanager_application as t4', 't2.document_requirement_id', 't4.id')
                     ->leftJoin('par_document_types as t3', 't4.document_type_id', 't3.id')
                     ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
                     ->select(DB::raw("t1.*,t1.initial_file_name as file_name, t2.remarks, t4.module_id, t4.sub_module_id,t4.section_id,t1.file_type, t2.uploaded_on, CONCAT(decryptval(t5.first_name,".getDecryptFunParams()."),' ',decryptval(t5.last_name,".getDecryptFunParams().")) as uploaded_by,t4.is_mandatory, t2.document_type_id,t3.name as document_type, t4.name as document_requirement, case when (select count(id) from tra_application_uploadeddocuments q where q.parent_id = t1.id) = 0 then true else false end leaf"))
@@ -961,7 +962,7 @@ $table_name = $request->input('table_name');
                    }
             }else{
                  $qry = DB::table('tra_application_documents as t1')
-                        ->join('tra_documentupload_requirements as t2', 't1.document_requirement_id', 't2.id')
+                        ->join('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
                         ->join('par_document_types as t3', 't2.document_type_id', 't3.id')
                         ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code,$isvalidate_uploaded_by,$uploaded_by) {
 
@@ -1018,7 +1019,7 @@ $table_name = $request->input('table_name');
             $upload_url =  Config('constants.dms.system_uploadurl'); //get applicable document requirements
 
                 $qry = DB::table('par_document_types as t1')
-                ->join('tra_documentupload_requirements as t2','t1.id','=','t2.document_type_id')
+                ->join('tra_documentmanager_application as t2','t1.id','=','t2.document_type_id')
                 ->select(DB::raw("t4.remarks, t1.id as document_type_id, t4.product_id, t2.id as document_requirement_id,
                  t1.name as document_type,t2.name as document_requirement, t4.id,t4.initial_file_name,t4.file_name,t4.document_folder,thumbnail_folder,
                 t4.filetype,t4.uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by"))
@@ -1069,7 +1070,7 @@ $table_name = $request->input('table_name');
             $data = array();
             $upload_url =  Config('constants.dms.system_uploadurl');
            $qry = DB::table('par_document_types as t1')
-                        ->join('tra_documentupload_requirements as t2','t1.id','=','t2.document_type_id')
+                        ->join('tra_documentmanager_application as t2','t1.id','=','t2.document_type_id')
                         ->select(DB::raw("t4.remarks, t1.id as document_type_id, t4.product_id, t2.id as document_requirement_id,
                          t1.name as document_type,t2.name as document_requirement, t4.id,t4.initial_file_name,t4.file_name,t4.document_folder,thumbnail_folder,
                         t4.filetype,t4.uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by"))
@@ -1479,7 +1480,7 @@ $table_name = $request->input('table_name');
             //$file->move($destination, $savedName);
         $document_path = $destination . $savedName;
         //check if tje dpcument type has been mapped and not autoCreate the folder
-        $document_requirement = getParameterItem('tra_documentupload_requirements', $document_requirement_id);
+        $document_requirement = getParameterItem('tra_documentmanager_application', $document_requirement_id);
 
         //get the application root folder
 
@@ -1579,7 +1580,7 @@ $table_name = $request->input('table_name');
                             //$file->move($destination, $savedName);
                             $document_path = $destination . $savedName;
                             //check if tje dpcument type has been mapped and not autoCreate the folder
-                            $document_requirement = getParameterItem('tra_documentupload_requirements', $document_requirement_id);
+                            $document_requirement = getParameterItem('tra_documentmanager_application', $document_requirement_id);
 
                             //get the application root folder
 
@@ -1919,7 +1920,7 @@ $table_name = $request->input('table_name');
             $application_code = $req->application_code;
             $workflow_stage_id = $req->workflow_stage_id;
             $application_feetype_id = 1;
-            $record = DB::table('tra_documentupload_requirements')
+            $record = DB::table('tra_documentmanager_application')
                 ->where('application_code', $application_code)
                 ->first();
             if($record){
@@ -1994,28 +1995,33 @@ $table_name = $request->input('table_name');
             $table_name = $req->table_name;
 
             $original_file_id = $req->document_id;
-            $document_requirement_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id'=>$original_file_id], 'document_requirement_id');
+            $document_requirement_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id'=>$original_file_id], 'application_code');
             $application_document_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id'=>$original_file_id], 'application_document_id');
             $application_code = getSingleRecordColValue('tra_application_documents', ['id'=>$application_document_id], 'application_code');
             $doc_data = array();//original_file_id
             $i = 1;
-            $doc_data = DB::table('tra_documents_prevversions as t1')
-                    ->leftJoin('tra_documentupload_requirements as t2', 't1.document_requirement_id', 't2.id')
-                     ->leftJoin('par_document_types as t3', 't2.document_type_id', '=', 't3.id')
-                     ->leftJoin('users as t5', 't1.uploaded_by', '=', 't5.id')
-                     ->select(DB::raw("t1.remarks,  t1.node_ref,t1.version as version_no, t2.name as document_type, t1.id,t1.initial_file_name,t1.file_name, t1.file_type,t1.uploaded_on,t5.email as uploaded_by ,t2.document_type_id,t3.name as document_type, t2.name as document_requirement"))
-                    ->where('t1.application_code', $application_code)
-                    ->where('t1.document_requirement_id', $document_requirement_id)
-                    ->get();
-            // $doc_data = DB::table('tra_documentupload_requirements as t1')
-            //     ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
-            //     ->select(DB::raw("t1.remarks,  t4.node_ref, t2.name as document_type, t4.id,t4.initial_file_name,t4.file_name, t4.file_type,t4.uploaded_on,t5.email as uploaded_by ,t1.is_mandatory ,t1.id as document_requirement_id, t1.document_type_id,t2.name as document_type, t1.name as document_requirement"))
-            //     ->join('tra_documents_prevversions as t4', function ($join) {
-            //         $join->on("orin", "=", "t4.document_requirement_id");
-            //     })
-            //     ->leftJoin('users as t5', 't4.uploaded_by', '=', 't5.id')
-            //     ->where(array('document_upload_id' => $document_upload_id))
-            //     ->get();
+           
+            // $doc_data = DB::table('tra_documents_prevversions as t1')
+            //         ->leftJoin('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
+            //          ->leftJoin('par_document_types as t3', 't2.document_type_id', '=', 't3.id')
+            //          ->leftJoin('users as t5', 't1.uploaded_by', '=', 't5.id')
+            //          ->select(DB::raw("t1.remarks,  t1.node_ref,t1.version as version_no, t2.name as document_type, t1.id,t1.initial_file_name,t1.file_name, t1.file_type,t1.uploaded_on,t5.email as uploaded_by ,t2.document_type_id,t3.name as document_type, t2.name as document_requirement"))
+            //         ->where('t1.application_code', $application_code)
+            //         ->get();
+
+            $doc_data = DB::table('tra_documentmanager_application as t1')
+                ->leftJoin('tra_documentupload_requirements as t2', 't1.document_type_id', '=', 't2.id')
+                ->select(DB::raw("t2.name as document_type,t5.email as uploaded_by ,t1.is_mandatory ,t1.id as document_requirement_id, t1.document_type_id,t2.name as document_type, t1.name as document_requirement, t4.file_name,t1.version as version_no, t1.description as remarks,t4.node_ref,t4.file_type,t4.initial_file_name,t4.created_on as uploaded_on"))
+                // ->join('tra_documents_prevversions as t4', function ($join) {
+                //     $join->on("orin", "=", "t4.document_requirement_id");
+                // })
+                   ->leftJoin('tra_application_uploadeddocuments as t4', 't1.application_code', '=', 't4.application_code')
+                ->leftJoin('users as t5', 't4.created_by', '=', 't5.id')
+             
+                ->where(array('t1.application_code' => $document_requirement_id))
+                ->get();
+
+              
 
             $res = array('success' => true, 'results' => $doc_data);
 
@@ -2325,7 +2331,7 @@ $table_name = $request->input('table_name');
 
     //check if its the first chunk
     $currentChunk = $handler->getCurrentChunk();
-
+   
     if($currentChunk < 5){
 
         //check if allowed

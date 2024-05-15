@@ -65,7 +65,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         valueField: 'id',
         columnWidth: 1,
         displayField: 'name',
-        fieldLabel: 'Recommendation',
+        fieldLabel: 'Review status',
         name: 'recommendation_id',
         listeners: {
             beforerender: {
@@ -75,7 +75,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
                     storeId:'configurations/getNonrefParameter',
                     proxy: {
                         extraParams:{
-                             table_name: "par_permits_reviewrecommendations"
+                             table_name: "par_recommendations"
                          }
                     }
                 },
@@ -107,7 +107,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         columnWidth: 1,
         displayField: 'name',
         fieldLabel: 'Approval Status',
-        name: 'review_recommendation_id',
+        name: 'approval_id',
         listeners: {
             beforerender: {
                 fn: 'setCompStore',

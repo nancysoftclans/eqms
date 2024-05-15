@@ -202,7 +202,7 @@ Ext.define('Admin.view.issuemanagement.views.panels.CustomerComplaintReceivingWi
                     iconCls: 'fa fa-check',
                     name: 'process_submission_btn',
                     storeID: 'drugproductregistrationstr',
-                    table_name: 'tra_documentupload_requirements',
+                    table_name: 'tra_documentmanager_application',
                     winWidth: '50%',
                     action: 'process_submission_btn',
                     

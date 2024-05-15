@@ -54,6 +54,7 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('getParameterstableSchema', [DmsConfigurationsController::class, 'getParameterstableSchema']);
     Route::get('getdocdefinationrequirementDetails', [DmsConfigurationsController::class, 'getdocdefinationrequirementDetails']);
     Route::get('getdoctypesDetails', [DmsConfigurationsController::class, 'getdoctypesDetails']);
+    Route::get('getNavigatorDetails', [DmsConfigurationsController::class, 'getNavigatorDetails']);
     Route::get('docdefinationrequirementfilterdetails', [DmsConfigurationsController::class, 'docdefinationrequirementfilterdetails']);
     Route::get('getdocumentreposirotystructureDetails', [DmsConfigurationsController::class, 'getdocumentreposirotystructureDetails']);
     Route::get('getdocumentsectionsrepstructure', [DmsConfigurationsController::class, 'getdocumentsectionsrepstructure']);
