@@ -187,12 +187,15 @@ class ConfigurationsController extends Controller
 
             $id = $post_data['id'];
             $unsetData = $req->input('unset_data');
+
+
             //unset unnecessary values
             unset($post_data['_token']);
             unset($post_data['document_template']);
             unset($post_data['table_name']);
             unset($post_data['model']);
-            unset($post_data['id']); unset($post_data['document_extension_ids']);
+            unset($post_data['id']); 
+            unset($post_data['document_extension_ids']);
             unset($post_data['unset_data']);
 
             if (isset($unsetData)) {
@@ -200,9 +203,11 @@ class ConfigurationsController extends Controller
                 $post_data = unsetArrayData($post_data, $unsetData);
             }
             $table_data = $post_data;
+            //dd($table_data);
             //add extra params
             $table_data['created_on'] = Carbon::now();
             $table_data['created_by'] = $user_id;
+            $table_data['dola'] = Carbon::now();
             $where = array(
                 'id' => $id
             );
@@ -218,8 +223,9 @@ class ConfigurationsController extends Controller
                     $res = updateRecord($table_name, $where, $table_data);
                 }
             } else {
-
+              
                 $res = insertRecord($table_name, $table_data);
+
 
                 $id = $res['record_id'];
 
@@ -892,7 +898,7 @@ class ConfigurationsController extends Controller
                     // ->leftJoin('par_prodclass_categories as t7','t1.prodclass_category_id','=','t7.id')
                     // ->leftJoin('par_premises_types as t8','t1.premise_type_id','=','t8.id')
                     ->select('t1.*', 
-                         DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentupload_requirements q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+                         DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
               
                 't4.name AS sub_module',
                 't4.name as module_name',
@@ -3290,7 +3296,7 @@ public function checkApplicationChecklistUploadDetails(Request $request){
             $docTypes = convertStdClassObjToArray($docTypes);
             $docTypes = convertAssArrayToSimpleArray($docTypes, 'doctype_id');
             //get applicable document requirements
-            $qry = DB::table('tra_documentupload_requirements as t1')
+            $qry = DB::table('tra_documentmanager_application as t1')
                 ->join('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
                 ->select(DB::raw("t4.remarks, t1.id as document_requirement_id, t4.application_code,
                 t4.node_ref, t2.name as document_type, t4.id,t4.initial_file_name,t4.file_name, t1.module_id,t1.sub_module_id,t1.section_id,

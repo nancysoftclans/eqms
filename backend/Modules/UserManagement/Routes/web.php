@@ -21,6 +21,7 @@ Route::group(['prefix' => 'usermanagement','middleware' => ['web']], function() 
 Route::group(['prefix' => 'usermanagement','middleware' => ['auth:api', 'web']], function() {
     Route::get('/', [UserManagementController::class, 'index']);
     Route::get('getActiveSystemUsers', [UserManagementController::class, 'getActiveSystemUsers']);
+    Route::get('documentOwner', [UserManagementController::class, 'documentOwner']);
 //     Route::get('getUserParamFromModel', [UserManagementController::class, 'getUserParamFromModel']);
 //     Route::post('saveUserCommonData', [UserManagementController::class, 'saveUserCommonData']);
     Route::post('deleteUserRecord', [UserManagementController::class, 'deleteUserRecord']);

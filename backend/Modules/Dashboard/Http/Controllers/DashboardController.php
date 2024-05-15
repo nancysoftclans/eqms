@@ -51,7 +51,7 @@ class DashboardController extends Controller
     }
 
     
-    function getUserIntrayDashboard($request, $is_internaluser){
+    function getUserIntrayDashboard($request,$is_internaluser){
         
         $user_id = $this->user_id;
         //$limsusr_id = getLimsUserId($user_id);
@@ -108,16 +108,16 @@ class DashboardController extends Controller
                 ->leftJoin('users as t7', 't1.usr_from', '=', 't7.id')
                 ->leftJoin('users as t8', 't1.usr_to', '=', 't8.id')
                 ->leftJoin('wb_trader_account as t9', 't1.applicant_id', '=', 't9.id')
-                ->leftJoin('par_zones as t10', 't1.zone_id', '=', 't10.id')
                 ->leftJoin('tra_premises_applications as t11', 't1.application_code', '=', 't11.application_code')
                 ->leftJoin('tra_premises as t12', 't11.premise_id', '=', 't12.id')
                 ->leftJoin('par_sub_modules as t13', 't1.sub_module_id', '=', 't13.id')
-                ->select(DB::raw("t1.*, t1.current_stage as workflow_stage_id,t13.name as sub_module, t1.zone_id, t1.application_id as active_application_id, t2.name as process_name,t10.name as zone_name,t4.is_multi_interface,t4.is_receipting_stage,t1.application_status_id,
+                ->select(DB::raw("t1.*, t1.current_stage as workflow_stage_id,t13.name as sub_module,  t1.application_id as active_application_id, t2.name as process_name,t4.is_receipting_stage,t1.application_status_id,
                     t3.name as prev_stage, if(t4.is_receipting_stage=1,concat(t4.name,' :',t5.name), t4.name ) as workflow_stage,t4.is_general,t5.name as application_status,t6.name as urgencyName,t6.name as urgency_name,
-                    CONCAT_WS(' ',decrypt(t7.first_name),decrypt(t7.last_name)) as from_user,CONCAT_WS(' ',decrypt(t8.first_name),decrypt(t8.last_name)) as to_user,t4.servicedelivery_timeline,  TOTAL_WEEKDAYS(now(), t1.date_received) as time_span,(t4.servicedelivery_timeline -TOTAL_WEEKDAYS(now(), t1.date_received)) as deliverytimeline_reminder,
-                    if(t1.module_id= 2, t12.name , t9.name) as applicant_name,t12.name as premises_name, '' as sample_analysis_status"))
+                    CONCAT_WS(' ',decrypt(t7.first_name),decrypt(t7.last_name)) as from_user,CONCAT_WS(' ',decrypt(t8.first_name),decrypt(t8.last_name)) as to_user,
+                     
+                    if(t1.module_id= 2, t12.name , t9.name) as applicant_name,t12.name as premises_name, '' as sample_analysis_status"));
                 
-                ->where('is_done', 0);
+               // ->where('isDone', 0);
 //->where('t4.stage_status','<>',3)
                 if($is_internaluser){
                     $assigned_groups = getUserGroups($user_id);
@@ -205,7 +205,6 @@ class DashboardController extends Controller
         return $res;
 
     }
-
      public function getOutTrayUserDetails($request,$is_internaluser){
 
         $user_id = $this->user_id;

@@ -1266,7 +1266,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(),
             is_siginig = btn.is_siginig,
             approval_frm ='documentreviewrecommfrm',
-            table_name = 'tra_documentupload_requirements',
+            table_name = 'tra_documentmanager_application',
             vwcontroller= 'documentsManagementvctr',
             stores ='["productApprovalDecisionsStr"]',
             form = Ext.widget(approval_frm),
@@ -1804,7 +1804,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         tab.down('displayfield[name=application_status]').setValue(application_status);
         tab.down('displayfield[name=tracking_no]').setValue(tracking_no);
         tab.down('hiddenfield[name=application_code]').setValue(application_code);
-      //tab.down('displayfield[name=reference_no]').setValue(reference_no);
+      //tab.down('displayfield[name=reference_no]').setValue(reference_no);;;;;;
     },
     showPreviousUploadedDocsGeneric: function (btn, section_id, module_id, sub_module_id, workflow_stage, application_code) {
         var childXtype = btn.childXtype,
@@ -2476,7 +2476,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
     refreshApplicationDocUploadsGrid: function (me) {
         var store = me.store,
             grid = me.up('treepanel'),
-            decision_id = grid.down('combo[name=review_recommendation_id]').getValue(),
+            decision_id = grid.down('combo[name=approval_id]').getValue(),
             approval_id = grid.down('combo[name=recommendation_id]').getValue(),
             mainTabPanel = this.getMainTabPanel(),
             activeTab = mainTabPanel.getActiveTab(),
@@ -2485,38 +2485,31 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
             module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
-            workflow_stage = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(),
-            premise_type_id,prodclass_category_id;
+            workflow_stage = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
+           
 
-
-            if(workflow_stage_id == 1442 || workflow_stage_id === 1442){
+             if(workflow_stage_id == 1442 || workflow_stage_id === 1442){
+                activeTab.down('button[name=recommendation]').setVisible(false)
+                activeTab.down('button[name=approval]').setVisible(true)
                 activeTab.down('combo[name=recommendation_id]').setVisible(false)
-                activeTab.down('combo[name=review_recommendation_id]').setVisible(true)
+                activeTab.down('combo[name=approval_id]').setVisible(true)
                 activeTab.down('button[name=add_upload]').setVisible(false)
             }else if(workflow_stage_id == 1441 || workflow_stage_id === 1441){
-                activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+                activeTab.down('button[name=approval]').setVisible(false)
+                activeTab.down('button[name=recommendation]').setVisible(true)
+                activeTab.down('combo[name=approval_id]').setVisible(false)
                 activeTab.down('combo[name=recommendation_id]').setVisible(true)
                 activeTab.down('button[name=add_upload]').setVisible(false)
 
             }else{
-                activeTab.down('combo[name=recommendation_id]').setVisible(false)
-                activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
-                activeTab.down('button[name=add_upload]').setVisible(false)
+              activeTab.down('button[name=recommendation]').setVisible(false)
+              activeTab.down('button[name=approval]').setVisible(false)
+              activeTab.down('combo[name=recommendation_id]').setVisible(false)
+                activeTab.down('combo[name=approval_id]').setVisible(false)
+                activeTab.down('button[name=add_upload]').setVisible(true)
 
             }
-            if(module_id == 1){
-                if(!prodclass_category_id){
-                    if(activeTab.down('hiddenfield[name=prodclass_category_id]')){
-                        prodclass_category_id = activeTab.down('hiddenfield[name=prodclass_category_id]').getValue();
-                    }
-                }
-            }
-            if(module_id == 2){
-                    if(activeTab.down('hiddenfield[name=premise_type_id]')){
-                        premise_type_id = activeTab.down('hiddenfield[name=premise_type_id]').getValue();
-                        
-                    }
-            }
+    
             store.getProxy().extraParams = {
                 application_code: application_code,
                 // table_name: table_name,
@@ -2525,9 +2518,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 section_id: section_id,
                 module_id: module_id,
                 sub_module_id: sub_module_id,
-                workflow_stage: workflow_stage,
-                prodclass_category_id: prodclass_category_id,
-                premise_type_id: premise_type_id
+                workflow_stage: workflow_stage
+                
             };
     },
     showApplicationChecklistRevisions: function(btn){
@@ -3070,12 +3062,12 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 activeTab.down('button[name=recommendation]').setVisible(false)
                 activeTab.down('button[name=approval]').setVisible(true)
                 activeTab.down('combo[name=recommendation_id]').setVisible(false)
-                activeTab.down('combo[name=review_recommendation_id]').setVisible(true)
+                activeTab.down('combo[name=approval_id]').setVisible(true)
                 activeTab.down('button[name=add_upload]').setVisible(false)
             }else if(workflow_stage_id == 1441 || workflow_stage_id === 1441){
                 activeTab.down('button[name=approval]').setVisible(false)
                 activeTab.down('button[name=recommendation]').setVisible(true)
-                activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+                activeTab.down('combo[name=approval_id]').setVisible(false)
                 activeTab.down('combo[name=recommendation_id]').setVisible(true)
                 activeTab.down('button[name=add_upload]').setVisible(false)
 
@@ -3083,8 +3075,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
               activeTab.down('button[name=recommendation]').setVisible(false)
               activeTab.down('button[name=approval]').setVisible(false)
               activeTab.down('combo[name=recommendation_id]').setVisible(false)
-                activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
-                activeTab.down('button[name=add_upload]').setVisible(false)
+                activeTab.down('combo[name=approval_id]').setVisible(false)
+                activeTab.down('button[name=add_upload]').setVisible(true)
 
             }
 
@@ -3092,16 +3084,16 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
 
             // if(workflow_stage_id == 1442 || workflow_stage_id === 1442){
             //     activeTab.down('combo[name=recommendation_id]').setVisible(false)
-            //     activeTab.down('combo[name=review_recommendation_id]').setVisible(true)
+            //     activeTab.down('combo[name=approval_id]').setVisible(true)
             //     activeTab.down('button[name=add_upload]').setVisible(false)
             // }else if(workflow_stage_id == 1441 || workflow_stage_id === 1441){
-            //     activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+            //     activeTab.down('combo[name=approval_id]').setVisible(false)
             //     activeTab.down('combo[name=recommendation_id]').setVisible(true)
             //     activeTab.down('button[name=add_upload]').setVisible(false)
 
             // }else{
             //     activeTab.down('combo[name=recommendation_id]').setVisible(false)
-            //     activeTab.down('combo[name=review_recommendation_id]').setVisible(false)
+            //     activeTab.down('combo[name=approval_id]').setVisible(false)
             //     activeTab.down('button[name=add_upload]').setVisible(false)
 
             // }
@@ -3123,16 +3115,15 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                         success = resp.success,
                         results = resp.results,
                         model = Ext.create('Ext.data.Model', results);
+                      
 
                     if (success == true || success === true) {
                         
                         docdefinationrequirementfrm.loadRecord(model);
 
-                        activeTab.down('displayfield[name=application_status]').setValue(results.application_status);
-
-                        //activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
-                        activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);
-                        activeTab.down('combo[name=review_recommendation_id]').setValue(results.decision_id);
+                        activeTab.down('combo[name=approval_id]').setValue(results.decision_id);
+                        activeTab.down('combo[name=recommendation_id]').setValue(results.recommendation_id);
+                        activeTab.down('displayfield[name=workflow_stage]').setValue(results.workflow_stage);  
 
                         
                     } else {
@@ -3166,7 +3157,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
             process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
-            reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
+           // reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
             workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
 
             if(workflow_stage_id == 1442 || workflow_stage_id === 1442){
@@ -3199,15 +3190,18 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                         success = resp.success,
                         results = resp.results,
                         model = Ext.create('Ext.data.Model', results);
+                   
 
                     if (success == true || success === true) {
                         
                         docdefinationrequirementfrm.loadRecord(model);
 
-                        activeTab.down('displayfield[name=application_status]').setValue(results.application_status);
+                        activeTab.down('displayfield[name=workflow_stage]').setValue(results.workflow_stage);
 
                       //  activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
                         activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);
+                     
+                    
                         
                     } else {
                         toastr.error(message, 'Failure Response');
@@ -4107,8 +4101,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                         success = response.success,
                         message = response.message;
                     if (success == true || success === true) {
-                        if(activeTab.down('combo[name=review_recommendation_id]')){
-                            activeTab.down('combo[name=review_recommendation_id]').setValue(decision_id);
+                        if(activeTab.down('combo[name=approval_id]')){
+                            activeTab.down('combo[name=approval_id]').setValue(decision_id);
                         }
                         else{
                             mainStore.load();

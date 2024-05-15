@@ -2910,7 +2910,7 @@ public function saveParameterConfig(Request $req)
            $docTypes = convertStdClassObjToArray($docTypes);
            $docTypes = convertAssArrayToSimpleArray($docTypes, 'doctype_id');
            //get applicable document requirements
-           $qry = DB::table('tra_documentupload_requirements as t1')
+           $qry = DB::table('tra_documentmanager_application as t1')
                ->join('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
                ->select(DB::raw("t4.remarks, t1.id as document_requirement_id, t4.application_code,
                t4.node_ref, t2.name as document_type, t4.id,t4.initial_file_name,t4.file_name, t1.module_id,t1.sub_module_id,t1.section_id,

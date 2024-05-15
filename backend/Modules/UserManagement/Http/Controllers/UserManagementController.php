@@ -246,6 +246,63 @@ class UserManagementController extends Controller
         return response()->json($res);
     }
 
+     public function documentOwner(Request $request)
+    {
+        $group_id = $request->input('group_id');
+        $department_id = $request->input('department_id');
+        $directorate_id = $request->input('directorate_id');
+        try {
+            $qry = DB::table('users as t1')
+                ->leftJoin('par_titles as t2', 't1.title_id', '=', 't2.id')
+                ->leftJoin('par_user_images as t3', 't1.id', '=', 't3.user_id')
+                ->leftJoin('par_departments as t4', 't1.department_id', '=', 't4.id')
+             
+                ->leftJoin('tra_blocked_accounts as t6', 't1.id', '=', 't6.account_id')
+                ->leftJoin('tra_user_group as t7','t1.id','t7.user_id')
+                ->select(DB::raw("t1.id,decrypt(t1.first_name) as firstname,decrypt(t1.last_name) as lastname"))
+                    
+                ->whereNull('t6.id');
+
+                //CONCAT(decryptval(first_name,".getDecryptFunParams()."),' ',decryptval(last_name,".getDecryptFunParams().")) as name
+            // if (isset($group_id) && $group_id != '') {
+            //     $users = DB::table('tra_user_group')
+            //         ->select('user_id')
+            //         ->where('group_id', $group_id)
+            //         ->get();
+            //     $users = convertStdClassObjToArray($users);
+            //     $users = convertAssArrayToSimpleArray($users, 'user_id');
+            //     $qry->whereIn('t1.id', $users);
+            // }
+
+            // if(validateIsNumeric($department_id)){
+            //     $qry->where('t1.department_id',$department_id);
+            // }
+            // if(validateIsNumeric($directorate_id)){
+            //     $qry->where('t1.directorate_id',$directorate_id);
+            // }
+            $results = $qry->get();
+            $results = convertStdClassObjToArray($results);
+            $results = decryptArray($results);
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return response()->json($res);
+    }
+
     public
     function getBlockedSystemUsers()
     {
