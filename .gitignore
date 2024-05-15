@@ -4,12 +4,12 @@ backend/storage/logs/laravel.log
 .sencha
 backend/bootstrap/cache/config.php
 
-mis/backend/storage/api-docs/api-docs.json
-mis/bootstrap.js
-mis/classic.json
-mis/classic.jsonp
-mis/modern.json
-mis/modern.jsonp
-mis/backend/bootstrap/
+backend/storage/api-docs/api-docs.json
+bootstrap.js
+classic.json
+classic.jsonp
+modern.json
+modern.jsonp
+backend/bootstrap/
 production/*
-mis/build/*
+build/*
