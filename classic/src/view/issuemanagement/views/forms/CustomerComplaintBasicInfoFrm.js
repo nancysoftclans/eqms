@@ -4,7 +4,7 @@ Ext.define('Admin.view.issuemanagement.views.forms.CustomerComplaintBasicInfoFrm
     alias: 'widget.customercomplaintbasicinfofrm',
     itemId: 'customercomplaintbasicinfofrm',
     height: Ext.Element.getViewportHeight() - 118,
-    controller: 'issuemgmtvctr',
+    controller: 'issuemanagementvctr',
     autoScroll: true,
     layout: {
         type: 'fit',

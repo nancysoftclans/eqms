@@ -4,7 +4,7 @@
 Ext.define('Admin.view.issuemanagement.views.sharedinterfaces.CustomerComplaint', {
     extend: 'Ext.panel.Panel',
     xtype: 'customercomplaint',
-    controller: 'issuemgmtvctr',
+    controller: 'issuemanagementvctr',
     viewModel: 'issuemgmtvm',
     layout: 'fit',
     dockedItems: [

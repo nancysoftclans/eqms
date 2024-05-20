@@ -3,7 +3,7 @@
  */
 Ext.define('Admin.view.issuemanagement.views.grids.IssueMgmtGrid', {
     extend: 'Ext.grid.Panel',
-    controller: 'issuemgmtvctr',
+    controller: 'issuemanagementvctr',
     xtype: 'issuemgmtgrid',
     autoScroll: true,
     autoHeight: true,

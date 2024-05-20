@@ -1,24 +1,26 @@
-/**
- * Created by Jeff on 09/02/2024.
- */
-Ext.define('Admin.view.issuemanagement.views.containers.IssueMgmtCtn', {
+Ext.define('Admin.view.issuemanagement.views.panels.IssueManagementPnl', {
     extend: 'Ext.Container',
-    xtype: 'issuemgmtctn',
+    xtype: 'issuemanagement',
+    itemId: 'issuemanagement',
     controller: 'issuemanagementvctr',
     layout: 'border',
     items: [
         {
             xtype: 'hiddenfield',
             name: 'module_id',
-            value: 34
+            value: 268
+        },{
+            xtype: 'hiddenfield',
+            name: 'sub_module_id',
+            value: 102
         },
         {
-            xtype: 'issuemgmtdashwrapper',
+            xtype: 'issuemanagementwrapper',
             region: 'center'
         },
         {
             xtype: 'issuemgmttb',
             region: 'south'
         }
-        ]
+    ]
 });
