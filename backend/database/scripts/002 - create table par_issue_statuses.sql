@@ -1,15 +1,15 @@
 -- Dumping structure for table bomra.par_issue_statuses
-CREATE TABLE IF NOT EXISTS `par_issue_statuses` (
-  `id` bigint unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(255) NOT NULL,
-  `description` text,
-  `is_enabled` int NOT NULL DEFAULT '1',
-  `created_by` int NOT NULL DEFAULT '0',
-  `altered_by` int NOT NULL DEFAULT '0',
-  `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `dola` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb3;
+-- CREATE TABLE IF NOT EXISTS `par_issue_statuses` (
+--   `id` bigint unsigned NOT NULL AUTO_INCREMENT,
+--   `name` varchar(255) NOT NULL,
+--   `description` text,
+--   `is_enabled` int NOT NULL DEFAULT '1',
+--   `created_by` int NOT NULL DEFAULT '0',
+--   `altered_by` int NOT NULL DEFAULT '0',
+--   `created_on` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--   `dola` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
+--   PRIMARY KEY (`id`)
+-- ) ENGINE=InnoDB AUTO_INCREMENT=9 DEFAULT CHARSET=utf8mb3;
 
 -- Dumping data for table bomra.par_issue_statuses: ~8 rows (approximately)
 INSERT INTO `par_issue_statuses` (`id`, `name`, `description`, `is_enabled`, `created_by`, `altered_by`, `created_on`, `dola`) VALUES
