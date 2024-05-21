@@ -18,7 +18,7 @@ Ext.define(
       {
         xtype: "issuemanagementgrid",
         region: "center",
-        title: "Active Customer Complaints",
+        title: "Active Issue Lists",
         margin: 2,
       },
     ],

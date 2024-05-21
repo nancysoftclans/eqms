@@ -50,20 +50,20 @@ Ext.define("Admin.view.issuemanagement.views.toolbars.IssueManagementTb", {
       menu: {
         xtype: "menu",
         items: [
-        //   {
-        //     text: "Structured Surveillance",
-        //     iconCls: "x-fa fa-check",
-        //     handler: "showPmsApplicationWorkflow",
-        //     wrapper_xtype: "drugssurveillancedashwrapper",
-        //     app_type: 38,
-        //   },
-        //   {
-        //     text: "Non-Structured Surveillance",
-        //     iconCls: "x-fa fa-check",
-        //     handler: "showPmsApplicationWorkflow",
-        //     wrapper_xtype: "drugssurveillancedashwrapper",
-        //     app_type: 37,
-        //   },
+          //   {
+          //     text: "Structured Surveillance",
+          //     iconCls: "x-fa fa-check",
+          //     handler: "showPmsApplicationWorkflow",
+          //     wrapper_xtype: "drugssurveillancedashwrapper",
+          //     app_type: 38,
+          //   },
+          //   {
+          //     text: "Non-Structured Surveillance",
+          //     iconCls: "x-fa fa-check",
+          //     handler: "showPmsApplicationWorkflow",
+          //     wrapper_xtype: "drugssurveillancedashwrapper",
+          //     app_type: 37,
+          //   },
         ],
       },
     },
