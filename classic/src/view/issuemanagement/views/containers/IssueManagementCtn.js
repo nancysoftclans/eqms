@@ -8,7 +8,7 @@ Ext.define("Admin.view.issuemanagement.views.containers.IssueManagementPnl", {
     {
       xtype: "hiddenfield",
       name: "module_id",
-      value: 268,
+      value: 28,
     },
     {
       xtype: "hiddenfield",

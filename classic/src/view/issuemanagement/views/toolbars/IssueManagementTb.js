@@ -20,18 +20,44 @@ Ext.define("Admin.view.issuemanagement.views.toolbars.IssueManagementTb", {
     {
       text: "Issue Initialisation",
       iconCls: "x-fa fa-plus-square",
-      menu: {
-        xtype: "menu",
-        items: [
-          {
-            text: "Create Issue",
-            iconCls: "x-fa fa-check",
-            wrapper_xtype: "issuemanagementdashboard",
-            handler: "showNewIssueApplication",
-            app_type: 102,
-          },
-        ],
-      },
+      childXtype: "issuetypeselectform",
+      winTitle: "Select Issue Type",
+      winWidth: "40%",
+      handler: "showIssueTypeConfigParam",
+      stores: "[]"
+      // menu: {
+      //   xtype: "menu",
+      //   items: [
+      //     {
+      //       text: "Customer Complaints And Appeals",
+      //       iconCls: "x-fa fa-check",
+      //       wrapper_xtype: "issuemanagementdashboard",
+      //       handler: "showNewIssueApplication",
+      //       app_type: 102,
+      //     },
+      //     {
+      //       text: "Corrective Actions",
+      //       iconCls: "x-fa fa-check",
+      //       wrapper_xtype: "issuemanagementdashboard",
+      //       handler: "",
+      //       app_type: 102,
+      //     },
+      //     {
+      //       text: "Change Management",
+      //       iconCls: "x-fa fa-check",
+      //       wrapper_xtype: "issuemanagementdashboard",
+      //       handler: "",
+      //       app_type: 102,
+      //     },
+      //     {
+      //       text: "Deviation",
+      //       iconCls: "x-fa fa-check",
+      //       wrapper_xtype: "issuemanagementdashboard",
+      //       handler: "",
+      //       app_type: 102,
+      //     },
+      //   ],
+      // },
     },
     // {
     //   text: "Program Plan Implementation Details",

@@ -2,11 +2,12 @@
 
 namespace Modules\IssueManagement\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Carbon;
+use Illuminate\Contracts\Support\Renderable;
+use Modules\IssueManagement\Entities\IssueManagement;
 
 class IssueManagementController extends Controller
 {
@@ -262,14 +263,10 @@ class IssueManagementController extends Controller
 
     public function getComplaintFormDetails(Request $request) {
         $application_id = $request->input('application_id');
-        $table_name = 'tra_issuemanagement_applications';
+        $table_name = 'tra_issue_management_applications';
 
         try{
-            $qry = Db::table($table_name . ' as t1')
-            ->leftJoin('tra_complaints as t2', 't1.complaint_id', '=', 't2.id')
-            ->where('t1.id', $application_id)
-            ->select('t2.*');
-            $results = $qry->first();
+            $results = IssueManagement::all();
 
             $res = array(
                 'success' => true,

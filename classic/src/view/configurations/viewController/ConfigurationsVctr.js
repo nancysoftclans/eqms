@@ -62,10 +62,10 @@ Ext.define('Admin.view.configurations.viewcontroller.ConfigurationsVctr', {
             child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
         }
       if(btn.has_params_ctr){
-        console.log(1);
+        // console.log(1);
           var application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue();
           child.down('hiddenfield[name=application_code]').setValue(application_code);
-          console.log(2);
+        //   console.log(2);
       }
         if(btn.is_caller){
             if(btn.up('form')){
@@ -76,7 +76,7 @@ Ext.define('Admin.view.configurations.viewcontroller.ConfigurationsVctr', {
             }
             child.caller = caller;
         }
-        console.log(3);
+        // console.log(3);
         funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow', btn);
        
     },
@@ -104,7 +104,7 @@ Ext.define('Admin.view.configurations.viewcontroller.ConfigurationsVctr', {
          }*/
     },
     showAddParameterFrm: function (btn, evt, opts) {
-        console.log(btn);
+        // console.log(btn);
         if (this.fireEvent('checkFullAccess') || this.fireEvent('checkWriteUpdate')) {
             var me = this,
                 formWidget = btn.form,
@@ -920,7 +920,7 @@ doDeleteConfigWidgetParam: function (item) {
             storeID = btn.storeID,
             store = Ext.getStore(storeID);
 
-            console.log(form_xtype);
+            // console.log(form_xtype);
 
         //for variations calls add flag
         var is_variation = form_xtype.is_variation
@@ -1228,7 +1228,7 @@ doDeleteConfigWidgetParam: function (item) {
        container.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
        container.down('hiddenfield[name=section_id]').setValue(section_id);
        container.down('hiddenfield[name=active_application_id]').setValue(application_id);
-       console.log(module_id);
+    //    console.log(module_id);
        this.fireEvent('showPortalReceivingApplicationMoreDetails', btn,application_code,module_id,sub_module_id,section_id,prodclass_category_id,ref_no,application_id,applicant_id,process_id);
    },
    
@@ -1281,7 +1281,7 @@ showReceivePortalApplicationsWinGeneric: function(btn) {
        ref_no = record.get('tracking_no');
        workflow_stage_id= record.get('workflow_stage_id');
        new_application_id = record.get('new_application_id');
-       console.log(new_application_id);
+    //    console.log(new_application_id);
    container.down('hiddenfield[name=application_code]').setValue(application_code);
    container.down('hiddenfield[name=active_application_code]').setValue(application_code);
    container.down('hiddenfield[name=prodclass_category_id]').setValue(prodclass_category_id);
@@ -1309,7 +1309,7 @@ showSubmitPortalApplicationsWinGeneric: function(btn) {
        application_code = record.get('application_code');
        application_id = record.get('application_id');
        new_application_id = record.get('new_application_id');
-       console.log(new_application_id)
+    //    console.log(new_application_id)
        prodclass_category_id = record.get('prodclass_category_id');
        importexport_permittype_id = record.get('importexport_permittype_id');
        premise_type_id = record.get('premise_type_id');
@@ -1345,7 +1345,7 @@ showSubmitPortalApplicationsWinGeneric: function(btn) {
                 message = resp.message,
                 results = resp.results,
                 workflow_stage_id = results.id;
-                console.log(workflow_stage_id)
+                // console.log(workflow_stage_id)
                 container.down('hiddenfield[name=workflow_stage_id]').setValue(workflow_stage_id);
             if (success == true || success === true) {
                 showWorkflowSubmissionWin(new_application_id, application_code, table_name, 'workflowPortalReceivingSubmissionFrm', winWidth, storeID,'','','',workflow_stage_id,is_dataammendment_request);
