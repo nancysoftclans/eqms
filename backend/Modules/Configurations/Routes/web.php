@@ -100,6 +100,7 @@ use Modules\Configurations\Http\Controllers\ConfigurationsController;
     Route::get('checkApplicationChecklistUploadDetails', [ConfigurationsController::class, 'checkApplicationChecklistUploadDetails']);
     Route::get('checkApplicationRaisedQueries', [ConfigurationsController::class, 'checkApplicationRaisedQueries']);
     Route::post('saveDocDefinationrequirement', [ConfigurationsController::class, 'saveDocDefinationrequirement']);
+    Route::post('navigatorFolder', [ConfigurationsController::class, 'navigatorFolder']);
     Route::get('getCountryRegions', [ConfigurationsController::class, 'getCountryRegions']);
     Route::get('getMeetingSchedules', [ConfigurationsController::class, 'getMeetingSchedules']);
     Route::get('getGridColumnsFromSchema', [ConfigurationsController::class, 'getGridColumnsFromSchema']);

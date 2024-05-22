@@ -51,6 +51,7 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('getDocumentsTypes', [DmsConfigurationsController::class, 'getDocumentsTypes']);
     Route::get('prepareDocumentCreationReceivingStage', [DmsConfigurationsController::class, 'prepareDocumentCreationReceivingStage']);
     Route::get('getDocumentsSubTypes', [DmsConfigurationsController::class, 'getDocumentsSubTypes']);
+    Route::get('navigatorMoveFolder', [DmsConfigurationsController::class, 'navigatorMoveFolder']);
     Route::get('getParameterstableSchema', [DmsConfigurationsController::class, 'getParameterstableSchema']);
     Route::get('getdocdefinationrequirementDetails', [DmsConfigurationsController::class, 'getdocdefinationrequirementDetails']);
     Route::get('getdoctypesDetails', [DmsConfigurationsController::class, 'getdoctypesDetails']);

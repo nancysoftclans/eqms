@@ -1,6 +1,6 @@
-Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
+Ext.define('Admin.view.documentManager.views.forms.NavigatorMoveForm',{
     extend: 'Ext.form.Panel',
-    xtype: 'navigatorform',
+    xtype: 'navigatormoveform',
     controller: 'documentsManagementvctr',
     autoScroll: true,
     layout: 'form',
@@ -33,8 +33,9 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
         xtype: 'textfield',
         fieldLabel: 'Title',
         margin: '0 20 20 0',
+        hidden: true,
         name: 'folder_name',
-        allowBlank: false
+        allowBlank: true
     },{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Has Parent',
@@ -44,7 +45,6 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
         displayField: 'name',
         forceSelection: true,
         allowBlank: true,
-        hidden: true,
         queryMode: 'local',
         listeners: {
             beforerender: {
@@ -68,7 +68,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
         name: 'docparent_id',
         valueField: 'id',
         hidden: true,
-        displayField: 'name',
+        displayField: 'folder_name',
         forceSelection: true,
         allowBlank: true,
         queryMode: 'local',
@@ -78,9 +78,9 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
                 config: {
                     pageSize: 10000,
                     proxy: {
-                       
+                        url: 'documentmanagement/navigatorMoveFolder',
                         extraParams: {
-                            table_name: 'par_document_types'
+                          //  table_name: 'par_document_types'
                         }
                      }
                 },

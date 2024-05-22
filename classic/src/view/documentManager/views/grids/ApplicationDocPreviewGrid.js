@@ -1,7 +1,7 @@
-Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
+Ext.define('Admin.view.documentManager.views.grids.ApplicationDocPreviewGrid', {
     extend: 'Ext.tree.Panel',
     controller: 'commoninterfacesVctr',
-    xtype: 'applicationdocuploadsgrid',
+    xtype: 'applicationdocpreviewgrid',
     useArrows: true,
     rootVisible: false,
     multiSelect: false,
@@ -229,7 +229,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         displayMsg: 'Showing {0} - {1} of {2} total records',
         emptyMsg: 'No Records',
         beforeLoad: function () {
-            this.up('applicationdocuploadsgrid').fireEvent('refresh', this);
+            this.up('applicationdocpreviewgrid').fireEvent('refresh', this);
         }
     }],
     autoScroll: true,

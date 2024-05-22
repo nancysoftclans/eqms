@@ -139,7 +139,7 @@ class DocumentManagementController extends Controller
                 ->select('t1.id', 't1.name', 't2.id as process', 't1.prodclass_category_id')
                 ->where('t1.document_type_id', $docType_id)
                 ->whereRaw("(select count(a.id) from tra_documentmanager_application a where a.docparent_id = t1.id) = 0")
-                ->where($where);
+               ->where($where);
 
             if (validateIsNumeric($process_id)) {
                 $qry->where('t2.id', $process_id);
@@ -196,9 +196,14 @@ class DocumentManagementController extends Controller
                 "assessment_date" => $request->input('assessment_date'),
                 "application_status_id" => $request->input('application_status_id'),
 
-            );
-
-            $applications_table = 'tra_documentmanager_application';
+                 $applications_table = 'tra_documentmanager_application';
+                 
+               if (validateIsNumeric($application_code)) {
+                   //update
+                   $app_data['dola'] = Carbon::now();
+                   $app_data['altered_by'] = $user_id;
+                   $app_details = array();
+                   $where_app['application_code'] = $application_code;
 
 
             if (validateIsNumeric($application_code)) {
@@ -491,10 +496,10 @@ class DocumentManagementController extends Controller
         $table_name = $req->input('table_name');
         try {
             $main_qry = DB::table('tra_documentmanager_application as t1')
-                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
-                ->leftJoin('tra_managerpermits_review as t3', 't1.application_code', '=', 't3.application_code')
-                ->leftJoin('tra_evaluation_recommendations as t4', 't1.application_code', '=', 't4.application_code')
-                ->select('t1.*', 't2.name as workflow_stage', 't3.decision_id', 't4.recommendation_id')
+                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
+                ->leftJoin('tra_managerpermits_review as t3', 't1.application_code' ,'=', 't3.application_code')
+                ->leftJoin('tra_evaluation_recommendations as t4', 't1.application_code' ,'=', 't4.application_code')
+                ->select('t1.*','t2.name as workflow_stage','t3.decision_id', 't4.recommendation_id')
                 ->where('t1.application_code', $application_code);
 
 
@@ -525,8 +530,8 @@ class DocumentManagementController extends Controller
         $table_name = $req->input('table_name');
         try {
             $main_qry = DB::table('tra_documentmanager_application as t1')
-                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
-                ->select('t1.*', 't2.name as workflow_stage')
+                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
+                ->select('t1.*','t2.name as workflow_stage')
                 ->where('t1.application_code', $application_code);
 
             $results = $main_qry->first();
@@ -832,31 +837,73 @@ class DocumentManagementController extends Controller
         if (!validateIsNumeric($isvalidate_uploaded_by)) {
             $isvalidate_uploaded_by = 0;
         }
-        $results = collect();
-        $where = array(
-            'module_id' => $module_id,
-            'sub_module_id' => $sub_module_id
-        );
+            $results=collect();
+         $where = array(
+                'module_id' => $module_id,
+                'sub_module_id' => $sub_module_id
+            );
+            
+            
+            if(!validateIsNumeric($process_id)){
+                $process_id = getSingleRecordColValue('wf_processes', $where, 'id');
+            }
+         
+            //get applicable document types
+            $qry1 = DB::table('tra_documentmanager_application')
+                ->select('*');
+            if (validateIsNumeric($process_id)) {
+                
+            }
+            if (validateIsNumeric($workflow_stage)) {
+              //  $qry1->where('stage_id', $workflow_stage);
+            }
+
+            if (validateIsNumeric($doc_type_id)) {
+                $qry1->where('doctype_id', $doc_type_id);
+            }
+           // $procesS_id = 67;
 
 
         if (!validateIsNumeric($process_id)) {
             $process_id = getSingleRecordColValue('wf_tfdaprocesses', $where, 'id');
         }
 
-        //get applicable document types
-        $qry1 = DB::table('tra_documentmanager_application')
-            ->select('*');
-        if (validateIsNumeric($process_id)) {
+            if (validateIsNumeric($doc_type_id)) {
+               // $where['t1.document_type_id'] = $doc_type_id;
+            }
+                
+            if(validateIsNumeric($application_code)){
+                $qry = DB::table('tra_application_uploadeddocuments as t1')
+                    ->Join('tra_application_documents as t2', 't1.application_code', 't2.application_code')
+                   // ->leftJoin('tra_documentmanager_application as t4', 't2.document_requirement_id', 't4.id')
+                   // ->leftJoin('par_document_types as t3', 't4.document_type_id', 't3.id')
+                    ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
+                    ->select(DB::raw("t2.*, t1.*,t1.initial_file_name as file_name, t2.remarks,t1.file_type, t2.uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by, case when (select count(id) from tra_application_uploadeddocuments q where q.application_code = t1.application_code) = 0 then false else true end leaf"))
+                    ->where('t1.application_code', $application_code);
+                    //->where('t4.is_enabled', 1);
+                $results = $qry->get();
+            }else{
 
-        }
-        if (validateIsNumeric($workflow_stage)) {
-            //  $qry1->where('stage_id', $workflow_stage);
-        }
+                $doc_requirments = DB::table('tra_documentmanager_application as t1')
+                                ->where($where)
+                                ->whereIn('document_type_id', $docTypes)
+                                ->get();
 
-        if (validateIsNumeric($doc_type_id)) {
-            $qry1->where('doctype_id', $doc_type_id);
-        }
-        // $procesS_id = 67;
+
+
+                foreach ($doc_requirments as $doc_req) {
+                    $qry = DB::table('tra_application_documents as t1')
+                        ->join('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
+                        ->join('par_document_types as t3', 't2.document_type_id', 't3.id')
+                        ->Join('tra_application_uploadeddocuments as t4', function ($join) use ($application_code,$isvalidate_uploaded_by,$uploaded_by, $documentreg_serialno) {
+                            if(validateIsNumeric($documentreg_serialno)){
+                                $join->on("t1.id", "=", "t4.application_document_id")
+                                 ->where("t4.documentreg_serialno", $documentreg_serialno)
+                                 ->whereRaw("CASE WHEN $isvalidate_uploaded_by =1  THEN t1.uploaded_by = $uploaded_by ELSE 1 = 1 END");
+                            }else{
+                                $join->on("t1.id", "=", "t4.application_document_id")
+                                 ->whereRaw("CASE WHEN $isvalidate_uploaded_by =1  THEN t1.uploaded_by = $uploaded_by ELSE 1 = 1 END");
+                            }
 
 
         $qry1->where('process_id', $process_id);
@@ -910,13 +957,16 @@ class DocumentManagementController extends Controller
 
                 $res = $qry->get();
 
+                    // if($res->isEmpty()){
+                    //     $res = DB::table('tra_documentmanager_application as t1')
+                    //             ->join('par_document_types as t3', 't1.document_type_id', 't3.id')
+                    //             ->where('t1.id', $doc_req->id)
+                    //             ->selectRaw("t1.name as file_name, true as leaf,t1.is_mandatory, t1.name as document_requirement, t3.name as document_type")
+                    //             ->get();
+                    //             dd($res);
+                    // }
+                    $results = $results->merge($res);
 
-                if ($res->isEmpty()) {
-                    $res = DB::table('tra_documentmanager_application as t1')
-                        ->join('par_document_types as t3', 't1.document_type_id', 't3.id')
-                        ->where('t1.id', $doc_req->id)
-                        ->selectRaw("t1.name as file_name, true as leaf,t1.is_mandatory, t1.name as document_requirement, t3.name as document_type")
-                        ->get();
                 }
                 $results = $results->merge($res);
 
@@ -962,14 +1012,14 @@ class DocumentManagementController extends Controller
                     ->select(DB::raw("t1.*,t1.initial_file_name as file_name, t2.remarks, t4.module_id, t4.sub_module_id,t4.section_id,t1.file_type, t2.uploaded_on, CONCAT(decryptval(t5.first_name," . getDecryptFunParams() . "),' ',decryptval(t5.last_name," . getDecryptFunParams() . ")) as uploaded_by,t4.is_mandatory, t2.document_type_id,t3.name as document_type, t4.name as document_requirement, case when (select count(id) from tra_application_uploadeddocuments q where q.parent_id = t1.id) = 0 then true else false end leaf"))
                     ->where('t1.parent_id', $parent_id);
 
-                if (validateIsNumeric($is_original_dossier)) {
-                    $qry->where('t3.is_assessment_doc', '!=', 1);
-                }
-            } else {
-                $qry = DB::table('tra_application_documents as t1')
-                    ->join('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
-                    ->join('par_document_types as t3', 't2.document_type_id', 't3.id')
-                    ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code, $isvalidate_uploaded_by, $uploaded_by) {
+               if(validateIsNumeric($is_original_dossier)){
+                     $qry->where('t3.is_assessment_doc', '!=', 1);
+                   }
+            }else{
+                 $qry = DB::table('tra_application_documents as t1')
+                        ->join('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
+                        ->join('par_document_types as t3', 't2.document_type_id', 't3.id')
+                        ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code,$isvalidate_uploaded_by,$uploaded_by) {
 
                         $join->on("t1.id", "=", "t4.application_document_id")
                             ->whereRaw("CASE WHEN $isvalidate_uploaded_by =1  THEN t1.uploaded_by = $uploaded_by ELSE 1 = 1 END");
@@ -1023,8 +1073,8 @@ class DocumentManagementController extends Controller
             $data = array();
             $upload_url = Config('constants.dms.system_uploadurl'); //get applicable document requirements
 
-            $qry = DB::table('par_document_types as t1')
-                ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.document_type_id')
+                $qry = DB::table('par_document_types as t1')
+                ->join('tra_documentmanager_application as t2','t1.id','=','t2.document_type_id')
                 ->select(DB::raw("t4.remarks, t1.id as document_type_id, t4.product_id, t2.id as document_requirement_id,
                  t1.name as document_type,t2.name as document_requirement, t4.id,t4.initial_file_name,t4.file_name,t4.document_folder,thumbnail_folder,
                 t4.filetype,t4.uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by"))
@@ -1075,10 +1125,10 @@ class DocumentManagementController extends Controller
         $product_id = $req->input('product_id');
         try {
             $data = array();
-            $upload_url = Config('constants.dms.system_uploadurl');
-            $qry = DB::table('par_document_types as t1')
-                ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.document_type_id')
-                ->select(DB::raw("t4.remarks, t1.id as document_type_id, t4.product_id, t2.id as document_requirement_id,
+            $upload_url =  Config('constants.dms.system_uploadurl');
+           $qry = DB::table('par_document_types as t1')
+                        ->join('tra_documentmanager_application as t2','t1.id','=','t2.document_type_id')
+                        ->select(DB::raw("t4.remarks, t1.id as document_type_id, t4.product_id, t2.id as document_requirement_id,
                          t1.name as document_type,t2.name as document_requirement, t4.id,t4.initial_file_name,t4.file_name,t4.document_folder,thumbnail_folder,
                         t4.filetype,t4.uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by"))
                 ->join('tra_uploadedproduct_images as t4', function ($join) use ($product_id) {
@@ -1483,9 +1533,25 @@ class DocumentManagementController extends Controller
         $docextension_check = $this->validateDocumentExtension($extension, $document_requirement_id);
         $is_allowedextension = $docextension_check['is_allowedextension'];
 
-        if (!$is_allowedextension) {
-            $allowed_filetypes = $docextension_check['allowed_filetypes'];
-            $res = array('success' => false, 'message' => 'Uploaded file should only contain the following allowed file formats :.' . $allowed_filetypes);
+        if(!$is_allowedextension){
+                $allowed_filetypes = $docextension_check['allowed_filetypes'];
+                $res = array('success'=>false, 'message'=>'Uploaded file should only contain the following allowed file formats :.'.$allowed_filetypes);
+                DB::rollback();
+        }else{
+            //$file->move($destination, $savedName);
+        $document_path = $destination . $savedName;
+        //check if tje dpcument type has been mapped and not autoCreate the folder
+        $document_requirement = getParameterItem('tra_documentmanager_application', $document_requirement_id);
+
+        //get the application root folder
+
+        $uploadfile_name = $document_requirement . str_random(5) . '.' . $extension;
+        $destination_node = $app_rootnode->node_ref;
+        //upload to dms
+        $response = dmsUploadNodeDocument($destination_node, $file_path, $uploadfile_name, $node_ref);
+ 
+        //check if upload was successfull
+        if(!isset($response['nodeRef'])){
             DB::rollback();
         } else {
             //$file->move($destination, $savedName);
@@ -1587,10 +1653,10 @@ class DocumentManagementController extends Controller
                         $destination = getcwd() . $document_rootupload;
                         $savedName = str_random(3) . time() . '.' . $extension;
 
-                        //$file->move($destination, $savedName);
-                        $document_path = $destination . $savedName;
-                        //check if tje dpcument type has been mapped and not autoCreate the folder
-                        $document_requirement = getParameterItem('tra_documentmanager_application', $document_requirement_id);
+                            //$file->move($destination, $savedName);
+                            $document_path = $destination . $savedName;
+                            //check if tje dpcument type has been mapped and not autoCreate the folder
+                            $document_requirement = getParameterItem('tra_documentmanager_application', $document_requirement_id);
 
                         //get the application root folder
 
@@ -2014,12 +2080,12 @@ class DocumentManagementController extends Controller
             $table_name = $req->table_name;
 
             $original_file_id = $req->document_id;
-            $document_requirement_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_code');
-            $application_document_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_document_id');
-            $application_code = getSingleRecordColValue('tra_application_documents', ['id' => $application_document_id], 'application_code');
+            $document_requirement_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id'=>$original_file_id], 'application_code');
+            $application_document_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id'=>$original_file_id], 'application_document_id');
+            $application_code = getSingleRecordColValue('tra_application_documents', ['id'=>$application_document_id], 'application_code');
             $doc_data = array();//original_file_id
             $i = 1;
-
+           
             // $doc_data = DB::table('tra_documents_prevversions as t1')
             //         ->leftJoin('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
             //          ->leftJoin('par_document_types as t3', 't2.document_type_id', '=', 't3.id')
@@ -2034,13 +2100,13 @@ class DocumentManagementController extends Controller
                 // ->join('tra_documents_prevversions as t4', function ($join) {
                 //     $join->on("orin", "=", "t4.document_requirement_id");
                 // })
-                ->leftJoin('tra_application_uploadeddocuments as t4', 't1.application_code', '=', 't4.application_code')
+                   ->leftJoin('tra_application_uploadeddocuments as t4', 't1.application_code', '=', 't4.application_code')
                 ->leftJoin('users as t5', 't4.created_by', '=', 't5.id')
-
+             
                 ->where(array('t1.application_code' => $document_requirement_id))
                 ->get();
 
-
+              
 
             $res = array('success' => true, 'results' => $doc_data);
 
@@ -2350,10 +2416,10 @@ class DocumentManagementController extends Controller
         //get handler class
         $handler = $fileReceived->handler();
 
-        //check if its the first chunk
-        $currentChunk = $handler->getCurrentChunk();
-
-        if ($currentChunk < 5) {
+    //check if its the first chunk
+    $currentChunk = $handler->getCurrentChunk();
+   
+    if($currentChunk < 5){
 
             //check if allowed
             $docextension_check = $this->validateDocumentExtension($fileReceived->getClientOriginalExtension(), $request->document_requirement_id);
