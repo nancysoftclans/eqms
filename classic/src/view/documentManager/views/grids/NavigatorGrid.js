@@ -34,7 +34,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
         }
     },
     tbar: [{
-      text: 'Add',
+      text: 'Create New Folder',
                 iconCls: 'x-fa fa-plus',
                 action: 'add',
                 ui: 'soft-blue',
@@ -182,7 +182,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             },
             isLoad: true
         },
-        itemdblclick: 'onViewDocumentApplication'
+        itemdblclick: 'onViewDocumentDetails'
     },
    
     bbar: [
@@ -193,7 +193,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             iconCls: 'x-fa fa-backward',
             handler: 'backFromGroupAllDetails'
         },
-        {
+         {
             xtype: 'pagingtoolbar',
             // store: 'systemrolestreestr',
             displayInfo: true,
@@ -201,16 +201,8 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             emptyMsg: 'No Records',
             beforeLoad: function() {
                 var grid = this.up('treepanel'),
-                    store= this.getStore(),
-                    module_id = grid.down('combo[name=module_id]').getValue(),
-                    sub_module_id = grid.down('combo[name=sub_module_id]').getValue(),
-                    section_id = grid.down('combo[name=section_id]').getValue(),
-                    premise_type_id = grid.down('combo[name=premise_type_id]').getValue();
+                    store= this.getStore();
                     store.getProxy().extraParams = {
-                        module_id: module_id,
-                        sub_module_id: sub_module_id,
-                        section_id: section_id,
-                        premise_type_id:premise_type_id,
                         table_name:'tra_documentmanager_application'
                     };
             
@@ -227,96 +219,27 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
     columns: [{
         xtype: 'treecolumn',
         dataIndex: 'name',
-        text: 'Document Title',
+        text: 'Title',
         flex: 1,
         sortable: true
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'name',
-        text: 'Name',
+        dataIndex: 'id',
+        text: 'ID',
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'module_name',
-        text: 'Module',
+        dataIndex: 'attachments',
+        text: 'Attachments',
         flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'allowed_extensions',
-        text: 'Allowed Extensions',
-        tdCls:'wrap-text',
+    },{  xtype: 'gridcolumn',
+        dataIndex: 'version',
+        text: 'Version',
         flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'parent_level',
-        text: 'Has Parent',
+    },{  xtype: 'gridcolumn',
+        dataIndex: 'dola',
+        text: 'Issue Date',
         flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'name',
-        text: 'Parent Name',
-        tdCls:'wrap-text',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'is_mandatory',
-        hidden: true,
-        text: 'Is Mandatory',
-        flex: 0.5,
-        renderer: function (value, metaData) {
-                if(value) {
-                    metaData.tdStyle = 'color:white;background-color:red';
-                    return "Mandatory";
-                }
-                metaData.tdStyle = 'color:white;background-color:green';
-                return "Optional";
-            }
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'has_document_template',
-        hidden: true,
-        text: 'Has Document Template',
-        flex: 0.5,
-        renderer: function (value, metaData) {
-                if(value == 1) {
-                    metaData.tdStyle = 'color:white;background-color:green';
-                    return "Has Template";
-                }
-                metaData.tdStyle = 'color:white;background-color:red';
-                return "No Template";
-                
-            }
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'portal_uploadable',
-        hidden: true,
-        text: 'Portal Uploadable',
-        flex: 0.5,
-        renderer: function (value, metaData) {
-            if(value==1||value===1) {
-                return "YES";
-            }
-            return "NO";
-        }
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'description',
-        text: 'Description',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'is_enabled',
-        text: 'Enable',
-        flex: 1,
-        renderer: function (value, metaData) {
-            if (value) {
-                metaData.tdStyle = 'color:white;background-color:green';
-                return "True";
-            }
-
-            metaData.tdStyle = 'color:white;background-color:red';
-            return "False";
-        }
     },{
         text: 'Options',
         xtype: 'widgetcolumn',
@@ -333,6 +256,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     name: 'addfields',
                     text: 'Add Fields',
                     tooltip: 'Add Fields',
+                    hidden: true,
                     iconCls: 'x-fa fa-plus',
                     childXtype: 'documenttypefieldgrid',
                     winTitle: 'Form Type Fields',
@@ -343,7 +267,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     iconCls: 'x-fa fa-edit',
                     tooltip: 'Edit Record',
                     action: 'edit',
-                    childXtype: 'documenttypeform',
+                    childXtype: 'navigatorform',
                     winTitle: 'Edit Document Type',
                     winWidth: '40%',
                     handler: 'showEditConfigParamWinFrm',bind: {
@@ -351,8 +275,21 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
         },
                     stores: '[]'
                 }, {
+                    text: 'Copy/Move',
+                    iconCls: 'x-fa fa-edit',
+                    tooltip: 'Copy/Move',
+                    action: 'move',
+                    childXtype: 'navigatormoveform',
+                    winTitle: 'Copy/Move',
+                    winWidth: '40%',
+                    handler: 'showEditConfigParamWinFrm',bind: {
+            disabled: '{isReadOnly}'
+        },
+                    stores: '[]'
+                },{
                     text: 'Disable',
                     iconCls: 'x-fa fa-repeat',
+                    hidden: true,
                     table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/softDeleteConfigRecord',
@@ -364,6 +301,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     text: 'Delete',
                     iconCls: 'x-fa fa-trash',
                     tooltip: 'Delete Record',
+                    hidden: true,
                     table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/deleteConfigRecord',  
@@ -377,6 +315,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     text: 'Enable',
                     iconCls: 'x-fa fa-undo',
                     tooltip: 'Enable Record',
+                    hidden: true,
                     table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/undoConfigSoftDeletes',

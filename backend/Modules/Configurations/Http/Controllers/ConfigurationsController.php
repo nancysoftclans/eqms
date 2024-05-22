@@ -193,7 +193,7 @@ class ConfigurationsController extends Controller
             unset($post_data['document_template']);
             unset($post_data['table_name']);
             unset($post_data['model']);
-            unset($post_data['id']);
+            unset($post_data['id']); 
             unset($post_data['document_extension_ids']);
             unset($post_data['unset_data']);
 
@@ -206,7 +206,8 @@ class ConfigurationsController extends Controller
             //add extra params
             $table_data['created_on'] = Carbon::now();
             $table_data['created_by'] = $user_id;
-            $table_data['dola'] = Carbon::now();
+
+
             $where = array(
                 'id' => $id
             );
@@ -222,7 +223,8 @@ class ConfigurationsController extends Controller
                     $res = updateRecord($table_name, $where, $table_data);
                 }
             } else {
-
+                $table_data['dola'] = Carbon::now();
+              
                 $res = insertRecord($table_name, $table_data);
 
 
@@ -259,8 +261,71 @@ class ConfigurationsController extends Controller
         //
 
     }
-    function uploadDocumentRequirementTemplate($req, $params)
-    {
+
+    public function navigatorFolder(Request $req){
+        try {
+            $user_id = \Auth::user()->id;
+            $post_data = $req->post();
+            $table_name = $post_data['table_name'];
+
+            $id = $post_data['id'];
+
+            //unset unnecessary values
+            unset($post_data['_token']);
+            unset($post_data['table_name']);
+            unset($post_data['model']);
+            unset($post_data['id']);
+            unset($post_data['unset_data']);
+
+            $table_data = $post_data;
+            //dd($table_data);
+            //add extra params
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+
+
+            $where = array(
+                'id' => $id
+            );
+            //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
+
+            if (isset($id) && $id != "") {
+                if (recordExists($table_name, $where)) {
+
+                    unset($table_data['created_on']);
+                    unset($table_data['created_by']);
+                    $table_data['dola'] = Carbon::now();
+                    $table_data['altered_by'] = $user_id;
+                    $res = updateRecord($table_name, $where, $table_data);
+                }
+            } else {
+                $table_data['dola'] = Carbon::now();
+                $res = insertRecord($table_name, $table_data);
+
+                $id = $res['record_id'];
+
+            }
+            //save the documetn extension types
+         
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+        //
+
+
+
+        //
+
+    }
+
+
+
+    function uploadDocumentRequirementTemplate($req,$params){
         $file = $req->file('document_template');
         $user_id = $this->user_id;
         if ($req->hasFile('document_template')) {
@@ -885,25 +950,28 @@ class ConfigurationsController extends Controller
             //                 FROM tra_docupload_reqextensions t 
             //                 INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 
             //                 WHERE t.documentupload_requirement_id = t1.id) AS allowed_extensions")
-            else if ($table_name == 'par_form_categories') {
-                $qry->Join('par_modules as t4', 't1.module_id', '=', 't4.id')
-                    // ->Join('par_sub_modules as t5','t1.sub_module_id','=','t5.id')
-                    // ->leftJoin('par_sections as t6','t1.section_id','=','t6.id')
-                    // ->leftJoin('par_prodclass_categories as t7','t1.prodclass_category_id','=','t7.id')
-                    // ->leftJoin('par_premises_types as t8','t1.premise_type_id','=','t8.id')
-                    ->select(
-                        't1.*',
-                        DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+            // else if ($table_name == 'par_form_categories') {
+            //     $qry->Join('par_modules as t4', 't1.module_id', '=', 't4.id')
+            //         // ->Join('par_sub_modules as t5','t1.sub_module_id','=','t5.id')
+            //         // ->leftJoin('par_sections as t6','t1.section_id','=','t6.id')
+            //         // ->leftJoin('par_prodclass_categories as t7','t1.prodclass_category_id','=','t7.id')
+            //         // ->leftJoin('par_premises_types as t8','t1.premise_type_id','=','t8.id')
+            //         ->select('t1.*', 
+            //              DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+              
+            //     't4.name AS sub_module',
+            //     't4.name as module_name',
 
-                        't4.name AS sub_module',
-                        't4.name as module_name',
+            //             't4.name AS sub_module',
+            //             't4.name as module_name',
 
-                        DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
-                            FROM tra_docupload_reqextensions t 
-                            INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 
-                            WHERE t.documentupload_requirement_id = t1.id) AS allowed_extensions")
-                    );
-            } else if ($table_name == 'par_maindetails_variation_points') {
+            //             DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
+            //                 FROM tra_docupload_reqextensions t 
+            //                 INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 
+            //                 WHERE t.documentupload_requirement_id = t1.id) AS allowed_extensions")
+            //         );
+            // } 
+            else if ($table_name == 'par_maindetails_variation_points') {
                 $qry->Join('par_modules as t4', 't1.module_id', '=', 't4.id')
                     ->Join('par_sub_modules as t5', 't1.sub_module_id', '=', 't5.id')
                     ->leftJoin('par_sections as t6', 't1.section_id', '=', 't6.id')
@@ -2282,7 +2350,7 @@ class ConfigurationsController extends Controller
         foreach ($param_columns as $result) {
             $pure_array[] = $result;
         }
-        // $labels = array_reverse($labels);
+        //$labels = array_reverse($labels);
         $res = array(
             'success' => true,
             'main_fields' => $pure_array,

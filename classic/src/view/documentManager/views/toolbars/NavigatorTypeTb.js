@@ -1,9 +1,9 @@
 /**
  * Created by softclans
  */
-Ext.define('Admin.view.documentManager.views.toolbars.DocumentTypeTb', {
+Ext.define('Admin.view.documentManager.views.toolbars.NavigatorTypeTb', {
     extend: 'Ext.toolbar.Toolbar',
-    xtype: 'documenttypetb',
+    xtype: 'navigatortypetb',
     ui: 'footer',
     defaults: {
         //arrowAlign: 'bottom',
@@ -19,13 +19,14 @@ Ext.define('Admin.view.documentManager.views.toolbars.DocumentTypeTb', {
         {
             text: 'Home',
             iconCls: 'x-fa fa-home',
+            hidden: true,
             sec_dashboard:'documentapplicationwrapper',
             name: 'disposalpermitstbRegHomeBtn'
         },
         {
             text: 'Create Document',
             iconCls: 'x-fa fa-plus-square',
-            handler:'onInitiateDocumentApplication',
+            handler:'onInitiateNavigatorApplication',
             app_type: 101
             // menu:{
             //     xtype: 'menu',

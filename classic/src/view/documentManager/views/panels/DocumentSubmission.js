@@ -8,4 +8,3 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentSubmission', {
     xtype:'documentsubmissionpnl',
 }]
 });
-

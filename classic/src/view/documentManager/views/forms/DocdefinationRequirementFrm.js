@@ -68,7 +68,7 @@
                     pageSize: 10000,
                     proxy: {
                         extraParams: {
-                            table_name: 'par_form_categories'
+                            table_name: 'par_document_types'
                         }
                     }
                 },

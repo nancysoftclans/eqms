@@ -253,39 +253,23 @@ public function getdocdefinationrequirementDetails(Request $req)
     $parent_id = $req->node;
 
     try {
-        // $results = DB::table('tra_documentmanager_application as t1')
-        //     ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
-        //     ->leftJoin('users as t3', 't1.document_owner_id', '=', 't3.id')
-        //     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
-        //     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
-        //     ->select(DB::raw("CONCAT(decrypt(t3.first_name),' ',COALESCE(decrypt(t3.last_name))) as owner,  decrypt(t3.last_name)"),
-        //         't1.*',
-        //         't1.name AS mtype',
-        //         't2.name AS document_type',
-        //         't4.name as status',
-        //         't5.name as process_name',
-        //         DB::raw("(SELECT k.name as status FROM tra_managerpermits_review q inner join par_permits_reviewrecommendations k on q.decision_id = k.id")
-
-        //     );
-    $results = DB::table('tra_documentmanager_application as t1')
+     $results = DB::table('tra_documentmanager_application as t1')
     ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
     ->leftJoin('users as t3', 't1.document_owner_id', '=', 't3.id')
     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
+    ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
     ->select(
-        DB::raw("CONCAT(Decrypt(t3.first_name), ' ', COALESCE(Decrypt(t3.last_name), '')) as owner"),
+        // DB::raw("CONCAT_WS(decrypt(t3.first_name), ' ', COALESCE(decrypt(t3.last_name), '')) as owner"),
+        DB::raw("CONCAT_WS(' ',decrypt(t3.first_name),decrypt(t3.last_name)) as owner"),
         't1.*',
         't1.name AS mtype',
         't2.name AS document_type',
-        DB::raw("(SELECT 
-                    CASE 
-                        WHEN q.decision_id IS NULL THEN k.name
-                        ELSE  t4.name
-                    END
-                  FROM tra_managerpermits_review q 
-                  LEFT JOIN par_permits_reviewrecommendations k ON q.decision_id = k.id LIMIT 1) AS status"),
+        't6.name AS status',
         't5.name AS process_name'
-    );
+    )
+    ->whereNull('t1.folder_name');
+
 
 //CONCAT(t11.brand_name,' ',COALESCE(t12.name,'')) as brand_name,
 
@@ -316,7 +300,7 @@ public function getdocdefinationrequirementDetails(Request $req)
             ->leftJoin('par_confirmations as t9', 't1.has_parent_level', '=', 't9.id')
             ->select(
                 't1.*',
-                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_form_categories q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_document_types q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
                 't1.name AS mtype',
                 't3.name AS module_name',
                 't4.name AS sub_module',
@@ -364,22 +348,23 @@ public function getdocdefinationrequirementDetails(Request $req)
     $parent_id = $req->node;
 
     try {
-        $results = DB::table('par_document_types as t1')
-          // ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+        $results = DB::table('tra_documentmanager_application as t1')
+            ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
             ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
             ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
-           // ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
-            // ->leftJoin('par_prodclass_categories as t6', 't1.prodclass_category_id', '=', 't6.id')
-            // ->leftJoin('wf_processes as t7', 't1.process_id', '=', 't7.id')
-           // ->leftJoin('par_form_categories as t8', 't1.document_type_id', '=', 't8.id')
-            ->leftJoin('par_confirmations as t9', 't1.has_parent_level', '=', 't9.id')
+            ->leftJoin('par_confirmations as t5', 't1.has_parent_level', '=', 't5.id')
+            ->leftJoin('wf_workflow_stages as t6', 't1.workflow_stage_id', '=', 't6.id')
+            ->leftJoin('wf_processes as t7', 't1.process_id', '=', 't7.id')
+            ->leftJoin('par_system_statuses as t8', 't1.application_status_id', '=', 't8.id')
             ->select(
                 't1.*',
-                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_form_categories q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+                DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
                 't1.name AS mtype',
                 't3.name AS module_name',
                 't4.name AS sub_module',
-                't9.name AS parent_level',
+                't5.name AS parent_level',
+                't8.name AS status',
+                't7.name AS process_name',
 
                 DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
                             FROM tra_docupload_reqextensions t 
@@ -392,19 +377,7 @@ public function getdocdefinationrequirementDetails(Request $req)
         } else {
             $results->whereNull('t1.docparent_id');
         }
-        if (validateIsNumeric($module_id)) {
-            $results->where('t4.module_id', $module_id);
-        }
-        if (validateIsNumeric($sub_module_id)) {
-            $results->where('t1.sub_module_id', $sub_module_id);
-        }
-        if (validateIsNumeric($section_id)) {
-            $results->where('t1.section_id', $section_id);
-        }
-        if (validateIsNumeric($premise_type_id)) {
-            $results->where('t1.premise_type_id', $premise_type_id);
-        }
-
+ 
         $results = $results->get();
     } catch (\Exception $exception) {
         $results = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
@@ -413,6 +386,34 @@ public function getdocdefinationrequirementDetails(Request $req)
     }
     return $results;
 
+    }
+
+     public function navigatorMoveFolder(Request $request)
+    {
+        try {
+            $qry = DB::table('tra_documentmanager_application as t1')
+        
+                ->select('t1.id', 't1.folder_name');
+
+            $results = $qry->get();
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return response()->json($res);
     }
 
     public function getdocumentreposirotystructureDetails()

@@ -78,8 +78,8 @@ Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid'
             displayMsg: 'Showing {0} - {1} of {2} total records',
             emptyMsg: 'No Records',
             beforeLoad: function() {
-                var grid = this.up('treepanel'),
-                    store= this.getStore();
+                var store = this.store,
+                   grid = this.up('grid');
                     store.getProxy().extraParams = {
                         table_name:'tra_documentmanager_application'
                     };

@@ -46,7 +46,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                     xtype: 'displayfield',
                     name: 'workflow_stage',
                      //hidden: true,
-                    fieldLabel: 'App Status',
+                    fieldLabel: 'Stage',
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',

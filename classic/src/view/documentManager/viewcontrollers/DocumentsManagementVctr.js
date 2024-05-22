@@ -152,6 +152,11 @@ Ext.define('Admin.view.documentManager.viewcontrollers.DocumentsManagementVctr',
         var application_type = btn.app_type;
         this.fireEvent('onInitiateDocumentApplication', application_type, btn);
     },
+
+    onInitiateNavigatorApplication: function (btn) {
+        var application_type = btn.app_type;
+        this.fireEvent('onInitiateNavigatorApplication', application_type, btn);
+    },
     doCreateConfigParam: function (btn) {
         var me = this,
             action_url = btn.action_url,
@@ -333,11 +338,19 @@ showEditConfigParamWinFrm: function (item) {
              return false;
          }*/
     },
+
+    
     onViewDocumentApplication: function (grid, record) {
 
         this.fireEvent('viewApplicationDetails', record);
 
     },
+    onViewDocumentDetails: function (grid, record) {
+
+        this.fireEvent('onViewDocumentDetails', record);
+
+    },
+
     getDocumentReleaseRecommendationDetails: function (btn) {
         this.fireEvent('getDocumentReleaseRecommendationDetails', btn);
     },

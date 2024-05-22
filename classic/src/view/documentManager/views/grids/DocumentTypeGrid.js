@@ -1,7 +1,14 @@
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
 Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
     extend: 'Ext.tree.Panel',
     xtype: 'documenttypegrid',
     itemId: 'documenttypegrid',
+========
+Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
+    extend: 'Ext.tree.Panel',
+    xtype: 'navigatorgrid',
+    itemId: 'navigatorgrid',
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
     controller: 'documentsManagementvctr',
     useArrows: true,
     rootVisible: false,
@@ -34,12 +41,21 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
         }
     },
     tbar: [{
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
       text: 'Add Document Type',
                 iconCls: 'x-fa fa-plus',
                 action: 'add',
                 ui: 'soft-blue',
                 childXtype: 'documenttypeform',
                 winTitle: 'Create Document Type',
+========
+      text: 'Add',
+                iconCls: 'x-fa fa-plus',
+                action: 'add',
+                ui: 'soft-blue',
+                childXtype: 'navigatorform',
+                winTitle: 'Navigator',
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                 winWidth: '40%',
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
@@ -69,12 +85,20 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 isLoad: true
             },
             change: function (cmbo, newVal) {
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                 var grid = cmbo.up('#documenttypegrid'),
+========
+                var grid = cmbo.up('#navigatorgrid'),
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     subModuleStore = grid.down('combo[name=sub_module_id]').getStore();
                     subModuleStore.removeAll();
                     subModuleStore.load({params: {module_id: newVal}});
 
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                 var store = this.up('#documenttypegrid').getStore();
+========
+                var store = this.up('#navigatorgrid').getStore();
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                 store.reload();                 
             }
         }
@@ -105,7 +129,11 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 isLoad: false
             },
             change: function (cmbo, newVal) {
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                var store = this.up('#documenttypegrid').getStore();
+========
+               var store = this.up('#navigatorgrid').getStore();
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                 store.reload();
             }
         }
@@ -134,7 +162,11 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 },
                 isLoad: true
             },change: function (cmbo, newVal) {
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                var store = this.up('#documenttypegrid').getStore();
+========
+               var store = this.up('#navigatorgrid').getStore();
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                 store.reload();
             }
         }
@@ -163,7 +195,11 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 },
                 isLoad: true
             },change: function (cmbo, newVal) {
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                var store = this.up('#documenttypegrid').getStore();
+========
+               var store = this.up('#navigatorgrid').getStore();
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                 store.reload();
             }
         }
@@ -176,7 +212,11 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                         read: 'documentmanagement/getdoctypesDetails'
+========
+                        read: 'documentmanagement/getNavigatorDetails'
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     },
                 },
             },
@@ -200,10 +240,18 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
             displayMsg: 'Showing {0} - {1} of {2} total records',
             emptyMsg: 'No Records',
             beforeLoad: function() {
-                var grid = this.up('treepanel'),
-                    store= this.getStore();
+                var store = this.store,
+                   grid = this.up('grid');
                     store.getProxy().extraParams = {
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                         table_name:'par_document_types'
+========
+                        module_id: module_id,
+                        sub_module_id: sub_module_id,
+                        section_id: section_id,
+                        premise_type_id:premise_type_id,
+                        table_name:'tra_documentmanager_application'
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     };
             
             },
@@ -217,35 +265,53 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
             handler: 'updateSystemNavigationAccessRoles'
         }],
     columns: [{
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
+        xtype: 'gridcolumn',
+========
         xtype: 'treecolumn',
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         dataIndex: 'name',
         text: 'Title',
         flex: 1,
         sortable: true
     },{
         xtype: 'gridcolumn',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         dataIndex: 'module_name',
         hidden: true,
+========
+        dataIndex: 'name',
+        text: 'Name',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'module_name',
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         text: 'Module',
         flex: 1
     },{
         xtype: 'gridcolumn',
         dataIndex: 'allowed_extensions',
-        hidden: true,
         text: 'Allowed Extensions',
         tdCls:'wrap-text',
         flex: 1
     },{
         xtype: 'gridcolumn',
         dataIndex: 'parent_level',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         hidden: true,
+========
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         text: 'Has Parent',
         flex: 1
     },{
         xtype: 'gridcolumn',
         dataIndex: 'name',
         text: 'Parent Name',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         hidden: true,
+========
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         tdCls:'wrap-text',
         flex: 1
     },{
@@ -292,11 +358,15 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
     },{
         xtype: 'gridcolumn',
         dataIndex: 'description',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         hidden: true,
+========
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         text: 'Description',
         flex: 1
     },{
         xtype: 'gridcolumn',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         dataIndex: 'is_controlled',
         text: 'Controlled',
         flex: 1,
@@ -325,6 +395,21 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
         text: 'Date Modified',
         flex: 1
     },{
+========
+        dataIndex: 'is_enabled',
+        text: 'Enable',
+        flex: 1,
+        renderer: function (value, metaData) {
+            if (value) {
+                metaData.tdStyle = 'color:white;background-color:green';
+                return "True";
+            }
+
+            metaData.tdStyle = 'color:white;background-color:red';
+            return "False";
+        }
+    },{
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         text: 'Options',
         xtype: 'widgetcolumn',
         width: 90,
@@ -341,6 +426,10 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                     text: 'Add Fields',
                     tooltip: 'Add Fields',
                     iconCls: 'x-fa fa-plus',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
+                    hidden: true,
+========
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     childXtype: 'documenttypefieldgrid',
                     winTitle: 'Form Type Fields',
                     winWidth: '70%',
@@ -351,7 +440,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                     tooltip: 'Edit Record',
                     action: 'edit',
                     childXtype: 'documenttypeform',
-                    winTitle: 'Form Category',
+                    winTitle: 'Edit Document Type',
                     winWidth: '40%',
                     handler: 'showEditConfigParamWinFrm',bind: {
             disabled: '{isReadOnly}'
@@ -360,8 +449,12 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 }, {
                     text: 'Disable',
                     iconCls: 'x-fa fa-repeat',
-                    table_name: 'par_form_categories',
+                    table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
+                    hidden: true,
+========
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     action_url: 'configurations/softDeleteConfigRecord',
                     action: 'soft_delete',bind: {
             disabled: '{isReadOnly}'
@@ -371,8 +464,12 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                     text: 'Delete',
                     iconCls: 'x-fa fa-trash',
                     tooltip: 'Delete Record',
-                    table_name: 'par_form_categories',
+                    table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
+                    hidden: true,
+========
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     action_url: 'configurations/deleteConfigRecord',  
                     action: 'actual_delete',bind: {
                         disabled: '{hideDeleteButton}'
@@ -384,7 +481,11 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                     text: 'Enable',
                     iconCls: 'x-fa fa-undo',
                     tooltip: 'Enable Record',
-                    table_name: 'par_form_categories',
+                    table_name: 'par_document_types',
+<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
+                    hidden: true,
+========
+>>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/undoConfigSoftDeletes',
                     action: 'enable',

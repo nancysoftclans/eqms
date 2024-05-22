@@ -11,7 +11,7 @@ Ext.define('Admin.view.documentManager.views.panels.InspectionImportExportDetail
     },
     viewModel: 'documentcreationvm',
     items: [{
-        xtype: 'docdefinationrequirementfrm',
+        xtype: 'docuploadsgrid',
         autoScroll: true,
         title: 'Import/Export Permit Information'
     }, 
