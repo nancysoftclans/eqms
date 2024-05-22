@@ -1,14 +1,7 @@
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
 Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
     extend: 'Ext.tree.Panel',
     xtype: 'documenttypegrid',
     itemId: 'documenttypegrid',
-========
-Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
-    extend: 'Ext.tree.Panel',
-    xtype: 'navigatorgrid',
-    itemId: 'navigatorgrid',
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
     controller: 'documentsManagementvctr',
     useArrows: true,
     rootVisible: false,
@@ -41,25 +34,16 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
         }
     },
     tbar: [{
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
-      text: 'Add Document Type',
-                iconCls: 'x-fa fa-plus',
-                action: 'add',
-                ui: 'soft-blue',
-                childXtype: 'documenttypeform',
-                winTitle: 'Create Document Type',
-========
-      text: 'Add',
-                iconCls: 'x-fa fa-plus',
-                action: 'add',
-                ui: 'soft-blue',
-                childXtype: 'navigatorform',
-                winTitle: 'Navigator',
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
-                winWidth: '40%',
-                handler: 'showAddConfigParamWinFrm',
-                stores: '[]'
-    },{
+        text: 'Add Document Type',
+        iconCls: 'x-fa fa-plus',
+        action: 'add',
+        ui: 'soft-blue',
+        childXtype: 'documenttypeform',
+        winTitle: 'Create Document Type',
+        winWidth: '40%',
+        handler: 'showAddConfigParamWinFrm',
+        stores: '[]'
+    }, {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Module',
         name: 'module_id',
@@ -85,21 +69,13 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 isLoad: true
             },
             change: function (cmbo, newVal) {
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                 var grid = cmbo.up('#documenttypegrid'),
-========
-                var grid = cmbo.up('#navigatorgrid'),
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     subModuleStore = grid.down('combo[name=sub_module_id]').getStore();
-                    subModuleStore.removeAll();
-                    subModuleStore.load({params: {module_id: newVal}});
+                subModuleStore.removeAll();
+                subModuleStore.load({ params: { module_id: newVal } });
 
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                 var store = this.up('#documenttypegrid').getStore();
-========
-                var store = this.up('#navigatorgrid').getStore();
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
-                store.reload();                 
+                store.reload();
             }
         }
     }, {
@@ -122,18 +98,14 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     proxy: {
                         url: 'workflow/getSystemSubModules',
                         extraParams: {
-                           table_name: 'par_sub_modules'
+                            table_name: 'par_sub_modules'
                         }
                     }
                 },
                 isLoad: false
             },
             change: function (cmbo, newVal) {
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
-               var store = this.up('#documenttypegrid').getStore();
-========
-               var store = this.up('#navigatorgrid').getStore();
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
+                var store = this.up('#documenttypegrid').getStore();
                 store.reload();
             }
         }
@@ -161,16 +133,12 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     }
                 },
                 isLoad: true
-            },change: function (cmbo, newVal) {
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
-               var store = this.up('#documenttypegrid').getStore();
-========
-               var store = this.up('#navigatorgrid').getStore();
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
+            }, change: function (cmbo, newVal) {
+                var store = this.up('#documenttypegrid').getStore();
                 store.reload();
             }
         }
-    },{
+    }, {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Premise Type',
         name: 'premise_type_id',
@@ -194,12 +162,8 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     }
                 },
                 isLoad: true
-            },change: function (cmbo, newVal) {
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
-               var store = this.up('#documenttypegrid').getStore();
-========
-               var store = this.up('#navigatorgrid').getStore();
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
+            }, change: function (cmbo, newVal) {
+                var store = this.up('#documenttypegrid').getStore();
                 store.reload();
             }
         }
@@ -212,11 +176,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                         read: 'documentmanagement/getdoctypesDetails'
-========
-                        read: 'documentmanagement/getNavigatorDetails'
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     },
                 },
             },
@@ -224,7 +184,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
         },
         itemdblclick: 'onViewDocumentApplication'
     },
-   
+
     bbar: [
         {
             xtype: 'button',
@@ -239,21 +199,13 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             displayInfo: true,
             displayMsg: 'Showing {0} - {1} of {2} total records',
             emptyMsg: 'No Records',
-            beforeLoad: function() {
+            beforeLoad: function () {
                 var store = this.store,
-                   grid = this.up('grid');
-                    store.getProxy().extraParams = {
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
-                        table_name:'par_document_types'
-========
-                        module_id: module_id,
-                        sub_module_id: sub_module_id,
-                        section_id: section_id,
-                        premise_type_id:premise_type_id,
-                        table_name:'tra_documentmanager_application'
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
-                    };
-            
+                    grid = this.up('grid');
+                store.getProxy().extraParams = {
+                    table_name: 'par_document_types'
+                };
+
             },
         },
         '->',
@@ -265,151 +217,113 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             handler: 'updateSystemNavigationAccessRoles'
         }],
     columns: [{
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         xtype: 'gridcolumn',
-========
-        xtype: 'treecolumn',
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         dataIndex: 'name',
         text: 'Title',
         flex: 1,
         sortable: true
-    },{
+    }, {
         xtype: 'gridcolumn',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         dataIndex: 'module_name',
         hidden: true,
-========
-        dataIndex: 'name',
-        text: 'Name',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'module_name',
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         text: 'Module',
         flex: 1
-    },{
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'allowed_extensions',
         text: 'Allowed Extensions',
-        tdCls:'wrap-text',
+        tdCls: 'wrap-text',
         flex: 1
-    },{
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'parent_level',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         hidden: true,
-========
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         text: 'Has Parent',
         flex: 1
-    },{
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'name',
         text: 'Parent Name',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         hidden: true,
-========
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
-        tdCls:'wrap-text',
+        tdCls: 'wrap-text',
         flex: 1
-    },{
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'is_mandatory',
         hidden: true,
         text: 'Is Mandatory',
         flex: 0.5,
         renderer: function (value, metaData) {
-                if(value) {
-                    metaData.tdStyle = 'color:white;background-color:red';
-                    return "Mandatory";
-                }
-                metaData.tdStyle = 'color:white;background-color:green';
-                return "Optional";
+            if (value) {
+                metaData.tdStyle = 'color:white;background-color:red';
+                return "Mandatory";
             }
-    },{
+            metaData.tdStyle = 'color:white;background-color:green';
+            return "Optional";
+        }
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'has_document_template',
         hidden: true,
         text: 'Has Document Template',
         flex: 0.5,
         renderer: function (value, metaData) {
-                if(value == 1) {
-                    metaData.tdStyle = 'color:white;background-color:green';
-                    return "Has Template";
-                }
-                metaData.tdStyle = 'color:white;background-color:red';
-                return "No Template";
-                
+            if (value == 1) {
+                metaData.tdStyle = 'color:white;background-color:green';
+                return "Has Template";
             }
-    },{
+            metaData.tdStyle = 'color:white;background-color:red';
+            return "No Template";
+
+        }
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'portal_uploadable',
         hidden: true,
         text: 'Portal Uploadable',
         flex: 0.5,
         renderer: function (value, metaData) {
-            if(value==1||value===1) {
+            if (value == 1 || value === 1) {
                 return "YES";
             }
             return "NO";
         }
-    },{
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'description',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         hidden: true,
-========
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
         text: 'Description',
         flex: 1
-    },{
+    }, {
         xtype: 'gridcolumn',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
         dataIndex: 'is_controlled',
         text: 'Controlled',
         flex: 1,
         renderer: function (value, metaData) {
-             if (value) {
+            if (value) {
                 metaData.tdStyle = 'color:green;';
                 return '<i class="fas fa-check"></i>';
-             } 
+            }
         }
-    },{
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'is_enabled',
         text: 'Active',
         flex: 1,
         renderer: function (value, metaData) {
-             if (value) {
+            if (value) {
                 metaData.tdStyle = 'color:green;';
                 return '<i class="fas fa-check"></i>';
-               }
-             metaData.tdStyle = 'color:green;';
-             return '<i class="fas fa-times"></i>';
+            }
+            metaData.tdStyle = 'color:green;';
+            return '<i class="fas fa-times"></i>';
         }
-    },{
+    }, {
         xtype: 'gridcolumn',
         dataIndex: 'dola',
         text: 'Date Modified',
         flex: 1
-    },{
-========
-        dataIndex: 'is_enabled',
-        text: 'Enable',
-        flex: 1,
-        renderer: function (value, metaData) {
-            if (value) {
-                metaData.tdStyle = 'color:white;background-color:green';
-                return "True";
-            }
-
-            metaData.tdStyle = 'color:white;background-color:red';
-            return "False";
-        }
-    },{
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
+    }, {
         text: 'Options',
         xtype: 'widgetcolumn',
         width: 90,
@@ -426,15 +340,12 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     text: 'Add Fields',
                     tooltip: 'Add Fields',
                     iconCls: 'x-fa fa-plus',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                     hidden: true,
-========
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     childXtype: 'documenttypefieldgrid',
                     winTitle: 'Form Type Fields',
                     winWidth: '70%',
                     handler: 'AddFormTypeFields'
-                },{
+                }, {
                     text: 'Edit',
                     iconCls: 'x-fa fa-edit',
                     tooltip: 'Edit Record',
@@ -442,23 +353,20 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     childXtype: 'documenttypeform',
                     winTitle: 'Edit Document Type',
                     winWidth: '40%',
-                    handler: 'showEditConfigParamWinFrm',bind: {
-            disabled: '{isReadOnly}'
-        },
+                    handler: 'showEditConfigParamWinFrm', bind: {
+                        disabled: '{isReadOnly}'
+                    },
                     stores: '[]'
                 }, {
                     text: 'Disable',
                     iconCls: 'x-fa fa-repeat',
                     table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                     hidden: true,
-========
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     action_url: 'configurations/softDeleteConfigRecord',
-                    action: 'soft_delete',bind: {
-            disabled: '{isReadOnly}'
-        },
+                    action: 'soft_delete', bind: {
+                        disabled: '{isReadOnly}'
+                    },
                     handler: 'doDeleteConfigWidgetParam'
                 }, {
                     text: 'Delete',
@@ -466,15 +374,12 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     tooltip: 'Delete Record',
                     table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                     hidden: true,
-========
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
-                    action_url: 'configurations/deleteConfigRecord',  
-                    action: 'actual_delete',bind: {
+                    action_url: 'configurations/deleteConfigRecord',
+                    action: 'actual_delete', bind: {
                         disabled: '{hideDeleteButton}'
                     },
-                    handler: 'doDeleteConfigWidgetParam',bind: {
+                    handler: 'doDeleteConfigWidgetParam', bind: {
                         disabled: '{hideDeleteButton}'
                     },
                 }, {
@@ -482,16 +387,13 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     iconCls: 'x-fa fa-undo',
                     tooltip: 'Enable Record',
                     table_name: 'par_document_types',
-<<<<<<<< HEAD:classic/src/view/documentManager/views/grids/DocumentTypeGrid.js
                     hidden: true,
-========
->>>>>>>> main:classic/src/view/documentManager/views/grids/NavigatorGrid.js
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/undoConfigSoftDeletes',
                     action: 'enable',
-                    disabled: true,bind: {
-            disabled: '{isReadOnly}'
-        },
+                    disabled: true, bind: {
+                        disabled: '{isReadOnly}'
+                    },
                     handler: 'doDeleteConfigWidgetParam'
                 }
                 ]
@@ -506,78 +408,78 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 widget.down('menu menuitem[action=soft_delete]').setDisabled(false);
             }
         }
-    // {
-    //     text: 'Options',
-    //     xtype: 'widgetcolumn',
-    //     width: 90,
-    //     widget: {
-    //         width: 75,
-    //         textAlign: 'left',
-    //         xtype: 'splitbutton',
-    //         iconCls: 'x-fa fa-th-list',
-    //         ui: 'gray',
-    //         menu: {
-    //             xtype: 'menu',
-    //             items: [{
-    //                 text: 'Edit',
-    //                 iconCls: 'x-fa fa-edit',
-    //                 tooltip: 'Edit Record',
-    //                 action: 'edit',
-    //                 childXtype: 'docdefinationrequirementfrm',
-    //                 winTitle: 'Dcouments requirements Defination',
-    //                 winWidth: '40%',
-    //                 handler: 'showEditConfigParamWinFrm',
-    //                 stores: '[]'
-    //             }, {
-    //                 text: 'Disable',
-    //                 iconCls: 'x-fa fa-trash-o',
-    //                 tooltip: 'Delete Record',
-    //                 table_name: 'tra_documentupload_requirements',
-    //                 storeId: 'docdefinationrequirementstr',
-    //                 action_url: 'configurations/softDeleteConfigRecord',
-    //                 action: 'soft_delete',
-    //                 handler: 'doDeleteConfigWidgetParam'
-    //             }, {
-    //                 text: 'Delete',
-    //                 iconCls: 'x-fa fa-trash',
-    //                 tooltip: 'Delete Record',
-    //                 table_name: 'tra_documentupload_requirements',
-    //                 storeId: 'docdefinationrequirementstr',
-    //                 action_url: 'configurations/deleteConfigRecord',
-    //                 action: 'actual_delete',
-    //                 handler: 'doDeleteConfigWidgetParam',
-    //                 // hidden: Admin.global.GlobalVars.checkForProcessVisibility('actual_delete')
-    //             }, {
-    //                 text: 'Enable',
-    //                 iconCls: 'x-fa fa-undo',
-    //                 tooltip: 'Enable Record',
-    //                 table_name: 'tra_documentupload_requirements',
-    //                 storeId: 'docdefinationrequirementstr',
-    //                 action_url: 'configurations/undoWorkflowSoftDeletes',
-    //                 action: 'enable',
-    //                 disabled: true,
-    //                 handler: 'doDeleteConfigWidgetParam'
-    //             }, {
-    //                 text: 'Download Template',
-    //                 iconCls: 'x-fa fa-undo',
-    //                 tooltip: 'Download Template',
-    //                 table_name: 'tra_documentupload_requirements',
-    //                 action_url: 'configurations/undoWorkflowSoftDeletes',
-    //                 handler: 'downloadDocumentRequirementTemplate'
-    //             }
-    //             ]
-    //         }
-    //     }, onWidgetAttach: function (col, widget, rec) {
-    //         var is_enabled = rec.get('is_enabled');
-    //         if (is_enabled === 0 || is_enabled == 0) {
-    //             widget.down('menu menuitem[action=enable]').setDisabled(false);
-    //             widget.down('menu menuitem[action=soft_delete]').setDisabled(true);
-    //         } else {
-    //             widget.down('menu menuitem[action=enable]').setDisabled(true);
-    //             widget.down('menu menuitem[action=soft_delete]').setDisabled(false);
-    //         }
-    //     }
-    // }
+        // {
+        //     text: 'Options',
+        //     xtype: 'widgetcolumn',
+        //     width: 90,
+        //     widget: {
+        //         width: 75,
+        //         textAlign: 'left',
+        //         xtype: 'splitbutton',
+        //         iconCls: 'x-fa fa-th-list',
+        //         ui: 'gray',
+        //         menu: {
+        //             xtype: 'menu',
+        //             items: [{
+        //                 text: 'Edit',
+        //                 iconCls: 'x-fa fa-edit',
+        //                 tooltip: 'Edit Record',
+        //                 action: 'edit',
+        //                 childXtype: 'docdefinationrequirementfrm',
+        //                 winTitle: 'Dcouments requirements Defination',
+        //                 winWidth: '40%',
+        //                 handler: 'showEditConfigParamWinFrm',
+        //                 stores: '[]'
+        //             }, {
+        //                 text: 'Disable',
+        //                 iconCls: 'x-fa fa-trash-o',
+        //                 tooltip: 'Delete Record',
+        //                 table_name: 'tra_documentupload_requirements',
+        //                 storeId: 'docdefinationrequirementstr',
+        //                 action_url: 'configurations/softDeleteConfigRecord',
+        //                 action: 'soft_delete',
+        //                 handler: 'doDeleteConfigWidgetParam'
+        //             }, {
+        //                 text: 'Delete',
+        //                 iconCls: 'x-fa fa-trash',
+        //                 tooltip: 'Delete Record',
+        //                 table_name: 'tra_documentupload_requirements',
+        //                 storeId: 'docdefinationrequirementstr',
+        //                 action_url: 'configurations/deleteConfigRecord',
+        //                 action: 'actual_delete',
+        //                 handler: 'doDeleteConfigWidgetParam',
+        //                 // hidden: Admin.global.GlobalVars.checkForProcessVisibility('actual_delete')
+        //             }, {
+        //                 text: 'Enable',
+        //                 iconCls: 'x-fa fa-undo',
+        //                 tooltip: 'Enable Record',
+        //                 table_name: 'tra_documentupload_requirements',
+        //                 storeId: 'docdefinationrequirementstr',
+        //                 action_url: 'configurations/undoWorkflowSoftDeletes',
+        //                 action: 'enable',
+        //                 disabled: true,
+        //                 handler: 'doDeleteConfigWidgetParam'
+        //             }, {
+        //                 text: 'Download Template',
+        //                 iconCls: 'x-fa fa-undo',
+        //                 tooltip: 'Download Template',
+        //                 table_name: 'tra_documentupload_requirements',
+        //                 action_url: 'configurations/undoWorkflowSoftDeletes',
+        //                 handler: 'downloadDocumentRequirementTemplate'
+        //             }
+        //             ]
+        //         }
+        //     }, onWidgetAttach: function (col, widget, rec) {
+        //         var is_enabled = rec.get('is_enabled');
+        //         if (is_enabled === 0 || is_enabled == 0) {
+        //             widget.down('menu menuitem[action=enable]').setDisabled(false);
+        //             widget.down('menu menuitem[action=soft_delete]').setDisabled(true);
+        //         } else {
+        //             widget.down('menu menuitem[action=enable]').setDisabled(true);
+        //             widget.down('menu menuitem[action=soft_delete]').setDisabled(false);
+        //         }
+        //     }
+        // }
     }]
 });
 
