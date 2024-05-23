@@ -55,14 +55,10 @@ Ext.define("Admin.view.documentManager.views.forms.IssueTypeSelectForm", {
         {
           text: "Iniate",
           iconCls: "x-fa fa-save",
-          // action: "save",
-          storeID: "",
           formBind: true,
           ui: "soft-blue",
-          // action_url: "configurations/navigatorFolder",
           handler: "showNewIssueApplication",
-          app_type: 102,
-          wrapper_xtype: "issuemanagementdashboard"
+          wrapper_xtype: "issuemanagementwrapper"
         },
       ],
     },

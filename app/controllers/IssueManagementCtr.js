@@ -42,7 +42,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     var me = this,
       mainTabPanel = me.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      dashboardWrapper = activeTab.down("#issuemanagementwrapper"),
+      dashboardWrapper = activeTab.down(wrapper_xtype),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
       section_id = 0,
 
@@ -51,8 +51,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         section_id,
         sub_module_id
       );
-
-      console.log(workflow_details);
 
     if (!workflow_details || workflow_details.length < 1) {
       Ext.getBody().unmask();

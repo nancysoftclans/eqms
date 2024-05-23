@@ -36,21 +36,6 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       }
     },
   },
-  // tbar: [
-  //   {
-  //     xtype: "button",
-  //     text: "Add",
-  //     iconCls: "x-fa fa-plus",
-  //     action: "add",
-  //     ui: "soft-blue",
-  //     hidden: true,
-  //     childXtype: "docdefinationrequirementfrm",
-  //     winTitle: "Documents requirements Defination",
-  //     winWidth: "40%",
-  //     handler: "showAddConfigParamWinFrm",
-  //     stores: "[]",
-  //   },
-  // ],
   autoScroll: true,
   listeners: {
     beforerender: {

@@ -6,16 +6,6 @@ Ext.define("Admin.view.issuemanagement.views.containers.IssueManagementPnl", {
   layout: "border",
   items: [
     {
-      xtype: "hiddenfield",
-      name: "module_id",
-      value: 28,
-    },
-    {
-      xtype: "hiddenfield",
-      name: "sub_module_id",
-      value: 102,
-    },
-    {
       xtype: "issuemanagementwrapper",
       region: "center",
     },

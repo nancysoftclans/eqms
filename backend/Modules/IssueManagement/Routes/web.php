@@ -1,5 +1,6 @@
 <?php
 use Modules\IssueManagement\Http\Controllers\IssueManagementController;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -11,7 +12,8 @@ use Modules\IssueManagement\Http\Controllers\IssueManagementController;
 |
 */
 
-Route::group(['prefix' => 'issuemanagement','middleware' => ['web']], function() {
-    Route::post('/saveNewReceivingBaseDetails', [IssueManagementController::class, 'saveNewReceivingBaseDetails']);
-    Route::get('/getIssueManagementDetails', [IssueManagementController::class, 'getIssueManagementDetails']);
+Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function () {
+    Route::post('saveNewReceivingBaseDetails', [IssueManagementController::class, 'saveNewReceivingBaseDetails']);
+    Route::get('getIssueManagementDetails', [IssueManagementController::class, 'getIssueManagementDetails']);
+    Route::get('getIssueProcessDetails', [IssueManagementController::class, 'getIssueProcessDetails']);
 });

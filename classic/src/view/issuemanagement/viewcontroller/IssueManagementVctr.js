@@ -35,20 +35,59 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
   },
 
   showNewIssueApplication: function (btn) {
-    var form = btn.up("form"),
+    var me = this,
+      form = btn.up("form"),
       win = btn.up("window"),
-      application_type = btn.app_type,
       wrapper_xtype = btn.wrapper_xtype;
     // Get the selected Issue Type
-    issueType = form.query('combo[name="issue_type_id"]')[0].getValue();
+    issue_type_id = form.query('combo[name="issue_type_id"]')[0].getValue();
 
-    console.log(issueType);
-
-    if (!isNaN(issueType)) {
+    if (!isNaN(issue_type_id)) {
       //Find Application type and workflow using this
       //Make the form dynamic based on this issue type i.e Change Management, Customer Complaints, Deviation, Corrective Actions
-      this.fireEvent("onNewIssueApplication", application_type, wrapper_xtype);
-      win.close();
+      Ext.Ajax.request({
+        url: "issuemanagement/getIssueProcessDetails",
+        method: "GET",
+        params: {
+          issue_type_id: issue_type_id,
+        },
+        headers: {
+          Authorization: "Bearer " + access_token,
+          "X-CSRF-Token": token,
+        },
+        success: function (response) {
+          var resp = Ext.JSON.decode(response.responseText),
+            success = resp.success,
+            results = resp.results;
+          if (results != null && success === true) {
+            var application_type = resp.results.sub_module_id,
+              module_id = resp.results.module_id;
+            me.fireEvent(
+              "onNewIssueApplication",
+              application_type,
+              wrapper_xtype
+            );
+            win.close();
+          } else {
+            win.close();
+            toastr.error(
+              "Problem encountered while fetching workflow details-->Possibly workflow not set!!",
+              "Failure Response"
+            );
+          }
+        },
+        failure: function (response) {
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          toastr.error(
+            "Error downloading data: " + errorThrown,
+            "Error Response"
+          );
+        },
+      });
     }
   },
 });
