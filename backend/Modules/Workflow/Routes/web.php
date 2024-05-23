@@ -108,6 +108,7 @@ Route::group(['prefix' => 'workflow','middleware' => ['auth:api', 'web']], funct
     Route::get('getManagerReviewChecklistLogs', [WorkflowController::class, 'getManagerReviewChecklistLogs']);
     Route::post('getApprovalExpiryDate', [WorkflowController::class, 'getApprovalExpiryDate']);
     Route::get('getReportApplicableChecklistItems', [WorkflowController::class, 'getReportApplicableChecklistItems']);
+    Route::get('getIssueManagementWorkflowDetails', [WorkflowController::class, 'getIssueManagementWorkflowDetails']);
     
 
 });

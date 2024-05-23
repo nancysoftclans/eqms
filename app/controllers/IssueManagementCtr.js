@@ -33,53 +33,12 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     controller: {
       // This selector matches any originating Controller, you can specify controller name instead of *
       "*": {
-        onNewIssueApplication: "onNewIssueApplication",
+        // onNewIssueApplication: "onNewIssueApplication",
       },
     },
   },
 
-  onNewIssueApplication: function (sub_module_id, wrapper_xtype) {
-    var me = this,
-      mainTabPanel = me.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      dashboardWrapper = activeTab.down(wrapper_xtype),
-      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
-      section_id = 0,
-
-      workflow_details = getInitialWorkflowDetails(
-        module_id,
-        section_id,
-        sub_module_id
-      );
-
-    if (!workflow_details || workflow_details.length < 1) {
-      Ext.getBody().unmask();
-      toastr.warning(
-        "Problem encountered while fetching workflow details-->Possibly workflow not set!!",
-        "Warning Response"
-      );
-      return false;
-    }
-
-    dashboardWrapper.removeAll();
-
-    var workflowContainer = Ext.widget(workflow_details.viewtype);
-    
-    workflowContainer.down("displayfield[name=process_name]").setValue(workflow_details.processName);
-    workflowContainer.down("displayfield[name=workflow_stage]").setValue(workflow_details.initialStageName);
-    workflowContainer.down("displayfield[name=application_status]").setValue(workflow_details.initialAppStatus);
-    workflowContainer.down("hiddenfield[name=process_id]").setValue(workflow_details.processId);
-    workflowContainer.down("hiddenfield[name=workflow_stage_id]").setValue(workflow_details.initialStageId);
-    workflowContainer.down("hiddenfield[name=module_id]").setValue(module_id);
-    workflowContainer.down("hiddenfield[name=sub_module_id]").setValue(sub_module_id);
-
-
-    dashboardWrapper.add(workflowContainer);
-    
-    Ext.Function.defer(function () {
-      Ext.getBody().unmask();
-    }, 300);
-  },
+  
 
   // saveComplaintDetails: function () {
   //   var me = this,

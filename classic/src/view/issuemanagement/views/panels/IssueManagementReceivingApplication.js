@@ -10,7 +10,7 @@ Ext.define(
     layout: "fit",
     items: [
       {
-        xtype: "documentapplicationreceivingwizard",
+        xtype: "issuemanagementreceivingapplicationwizard",
       },
     ],
   }

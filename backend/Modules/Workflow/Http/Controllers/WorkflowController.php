@@ -26,6 +26,7 @@ use Modules\PromotionMaterials\Traits\PromotionMaterialsTrait;
 use Modules\Surveillance\Traits\SurveillanceTrait;
 use Modules\Importexportpermits\Traits\ImportexportpermitsTraits;
 use Modules\Enforcement\Traits\EnforcementTrait;
+
 class WorkflowController extends Controller
 {
     protected $user_id;
@@ -54,12 +55,12 @@ class WorkflowController extends Controller
         } else {
             $this->middleware(function ($request, $next) {
                 if (!\Auth::check()) {
-                    $res = array(
+                    $res = array (
                         'success' => false,
                         'message' => '<p>NO SESSION, SERVICE NOT ALLOWED!!<br>PLEASE RELOAD THE SYSTEM!!</p>'
                     );
                     echo json_encode($res);
-                    exit();
+                    exit ();
                 }
                 $this->user_id = \Auth::user()->id;
                 return $next($request);
@@ -76,7 +77,7 @@ class WorkflowController extends Controller
 
     public function saveWorkflowCommonData(Request $req)
     {
-        $res=array();
+        $res = array();
         try {
             $user_id = \Auth::user()->id;
             $post_data = $req->all();
@@ -120,7 +121,7 @@ class WorkflowController extends Controller
         return response()->json($res);
     }
 
-public function getInitialDocumentCreationWorkflowDetails(Request $request)
+    public function getInitialDocumentCreationWorkflowDetails(Request $request)
     {
         $module_id = $request->input('module_id');
         $sub_module_id = $request->input('sub_module_id');
@@ -128,32 +129,74 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
         try {
             //get workflow id
-
-            if($sub_module_id == 81){
-                $where = array(
-                't1.module_id' => $module_id,
-                't1.importexport_applicationtype_id' => $is_licenced,
-                't1.sub_module_id' => $sub_module_id
-
-
-            );
-
-
-            }else{
-                $where = array(
+            $where = array(
                 't1.module_id' => $module_id,
                 't1.sub_module_id' => $sub_module_id
             );
+
+
+            if (validateIsNumeric($is_dataammendment_request)) {
+
+                $where['t1.is_dataammendment_request'] = $is_dataammendment_request;
             }
-            
-            if(validateIsNumeric($is_dataammendment_request)){
-               
-                $where['t1.is_dataammendment_request'] = $is_dataammendment_request; 
-            }
-           
+
             // if(validateIsNumeric($is_licenced)){
             //     $where['t1.importexport_applicationtype_id'] = $is_licenced; 
             // }
+            $qry = DB::table('wf_processes as t1')
+                ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
+                ->join('wf_workflow_stages as t3', function ($join) {
+                    $join->on('t2.id', '=', 't3.workflow_id')
+                        ->on('t3.stage_status', '=', DB::raw(1));
+                })
+                ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
+                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId');
+
+
+
+            $qry->where($where);
+
+            $results = $qry->first();
+            //initial status details
+            $statusDetails = getApplicationInitialStatus($module_id, $sub_module_id);
+
+            $results->initialAppStatus = $statusDetails->name;
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return response()->json($res);
+    }
+
+    public function getIssueManagementWorkflowDetails(Request $request)
+    {
+        $module_id = $request->input('module_id');
+        $sub_module_id = $request->input('sub_module_id');
+        $issue_type_id = $request->input('issue_type_id');
+
+        try {
+            //get workflow id
+
+            $where = array(
+                't1.module_id' => $module_id,
+                't1.sub_module_id' => $sub_module_id,
+                't1.issue_type_id' => $issue_type_id
+            );
+
             $qry = DB::table('wf_processes as t1')
                 ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
                 ->join('wf_workflow_stages as t3', function ($join) {
@@ -197,11 +240,11 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $model_name = $request->input('model_name');
         $strict_mode = $request->input('strict_mode');
         $filters = $request->input('filter');
-        $filters = (array)json_decode($filters);
+        $filters = (array) json_decode($filters);
         $filters['is_enabled'] = 1;
         try {
             $model = 'Modules\\Workflow\\Entities\\' . $model_name;
-            if (count((array)$filters) > 0) {
+            if (count((array) $filters) > 0) {
                 $results = $model::where($filters)
                     ->get()
                     ->toArray();
@@ -215,10 +258,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => returnMessage($results)
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -238,10 +281,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -261,7 +304,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
                 ->leftJoin('par_importexport_permittypes as t7', 't1.importexport_permittype_id', '=', 't7.id')
                 ->leftJoin('par_premises_types as t8', 't1.premise_type_id', 't8.id')
-                ->select('t1.*', 't2.name as module','t7.name as importexport_permittype', 't3.name as submodule',  't5.name as workflow', 't6.name as prodclass_category', 't8.name as premise_type');
+                ->select('t1.*', 't2.name as module', 't7.name as importexport_permittype', 't3.name as submodule', 't5.name as workflow', 't6.name as prodclass_category', 't8.name as premise_type');
 
             if (validateIsNumeric($section_id)) {
                 $qry->where('t1.section_id', $section_id);
@@ -279,10 +322,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -303,10 +346,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $previous_data = $previous_data['results'];
             $res = softDeleteRecord($table_name, $where, $user_id);
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -327,10 +370,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $previous_data = $previous_data['results'];
             $res = undoSoftDeletes($table_name, $previous_data, $where, $user_id);
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -344,17 +387,17 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $where = array(
                 'id' => $record_id
             );
-            if($table_name == 'wf_workflows'){
+            if ($table_name == 'wf_workflows') {
                 $res = $this->deleteWorkflowMappingRecord($record_id);
-            }else{
+            } else {
                 $res = deleteRecord($table_name, $where);
             }
 
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -379,10 +422,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -430,10 +473,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -454,10 +497,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -479,10 +522,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -551,14 +594,14 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 });
             }
             if (validateIsNumeric($has_queries)) {
-               /* $qry->where('t1.query_raised_submission', 1);*/
+                /* $qry->where('t1.query_raised_submission', 1);*/
 
             } else {
                 if (validateIsNumeric($is_submission) && $is_submission == 1) {
                     $qry->where(function ($query) {
-                    $query->where('t1.query_raised_submission', 2)
-                    ->orWhereNull('t1.query_raised_submission');
-                     });
+                        $query->where('t1.query_raised_submission', 2)
+                            ->orWhereNull('t1.query_raised_submission');
+                    });
                 }
             }
 
@@ -571,10 +614,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -598,10 +641,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -633,10 +676,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -653,7 +696,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 't1.sub_module_id' => $sub_module_id,
 
             );
-            if(validateIsNumeric($section_id)){
+            if (validateIsNumeric($section_id)) {
                 $where['t1.section_id'] = $section_id;
 
             }
@@ -668,10 +711,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -681,13 +724,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $module_id = $request->input('module_id');
         $sub_module_id = $request->input('sub_module_id');
         $section_id = $request->input('section_id');
-        
+
 
         //$premise_type_id = 12;
         $is_dataammendment_request = $request->input('is_dataammendment_request');
         $prodclass_category_id = $request->input('prodclass_category_id');
         $importexport_permittype_id = $request->input('importexport_permittype_id');
-       // $importexport_permittype_id = $request->importexport_permittype_id;
+        // $importexport_permittype_id = $request->importexport_permittype_id;
         $premise_type_id = $request->input('premise_type_id');
 
         try {
@@ -696,24 +739,24 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 't1.module_id' => $module_id,
                 't1.sub_module_id' => $sub_module_id
             );
-            if(validateIsNumeric($prodclass_category_id)){
+            if (validateIsNumeric($prodclass_category_id)) {
                 $where['t1.prodclass_category_id'] = $prodclass_category_id;
             }
-            if(validateIsNumeric($premise_type_id)){
+            if (validateIsNumeric($premise_type_id)) {
                 $where['t1.premise_type_id'] = $premise_type_id;
             }
-            if(validateIsNumeric($is_dataammendment_request)){
+            if (validateIsNumeric($is_dataammendment_request)) {
 
                 $where['t1.is_dataammendment_request'] = $is_dataammendment_request;
             }
-            if(validateIsNumeric($section_id)){
+            if (validateIsNumeric($section_id)) {
                 $where['t1.section_id'] = $section_id;
             }
 
             // if(validateIsNumeric($prodclass_category_id)){
             //     $where['t1.prodclass_category_id'] = $prodclass_category_id;
             // }
-            if(validateIsNumeric($importexport_permittype_id)){
+            if (validateIsNumeric($importexport_permittype_id)) {
                 $where['t1.importexport_permittype_id'] = $importexport_permittype_id;
             }
 
@@ -724,14 +767,14 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                         ->on('t3.stage_status', '=', DB::raw(1));
                 })
                 ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
-                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId', 't1.prodclass_category_id','t1.importexport_permittype_id','t1.premise_type_id');
-                
+                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId', 't1.prodclass_category_id', 't1.importexport_permittype_id', 't1.premise_type_id');
+
             $qry->where($where);
             $results = $qry->first();
 
             //initial status details
             $statusDetails = getApplicationInitialStatus($module_id, $sub_module_id);
-            if(!is_null($results)){
+            if (!is_null($results)) {
                 $results->initialAppStatus = $statusDetails->name;
             }
             $res = array(
@@ -740,10 +783,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -755,7 +798,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         try {
             //get workflow id
             $where = array(
-                't1.sub_module_id'=>$sub_module_id
+                't1.sub_module_id' => $sub_module_id
             );
             $qry = DB::table('wf_processes as t1')
                 ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
@@ -774,10 +817,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -798,19 +841,19 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->leftJoin('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
                 ->select('t1.workflow_id', 't2.name', 't4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId');
             $qry->where($where);
-           
+
             $results = $qry->first();
-            
+
             $res = array(
                 'success' => true,
                 'results' => $results,
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -820,7 +863,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $workflow_stage_id = $request->input('workflow_stage_id');
         try {
             $qry = DB::table('wf_workflow_stages as t1')
-                ->select('t1.id as currentStageId',  't1.name as currentStageName')
+                ->select('t1.id as currentStageId', 't1.name as currentStageName')
                 ->where('t1.id', $workflow_stage_id);
             $results = $qry->first();
 
@@ -830,10 +873,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -842,66 +885,114 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $application_id = $request->input('application_id');
         $workflow_stage_id = $request->input('workflow_stage_id');
         $stage_status = $request->input('stage_status');
-		$application_id = 0;
+        $application_id = 0;
         $application_code = $request->input('application_code');
         $table_name = $request->input('table_name');
         try {
-            if(validateIsNumeric($workflow_stage_id)){
-                if($table_name != ''){
+            if (validateIsNumeric($workflow_stage_id)) {
+                if ($table_name != '') {
 
                     $qry = DB::table('tra_submissions as t1')
                         ->join('wf_processes as t2', 't1.process_id', '=', 't2.id')
                         ->join('wf_workflow_stages as t3', 't1.current_stage', 't3.id')
                         ->leftJoin('par_system_statuses as t4', 't1.application_status_id', 't4.id')
-                        ->leftJoin($table_name.' as t5', 't1.application_code','=','t5.application_code')
-                        ->select('t1.id', 't1.tracking_no', 't1.reference_no', 't1.process_id as processId', 't1.current_stage as currentStageId','t3.is_manager_submission','t3.process_type_id', 't2.name as processName', 't3.name as currentStageName',
-                            't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't5.sub_module_id', 't5.section_id')
-                        ->where(array('current_stage'=>$workflow_stage_id,'is_done'=>0));
+                        ->leftJoin($table_name . ' as t5', 't1.application_code', '=', 't5.application_code')
+                        ->select(
+                            't1.id',
+                            't1.tracking_no',
+                            't1.reference_no',
+                            't1.process_id as processId',
+                            't1.current_stage as currentStageId',
+                            't3.is_manager_submission',
+                            't3.process_type_id',
+                            't2.name as processName',
+                            't3.name as currentStageName',
+                            't4.name as applicationStatus',
+                            't4.id as applicationStatusId',
+                            't2.module_id',
+                            't5.sub_module_id',
+                            't5.section_id'
+                        )
+                        ->where(array('current_stage' => $workflow_stage_id, 'is_done' => 0));
 
-                    if(validateIsNumeric($application_id)){
-                        $where = array('t1.application_id'=>$application_id);
-                    }
-                    else{
-                        $where = array('t1.application_code'=>$application_code);
+                    if (validateIsNumeric($application_id)) {
+                        $where = array('t1.application_id' => $application_id);
+                    } else {
+                        $where = array('t1.application_code' => $application_code);
                     }
                     $qry->where($where);
-                }
-                else if(validateIsNumeric($application_id)){
+                } else if (validateIsNumeric($application_id)) {
 
                     $qry = DB::table('tra_submissions as t1')
                         ->join('wf_processes as t2', 't1.process_id', '=', 't2.id')
                         ->join('wf_workflow_stages as t3', 't1.current_stage', 't3.id')
                         ->leftJoin('par_system_statuses as t4', 't1.application_status_id', 't4.id')
-                        ->select('t1.id', 't1.tracking_no', 't1.reference_no', 't1.process_id as processId', 't1.current_stage as currentStageId','t3.is_manager_submission', 't2.name as processName', 't3.name as currentStageName',
-                            't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't1.sub_module_id', 't1.section_id')
+                        ->select(
+                            't1.id',
+                            't1.tracking_no',
+                            't1.reference_no',
+                            't1.process_id as processId',
+                            't1.current_stage as currentStageId',
+                            't3.is_manager_submission',
+                            't2.name as processName',
+                            't3.name as currentStageName',
+                            't4.name as applicationStatus',
+                            't4.id as applicationStatusId',
+                            't2.module_id',
+                            't1.sub_module_id',
+                            't1.section_id'
+                        )
 
-                        ->where(array('t1.application_id'=>$application_id, 'current_stage'=>$workflow_stage_id,'is_done'=>0));
-                }
-                else{
+                        ->where(array('t1.application_id' => $application_id, 'current_stage' => $workflow_stage_id, 'is_done' => 0));
+                } else {
 
                     $qry = DB::table('tra_submissions as t1')
                         ->join('wf_processes as t2', 't1.process_id', '=', 't2.id')
                         ->join('wf_workflow_stages as t3', 't1.current_stage', 't3.id')
                         ->leftJoin('par_system_statuses as t4', 't1.application_status_id', 't4.id')
-                        ->select('t1.id', 't1.tracking_no', 't1.reference_no', 't1.process_id as processId', 't1.current_stage as currentStageId','t3.is_manager_submission', 't2.name as processName', 't3.name as currentStageName',
-                            't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't1.sub_module_id', 't1.section_id')
+                        ->select(
+                            't1.id',
+                            't1.tracking_no',
+                            't1.reference_no',
+                            't1.process_id as processId',
+                            't1.current_stage as currentStageId',
+                            't3.is_manager_submission',
+                            't2.name as processName',
+                            't3.name as currentStageName',
+                            't4.name as applicationStatus',
+                            't4.id as applicationStatusId',
+                            't2.module_id',
+                            't1.sub_module_id',
+                            't1.section_id'
+                        )
 
-                        ->where(array('t1.application_code'=>$application_code, 'current_stage'=>$workflow_stage_id,'is_done'=>0));
+                        ->where(array('t1.application_code' => $application_code, 'current_stage' => $workflow_stage_id, 'is_done' => 0));
                 }
 
-            }
-            else if(validateIsNumeric($stage_status)){
+            } else if (validateIsNumeric($stage_status)) {
 
                 $qry = DB::table($table_name . ' as t1')
                     ->join('wf_processes as t2', 't1.process_id', '=', 't2.id')
                     ->join('wf_workflows as t6', 't2.workflow_id', '=', 't6.id')
                     ->join('wf_workflow_stages as t3', 't6.id', 't3.workflow_id')
                     ->leftJoin('par_system_statuses as t4', 't1.application_status_id', 't4.id')
-                    ->select('t1.id', 't1.tracking_no', 't1.reference_no', 't1.process_id as processId', 't3.id as  currentStageId','t3.is_manager_submission', 't2.name as processName', 't3.name as currentStageName',
-                        't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't2.sub_module_id', 't2.section_id')
-                    ->where(array('t1.id'=> $application_id,'t3.stage_status'=>$stage_status));
-            }
-            else{
+                    ->select(
+                        't1.id',
+                        't1.tracking_no',
+                        't1.reference_no',
+                        't1.process_id as processId',
+                        't3.id as  currentStageId',
+                        't3.is_manager_submission',
+                        't2.name as processName',
+                        't3.name as currentStageName',
+                        't4.name as applicationStatus',
+                        't4.id as applicationStatusId',
+                        't2.module_id',
+                        't2.sub_module_id',
+                        't2.section_id'
+                    )
+                    ->where(array('t1.id' => $application_id, 't3.stage_status' => $stage_status));
+            } else {
                 /*  $qry = DB::table($table_name . ' as t1')
                   ->join('wf_processes as t2', 't1.process_id', '=', 't2.id')
                   ->leftJoin('wf_workflow_stages as t3', 't1.workflow_stage_id', 't3.id')
@@ -910,45 +1001,83 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                       't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't2.sub_module_id', 't2.section_id')
                   ->where('t1.application_code', $application_code);
                   */
-                $where = array('t1.application_id'=>$application_id,'is_done'=>0,'is_revenuesubprocessfinal_stage'=>0 );
-                if(validateIsNumeric($application_code)){
-                    $where = array('t1.application_code'=>$application_code,'is_done'=>0,'is_revenuesubprocessfinal_stage'=>0 );
+                $where = array('t1.application_id' => $application_id, 'is_done' => 0, 'is_revenuesubprocessfinal_stage' => 0);
+                if (validateIsNumeric($application_code)) {
+                    $where = array('t1.application_code' => $application_code, 'is_done' => 0, 'is_revenuesubprocessfinal_stage' => 0);
                 }
-                if($table_name != ''){
+                if ($table_name != '') {
                     $qry = DB::table('tra_submissions as t1')
                         ->leftJoin('wf_processes as t2', 't1.process_id', '=', 't2.id')
                         ->leftJoin('wf_workflow_stages as t3', 't1.current_stage', 't3.id')
                         ->leftJoin('par_system_statuses as t4', 't1.application_status_id', 't4.id')
-                        ->join($table_name.' as t5', 't1.application_code','=','t5.application_code')
-                        ->select('t1.id', 't1.tracking_no', 't1.reference_no', 't1.process_id as processId', 't1.current_stage as currentStageId','t3.is_manager_submission', 't2.name as processName', 't3.name as currentStageName',
-                            't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't5.sub_module_id', 't5.section_id')
-                        ->where('t3.stage_status','<>',3)
-                        ->whereNotIn('t3.stage_status',[3,4])
+                        ->join($table_name . ' as t5', 't1.application_code', '=', 't5.application_code')
+                        ->select(
+                            't1.id',
+                            't1.tracking_no',
+                            't1.reference_no',
+                            't1.process_id as processId',
+                            't1.current_stage as currentStageId',
+                            't3.is_manager_submission',
+                            't2.name as processName',
+                            't3.name as currentStageName',
+                            't4.name as applicationStatus',
+                            't4.id as applicationStatusId',
+                            't2.module_id',
+                            't5.sub_module_id',
+                            't5.section_id'
+                        )
+                        ->where('t3.stage_status', '<>', 3)
+                        ->whereNotIn('t3.stage_status', [3, 4])
                         ->where($where);
 
                     //handle the query responses
-                    if(!$qry->first()){
+                    if (!$qry->first()) {
                         $qry = DB::table($table_name . ' as t1')
                             ->join('wf_processes as t2', 't1.process_id', '=', 't2.id')
                             ->join('wf_workflows as t6', 't2.workflow_id', '=', 't6.id')
                             ->join('wf_workflow_stages as t3', 't6.id', 't3.workflow_id')
                             ->leftJoin('par_system_statuses as t4', 't1.application_status_id', 't4.id')
-                            ->select('t1.id', 't1.tracking_no', 't1.reference_no', 't1.process_id as processId', 't3.id as  currentStageId','t3.is_manager_submission', 't2.name as processName', 't3.name as currentStageName',
-                                't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't2.sub_module_id', 't2.section_id')
-                            ->where(array('t1.id'=> $application_id,'t3.stage_status'=>1));
+                            ->select(
+                                't1.id',
+                                't1.tracking_no',
+                                't1.reference_no',
+                                't1.process_id as processId',
+                                't3.id as  currentStageId',
+                                't3.is_manager_submission',
+                                't2.name as processName',
+                                't3.name as currentStageName',
+                                't4.name as applicationStatus',
+                                't4.id as applicationStatusId',
+                                't2.module_id',
+                                't2.sub_module_id',
+                                't2.section_id'
+                            )
+                            ->where(array('t1.id' => $application_id, 't3.stage_status' => 1));
 
                     }
 
 
-                }
-                else{
+                } else {
                     $qry = DB::table('tra_submissions as t1')
                         ->leftJoin('wf_processes as t2', 't1.process_id', '=', 't2.id')
                         ->leftJoin('wf_workflow_stages as t3', 't1.current_stage', 't3.id')
                         ->leftJoin('par_system_statuses as t4', 't1.application_status_id', 't4.id')
-                        ->select('t1.id', 't1.tracking_no', 't1.reference_no', 't1.process_id as processId', 't1.current_stage as currentStageId','t3.is_manager_submission', 't2.name as processName', 't3.name as currentStageName',
-                            't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't1.sub_module_id', 't1.section_id')
-                        ->where('t3.stage_status','<>',3)
+                        ->select(
+                            't1.id',
+                            't1.tracking_no',
+                            't1.reference_no',
+                            't1.process_id as processId',
+                            't1.current_stage as currentStageId',
+                            't3.is_manager_submission',
+                            't2.name as processName',
+                            't3.name as currentStageName',
+                            't4.name as applicationStatus',
+                            't4.id as applicationStatusId',
+                            't2.module_id',
+                            't1.sub_module_id',
+                            't1.section_id'
+                        )
+                        ->where('t3.stage_status', '<>', 3)
                         ->where($where);
                     //handle the query responses
 
@@ -967,10 +1096,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -992,8 +1121,19 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->join('wf_processes as t2', 't1.process_id', '=', 't2.id')
                 ->join('wf_workflow_stages as t3', 't1.current_stage', 't3.id')
                 ->join('par_system_statuses as t4', 't1.application_status_id', 't4.id')
-                ->select('t1.id', 't1.reference_no', 't1.process_id as processId', 't1.current_stage as currentStageId', 't2.name as processName', 't3.name as currentStageName',
-                    't4.name as applicationStatus', 't4.id as applicationStatusId', 't2.module_id', 't2.sub_module_id', 't2.section_id')
+                ->select(
+                    't1.id',
+                    't1.reference_no',
+                    't1.process_id as processId',
+                    't1.current_stage as currentStageId',
+                    't2.name as processName',
+                    't3.name as currentStageName',
+                    't4.name as applicationStatus',
+                    't4.id as applicationStatusId',
+                    't2.module_id',
+                    't2.sub_module_id',
+                    't2.section_id'
+                )
                 ->where('t1.id', $submission_id);
             $results = $qry->first();
 
@@ -1003,10 +1143,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -1033,18 +1173,17 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $application_code = $request->input('application_code');
         $process_id = $request->input('process_id');
         $action_type = $request->action_type;
-        if(validateIsNumeric($process_id)){
+        if (validateIsNumeric($process_id)) {
             $where = array(
                 't1.id' => $process_id
             );
 
-        }
-        else{
+        } else {
             $where = array(
                 't1.sub_module_id' => $sub_module_id
             );
-            if(validateIsNumeric($section_id)){
-                $where['t1.section_id']   =$section_id;
+            if (validateIsNumeric($section_id)) {
+                $where['t1.section_id'] = $section_id;
             }
         }
 
@@ -1066,7 +1205,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     $join->on('t2.workflow_id', '=', 't1.workflow_id')
                         ->on('t2.is_manager_query_response', '=', DB::raw(1));
                 });
-            }else if (isset($status_type_id) && ($status_type_id == 2) && $has_queries ==0) {//manager query response
+            } else if (isset($status_type_id) && ($status_type_id == 2) && $has_queries == 0) {//manager query response
                 $qry->join('wf_workflow_stages as t2', function ($join) {
                     $join->on('t2.workflow_id', '=', 't1.workflow_id')
                         ->on('t2.is_portalapp_initialstage', '=', DB::raw(1));
@@ -1076,24 +1215,32 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     $join->on('t2.workflow_id', '=', 't1.workflow_id')
                         ->on('t2.is_manager_precheckingquery', '=', DB::raw(1));
                 });
-            } else if(validateIsNumeric($action_type)){
+            } else if (validateIsNumeric($action_type)) {
                 $qry->join('wf_workflow_stages as t3', function ($join) {
                     $join->on('t3.workflow_id', '=', 't1.workflow_id')
                         ->on('t3.stage_status', '=', DB::raw(1));
                 })
-                    ->join('wf_workflow_transitions as t4','t3.id','t4.stage_id' )
-                    ->join('wf_workflow_stages as t2','t4.nextstage_id','t2.id')
-                    ->join('wf_workflow_actions as t5','t4.action_id','t5.id')
-                    ->where(array('t5.action_type_id' => $action_type ));
-            }else {
+                    ->join('wf_workflow_transitions as t4', 't3.id', 't4.stage_id')
+                    ->join('wf_workflow_stages as t2', 't4.nextstage_id', 't2.id')
+                    ->join('wf_workflow_actions as t5', 't4.action_id', 't5.id')
+                    ->where(array('t5.action_type_id' => $action_type));
+            } else {
                 $qry->join('wf_workflow_stages as t2', function ($join) {
                     $join->on('t2.workflow_id', '=', 't1.workflow_id')
                         ->on('t2.is_portalapp_initialstage', '=', DB::raw(1));
                 });
             }
 
-            $qry->select('t1.id as processId', 't2.id as currentStageId', 't1.name as processName', 't2.name as currentStageName','t2.needs_responsible_user',
-                't1.module_id', 't1.sub_module_id', 't1.section_id')
+            $qry->select(
+                't1.id as processId',
+                't2.id as currentStageId',
+                't1.name as processName',
+                't2.name as currentStageName',
+                't2.needs_responsible_user',
+                't1.module_id',
+                't1.sub_module_id',
+                't1.section_id'
+            )
                 ->where($where);
             //dd($qry->toSql());
             $results = $qry->first();
@@ -1104,10 +1251,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -1153,10 +1300,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $res = insertRecord($table_name, $table_data, $user_id);
             }
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -1218,10 +1365,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $res = insertRecord($table_name, $table_data, $user_id);
             }
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -1245,10 +1392,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -1272,10 +1419,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -1300,10 +1447,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -1328,10 +1475,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -1353,23 +1500,22 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         try {
             //module_id, sub_module_id and section_id
             $where2 = DB::table('wf_processes')
-                ->select('module_id', 'sub_module_id', 'section_id','product_type_id')
+                ->select('module_id', 'sub_module_id', 'section_id', 'product_type_id')
                 ->where('id', $process_id)
                 ->first();
             $where2 = convertStdClassObjToArray($where2);
             $module_id = $where2['module_id'];
             $sub_module_id = $where2['sub_module_id'];
-            if($sub_module_id == 7){
+            if ($sub_module_id == 7) {
                 $whereProductType = DB::table('tra_product_information as t1')
-                ->join('tra_product_applications as t2', 't1.id', 't2.product_id')
-                 ->select('t1.product_type_id')
-                 ->where('t2.application_code', $application_code)
-                 ->first();
-             $whereProductType = convertStdClassObjToArray($whereProductType);
-             $product_type_id = $whereProductType['product_type_id'];
-             $where2['product_type_id'] = $product_type_id;
-            }
-            else{
+                    ->join('tra_product_applications as t2', 't1.id', 't2.product_id')
+                    ->select('t1.product_type_id')
+                    ->where('t2.application_code', $application_code)
+                    ->first();
+                $whereProductType = convertStdClassObjToArray($whereProductType);
+                $product_type_id = $whereProductType['product_type_id'];
+                $where2['product_type_id'] = $product_type_id;
+            } else {
 
             }
             //get applicable checklist categories
@@ -1389,10 +1535,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -1403,19 +1549,18 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $sub_module_id = $request->input('sub_module_id');
         $section_id = $request->input('section_id');
 
-        if($module_id == 4){
+        if ($module_id == 4) {
             $where2 = array(
                 'module_id' => $module_id,
                 'sub_module_id' => $sub_module_id,
                 'section_id' => $section_id
             );
-        }else if($module_id == 14){
+        } else if ($module_id == 14) {
             $where2 = array(
                 'module_id' => $module_id,
                 'sub_module_id' => $sub_module_id
             );
-        }
-        else{
+        } else {
             $where2 = array(
                 'module_id' => $module_id,
                 'sub_module_id' => $sub_module_id,
@@ -1424,13 +1569,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         }
 
         $process_details = getTableData('wf_processes', $where2);
-		if(!isset($process_details->id)){
-			 $where2 = array(
+        if (!isset($process_details->id)) {
+            $where2 = array(
                 'module_id' => $module_id,
                 'sub_module_id' => $sub_module_id
             );
-        $process_details = getTableData('wf_processes', $where2);
-		}
+            $process_details = getTableData('wf_processes', $where2);
+        }
         $process_id = $process_details->id;
         $workflow_id = $process_details->workflow_id;
         $where3 = array(
@@ -1459,15 +1604,16 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
-    public function getChecklistQueriesApplicableChecklistItems(Request $request){
-        try{
+    public function getChecklistQueriesApplicableChecklistItems(Request $request)
+    {
+        try {
 
             $query_id = $request->input('query_id');
             $checklist_type = $request->input('checklist_type');
@@ -1481,7 +1627,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $is_auditor = $request->is_auditor;
             $is_structured = $request->is_structured;
             $filter = $request->input('filter');
-            if(validateIsNumeric($query_id)){
+            if (validateIsNumeric($query_id)) {
                 $query_data = DB::table('tra_application_query_reftracker')->where('id', $query_id)->first();
                 $checklist_category_id = $query_data->checklist_category_id;
                 $application_code = $query_data->application_code;
@@ -1489,7 +1635,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $process_id = $query_data->process_id;
             }
             $submission_details = getLastApplicationSubmissionDetails($application_code);
-            if($submission_details['success']){
+            if ($submission_details['success']) {
                 $submission_details = $submission_details['results'];
                 $submission_id = $submission_details->id;
             }
@@ -1511,14 +1657,12 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->first();
             $where2 = convertStdClassObjToArray($where2);
             $module_id = $where2['module_id'];
-            if($module_id == 4){
+            if ($module_id == 4) {
                 $module_id = $where2['module_id'];
                 $sub_module_id = $where2['sub_module_id'];
                 $section_id = $where2['section_id'];
-                $where2 = array('module_id'=>$module_id);
-            }
-
-            else{
+                $where2 = array('module_id' => $module_id);
+            } else {
                 $module_id = $where2['module_id'];
                 $sub_module_id = $where2['sub_module_id'];
                 $section_id = $where2['section_id'];
@@ -1543,10 +1687,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $qry = DB::table('par_checklist_items as t1')
                 ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
 
-                    if (isset($query_id) && $query_id != '') {
+                    if (isset ($query_id) && $query_id != '') {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
-                    } else if(validateIsNumeric($is_auditor)){
+                    } else if (validateIsNumeric($is_auditor)) {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
                     } else {
@@ -1567,16 +1711,15 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                  For unstructured queries they adopt
                  1. checklist type 102
             ------------------------------------------------------*/
-            if(validateIsNumeric($is_structured) && $is_structured == 2){
+            if (validateIsNumeric($is_structured) && $is_structured == 2) {
                 $qry->where('t5.is_query', 1);
-            }
-            else{
+            } else {
                 if (validateIsNumeric($checklist_type)) {
                     $qry->where('t1.checklist_type_id', $checklist_type);
                 } else {
                     $qry->whereIn('t1.checklist_type_id', $checklist_types);
                 }
-                if(validateIsNumeric($pass_status)){
+                if (validateIsNumeric($pass_status)) {
                     $qry->where('t2.pass_status', $pass_status);
                 }
             }
@@ -1591,11 +1734,11 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => returnMessage($results)
             );
 
-        }catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
 
@@ -1616,7 +1759,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $filter = $request->input('filter');
         $submission_id = 0;
         //check for previously added checklist
-        if(validateIsNumeric($query_id)){
+        if (validateIsNumeric($query_id)) {
             $query_data = DB::table('tra_application_query_reftracker')->where('id', $query_id)->first();
             $checklist_category_id = $query_data->checklist_category_id;
             $application_code = $query_data->application_code;
@@ -1624,7 +1767,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $process_id = $query_data->process_id;
         }
         $submission_details = getLastApplicationSubmissionDetails($application_code);
-        if($submission_details['success']){
+        if ($submission_details['success']) {
             $submission_details = $submission_details['results'];
             $submission_id = $submission_details->id;
         }
@@ -1643,13 +1786,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             if ($filters != NULL) {
                 foreach ($filters as $filter) {
                     switch ($filter->property) {
-                        case 'name' :
+                        case 'name':
                             $whereClauses[] = "t1.name ilike '%" . ($filter->value) . "%'";
                             break;
-                        case 'pass_status' :
+                        case 'pass_status':
                             $whereClauses[] = "t2.pass_status = '" . ($filter->value) . "'";
                             break;
-						case 'auditorpass_status' :
+                        case 'auditorpass_status':
                             $whereClauses[] = "t2.auditorpass_status = '" . ($filter->value) . "'";
                             break;
                     }
@@ -1660,41 +1803,40 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $filter_string = implode(' AND ', $whereClauses);
             }
         }
-        if(validateIsNumeric($pass_status)){
-             $whereClauses[] = "t2.pass_status = '" . ($pass_status) . "'";
+        if (validateIsNumeric($pass_status)) {
+            $whereClauses[] = "t2.pass_status = '" . ($pass_status) . "'";
         }
         try {
             //module_id, sub_module_id and section_id
             $where2 = DB::table('wf_processes')
-			    ->select('module_id', 'sub_module_id', 'section_id','premise_type_id','product_type_id')
+                ->select('module_id', 'sub_module_id', 'section_id', 'premise_type_id', 'product_type_id')
                 ->where('id', $process_id)
                 ->first();
             $where2 = convertStdClassObjToArray($where2);
             $module_id = $where2['module_id'];
-			$section_id = $where2['section_id'];
+            $section_id = $where2['section_id'];
             // if($module_id == 4){
             //     $module_id = $where2['module_id'];
             //     $sub_module_id = $where2['sub_module_id'];
             //     $section_id = $where2['section_id'];
             //     $where2 = array('module_id'=>$module_id);
             // }
-            if($module_id == 2){
-				if($section_id ==2){
-				  $module_id = $where2['module_id'];
-                  $sub_module_id = $where2['sub_module_id'];
-                  $section_id = $where2['section_id'];
-                  $premise_type_id = $where2['premise_type_id'];	
-				}
-				else{
-				   $module_id = $where2['module_id'];
-                  $sub_module_id = $where2['sub_module_id'];
-                  $section_id = $where2['section_id'];
-                  unset($where2['premise_type_id']);
-				}
-              
+            if ($module_id == 2) {
+                if ($section_id == 2) {
+                    $module_id = $where2['module_id'];
+                    $sub_module_id = $where2['sub_module_id'];
+                    $section_id = $where2['section_id'];
+                    $premise_type_id = $where2['premise_type_id'];
+                } else {
+                    $module_id = $where2['module_id'];
+                    $sub_module_id = $where2['sub_module_id'];
+                    $section_id = $where2['section_id'];
+                    unset($where2['premise_type_id']);
+                }
+
             }
-		    if($module_id == 1){
-                if($section_id == 3){
+            if ($module_id == 1) {
+                if ($section_id == 3) {
                     $module_id = $where2['module_id'];
                     $sub_module_id = $where2['sub_module_id'];
                     $section_id = $where2['section_id'];
@@ -1711,68 +1853,67 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 //  $sub_module_id = $where2['sub_module_id'];
                 //  $section_id = $where2['section_id'];
                 //  $product_type_id = $whereProductType['product_type_id'];
-				//  $where2['product_type_id'] = $product_type_id;
+                //  $where2['product_type_id'] = $product_type_id;
                 // } 
-                else{
+                else {
                     $module_id = $where2['module_id'];
                     $sub_module_id = $where2['sub_module_id'];
                     $section_id = $where2['section_id'];
-					unset($where2['product_type_id']);
+                    unset($where2['product_type_id']);
                 }
-            }
-            else{
+            } else {
                 $module_id = $where2['module_id'];
                 $sub_module_id = $where2['sub_module_id'];
                 $section_id = $where2['section_id'];
             }
             //get applicable checklist categories
 
-            if($sub_module_id == 7){
-                $product_id = getSingleRecordColValue('tra_product_applications', ['application_code'=>$application_code], 'product_id');
-				$product_type = getSingleRecordColValue('tra_product_information', ['id'=>$product_id], 'product_type_id');
-				$is_b_listed = getSingleRecordColValue('tra_product_information', ['id'=>$product_id], 'is_b_listed');
-				//b listed condition
-				if(validateIsNumeric($is_b_listed)){
-					$checklist_categories=[19];
-				} else{ 
-					switch ($product_type) {
-						case 7://small molecules
-							// code...
-							$checklist_categories=[20];
-							break;
-						case 8://Biologicals
-							// code...
-							$checklist_categories=[18];
-							break;
-						case 8999999999://B lIsted
-							// code...
-							$checklist_categories=[19];
-							break;
-						//vet
-						case 10://pharm / small mole
-							// code...
-							$checklist_categories=[21];
-							break;
-						case 11://Biological
-							// code...
-							$checklist_categories=[23];
-							break;
-						case 12://comps
-							// code...
-							$checklist_categories=[22];
-							break;
-						default:
-							$qry1 = DB::table('tra_proc_applicable_checklists')
-									->select('checklist_category_id')
-									->where($where);
+            if ($sub_module_id == 7) {
+                $product_id = getSingleRecordColValue('tra_product_applications', ['application_code' => $application_code], 'product_id');
+                $product_type = getSingleRecordColValue('tra_product_information', ['id' => $product_id], 'product_type_id');
+                $is_b_listed = getSingleRecordColValue('tra_product_information', ['id' => $product_id], 'is_b_listed');
+                //b listed condition
+                if (validateIsNumeric($is_b_listed)) {
+                    $checklist_categories = [19];
+                } else {
+                    switch ($product_type) {
+                        case 7://small molecules
+                            // code...
+                            $checklist_categories = [20];
+                            break;
+                        case 8://Biologicals
+                            // code...
+                            $checklist_categories = [18];
+                            break;
+                        case 8999999999://B lIsted
+                            // code...
+                            $checklist_categories = [19];
+                            break;
+                        //vet
+                        case 10://pharm / small mole
+                            // code...
+                            $checklist_categories = [21];
+                            break;
+                        case 11://Biological
+                            // code...
+                            $checklist_categories = [23];
+                            break;
+                        case 12://comps
+                            // code...
+                            $checklist_categories = [22];
+                            break;
+                        default:
+                            $qry1 = DB::table('tra_proc_applicable_checklists')
+                                ->select('checklist_category_id')
+                                ->where($where);
 
-							$checklist_categories = $qry1->get();
-							$checklist_categories = convertStdClassObjToArray($checklist_categories);
-							$checklist_categories = convertAssArrayToSimpleArray($checklist_categories, 'checklist_category_id');
-				
-					}
-				}
-            }else{
+                            $checklist_categories = $qry1->get();
+                            $checklist_categories = convertStdClassObjToArray($checklist_categories);
+                            $checklist_categories = convertAssArrayToSimpleArray($checklist_categories, 'checklist_category_id');
+
+                    }
+                }
+            } else {
                 $qry1 = DB::table('tra_proc_applicable_checklists')
                     ->select('checklist_category_id')
                     ->where($where);
@@ -1781,16 +1922,16 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $checklist_categories = convertStdClassObjToArray($checklist_categories);
                 $checklist_categories = convertAssArrayToSimpleArray($checklist_categories, 'checklist_category_id');
             }
-			
-			//get applicable checklist types
+
+            //get applicable checklist types
             //check if already done
             $added_categories = DB::table('par_checklist_items as t1')
-                    ->join('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
+                ->join('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
 
-                    if (isset($query_id) && $query_id != '') {
+                    if (isset ($query_id) && $query_id != '') {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
-                    } else if(validateIsNumeric($is_auditor)){
+                    } else if (validateIsNumeric($is_auditor)) {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
                     } else {
@@ -1804,8 +1945,8 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->groupBy('t3.checklist_category_id')
                 ->get();
             foreach ($added_categories as $category) {
-             //    $checklist_categories[] = $category->checklist_category_id;
-				 
+                //    $checklist_categories[] = $category->checklist_category_id;
+
             }
 
             $qry2 = DB::table('par_checklist_types as t1')
@@ -1815,14 +1956,14 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $checklist_types = $qry2->get();
             $checklist_types = convertStdClassObjToArray($checklist_types);
             $checklist_types = convertAssArrayToSimpleArray($checklist_types, 'id');
-			
+
             $qry = DB::table('par_checklist_items as t1')
                 ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
 
-                    if (isset($query_id) && $query_id != '') {
+                    if (isset ($query_id) && $query_id != '') {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
-                    } else if(validateIsNumeric($is_auditor)){
+                    } else if (validateIsNumeric($is_auditor)) {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
                     } else {
@@ -1838,8 +1979,8 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->join('par_checklist_types as t3', 't1.checklist_type_id', '=', 't3.id')
                 ->join('par_checklist_categories as t5', 't3.checklist_category_id', '=', 't5.id')
                 ->select(DB::raw("t1.*,t1.id as checklist_item_id,t1.serial_no as order_no, t2.id as item_resp_id,t2.pass_status, t2.comment,t2.observation, t2.auditor_comment, t3.name as checklist_type, t2.auditorpass_status, $module_id as module_id, $sub_module_id as sub_module_id,  t4.query, t4.query_response, CASE WHEN t2.risk_type is Null THEN t1.risk_type ELSE t2.risk_type end risk_type"))
-				->where('t1.is_enabled', 1)
-				->orderBy('t1.serial_no', 'ASC');
+                ->where('t1.is_enabled', 1)
+                ->orderBy('t1.serial_no', 'ASC');
 
             /*----------------------------------------------------
                  For unstructured queries they adopt
@@ -1849,25 +1990,24 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $qry->where('t4.query_id', $query_id);
             }
 
-            if(validateIsNumeric($is_structured) && $is_structured == 1){
+            if (validateIsNumeric($is_structured) && $is_structured == 1) {
                 $qry->where('t5.is_query', 1);
-            }
-            else{
+            } else {
                 if (validateIsNumeric($checklist_type)) {
-					$qry->where('t1.checklist_type_id', $checklist_type);
+                    $qry->where('t1.checklist_type_id', $checklist_type);
                 } else {
                     $qry->whereIn('t1.checklist_type_id', $checklist_types);
                 }
-                if(validateIsNumeric($pass_status)){
-                     $qry->where('t2.pass_status', $pass_status);
+                if (validateIsNumeric($pass_status)) {
+                    $qry->where('t2.pass_status', $pass_status);
                 }
             }
-			if($filter_string != ''){
-				$qry->whereRaw($filter_string);
-			}
+            if ($filter_string != '') {
+                $qry->whereRaw($filter_string);
+            }
 
             //is_structured
-			$qry->orderBy('t1.order_no', 'ASC');
+            $qry->orderBy('t1.order_no', 'ASC');
             $results = $qry->get();
             $res = array(
                 'success' => true,
@@ -1911,10 +2051,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => returnMessage($results)
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -1934,17 +2074,16 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             'sub_module_id' => $sub_module_id,
             'section_id' => $section_id
         );
-        if($module_id == 14){
+        if ($module_id == 14) {
             $where2 = array(
                 'module_id' => $module_id,
                 'sub_module_id' => $sub_module_id
             );
         }
         $process_details = getTableData('wf_processes', $where2);
-        if($module_id == 4){
+        if ($module_id == 4) {
             $process_id = 38;
-        }
-        else{
+        } else {
             $process_id = $process_details->id;
         }
 
@@ -1960,20 +2099,19 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $where = array(
             'process_id' => $process_id
         );
-        if (validateIsNumeric($workflow_stage) && $module_id !=4) {
+        if (validateIsNumeric($workflow_stage) && $module_id != 4) {
             $where['stage_id'] = $workflow_stage;
         }
 
         try {
 
-            if($module_id == 4){
+            if ($module_id == 4) {
                 $where2 = array(
                     'module_id' => $module_id,
                     'sub_module_id' => 12,
                     'section_id' => 2
                 );
-            }
-            else{
+            } else {
                 $where2 = array(
                     'module_id' => $module_id,
                     'sub_module_id' => $sub_module_id,
@@ -2002,7 +2140,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $is_previous) {
                     $join->on('t2.checklist_item_id', '=', 't1.id')
                         ->where('t2.application_code', $application_code);
-                    if (isset($is_previous) && $is_previous != '') {
+                    if (isset ($is_previous) && $is_previous != '') {
                         $join->where('t2.status', 0);
                     } else {
                         $join->where('t2.status', 1);
@@ -2027,10 +2165,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2047,9 +2185,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         );
         try {
             DB::transaction(function () use ($selected_ids, $process_id, $stage_id, $where) {
-                $params = array();
+                $params = array ();
                 foreach ($selected_ids as $selected_id) {
-                    $params[] = array(
+                    $params[] = array (
                         'process_id' => $process_id,
                         'stage_id' => $stage_id,
                         'checklist_category_id' => $selected_id,
@@ -2067,10 +2205,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Changes synced successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2087,9 +2225,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         );
         try {
             DB::transaction(function () use ($selected_ids, $process_id, $stage_id, $where) {
-                $params = array();
+                $params = array ();
                 foreach ($selected_ids as $selected_id) {
-                    $params[] = array(
+                    $params[] = array (
                         'process_id' => $process_id,
                         'stage_id' => $stage_id,
                         'doctype_id' => $selected_id,
@@ -2107,10 +2245,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Changes synced successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2129,11 +2267,11 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         );
         try {
             DB::transaction(function () use ($selected_ids, $selected_part_ids, $process_id, $form_id, $where) {
-                $params = array();
-                $params2 = array();
+                $params = array ();
+                $params2 = array ();
                 if (count($selected_ids) > 0) {
                     foreach ($selected_ids as $selected_id) {
-                        $params[] = array(
+                        $params[] = array (
                             'process_id' => $process_id,
                             'form_id' => $form_id,
                             'field_id' => $selected_id,
@@ -2143,7 +2281,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 }
                 if (count($selected_part_ids) > 0) {
                     foreach ($selected_part_ids as $selected_part_id) {
-                        $params2[] = array(
+                        $params2[] = array (
                             'process_id' => $process_id,
                             'part_id' => $selected_part_id,
                             'created_by' => $this->user_id
@@ -2168,10 +2306,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Changes synced successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2186,9 +2324,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         );
         try {
             DB::transaction(function () use ($selected_ids, $stage_id, $where) {
-                $params = array();
+                $params = array ();
                 foreach ($selected_ids as $selected_id) {
-                    $params[] = array(
+                    $params[] = array (
                         'stage_id' => $stage_id,
                         'group_id' => $selected_id,
                         'created_by' => $this->user_id
@@ -2205,10 +2343,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Changes synced successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2235,10 +2373,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -2263,10 +2401,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -2280,13 +2418,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         try {
             DB::transaction(function () use ($menu_id, $workflow_id, $workflow_stages, &$res) {
                 $workflow_stages = json_decode($workflow_stages);
-                $params = array();
+                $params = array ();
                 DB::table('wf_menus_stages')
                     ->where('menu_id', $menu_id)
                     ->delete();
-                if (isset($workflow_stages) > 0) {
+                if (isset ($workflow_stages) > 0) {
                     foreach ($workflow_stages as $workflow_stage) {
-                        $params[] = array(
+                        $params[] = array (
                             'menu_id' => $menu_id,
                             'stage_id' => $workflow_stage,
                             'created_on' => Carbon::now(),
@@ -2298,17 +2436,17 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 }
                 DB::table('par_menus')
                     ->where('id', $menu_id)
-                    ->update(array('workflow_id' => $workflow_id));
+                    ->update(array ('workflow_id' => $workflow_id));
             }, 5);
             $res = array(
                 'success' => true,
                 'message' => 'Data saved successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -2321,13 +2459,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         try {
             DB::transaction(function () use ($menu_id, $workflow_ids, &$res) {
                 $workflow_ids = json_decode($workflow_ids);
-                $params = array();
+                $params = array ();
                 DB::table('wf_menu_workflows')
                     ->where('menu_id', $menu_id)
                     ->delete();
                 if (count($workflow_ids) > 0) {
                     foreach ($workflow_ids as $workflow_id) {
-                        $params[] = array(
+                        $params[] = array (
                             'menu_id' => $menu_id,
                             'workflow_id' => $workflow_id,
                             'created_on' => Carbon::now(),
@@ -2343,10 +2481,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Data saved successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -2366,10 +2504,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Workflow data deleted successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2386,10 +2524,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Workflow setup data deleted successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2420,10 +2558,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2476,10 +2614,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
 
@@ -2497,7 +2635,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $qry = DB::table('wf_workflow_transitions as t1')
                 ->join('wf_workflow_actions as t2', 't1.action_id', 't2.id')
                 ->join('wf_workflow_stages as t3', 't1.nextstage_id', 't3.id')
-                ->select('t1.*','t2.is_to_portal', 't2.is_external_usersubmission', 't3.needs_responsible_user', 't2.is_inspection_submission')
+                ->select('t1.*', 't2.is_to_portal', 't2.is_external_usersubmission', 't3.needs_responsible_user', 't2.is_inspection_submission')
                 ->where($where);
             $results = $qry->first();
             $res = array(
@@ -2506,10 +2644,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2542,7 +2680,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 //             ->from('tra_user_group as t3')
                 //             ->whereIn('t3.group_id', $stage_groups);
                 //     })
-                 $qry2 = DB::table('users as t2')
+                $qry2 = DB::table('users as t2')
                     ->select(DB::raw("t2.id,CONCAT_WS(' ',decrypt(t2.first_name),decrypt(t2.last_name)) as name"))
                     ->whereIn('t2.id', function ($query) use ($stage_groups) {
                         $query->select(DB::raw('t3.user_id'))
@@ -2553,7 +2691,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                         $date_today = Carbon::now();
                         $query->select(DB::raw('t4.user_id'))
                             ->from('tra_actingposition_management as t4')
-                            ->whereRaw("acting_date_to >= '".formatDate($date_today)."' ")
+                            ->whereRaw("acting_date_to >= '" . formatDate($date_today) . "' ")
                             ->whereIn('t4.group_id', $stage_groups);
                     });
 
@@ -2567,10 +2705,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -2584,7 +2722,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         }
         $qry2 = DB::table($table_name . ' as t1')
             ->join('users as t2', 't1.inspector_id', '=', 't2.id')
-            ->select(DB::raw("t1.role_id,t2.id,CONCAT(decryptval(t2.first_name,".getDecryptFunParams()."),' ',decryptval(t2.last_name,".getDecryptFunParams().")) as name"))
+            ->select(DB::raw("t1.role_id,t2.id,CONCAT(decryptval(t2.first_name," . getDecryptFunParams() . "),' ',decryptval(t2.last_name," . getDecryptFunParams() . ")) as name"))
             ->where('t1.inspection_id', $inspection_id);
         $results = $qry2->get();
         return $results;
@@ -2617,18 +2755,19 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
             $data['workflowData'] = $diagramDataArray;
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
             echo json_encode($res);
             exit();
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
             echo json_encode($res);
             exit();
         }
 
         return view('workflow::workflow', $data);
     }
-    public function handleRevenueRequestApplicationSubmission(Request $request){
+    public function handleRevenueRequestApplicationSubmission(Request $request)
+    {
         $this->processRevenueApplicationSubmission($request);
 
     }
@@ -2638,7 +2777,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $module_id = $request->input('module_id');
         $table_name = $request->input('table_name');
 
-        $table_name = returnTableNamefromModule($table_name,$module_id);
+        $table_name = returnTableNamefromModule($table_name, $module_id);
 
         $module_id = $request->input('module_id');
         if ($module_id == 1) {//PRODUCT REGISTRATION
@@ -2657,42 +2796,39 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         } else if ($module_id == 6) {
             $this->processProductsNotificationSubmission($request);
 
-        }
-        else if ($module_id == 4) {//PRODUCT REGISTRATION
+        } else if ($module_id == 4) {//PRODUCT REGISTRATION
             $this->processImportExportApplicationSubmission($request);
         } else if ($module_id == 15) {//PRODUCT REGISTRATION
             $this->processDisposalApplicationSubmission($request);
         } else if ($module_id == 17) {//PRODUCT REGISTRATION
             $this->processRevenueApplicationSubmission($request);
-        }else if ($module_id == 18) {//inventory REGISTRATION
+        } else if ($module_id == 18) {//inventory REGISTRATION
             $this->processNormalApplicationSubmission($request);
         } else if ($module_id == 20) {//PRODUCT REGISTRATION
             $this->processImportExportApplicationSubmission($request);
-        }else if ($module_id == 12) {//PRODUCT REGISTRATION
+        } else if ($module_id == 12) {//PRODUCT REGISTRATION
             $this->processImportExportApplicationSubmission($request);
-        }else if ($module_id == 19) {//PRODUCT REGISTRATION
+        } else if ($module_id == 19) {//PRODUCT REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        }else if ($module_id == 21) {//MIR REGISTRATION
+        } else if ($module_id == 21) {//MIR REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        }else if ($module_id == 22) {//MIR REGISTRATION
+        } else if ($module_id == 22) {//MIR REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        }
-        else if ($module_id == 8) {//ENFORCEMENT REGISTRATION
+        } else if ($module_id == 8) {//ENFORCEMENT REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        }else if ($module_id == 9) {//POE Inspection
+        } else if ($module_id == 9) {//POE Inspection
             $this->processNormalApplicationSubmission($request);
-        }else if ($module_id == 24) {//RMU Inspection
+        } else if ($module_id == 24) {//RMU Inspection
             $this->processNormalApplicationSubmission($request);
         } else if ($module_id == 16) {//Revenue management
             $this->processNormalApplicationSubmission($request);
-        }else if ($module_id == 25) {//Psur Applications
+        } else if ($module_id == 25) {//Psur Applications
             $this->processNormalApplicationSubmission($request);
-        }else if($module_id == 26){
+        } else if ($module_id == 26) {
             $this->processNormalApplicationSubmission($request);
-        }else if ($module_id == 34) {//Issue Management Applications
+        } else if ($module_id == 34) {//Issue Management Applications
             $this->processNormalApplicationSubmission($request);
-        }
-        else {
+        } else {
             echo "module not set";
         }
     }
@@ -2716,7 +2852,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $this->processProductNotificationManagersSubmission($request);
         } else if ($module_id == 4 || $module_id == 20) {//IMPORT EXPORT
             $this->processImportExportManagersApplicationSubmission($request);
-        }else if ($module_id == 15) {//IMPORT EXPORT
+        } else if ($module_id == 15) {//IMPORT EXPORT
             $this->processImportExportManagersApplicationSubmission($request);
         } else if ($module_id == 12) {//IMPORT EXPORT
             $this->processImportExportManagersApplicationSubmission($request);
@@ -2726,7 +2862,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $this->processNormalManagersApplicationSubmission($request);
         } else if ($module_id == 23) {//PMS Program
             $this->processNormalManagersApplicationSubmission($request);
-        }else if ($module_id == 8) {//Enforcement
+        } else if ($module_id == 8) {//Enforcement
             $this->processManagerInvestigationApplicationSubmission($request);
         } else if ($module_id == 16) {//Revenue Management
             $this->processNormalManagersApplicationSubmission($request);
@@ -2738,8 +2874,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $this->processNormalManagersApplicationSubmission($request);
         } else if ($module_id == 11) {//Facility Schedule Applications
             $this->processNormalManagersApplicationSubmission($request);
-        }
-        else {
+        } else {
             //unknown module
         }
     }
@@ -2764,15 +2899,15 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
         } else if ($module_id == 15) { //IMPORT & EXPORT
             $res = $this->saveDisposalOnlineApplicationDetails($request);
-        }  else if ($module_id == 20) { //IMPORT & EXPORT
+        } else if ($module_id == 20) { //IMPORT & EXPORT
             $res = $this->saveDeclaredImportExportApplicationDetails($request);
         } else if ($module_id == 12) { //IMPORT & EXPORT
             $res = $this->saveImportExportOnlineApplicationDetails($request);
-        }else {
+        } else {
             //unknown module
 
         }
-        if($res['success']){
+        if ($res['success']) {
             //remove record in the online submissions
             $application_code = $request->application_code;
             $user_id = \Auth::user()->id;
@@ -2785,7 +2920,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $previous_data = $previous_data['results'];
                 //update
                 $onlinesubmission_status_id = 2;
-                $update_data = array('onlinesubmission_status_id'=>$onlinesubmission_status_id,'date_received'=>Carbon::now(),'altered_by'=>$user_id, 'dola'=>Carbon::now());
+                $update_data = array('onlinesubmission_status_id' => $onlinesubmission_status_id, 'date_received' => Carbon::now(), 'altered_by' => $user_id, 'dola' => Carbon::now());
 
                 updateRecord('tra_onlinesubmissions', $where, $update_data, $user_id);
                 // deleteRecord('tra_onlinesubmissions', $previous_data, $where, $user_id);
@@ -2843,28 +2978,28 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             //get application_details
             //notify submission
 
-            if(validateIsNumeric($request->responsible_user)){
-                   dd('ff');
-                $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name');
-                $process_name = getSingleRecordColValue('wf_processes', array('id'=>$request->process_id), 'name');
-                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id'=>$to_stage), 'name');
-                $email_address = getSingleRecordColValue('users', array('id'=>$request->responsible_user), 'email');
+            if (validateIsNumeric($request->responsible_user)) {
+                dd('ff');
+                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
+                $process_name = getSingleRecordColValue('wf_processes', array('id' => $request->process_id), 'name');
+                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
+                $email_address = getSingleRecordColValue('users', array('id' => $request->responsible_user), 'email');
                 $vars = array(
                     '{module_name}' => $module_name,
                     '{process_name}' => $process_name,
                     '{process_stage}' => $process_stage
-                   // '{application_no}' => $tracking_no
+                    // '{application_no}' => $tracking_no
                 );
-               sendTemplatedApplicationNotificationEmail(12, $email_address,$vars);
+                sendTemplatedApplicationNotificationEmail(12, $email_address, $vars);
             }
 
 
             $module_id = $request->input('module_id');
-            if($table_name == ''){
+            if ($table_name == '') {
                 $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename');
             }
 
-            if($table_name == 'tra_product_notifications'){
+            if ($table_name == 'tra_product_notifications') {
                 $table_name = 'tra_product_applications';
             }
 
@@ -2888,7 +3023,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $where = array(
                 'application_code' => $application_code
             );
-            if($is_dataammendment_request != 1){
+            if ($is_dataammendment_request != 1) {
                 $app_update = array(
                     'workflow_stage_id' => $to_stage,
                     'application_status_id' => $application_status_id
@@ -2905,44 +3040,43 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 }
             }
             //check the surveillace
-            if($module_id == 5){
-                if($to_stage == 364){
+            if ($module_id == 5) {
+                if ($to_stage == 364) {
                     $samples_nextstage = 1;
                     DB::table('tra_surveillance_sample_details as t1')
-                        ->where('t1.application_id', $application_id)
-                        ->where('t1.stage_id','<>', $samples_nextstage)
-                        ->update(array('stage_id'=>$samples_nextstage));
-                }
-                else if($to_stage == 365){
+                        ->where('t1.application_id', $application_code)
+                        ->where('t1.stage_id', '<>', $samples_nextstage)
+                        ->update(array('stage_id' => $samples_nextstage));
+                } else if ($to_stage == 365) {
                     $samples_nextstage = 2;
                     DB::table('tra_surveillance_sample_details as t1')
-                        ->where('t1.application_id', $application_id)
-                        ->where('t1.stage_id','<>', $samples_nextstage)
-                        ->update(array('stage_id'=>$samples_nextstage));
+                        ->where('t1.application_id', $application_code)
+                        ->where('t1.stage_id', '<>', $samples_nextstage)
+                        ->update(array('stage_id' => $samples_nextstage));
                 }
 
             }
             //check if MIR final stage
-            $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id'=>$to_stage], 'stage_status');
-            if($stage_status == 3 && $module_id == 22){
-                $update = ['is_completed'=> 1];
-                updateRecord('tra_mir_applications', ['id' => $application_id], $update);
+            $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $to_stage], 'stage_status');
+            if ($stage_status == 3 && $module_id == 22) {
+                $update = ['is_completed' => 1];
+                updateRecord('tra_mir_applications', ['id' => $application_code], $update);
             }
 
             //check if Monitoring is going to final stage
-            $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id'=>$to_stage], 'stage_status');
+            $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $to_stage], 'stage_status');
             $sub_module_id = $application_details->sub_module_id;
-            if($stage_status == 3 && $module_id == 8 && $sub_module_id == 88){
+            if ($stage_status == 3 && $module_id == 8 && $sub_module_id == 88) {
                 $application_code = $application_details->application_code;
                 $qry = DB::table('par_enforcement_action_recommendation as t1')
                     ->select('t1.*');
-                $qry->where('t1.application_code',$application_code);
+                $qry->where('t1.application_code', $application_code);
                 $results = $qry->get();
 
                 $recommendation_id = $results[0]->recommendation_id;
                 $remarks = $results[0]->remarks;
                 //application to go for investigation
-                if($recommendation_id == 2){
+                if ($recommendation_id == 2) {
                     DB::beginTransaction();
                     $app_data = array(
                         'module_id' => $module_id,
@@ -2953,32 +3087,32 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     );
                     $res = insertRecord('tra_investigation_approvals', $app_data);
                     DB::commit();
-// DD($application_code);tracking_no
+                    // DD($application_code);tracking_no
                     $lead_investigator = $results[0]->lead_investigator;
                     $co_investigators = $results[0]->co_investigators;
 
-                    $request->request -> add(['responsible_user' => $lead_investigator]);
-                    $request-> request -> add(['co_investigator' => $co_investigators]);
+                    $request->request->add(['responsible_user' => $lead_investigator]);
+                    $request->request->add(['co_investigator' => $co_investigators]);
 
                     $this->updateInvestigationApplicationSubmission($request, $application_details, $application_status_id);
                 }
             }
-            
+
             $this->updateApplicationSubmission($request, $application_details, $application_status_id);
 
 
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
             echo json_encode($res);
             exit();
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
             echo json_encode($res);
             exit();
         }
     }
 
-    public function processNormalManagersApplicationSubmission(Request $request, $keep_status = false,$action_type= 0)
+    public function processNormalManagersApplicationSubmission(Request $request, $keep_status = false, $action_type = 0)
     {
 
         $process_id = $request->input('process_id');
@@ -2995,8 +3129,8 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
         //for Facility Initial Submission
         $curr_stage_id = $request->curr_stage_id;
-        $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id'=>$curr_stage_id], 'stage_status');
-        if($request->sub_module_id == 50 && $stage_status == 1){
+        $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $curr_stage_id], 'stage_status');
+        if ($request->sub_module_id == 50 && $stage_status == 1) {
             $res = $this->handleInitialFacilityInspectionSubmission($request);
             echo json_encode($res);
             exit();
@@ -3004,19 +3138,18 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
 
         DB::beginTransaction();
-        if($table_name == ''){
+        if ($table_name == '') {
             $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename');
             $request->table_name = $table_name;
 
         }
         try {
             //get application_details
-            if(count($selected_appCodes) >0){
+            if (count($selected_appCodes) > 0) {
                 $application_details = DB::table($table_name)
                     ->whereIn('application_code', $selected_appCodes)
                     ->get();
-            }
-            else{
+            } else {
                 $application_details = DB::table($table_name)
                     ->whereIn('id', $selected_ids)
                     ->get();
@@ -3086,18 +3219,18 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $has_appdate_defination = $action_details->has_appdate_defination;
             $appdate_defination_id = $action_details->appdate_defination_id;
             $is_inspection_submission = 0;
-            if(isset($action_details->is_inspection_submission)){
+            if (isset($action_details->is_inspection_submission)) {
                 $is_inspection_submission = $action_details->is_inspection_submission;
             }
 
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id'=>$appdate_defination_id),'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
             $processtransition_data = $this->getActionTransitionDetails($action);
 
             $is_multi_submission = $processtransition_data->is_multi_submission;
             $multinextstage_id = $processtransition_data->multinextstage_id;
 
             $portal_table = getPortalApplicationsTable($module_id);
-	
+
             $application_processdefdata = array();
             $multisubmission_params = array();
             $inspectors = array();
@@ -3105,25 +3238,25 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             /*--------------------------------
                 confirm the responsible_users is an array or collection has_email_notification has_email_notification
             ----------------------------------*/
-            if($responsible_users instanceof Collection || is_array($responsible_users)){
+            if ($responsible_users instanceof Collection || is_array($responsible_users)) {
                 //is okay to proceed
-            }else{
+            } else {
                 $responsible_users = array($responsible_users);
             }
             //application details
             foreach ($application_details as $key => $application_detail) {
 
-                foreach($responsible_users as $responsible_user){
+                foreach ($responsible_users as $responsible_user) {
 
                     if ($keep_status == true) {
                         $application_status_id = $application_detail->application_status_id;
                     }
                     if ($action_details->update_portal_status == 1) {
                         $portal_status_id = $action_details->portal_status_id;
-						
+
                         $proceed = updatePortalApplicationStatus($application_detail->id, $portal_status_id, $table_name, $portal_table);
-                        
-						if ($proceed == false) {
+
+                        if ($proceed == false) {
                             echo json_encode($proceed);
                             exit();
                         }
@@ -3144,7 +3277,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     );
 
                     //submissions
-                    if($action_type == 11){
+                    if ($action_type == 11) {
                         $responsible_user = $this->getApplicationInspEvaUsers($application_detail->application_code);
                     }
                     $application_code = $application_detail->application_code;
@@ -3154,13 +3287,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     $prodclass_category_id = 0;
                     $premise_type_id = 0;
                     $importexport_permittype_id = 0;
-                    if($module_id == 1){
+                    if ($module_id == 1) {
                         $prodclass_category_id = $application_detail->prodclass_category_id;
                     }
-                    if($module_id == 2){
+                    if ($module_id == 2) {
                         $premise_type_id = $application_detail->premise_type_id;
                     }
-                    if($module_id == 4 || $module_id == 12|| $module_id == 9){
+                    if ($module_id == 4 || $module_id == 12 || $module_id == 9) {
                         $importexport_permittype_id = $application_detail->importexport_permittype_id;
                     }
                     //---------------------------//
@@ -3192,33 +3325,33 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                         'created_on' => Carbon::now(),
                         'created_by' => $user_id
                     );
-                    if(validateIsNumeric($external_user_id)){
+                    if (validateIsNumeric($external_user_id)) {
                         $usersubmission_data['usr_to'] = $external_user_id;
                         //send and email to the Extrenal user
-                        $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name');
-                        $process_name = getSingleRecordColValue('wf_processes', array('id'=>$process_id), 'name');
-                        $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id'=>$to_stage), 'name');
-                        $email_address = getSingleRecordColValue('users', array('id'=>$external_user_id), 'email');
+                        $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
+                        $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name');
+                        $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
+                        $email_address = getSingleRecordColValue('users', array('id' => $external_user_id), 'email');
                         $vars = array(
                             '{module_name}' => $module_name,
                             '{process_name}' => $process_name,
                             '{process_stage}' => $process_stage,
                         );
-                       sendTemplatedApplicationNotificationEmail(16, $email_address,$vars);
+                        sendTemplatedApplicationNotificationEmail(16, $email_address, $vars);
                         //send an email to the rest of the users
 
-                    }else{
-                        $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name');
-                        $process_name = getSingleRecordColValue('wf_processes', array('id'=>$process_id), 'name');
-                        $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id'=>$to_stage), 'name');
-                        $email_address = getSingleRecordColValue('users', array('id'=>$responsible_user), 'email');
+                    } else {
+                        $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
+                        $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name');
+                        $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
+                        $email_address = getSingleRecordColValue('users', array('id' => $responsible_user), 'email');
                         $vars = array(
                             '{module_name}' => $module_name,
                             '{process_name}' => $process_name,
                             '{process_stage}' => $process_stage,
                             '{application_no}' => $application_detail->tracking_no
                         );
-                       sendTemplatedApplicationNotificationEmail(12, $email_address,$vars);
+                        sendTemplatedApplicationNotificationEmail(12, $email_address, $vars);
                     }
 
                     // if ($action_details->has_submission_notification == 1 && validateIsNumeric($responsible_user)) {
@@ -3240,7 +3373,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     //     //send an email to the rest of the users
 
                     // }
-                    if($is_manager_submission == 1){
+                    if ($is_manager_submission == 1) {
 
                         $usersubmission_data['expected_start_date'] = $expected_start_date;
                         $usersubmission_data['expected_end_date'] = $expected_end_date;
@@ -3248,41 +3381,43 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                             log assignment
                         -----------------------------------------------*/
                         $assignment_log = array(
-                            'application_code' =>$application_detail->application_code,
-                            'reference_no'=>$application_detail->reference_no,
-                            'tracking_no'=>$application_detail->tracking_no,
-                            'assigned_by'=>$user_id,
-                            'assigned_to' =>$responsible_user,
-                            'assigned_on'=>Carbon::now(),
-                            'expected_start_date'=>$expected_start_date,
-                            'expected_end_date'=>$expected_end_date,
-                            'process_type_id'=>$process_type_id,
-                            'sub_module_id'=>$application_detail->sub_module_id,
-                            'module_id'=>$module_id
+                            'application_code' => $application_detail->application_code,
+                            'reference_no' => $application_detail->reference_no,
+                            'tracking_no' => $application_detail->tracking_no,
+                            'assigned_by' => $user_id,
+                            'assigned_to' => $responsible_user,
+                            'assigned_on' => Carbon::now(),
+                            'expected_start_date' => $expected_start_date,
+                            'expected_end_date' => $expected_end_date,
+                            'process_type_id' => $process_type_id,
+                            'sub_module_id' => $application_detail->sub_module_id,
+                            'module_id' => $module_id
                         );
 
-                       insertRecord('tra_manager_assignements_logs', $assignment_log, 1,'pgsql');
+                        insertRecord('tra_manager_assignements_logs', $assignment_log, 1, 'pgsql');
 
                     }
-                    if($has_appdate_defination == 1){
-                        $application_processdefdata[] =   array('application_code'=>$application_code,
-                            'appprocess_defination_id'=>$appprocess_defination_id,
-                            'process_date'=>Carbon::NOW(),
-                            'created_by'=>$user_id,
-                            'created_on'=>Carbon::NOW());
+                    if ($has_appdate_defination == 1) {
+                        $application_processdefdata[] = array(
+                            'application_code' => $application_code,
+                            'appprocess_defination_id' => $appprocess_defination_id,
+                            'process_date' => Carbon::NOW(),
+                            'created_by' => $user_id,
+                            'created_on' => Carbon::NOW()
+                        );
                     }
 
 
                     $submission_params[] = $usersubmission_data;
                     $application_codes[] = array($application_detail->application_code);
 
-                    if($is_multi_submission == 1){
-                        $usersubmission_data['current_stage'] =  $multinextstage_id;
-                        $usersubmission_data['usr_to'] =  '';
+                    if ($is_multi_submission == 1) {
+                        $usersubmission_data['current_stage'] = $multinextstage_id;
+                        $usersubmission_data['usr_to'] = '';
                         $multisubmission_params[] = $usersubmission_data;
                     }
 
-                    if($is_inspection_submission == 1){
+                    if ($is_inspection_submission == 1) {
                         //get Inspectors
 
                         $inspectors[] = $this->getInspectorsIDList($module_id, $application_detail->application_code);
@@ -3299,29 +3434,28 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $update_params = array(
                 'workflow_stage_id' => $to_stage,
                 'application_status_id' => $application_status_id,
-                'dola'=>Carbon::now()
+                'dola' => Carbon::now()
             );
-            if($has_appdate_defination == 1){
+            if ($has_appdate_defination == 1) {
 
-                $appdate_defination = array($appdate_defination=>Carbon::now(),'dola'=>Carbon::now());
-                 $app_update = DB::table($table_name . ' as t1')
-                                 ->whereIn('application_code', $selected_appCodes)
-                                 ->update($appdate_defination);//dd($app_update);
+                $appdate_defination = array($appdate_defination => Carbon::now(), 'dola' => Carbon::now());
+                $app_update = DB::table($table_name . ' as t1')
+                    ->whereIn('application_code', $selected_appCodes)
+                    ->update($appdate_defination);//dd($app_update);
             }
-            if(count($application_processdefdata) >0){
+            if (count($application_processdefdata) > 0) {
                 DB::table('tra_applications_processdefinations')
                     ->insert($application_processdefdata);
 
             }
 
-            if($is_dataammendment_request != 1){
-                if(count($selected_appCodes) >0){
+            if ($is_dataammendment_request != 1) {
+                if (count($selected_appCodes) > 0) {
 
                     $app_update = DB::table($table_name . ' as t1')
                         ->whereIn('application_code', convertStdClassObjToArray($selected_appCodes))
                         ->update($update_params);
-                }
-                else{
+                } else {
 
                     $app_update = DB::table($table_name . ' as t1')
                         ->whereIn('id', convertStdClassObjToArray($selected_ids))
@@ -3347,9 +3481,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             DB::table('tra_applications_transitions')
                 ->insert($transition_params);
             //$res_transitions = insertRecord('tra_applications_transitions',$transition_params,1,'pgsql');
-           // dd($res_transitions);
+            // dd($res_transitions);
             //submissions update
-            if($is_inspection_submission == 1){
+            if ($is_inspection_submission == 1) {
                 //loop through while updating submissions data
                 foreach ($inspectors as $inspector_array) {
                     foreach ($inspector_array as $inspector) {
@@ -3357,58 +3491,58 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                             //change usr_to
                             $submission_param['usr_to'] = $inspector->inspector_id;
                             //update submissions
-                            insertRecord('tra_submissions',$submission_param,1,'pgsql');
+                            insertRecord('tra_submissions', $submission_param, 1, 'pgsql');
                             //DB::table('tra_submissions')->insert($submission_param);
                         }
                     }
                 }
             } else {
 
-                $rest=insertMultipleRecords('tra_submissions',$submission_params);
+                $rest = insertMultipleRecords('tra_submissions', $submission_params);
 
             }
 
             updateInTraySubmissionsBatch($selected_ids, $application_codes, $from_stage, $user_id);
 
-            if(count($multisubmission_params) >0){
+            if (count($multisubmission_params) > 0) {
 
-               $res_multisubmission= insertRecord('tra_submissions',$multisubmission_params);
+                $res_multisubmission = insertRecord('tra_submissions', $multisubmission_params);
                 //print_r(($multisubmission_params));
 
             }
             //for the email notification and more so the meeting details
             //  $has_technicalmeeting_notification $has_email_notification $email_message_id
 
-            if($has_preminsp_notification == 1){
+            if ($has_preminsp_notification == 1) {
                 $application_code = $application_detail->application_code;
                 //get the inspectors email
                 $inspection_details = $this->getPremisesInspectionDetails($application_code);
                 $inspectors_email = $this->getPremInspectorsEmail($application_code);
 
                 $vars = array(
-                    '{start_date}'=>$inspection_details->start_date,
-                    '{end_date}'=>$inspection_details->end_date,
-                    '{description}'=>$inspection_details->description,
-                    '{lead_inspector}'=>$inspection_details->lead_inspector
+                    '{start_date}' => $inspection_details->start_date,
+                    '{end_date}' => $inspection_details->end_date,
+                    '{description}' => $inspection_details->description,
+                    '{lead_inspector}' => $inspection_details->lead_inspector
                 );
-                sendTemplatedApplicationNotificationEmail($preminspmail_msg_id, $inspectors_email,$vars);
+                sendTemplatedApplicationNotificationEmail($preminspmail_msg_id, $inspectors_email, $vars);
 
             }
-            if($has_email_notification == 1){
-                    $applicant_email = getTraderEmail($application_detail->applicant_id);
+            if ($has_email_notification == 1) {
+                $applicant_email = getTraderEmail($application_detail->applicant_id);
 
-                  $vars = array(
-                            '{reference_no}' => $application_detail->tracking_no
-                        );
+                $vars = array(
+                    '{reference_no}' => $application_detail->tracking_no
+                );
 
-                  sendTemplatedApplicationNotificationEmail($email_message_id, $applicant_email, $vars);
+                sendTemplatedApplicationNotificationEmail($email_message_id, $applicant_email, $vars);
 
             }
-            if($has_technicalmeeting_notification == 1){
+            if ($has_technicalmeeting_notification == 1) {
                 //get the emails
 
                 //meeting participants emails
-                if(validateIsNumeric($application_detail->application_code)){
+                if (validateIsNumeric($application_detail->application_code)) {
                     $app_description = '';
                     $application_code = $application_detail->application_code;
                     //var_dump($application_detail);
@@ -3422,7 +3556,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     // $directorate_name = $directorate_details->directorate_name;
                     // $director_name = $directorate_details->director_name;
                     // $section_name = $directorate_details->section_name;
-                    $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name');
+                    $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
 
                     $vars = array(
                         '{meeting_name}' => $meeting_details->meeting_name,
@@ -3436,21 +3570,21 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                         // '{module_name}' => $module_name
                     );
                     //check for the external users and
-                    sendTemplatedApplicationNotificationEmail($technicalmeetinemail_msg_id, $meeting_attendantsemail,$vars);
-                    $participantEmails = explode(';',$meeting_attendantsemail);
-                    foreach($participantEmails as $participantEmail){
-                        $res = sendInvitationMail($technicalmeetinemail_msg_id, $participantEmail,$vars);
-                      
+                    sendTemplatedApplicationNotificationEmail($technicalmeetinemail_msg_id, $meeting_attendantsemail, $vars);
+                    $participantEmails = explode(';', $meeting_attendantsemail);
+                    foreach ($participantEmails as $participantEmail) {
+                        $res = sendInvitationMail($technicalmeetinemail_msg_id, $participantEmail, $vars);
+
                     }
                     //send an email to the rest of the users
                     $records = DB::table('tc_meeting_participants')
                         ->select('*')
-                        ->where(array('meeting_id'=>$meeting_id))
+                        ->where(array('meeting_id' => $meeting_id))
                         ->whereNull($user_id)
                         ->get();
 
 
-                    if($records){
+                    if ($records) {
 
                         foreach ($records as $rec) {
 
@@ -3478,7 +3612,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                                 'phone' => $rec->phone,
                                 'user_category_id' => 2
                             );
-                            $this->createExternalUserAccountDetails($table_data,$email_address,$participant_id,$vars);
+                            $this->createExternalUserAccountDetails($table_data, $email_address, $participant_id, $vars);
 
 
                         }//endforeach
@@ -3496,14 +3630,15 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Application Submitted Successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         echo json_encode($res);
         exit();
     }
-    public function createExternalUserAccountDetails($table_data,$email_address,$participant_id,$vars){
+    public function createExternalUserAccountDetails($table_data, $email_address, $participant_id, $vars)
+    {
         $skipArray = array('user_category_id');
         $table_data = encryptArray($table_data, $skipArray);
 
@@ -3513,7 +3648,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             ->first();
 
 
-        if (!$email_exists){
+        if (!$email_exists) {
 
             $password = str_random(8);
             $uuid = generateUniqID();//unique user ID
@@ -3528,102 +3663,108 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $vars['user_password'] = $password;
             $vars['base_url'] = $base_url;
 
-            $email_res = sendTemplatedApplicationNotificationEmail(15,$email_address ,$vars);
+            $email_res = sendTemplatedApplicationNotificationEmail(15, $email_address, $vars);
 
             $results = insertRecord('users', $table_data, $this->user_id);
             if ($results['success'] == true) {
                 $insertId = $results['record_id'];
-                DB::table('tc_meeting_participants')->where(array('id'=>$participant_id))->update(array('user_id'=>$insertId));
+                DB::table('tc_meeting_participants')->where(array('id' => $participant_id))->update(array('user_id' => $insertId));
             }//endif
         }//endif
-        else{
+        else {
 
             $base_url = url('/');
             $vars['email_address'] = $email_address;
             $vars['user_password'] = "Please use your current password, If forgotten or do not know, please request a new password to be sent through your email by using the (Forgot password) option";
             $vars['base_url'] = $base_url;
 
-            $email_res = sendTemplatedApplicationNotificationEmail(15,$email_address ,$vars);
+            $email_res = sendTemplatedApplicationNotificationEmail(15, $email_address, $vars);
         }//endelse
 
     }//endfunction
 
-    public function getPremisesInspectionDetails($application_code){
+    public function getPremisesInspectionDetails($application_code)
+    {
         $records = DB::table('tra_premiseinspection_applications as t1')
             ->join('tra_premise_inspection_details as t2', 't1.inspection_id', 't2.id')
             ->select('t2.*')
-            ->where(array('t1.application_code'=>$application_code))
+            ->where(array('t1.application_code' => $application_code))
             ->groupBy('t2.id')
             ->first();
         return $records;
     }
 
-    public function getMeetingDetails($application_code){
+    public function getMeetingDetails($application_code)
+    {
         $records = DB::table('tc_meeting_applications as t1')
             ->join('tc_meeting_details as t2', 't1.meeting_id', 't2.id')
             ->select('t2.*')
-            ->where(array('t1.application_code'=>$application_code))
+            ->where(array('t1.application_code' => $application_code))
             ->groupBy('t2.id')
             ->first();
         return $records;
     }
-    public function getDirectorateInformation($section_id){
+    public function getDirectorateInformation($section_id)
+    {
         $record = DB::table('par_sections as t1')
-            ->join('par_directorates as t2', 't1.directorate_id','t2.id')
+            ->join('par_directorates as t2', 't1.directorate_id', 't2.id')
             ->join('tra_directorate_directors as t3', 't2.id', 't3.directorate_id')
-            ->join('users as t4','t3.user_id','t4.id')
+            ->join('users as t4', 't3.user_id', 't4.id')
             ->select(DB::raw("t2.name as directorate_name, CONCAT_WS(' ',decrypt(t4.first_name),decrypt(t4.last_name)) as director_name, t1.name as section_name"))
             ->where('t1.id', $section_id)
             ->first();
         return $record;
     }
 
-    public function getPremInspectorsEmail($application_code){
+    public function getPremInspectorsEmail($application_code)
+    {
         $inspectors_email = array();
         $records = DB::table('tra_premiseinspection_applications as t1')
             ->join('tra_premise_inspection_details as t2', 't1.inspection_id', 't2.id')
-            ->join('tra_premiseinspection_inspectors as t3', 't2.id','t3.inspection_id')
-            ->join('users as t4', 't3.inspector_id','t4.id')
-            ->select(DB::raw("decrypt(t4.email) as email") )
-            ->where(array('t1.application_code'=>$application_code))
+            ->join('tra_premiseinspection_inspectors as t3', 't2.id', 't3.inspection_id')
+            ->join('users as t4', 't3.inspector_id', 't4.id')
+            ->select(DB::raw("decrypt(t4.email) as email"))
+            ->where(array('t1.application_code' => $application_code))
             ->groupBy('t3.id')
             ->get();
-        if($records){
+        if ($records) {
             foreach ($records as $rec) {
                 $inspectors_email[] = $rec->email;
             }
         }
-        $inspectors_email=implode(';',$inspectors_email);
+        $inspectors_email = implode(';', $inspectors_email);
         return $inspectors_email;
 
     }
-    public function getMeetingAttendantsEmails($application_code){
+    public function getMeetingAttendantsEmails($application_code)
+    {
         $meeting_attendantsemail = array();
         $records = DB::table('tc_meeting_applications as t1')
             ->join('tc_meeting_details as t2', 't1.meeting_id', 't2.id')
-            ->join('tc_meeting_participants as t3', 't2.id','t3.meeting_id')
+            ->join('tc_meeting_participants as t3', 't2.id', 't3.meeting_id')
             ->select('t3.email')
-            ->where(array('t1.application_code'=>$application_code))
-			->whereNotNull('t3.user_id')
+            ->where(array('t1.application_code' => $application_code))
+            ->whereNotNull('t3.user_id')
             ->groupBy('t3.id')
             ->get();
-        if($records){
+        if ($records) {
             foreach ($records as $rec) {
                 $meeting_attendantsemail[] = $rec->email;
             }
         }
-        $meeting_attendantsemail=implode(';',$meeting_attendantsemail);
+        $meeting_attendantsemail = implode(';', $meeting_attendantsemail);
         return $meeting_attendantsemail;
 
     }
-    public function getApplicationInspEvaUsers($application_code){
+    public function getApplicationInspEvaUsers($application_code)
+    {
         $record = DB::table('tra_submissions as t1')
             ->join('wf_workflow_stages as t2', 't1.current_stage', 't2.id')
-            ->where(array('t1.application_code'=>$application_code, 'is_inspassessment_stage'=>1))
+            ->where(array('t1.application_code' => $application_code, 'is_inspassessment_stage' => 1))
             ->orderBy('t1.id', 'desc')
             ->select('t1.usr_to')
             ->first();
-        $user_to =$record->usr_to;
+        $user_to = $record->usr_to;
         return $user_to;
     }
     public function processNewApprovalApplicationSubmission(Request $request, $keep_status = false)
@@ -3677,7 +3818,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $sub_module_id = $process_details->sub_module_id;
             $section_id = $process_details->section_id;
             $application_status_id = getApplicationTransitionStatus($from_stage, $action, $to_stage);
-             $portal_table_name = getPortalApplicationsTable($module_id);
+            $portal_table_name = getPortalApplicationsTable($module_id);
             //application details
             $action_details = $this->getApplicationWorkflowActionDetails($action);
             $keep_status = $action_details->keep_status;
@@ -3686,7 +3827,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
             $has_appdate_defination = $action_details->has_appdate_defination;
             $appdate_defination_id = $action_details->appdate_defination_id;
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id'=>$appdate_defination_id),'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
             $application_processdefdata = array();
             foreach ($application_details as $key => $application_detail) {
                 if ($keep_status == true) {
@@ -3751,32 +3892,34 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     'created_by' => $user_id
                 );
                 $application_codes[] = array($application_detail->application_code);
-                if($has_appdate_defination == 1){
-                    $application_processdefdata[] =   array('application_code'=>$application_detail->application_code,
-                        'appprocess_defination_id'=>$appprocess_defination_id,
-                        'process_date'=>Carbon::NOW(),
-                        'created_by'=>$user_id,
-                        'created_on'=>Carbon::NOW());
+                if ($has_appdate_defination == 1) {
+                    $application_processdefdata[] = array(
+                        'application_code' => $application_detail->application_code,
+                        'appprocess_defination_id' => $appprocess_defination_id,
+                        'process_date' => Carbon::NOW(),
+                        'created_by' => $user_id,
+                        'created_on' => Carbon::NOW()
+                    );
                 }
 
             }
 
-            if($has_appdate_defination == 1){
+            if ($has_appdate_defination == 1) {
 
-                $appdate_defination = array($appdate_defination=>Carbon::now(),'dola'=>Carbon::now());
+                $appdate_defination = array($appdate_defination => Carbon::now(), 'dola' => Carbon::now());
                 /*       $app_update = DB::table($table_name . ' as t1')
                                        ->whereIn('id', $selected_ids)
                                        ->update($appdate_defination);
                                        */
             }
-            if(count($application_processdefdata) >0){
+            if (count($application_processdefdata) > 0) {
 
                 DB::table('tra_applications_processdefinations')
                     ->insert($application_processdefdata);
 
             }
             //application update
-            if($is_dataammendment_request != 1){
+            if ($is_dataammendment_request != 1) {
                 $update_params = array(
                     'workflow_stage_id' => $to_stage,
                     'application_status_id' => $application_status_id
@@ -3800,7 +3943,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->insert($transition_params);
             //dd($submission_params);
             //submissions update
-           $result= DB::table('tra_submissions')
+            $result = DB::table('tra_submissions')
                 ->insert($submission_params);
 
             updateInTraySubmissionsBatch($selected_ids, $application_codes, $from_stage, $user_id);
@@ -3810,9 +3953,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Application Submitted Successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         //return response()->json($res);
         echo json_encode($res);
@@ -3826,7 +3969,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $selected = $request->input('selected');
         $selected_ids = json_decode($selected);
         $user_id = $this->user_id;
-      //  dd($user_id);
+        //  dd($user_id);
         DB::beginTransaction();
         try {
             //get application_details
@@ -3885,7 +4028,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
             $has_appdate_defination = $action_details->has_appdate_defination;
             $appdate_defination_id = $action_details->appdate_defination_id;
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id'=>$appdate_defination_id),'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
             $application_processdefdata = array();
             //application details
             foreach ($application_details as $key => $application_detail) {
@@ -3938,24 +4081,26 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     'created_by' => $user_id
                 );
                 $application_codes[] = array($application_detail->application_code);
-                if($has_appdate_defination == 1){
-                    $application_processdefdata[] =   array('application_code'=>$application_code,
-                        'appprocess_defination_id'=>$appprocess_defination_id,
-                        'process_date'=>Carbon::NOW(),
-                        'created_by'=>$user_id,
-                        'created_on'=>Carbon::NOW());
+                if ($has_appdate_defination == 1) {
+                    $application_processdefdata[] = array(
+                        'application_code' => $application_code,
+                        'appprocess_defination_id' => $appprocess_defination_id,
+                        'process_date' => Carbon::NOW(),
+                        'created_by' => $user_id,
+                        'created_on' => Carbon::NOW()
+                    );
                 }
 
             }
-            if($has_appdate_defination == 1){
+            if ($has_appdate_defination == 1) {
 
-                $appdate_defination = array($appdate_defination=>Carbon::now(),'dola'=>Carbon::now());
+                $appdate_defination = array($appdate_defination => Carbon::now(), 'dola' => Carbon::now());
                 /* $app_update = DB::table($table_name . ' as t1')
                                  ->whereIn('id', $selected_ids)
                                  ->update($appdate_defination);
                              */
             }
-            if(count($application_processdefdata) >0){
+            if (count($application_processdefdata) > 0) {
 
                 DB::table('tra_applications_processdefinations')
                     ->insert($application_processdefdata);
@@ -3995,9 +4140,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Application Submitted Successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         echo json_encode($res);
         return true;
@@ -4199,11 +4344,11 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $this->updateApplicationSubmission($request, $application_details, $application_status_id);
             DB::commit();
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
             echo json_encode($res);
             exit();
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
             echo json_encode($res);
             exit();
         }
@@ -4321,11 +4466,11 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             echo json_encode($res);
             exit();
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
             echo json_encode($res);
             exit();
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
             echo json_encode($res);
             exit();
         }
@@ -4464,7 +4609,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                  exit();
              }
              */
-            updatePortalApplicationStatus($application_detail->id, $portal_status_id, $table_name, $portal_table_name);
+            updatePortalApplicationStatus($application_detail->id, $portal_status_id, $table_name, $portal_table);
             /* $portal_update = false;
              if ($module_id == 1) {
 
@@ -4482,7 +4627,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                  echo json_encode($res);
                  exit();
              }*/
-           // $portal_db->table('wb_manager_query_remarks')->insert($insert_remarks);
+            // $portal_db->table('wb_manager_query_remarks')->insert($insert_remarks);
             //transitions update
             DB::table('tra_applications_transitions')
                 ->insert($transition_params);
@@ -4496,9 +4641,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Application Submitted Successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         echo json_encode($res);
         return true;
@@ -4587,7 +4732,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
             $has_appdate_defination = $action_details->has_appdate_defination;
             $appdate_defination_id = $action_details->appdate_defination_id;
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id'=>$appdate_defination_id),'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
             $application_processdefdata = array();
 
             foreach ($application_details as $key => $application_detail) {
@@ -4630,24 +4775,26 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     'created_by' => $user_id
                 );
                 $application_codes[] = array($application_detail->application_code);
-                if($has_appdate_defination == 1){
-                    $application_processdefdata[] =   array('application_code'=>$application_detail->application_code,
-                        'appprocess_defination_id'=>$appprocess_defination_id,
-                        'process_date'=>Carbon::NOW(),
-                        'created_by'=>$user_id,
-                        'created_on'=>Carbon::NOW());
+                if ($has_appdate_defination == 1) {
+                    $application_processdefdata[] = array(
+                        'application_code' => $application_detail->application_code,
+                        'appprocess_defination_id' => $appprocess_defination_id,
+                        'process_date' => Carbon::NOW(),
+                        'created_by' => $user_id,
+                        'created_on' => Carbon::NOW()
+                    );
                 }
             }
             //application update
-            if($has_appdate_defination == 1){
+            if ($has_appdate_defination == 1) {
 
-                $appdate_defination = array($appdate_defination=>Carbon::now(),'dola'=>Carbon::now());
+                $appdate_defination = array($appdate_defination => Carbon::now(), 'dola' => Carbon::now());
                 /*  $app_update = DB::table($table_name . ' as t1')
                                   ->whereIn('application_code', $selected_appCodes)
                                   ->update($appdate_defination);
                                   */
             }
-            if(count($application_processdefdata) >0){
+            if (count($application_processdefdata) > 0) {
 
                 DB::table('tra_applications_processdefinations')
                     ->insert($application_processdefdata);
@@ -4669,7 +4816,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 echo json_encode($res);
                 exit();
             }
-			*/
+            */
             if ($invalidate_checklist === true) {
                 inValidateApplicationChecklist($module_id, $sub_module_id, $section_id, $checklist_category, $application_codes);
             }
@@ -4686,9 +4833,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Application Submitted Successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         echo json_encode($res);
         return true;
@@ -4724,20 +4871,20 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $function = "failed to fetch";
             //class
             $class_array = explode('\\', __CLASS__);
-            if(isset($class_array[5])){
+            if (isset($class_array[5])) {
                 $class = $class_array[5];
-            }else{
+            } else {
                 $class = "Failed to fetch";
             }
             //specifics
             $me = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-            if(isset($me[0]['function'])){
+            if (isset($me[0]['function'])) {
                 $function = $me[0]['function'];
             }
-            if(isset($me[0]['class'])){
+            if (isset($me[0]['class'])) {
                 $class = $me[0]['class'];
             }
-            $res = sys_error_handler($exception->getMessage(), 2, "function-->".$function." class-->".$class, \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, "function-->" . $function . " class-->" . $class, \Auth::user()->id);
             echo json_encode($res);
             exit();
         } catch (\Throwable $throwable) {
@@ -4745,20 +4892,20 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $function = "failed to fetch";
             //class
             $class_array = explode('\\', __CLASS__);
-            if(isset($class_array[5])){
+            if (isset($class_array[5])) {
                 $class = $class_array[5];
-            }else{
+            } else {
                 $class = "Failed to fetch";
             }
             //specifics
             $me = debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1);
-            if(isset($me[0]['function'])){
+            if (isset($me[0]['function'])) {
                 $function = $me[0]['function'];
             }
-            if(isset($me[0]['class'])){
+            if (isset($me[0]['class'])) {
                 $class = $me[0]['class'];
             }
-            $res = sys_error_handler($throwable->getMessage(), 2, "function-->".$function." class-->".$class, \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, "function-->" . $function . " class-->" . $class, \Auth::user()->id);
             echo json_encode($res);
             exit();
         }
@@ -4771,9 +4918,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $process_id = $request->input('process_id');
         $action = $request->input('action');
         $table_name = $request->input('table_name');
-        $external_user_id= $request->input('external_user_id');
+        $external_user_id = $request->input('external_user_id');
         $additionalpayment_type_id = $request->additionalpayment_type_id;
-        $sub_module_id= $request->input('sub_module_id');
+        $sub_module_id = $request->input('sub_module_id');
         $user_id = $this->user_id;
         try {
             //get process other details
@@ -4798,11 +4945,11 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             //application details
             $application_code = $application_details->application_code;
             $ref_no = $application_details->reference_no;
-           // $is_fast_track = $application_details->is_fast_track;
+            // $is_fast_track = $application_details->is_fast_track;
             $view_id = $application_details->view_id;
             $tracking_no = $application_details->tracking_no;
             $applicant_id = $application_details->applicant_id;
-            $branch_id = (isset($application_details->branch_id) && $process_details->module_id == 18)?$application_details->branch_id:2;
+            $branch_id = (isset($application_details->branch_id) && $process_details->module_id == 18) ? $application_details->branch_id : 2;
             $sub_module_id = $application_details->sub_module_id;
             //process other details
             $module_id = $process_details->module_id;
@@ -4816,13 +4963,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $importexport_permittype_id = 0;
             $enforcement_id = 0;
 
-            if($module_id == 1){
+            if ($module_id == 1) {
                 $prodclass_category_id = $application_details->prodclass_category_id;
             }
-            if($module_id == 2){
+            if ($module_id == 2) {
                 $premise_type_id = $application_details->premise_type_id;
             }
-            if($module_id == 4 || $module_id == 9 || $module_id == 12){
+            if ($module_id == 4 || $module_id == 9 || $module_id == 12) {
                 $importexport_permittype_id = $application_details->importexport_permittype_id;
             }
 
@@ -4839,17 +4986,19 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $has_email_notification = $action_details->has_email_notification;
             //for inspection submissions
             $is_inspection_submission = 0;
-            if(isset($action_details->is_inspection_submission)){
+            if (isset($action_details->is_inspection_submission)) {
                 $is_inspection_submission = $action_details->is_inspection_submission;
             }
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id'=>$appdate_defination_id),'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
             $application_processdefdata = array();
-            if($has_appdate_defination == 1){
-                $application_processdefdata =   array('application_code'=>$application_code,
-                    'appprocess_defination_id'=>$appprocess_defination_id,
-                    'process_date'=>Carbon::NOW(),
-                    'created_by'=>$user_id,
-                    'created_on'=>Carbon::NOW());
+            if ($has_appdate_defination == 1) {
+                $application_processdefdata = array(
+                    'application_code' => $application_code,
+                    'appprocess_defination_id' => $appprocess_defination_id,
+                    'process_date' => Carbon::NOW(),
+                    'created_by' => $user_id,
+                    'created_on' => Carbon::NOW()
+                );
             }
             $processtransition_data = $this->getActionTransitionDetails($action);
             $is_multi_submission = $processtransition_data->is_multi_submission;
@@ -4869,7 +5018,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'created_on' => Carbon::now(),
                 'created_by' => $user_id
             );
-             insertRecord('tra_applications_transitions', $transition_params);
+            insertRecord('tra_applications_transitions', $transition_params);
 
             // DB::table('tra_applications_transitions')
             //     ->insert($transition_params);
@@ -4890,7 +5039,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'previous_stage' => $from_stage,
                 'current_stage' => $to_stage,
                 'module_id' => $module_id,
-                'external_user_id'=>$external_user_id,
+                'external_user_id' => $external_user_id,
                 'sub_module_id' => $sub_module_id,
                 'section_id' => $section_id,
                 'application_status_id' => $application_status_id,
@@ -4903,51 +5052,51 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 //'created_on' => Carbon::now(),
                 'created_by' => $user_id
             );
-            if(validateIsNumeric($external_user_id)){
+            if (validateIsNumeric($external_user_id)) {
                 $submission_params['usr_to'] = $external_user_id;
                 //send and email to the Extrenal user
-                $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name');
-                $process_name = getSingleRecordColValue('wf_processes', array('id'=>$process_id), 'name');
-                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id'=>$to_stage), 'name');
-                $email_address = getSingleRecordColValue('users', array('id'=>$external_user_id), 'email');
+                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
+                $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name');
+                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
+                $email_address = getSingleRecordColValue('users', array('id' => $external_user_id), 'email');
                 $vars = array(
                     '{module_name}' => $module_name,
                     '{process_name}' => $process_name,
                     '{process_stage}' => $process_stage,
                 );
-                sendTemplatedApplicationNotificationEmail(16, $email_address,$vars);
+                sendTemplatedApplicationNotificationEmail(16, $email_address, $vars);
                 //send an email to the rest of the users
 
             }
-            if($has_email_notification == 1){
-                if($module_id == 8){
-                    $email_address = DB::table('tra_enforcement_information', array('id'=>$application_details->enforcement_id), 'app_email');
+            if ($has_email_notification == 1) {
+                if ($module_id == 8) {
+                    $email_address = DB::table('tra_enforcement_information', array('id' => $application_details->enforcement_id), 'app_email');
                     $vars = array(
-                         '{application_no}' => $tracking_no.': Application No '.$ref_no
+                        '{application_no}' => $tracking_no . ': Application No ' . $ref_no
                     );
-                    sendTemplatedApplicationNotificationEmail(10, $email_address,$vars);
+                    sendTemplatedApplicationNotificationEmail(10, $email_address, $vars);
                     //send an email to the rest of the users
                 }
             }
 
             if ($action_details->has_submission_notification == 1 && validateIsNumeric($responsible_user)) {
 
-                $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name');
-                $process_name = getSingleRecordColValue('wf_processes', array('id'=>$process_id), 'name');
-                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id'=>$to_stage), 'name');
-                $email_address = getSingleRecordColValue('users', array('id'=>$responsible_user), 'email');
+                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
+                $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name');
+                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
+                $email_address = getSingleRecordColValue('users', array('id' => $responsible_user), 'email');
                 $vars = array(
                     '{module_name}' => $module_name,
                     '{process_name}' => $process_name,
                     '{process_stage}' => $process_stage,
-                    '{application_no}' => $tracking_no.': Application No '.$ref_no,
+                    '{application_no}' => $tracking_no . ': Application No ' . $ref_no,
                 );
 
-                sendTemplatedApplicationNotificationEmail(12, $email_address,$vars);
+                sendTemplatedApplicationNotificationEmail(12, $email_address, $vars);
                 //send an email to the rest of the users
 
             }
-            if($is_inspection_submission == 1){
+            if ($is_inspection_submission == 1) {
 
                 $inspectors = $this->getInspectorsIDList($module_id, $application_code);
 
@@ -4956,15 +5105,15 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     //change usr_to
                     $submission_params['usr_to'] = $inspector->inspector_id;
                     //update submissions
-                    insertRecord('tra_submissions', $submission_params, 1,'pgsql');
+                    insertRecord('tra_submissions', $submission_params, 1, 'pgsql');
                 }
             } else {
 
                 //insertRecord('tra_submissions', $submission_params, 1,'pgsql');
                 DB::table('tra_submissions')
-                ->insert($submission_params);
+                    ->insert($submission_params);
                 //submissions
-               //dd(insertRecord('tra_submissions', $submission_params, 1,'pgsql'));
+                //dd(insertRecord('tra_submissions', $submission_params, 1,'pgsql'));
             }
 
             if ($action_details->update_portal_status == 1) {
@@ -4976,16 +5125,16 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
             }
 
-            if($has_appdate_defination == 1){
+            if ($has_appdate_defination == 1) {
 
-                $appdate_defination = array($appdate_defination=>Carbon::now(),'dola'=>Carbon::now());
+                $appdate_defination = array($appdate_defination => Carbon::now(), 'dola' => Carbon::now());
                 /* $app_update = DB::table($table_name . ' as t1')
                                  ->where('application_code', $application_code)
                                  ->update($appdate_defination);
                                  */
             }
-            if(count($application_processdefdata) >0){
-                insertRecord('tra_applications_processdefinations', $application_processdefdata, 1,'pgsql');
+            if (count($application_processdefdata) > 0) {
+                insertRecord('tra_applications_processdefinations', $application_processdefdata, 1, 'pgsql');
             }
 
             //check if Application is from inspection Submission
@@ -4993,9 +5142,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
             updateInTraySubmissions($application_id, $application_code, $from_stage, $user_id);
 
-            if($is_multi_submission == 1){
-                $submission_params['current_stage'] =  $multinextstage_id;
-                $submission_params['usr_to'] =  '';
+            if ($is_multi_submission == 1) {
+                $submission_params['current_stage'] = $multinextstage_id;
+                $submission_params['usr_to'] = '';
                 insertRecord('tra_submissions', $submission_params);
             }
             DB::commit();
@@ -5004,9 +5153,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'Application Submitted Successfully!!'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         echo json_encode($res);
         return true;
@@ -5041,19 +5190,20 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
 
     }
     // has_appdate_defination
-    public function getActionTransitionDetails($action_id){
+    public function getActionTransitionDetails($action_id)
+    {
         $rec = DB::table('wf_workflow_transitions as t1')
             ->select('t1.*')
-            ->where(array('action_id'=>$action_id))
+            ->where(array('action_id' => $action_id))
             ->first();
         return $rec;
     }
@@ -5085,10 +5235,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -5108,10 +5258,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -5129,7 +5279,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->join('wf_workflow_stages as t3', 't1.from_stage', '=', 't3.id')
                 ->join('wf_workflow_stages as t4', 't1.to_stage', '=', 't4.id')
                 // ->leftJoin('par_application_return_directives as t5', 't1.directive_id', '=', 't5.id')
-                ->select(DB::raw("t3.name as from_stage_name,t4.name as to_stage_name,t1.remarks,t1.created_on as changes_date,CONCAT(decryptval(t2.first_name,".getDecryptFunParams()."),decryptval(t2.last_name,".getDecryptFunParams().")) as author"))
+                ->select(DB::raw("t3.name as from_stage_name,t4.name as to_stage_name,t1.remarks,t1.created_on as changes_date,CONCAT(decryptval(t2.first_name," . getDecryptFunParams() . "),decryptval(t2.last_name," . getDecryptFunParams() . ")) as author"))
                 ->where($where)
                 ->orderBy('t1.id');
             $data = $qry->get();
@@ -5139,7 +5289,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         }
         return response()->json($res);
@@ -5163,10 +5313,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -5185,10 +5335,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -5214,10 +5364,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -5240,10 +5390,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -5269,10 +5419,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -5298,10 +5448,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -5322,10 +5472,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -5342,10 +5492,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -5389,9 +5539,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -5422,7 +5572,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->leftJoin('par_modules as t3', 't1.module_id', '=', 't3.id')
                 ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
                 ->leftJoin('par_importexport_permittypes as t6', 't1.importexport_permittype_id', '=', 't6.id')
-                ->select('t1.*', 't3.name as module_name','t6.name as importexport_permittype', 't4.name as sub_module', 't5.name as section_name');
+                ->select('t1.*', 't3.name as module_name', 't6.name as importexport_permittype', 't4.name as sub_module', 't5.name as section_name');
             if (validateIsNumeric($module_id)) {
                 $qry->where('t1.module_id', $module_id);
             }
@@ -5436,10 +5586,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => returnMessage($results)
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -5467,10 +5617,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => returnMessage($results)
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return response()->json($res);
     }
@@ -5490,7 +5640,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
     }
     //the details
 
-    public function saveApplicationInvoicingDetails($request,$application_id,$application_code,$tracking_no,$is_fast_track)
+    public function saveApplicationInvoicingDetails($request, $application_id, $application_code, $tracking_no, $is_fast_track)
     {
         $element_costs_id = $request->input('element_costs_id');
         $paying_currency_id = $request->input('paying_currency_id');
@@ -5502,12 +5652,12 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
         try {
             //check if invoice has been generated
-            $inv_details =  DB::table('tra_application_invoices')
+            $inv_details = DB::table('tra_application_invoices')
                 ->where('application_code', $application_code)
                 ->first();
 
-            if(!$inv_details){
-                $app_details =  DB::table($table_name)
+            if (!$inv_details) {
+                $app_details = DB::table($table_name)
                     ->where('id', $application_id)
                     ->first();
 
@@ -5519,7 +5669,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $applicant_id = $app_details->applicant_id;
                 $branch_id = $app_details->branch_id;
                 $quantity = 1;
-                if($is_fast_track == 1 && $sub_module_id == 7){
+                if ($is_fast_track == 1 && $sub_module_id == 7) {
                     $quantity = 2;
                 }
                 $isLocked = 1;
@@ -5539,22 +5689,22 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $date_today = Carbon::now();
                 $due_date = $date_today->addDays($due_date_counter);
                 $user = \Auth::user();
-                $prepared_by = decryptval($user->first_name,env('encryption_key'),env('encryption_iv')) . ' ' .decryptval($user->last_name,env('encryption_key'),env('encryption_iv'));
+                $prepared_by = decryptval($user->first_name, env('encryption_key'), env('encryption_iv')) . ' ' . decryptval($user->last_name, env('encryption_key'), env('encryption_iv'));
                 $invoicing_date = Carbon::now();
                 $invoice_params = array(
                     'applicant_id' => $applicant_id,
                     'applicant_name' => $applicant_name,
                     'paying_currency_id' => $paying_currency_id,
                     'paying_exchange_rate' => $paying_exchange_rate,
-                    'reference_no'=>$reference_no,
-                    'module_id'=>$module_id,
-                    'branch_id'=>$branch_id,
-                    'section_id'=>$section_id,
-                    'sub_module_id'=>$sub_module_id,
-                    'tracking_no'=>$tracking_no,
+                    'reference_no' => $reference_no,
+                    'module_id' => $module_id,
+                    'branch_id' => $branch_id,
+                    'section_id' => $section_id,
+                    'sub_module_id' => $sub_module_id,
+                    'tracking_no' => $tracking_no,
                     'isLocked' => $isLocked,
-                    'date_of_invoicing'=>$invoicing_date,
-                    'gepg_submission_status'=>2,
+                    'date_of_invoicing' => $invoicing_date,
+                    'gepg_submission_status' => 2,
                     'payment_terms' => 'Due in ' . $due_date_counter . ' Days',
                     'created_on' => Carbon::now()
                 );
@@ -5577,19 +5727,16 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $invoice_id = $res['record_id'];
 
                 $params = array();
-                $total_element_amount= $cost*$quantity;
-                if($paying_currency_id != $currency_id){
+                $total_element_amount = $cost * $quantity;
+                if ($paying_currency_id != $currency_id) {
 
-                    if($paying_currency_id == 4 && $currency_id ==1){
-                        $total_element_amount= $cost*$quantity*$exchange_rate;
+                    if ($paying_currency_id == 4 && $currency_id == 1) {
+                        $total_element_amount = $cost * $quantity * $exchange_rate;
+                    } else if ($paying_currency_id == 1 && $currency_id == 4) {
+                        $total_element_amount = ($cost * $quantity) / $paying_exchange_rate;
                     }
-
-                    else if($paying_currency_id == 1  && $currency_id ==4){
-                        $total_element_amount= ($cost*$quantity)/$paying_exchange_rate;
-                    }
-                }
-                else{
-                    $total_element_amount= $cost*$quantity;
+                } else {
+                    $total_element_amount = $cost * $quantity;
                 }
 
                 $params = array(
@@ -5597,9 +5744,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     'element_costs_id' => 1,
                     'element_amount' => $cost,
                     'quantity' => $quantity,
-                    'paying_currency_id'=>$paying_currency_id,
-                    'total_element_amount'=>round($total_element_amount, 2),
-                    'paying_exchange_rate'=>$paying_exchange_rate,
+                    'paying_currency_id' => $paying_currency_id,
+                    'total_element_amount' => round($total_element_amount, 2),
+                    'paying_exchange_rate' => $paying_exchange_rate,
                     'currency_id' => $currency_id,
                     'exchange_rate' => $exchange_rate
                 );
@@ -5636,7 +5783,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
                 //   applicationInvoiceEmail(5, $applicant_email, $vars, $report, 'invoice_' . $invoice_no);
 
-            }else{
+            } else {
                 $invoice_id = $inv_details->id;
                 $invoice_no = $inv_details->invoice_no;
 
@@ -5650,103 +5797,106 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             );
 
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return $res;
-    }public function saveApplicationDataAmmendmentRequest(Request $request){
-    try {
-        $module_id = $request->module_id;
-        $application_code = $request->application_code;
-        $application_id = $request->active_application_id;
-        $appdata_ammendementrequest_id = $request->appdata_ammendementrequest_id;
-        $workflow_stage_id = $request->workflow_stage_id;
-        $process_id = $request->process_id;
-        $user_id = $this->user_id;
-        $table_name = 'tra_appdata_ammendementrequests';
-        $app_table_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'tablename');
-        $app_details = getSingleRecord($app_table_name, array('application_code'=>$application_code, 'id'=>$application_id));
-        if (is_null($app_details)) {
-            $res = array(
-                'success' => false,
-                'message' => 'Problem encountered while getting application details!!'
-            );
-            return response()->json($res);
-        }
-
-        $ammendment_requestdata = array('application_code'=>$application_code,
-            'application_id'=>$application_id,
-            'requested_by'=>$user_id,
-        );
-        if(validateIsNumeric($appdata_ammendementrequest_id)){
-            $where_app = array('id'=>$appdata_ammendementrequest_id);
-            $ammendment_requestdata['dola'] = Carbon::now();
-            $ammendment_requestdata['altered_by'] = $user_id;
-            if (recordExists($table_name, $where_app)) {
-                $app_details = getPreviousRecords($table_name, $where_app);
-                if ($app_details['success'] == false) {
-                    return $app_details;
-                }
-                $app_details = $app_details['results'];
-
-                $res = updateRecord($table_name, $app_details, $where_app, $ammendment_requestdata, $user_id);
-
+    }
+    public function saveApplicationDataAmmendmentRequest(Request $request)
+    {
+        try {
+            $module_id = $request->module_id;
+            $application_code = $request->application_code;
+            $application_id = $request->active_application_id;
+            $appdata_ammendementrequest_id = $request->appdata_ammendementrequest_id;
+            $workflow_stage_id = $request->workflow_stage_id;
+            $process_id = $request->process_id;
+            $user_id = $this->user_id;
+            $table_name = 'tra_appdata_ammendementrequests';
+            $app_table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename');
+            $app_details = getSingleRecord($app_table_name, array('application_code' => $application_code, 'id' => $application_id));
+            if (is_null($app_details)) {
+                $res = array(
+                    'success' => false,
+                    'message' => 'Problem encountered while getting application details!!'
+                );
+                return response()->json($res);
             }
 
-        }
-        else{
-            $ammendment_requestdata['requested_on'] = Carbon::now();
-            $ammendment_requestdata['created_on'] = Carbon::now();
-            $ammendment_requestdata['created_by'] = $user_id;
-
-            $res = insertRecord($table_name, $ammendment_requestdata, $user_id);
-            $appdata_ammendementrequest_id = $res['record_id'];
-            $submission_params = array(
-                'application_id' => $application_id,
-                'process_id' => $process_id,
-                'view_id'=>$app_details->view_id,
+            $ammendment_requestdata = array(
                 'application_code' => $application_code,
-                "tracking_no" => $app_details->tracking_no,
-                "reference_no" => $app_details->reference_no,
-                "branch_id" => $app_details->branch_id,
-                'usr_from' => $user_id,
-                'usr_to' => $user_id,
-                'previous_stage' => $workflow_stage_id,
-                'current_stage' => $workflow_stage_id,
-                'module_id' => $app_details->module_id,
-                'sub_module_id' => $app_details->sub_module_id,
-                'section_id' => $app_details->section_id,
-                'application_status_id' =>1,
-                'urgency' => 1,
-                'applicant_id' => $app_details->applicant_id,
-                'remarks' => 'Initial save of the application',
-                'date_received' => Carbon::now(),
-                'created_on' => Carbon::now(),
-                'created_by' => $user_id,
-                'appdata_ammendementrequest_id'=>$appdata_ammendementrequest_id
+                'application_id' => $application_id,
+                'requested_by' => $user_id,
             );
+            if (validateIsNumeric($appdata_ammendementrequest_id)) {
+                $where_app = array('id' => $appdata_ammendementrequest_id);
+                $ammendment_requestdata['dola'] = Carbon::now();
+                $ammendment_requestdata['altered_by'] = $user_id;
+                if (recordExists($table_name, $where_app)) {
+                    $app_details = getPreviousRecords($table_name, $where_app);
+                    if ($app_details['success'] == false) {
+                        return $app_details;
+                    }
+                    $app_details = $app_details['results'];
 
-            $sub_res  =insertRecord('tra_submissions', $submission_params, $user_id);
+                    $res = updateRecord($table_name, $app_details, $where_app, $ammendment_requestdata, $user_id);
+
+                }
+
+            } else {
+                $ammendment_requestdata['requested_on'] = Carbon::now();
+                $ammendment_requestdata['created_on'] = Carbon::now();
+                $ammendment_requestdata['created_by'] = $user_id;
+
+                $res = insertRecord($table_name, $ammendment_requestdata, $user_id);
+                $appdata_ammendementrequest_id = $res['record_id'];
+                $submission_params = array(
+                    'application_id' => $application_id,
+                    'process_id' => $process_id,
+                    'view_id' => $app_details->view_id,
+                    'application_code' => $application_code,
+                    "tracking_no" => $app_details->tracking_no,
+                    "reference_no" => $app_details->reference_no,
+                    "branch_id" => $app_details->branch_id,
+                    'usr_from' => $user_id,
+                    'usr_to' => $user_id,
+                    'previous_stage' => $workflow_stage_id,
+                    'current_stage' => $workflow_stage_id,
+                    'module_id' => $app_details->module_id,
+                    'sub_module_id' => $app_details->sub_module_id,
+                    'section_id' => $app_details->section_id,
+                    'application_status_id' => 1,
+                    'urgency' => 1,
+                    'applicant_id' => $app_details->applicant_id,
+                    'remarks' => 'Initial save of the application',
+                    'date_received' => Carbon::now(),
+                    'created_on' => Carbon::now(),
+                    'created_by' => $user_id,
+                    'appdata_ammendementrequest_id' => $appdata_ammendementrequest_id
+                );
+
+                $sub_res = insertRecord('tra_submissions', $submission_params, $user_id);
+            }
+
+            if ($res['success']) {
+                $res = array(
+                    'success' => true,
+                    'message' => 'Application Ammendment Request Saved Successfully',
+                    'appdata_ammendementrequest_id' => $appdata_ammendementrequest_id
+                );
+            }
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
+        return \response()->json($res);
 
-        if($res['success']){
-            $res = array('success'=>true,
-                'message'=>'Application Ammendment Request Saved Successfully',
-                'appdata_ammendementrequest_id'=>$appdata_ammendementrequest_id
-            );
-        }
-
-    } catch (\Exception $exception) {
-        $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
-
-    } catch (\Throwable $throwable) {
-        $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
     }
-    return \response()->json($res);
-
-}
 
     // public function getAllWorkflow(Request $req){
     //     $module_id = $req->module_id;
@@ -5784,50 +5934,52 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
     //             );
     // return json_encode($res);
     // }
-    public function getGroupMappedWorkflowStages(Request $req){
+    public function getGroupMappedWorkflowStages(Request $req)
+    {
         $workflow_id = $req->workflow_id;
         $group_id = $req->group_id;
         $caller = $req->caller;
         $module_id = $req->module_id;
 
         $wf_stages = DB::table('tra_menu_access_permissions as t1')
-            ->join('wf_menu_workflows as t2','t1.menu_id','t2.menu_id')
+            ->join('wf_menu_workflows as t2', 't1.menu_id', 't2.menu_id')
             ->join('wf_workflow_stages as t3', 't2.workflow_id', 't3.workflow_id')
-            ->leftjoin('wf_stages_groups as t4',function ($join) {
-                $join->on('t1.group_id','t4.group_id')
+            ->leftjoin('wf_stages_groups as t4', function ($join) {
+                $join->on('t1.group_id', 't4.group_id')
                     ->on('t3.id', 't4.stage_id');
             })
-            ->join('wf_workflows as t5','t3.workflow_id','t5.id')
-            ->leftJoin('par_accesslevels as t6','t4.access_level_id','t6.id');
+            ->join('wf_workflows as t5', 't3.workflow_id', 't5.id')
+            ->leftJoin('par_accesslevels as t6', 't4.access_level_id', 't6.id');
         //->select('t2.workflow_id','t5.name as workflow_name', 't3.name as stage_name','t3.id as stage_id', 't4.id as has_access', 't4.access_level_id', 't6.name as access_level');
 
 
-        if(validateIsNumeric($workflow_id)){
-            $wf_stages->where('t2.workflow_id',$workflow_id);
+        if (validateIsNumeric($workflow_id)) {
+            $wf_stages->where('t2.workflow_id', $workflow_id);
         }
-        if(validateIsNumeric($group_id)){
-            $wf_stages->where('t1.group_id',$group_id);
+        if (validateIsNumeric($group_id)) {
+            $wf_stages->where('t1.group_id', $group_id);
         }
-        if(validateIsNumeric($module_id)){
-            $wf_stages->where('t5.module_id',$module_id);
+        if (validateIsNumeric($module_id)) {
+            $wf_stages->where('t5.module_id', $module_id);
         }
-        if($caller == 1){ //from workflow for distinct workflows
-            $wf_stages->select('t2.workflow_id','t5.name as workflow_name');
-            $wf_stages->groupBy('t2.workflow_id','t5.name');
-        }else{ //for distinct stages
-            $wf_stages->select('t2.workflow_id','t5.name as workflow_name', 't3.name as stage_name','t3.id as stage_id', 't4.id as has_access', 't4.access_level_id', 't6.name as access_level');
-            $wf_stages->groupBy('t2.workflow_id','t5.name', 't3.name','t3.id', 't4.id', 't4.access_level_id', 't6.name');
+        if ($caller == 1) { //from workflow for distinct workflows
+            $wf_stages->select('t2.workflow_id', 't5.name as workflow_name');
+            $wf_stages->groupBy('t2.workflow_id', 't5.name');
+        } else { //for distinct stages
+            $wf_stages->select('t2.workflow_id', 't5.name as workflow_name', 't3.name as stage_name', 't3.id as stage_id', 't4.id as has_access', 't4.access_level_id', 't6.name as access_level');
+            $wf_stages->groupBy('t2.workflow_id', 't5.name', 't3.name', 't3.id', 't4.id', 't4.access_level_id', 't6.name');
         }
         $result = $wf_stages->get();
         $res = array(
-            'success'=>true,
-            'message'=>'all is well',
-            'results'=>$result
+            'success' => true,
+            'message' => 'all is well',
+            'results' => $result
         );
         return json_encode($res);
     }
 
-    public function getInspectorsIDList($module_id, $application_code){
+    public function getInspectorsIDList($module_id, $application_code)
+    {
 
 
         switch ($module_id) {
@@ -5836,19 +5988,19 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 break;
             case 2:
                 $inspectors = DB::table('tra_premiseinspection_applications as t1')
-                    ->join('tra_premiseinspection_inspectors as t2','t1.inspection_id','t2.inspection_id')
-                    ->where('t1.application_code',$application_code)
+                    ->join('tra_premiseinspection_inspectors as t2', 't1.inspection_id', 't2.inspection_id')
+                    ->where('t1.application_code', $application_code)
                     ->select('t2.inspector_id')
                     ->get();
                 return $inspectors;
                 break;
             case 3:
                 $inspectors = DB::table('assigned_gmpinspections as t1')
-                    ->leftjoin('gmp_inspectorsdetails as t2','t1.inspection_id','t2.inspection_id')
-                    ->where('t1.application_code',$application_code)
+                    ->leftjoin('gmp_inspectorsdetails as t2', 't1.inspection_id', 't2.inspection_id')
+                    ->where('t1.application_code', $application_code)
                     ->select('t2.inspector_id')
                     ->get();
-                return$inspectors;
+                return $inspectors;
                 break;
             case 4:
                 return [];
@@ -5861,8 +6013,8 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 break;
             case 7:
                 $inspectors = DB::table('tra_ctrgcp_inspectedsites as t1')
-                    ->join('tra_premiseinspection_inspectors as t2','t1.inspection_id','t2.inspection_id')
-                    ->where('t1.application_code',$application_code)
+                    ->join('tra_premiseinspection_inspectors as t2', 't1.inspection_id', 't2.inspection_id')
+                    ->where('t1.application_code', $application_code)
                     ->select('t2.inspector_id')
                     ->get();
                 return $inspectors;
@@ -5876,140 +6028,142 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
     public function setIsDoneIFInspectionApplicationSubmission($application_code, $pre_stage)
     {
         $pre_prev_stage = DB::table('tra_submissions')
-            ->where('application_code',$application_code)
-            ->where('current_stage',$pre_stage)
-            ->orderBy('id','DESC')
+            ->where('application_code', $application_code)
+            ->where('current_stage', $pre_stage)
+            ->orderBy('id', 'DESC')
             ->select('previous_stage')
             ->first();
-        if($pre_prev_stage){
+        if ($pre_prev_stage) {
             $actions = DB::table('wf_workflow_stages as t1')
                 ->join('wf_workflow_actions as t2', 't1.id', '=', 't2.stage_id')
-                ->where('t1.id',$pre_prev_stage->previous_stage)
+                ->where('t1.id', $pre_prev_stage->previous_stage)
                 ->select('t2.is_inspection_submission')
                 ->first();
             $latest_entry = DB::table('tra_submissions')
-                ->where('application_code',$application_code)
-                ->orderBy('id','DESC')
+                ->where('application_code', $application_code)
+                ->orderBy('id', 'DESC')
                 ->select('id')
                 ->first();
 
             $is_inspection_submission = 0;
-            if(isset($action_details->is_inspection_submission)){
-                $is_inspection_submission = $action_details->is_inspection_submission;
+            if (isset($actions->is_inspection_submission)) {
+                $is_inspection_submission = $actions->is_inspection_submission;
             }
-            if($is_inspection_submission == 1){
+            if ($is_inspection_submission == 1) {
                 $update = DB::table('tra_submissions')
                     ->where('application_code', $application_code)
-                    ->where('id','<',$latest_entry->id)
-                    ->update(array('is_done'=> 1));
+                    ->where('id', '<', $latest_entry->id)
+                    ->update(array('is_done' => 1));
             }
 
         }
 
-    }public function saveRegistrationCancellationRequest(Request $req){
-    $reference_no = $req->reference_no;
-    $module_id = $req->module_id;
-    $requested_by = $req->requested_by;
-    $requested_on = $req->requested_on;
-    $cancellation_reason_id = $req->cancellation_reason_id;
-    $user_id = $this->user_id;
-    $remarks = $req->remarks;
-    DB::beginTransaction();
-    try{
-        if(validateIsNumeric($module_id) && $reference_no != ''){
-            $table_names = DB::table('par_modules')->where('id', $module_id)->select('tablename','cancellation_table_name')->first();
-            if(isset($table_names->table_name) && isset($table_names->cancellation_table_name)){
-                $table_name = $table_names->table_name;
-                $cancellation_table_name = $table_names->cancellation_table_name;
-                $table_data = DB::table($table_name)->where('reference_no', $reference_no)->first();
-
-                if(!empty($table_data)){
-                    $table_data->app_id = $table_data->id;
-                    unset($table_data->id);
-                    $table_data = (array)$table_data;
-                    $res = insertRecord($cancellation_table_name,$table_data, $user_id);
-                    if(!$res['success']){
-                        DB::rollBack();
-                        return $res;
-                    }
-                    $cancellation_request_data = array(
-                        'reference_no' => $reference_no,
-                        'app_id' => $table_data['app_id'],
-                        'tracking_no' => $table_data['tracking_no'],
-                        'module_id' => $module_id,
-                        'requested_by' => $requested_by,
-                        'requested_on' => $req->requested_on,
-                        'cancellation_reason_id' => $cancellation_reason_id,
-                        'approved_by_id' => $user_id,
-                        'approved_on' => Carbon::now(),
-                        'remarks' => $remarks,
-                        'cancellation_status_id' => 1
-                    );
-                    $res = insertRecord('tra_registrationcancellation_requests',$cancellation_request_data, $user_id);
-
-                    if(!$res['success']){
-                        DB::rollBack();
-                        return $res;
-                    }
-                    //delete from main table
-                    $del = DB::table($table_name)->where('reference_no', $reference_no)->delete();
-                    if($del){
-                        //flag off submissions
-                        DB::table('tra_submissions')->where('reference_no', $reference_no)->orWhere('tracking_no', $table_data['tracking_no'])->update(['is_done'=>1]);
-                        $res = array('message'=>'Application cancelled successfully','success'=>true);
-                        //email trader
-                        //trader details
-
-                        $applicant = DB::table($table_name.' as t1')
-                            ->join('wb_trader_account as t2', 't1.applicant_id', 't2.id')
-                            ->where('reference_no', $reference_no)
-                            ->orWhere('tracking_no', $table_data['tracking_no'])
-                            ->first();
-
-                        $template_id = 19; //email template id
-                        //$email = $applicant->email;
-                        $vars = array(
-                            '{reference_no}'=>$reference_no,
-                            '{cancellation_reason}'=>getSingleRecordColValue('par_cancellation_reasons', array('id' => $cancellation_reason_id), 'name'),
-                            '{requested_by}'=>$requested_by,
-                            '{cancellation_date}'=>Carbon::now()
-                        );
-                        //sendTemplatedApplicationNotificationEmail($template_id, $email, $vars);
-                        DB::commit();
-                    }else{
-                        DB::rollBack();
-                        $res = array('message'=>'Failed to cancel application from main table','success'=>false);
-
-                    }
-                }else{
-                    DB::rollBack();
-                    $res = array('success'=>false, 'message'=>'The provided reference has no entries');
-                }
-
-
-            }else{
-                DB::rollBack();
-                $res = array('success'=>false, 'message'=>'Missing transaction/cancellation table name from the selected modules');
-            }
-        }else{
-            DB::rollBack();
-            $res = array('success'=>false, 'message'=>'Module or Reference_no was not submitted');
-        }
-    }catch (\Exception $exception) {
-        DB::rollBack();
-        $res = array(
-            'success' => false,
-            'message' => $exception->getMessage()
-        );
-    } catch (\Throwable $throwable) {
-        DB::rollBack();
-        $res = array(
-            'success' => false,
-            'message' => $throwable->getMessage()
-        );
     }
-    return \response()->json($res);
-}
+    public function saveRegistrationCancellationRequest(Request $req)
+    {
+        $reference_no = $req->reference_no;
+        $module_id = $req->module_id;
+        $requested_by = $req->requested_by;
+        $requested_on = $req->requested_on;
+        $cancellation_reason_id = $req->cancellation_reason_id;
+        $user_id = $this->user_id;
+        $remarks = $req->remarks;
+        DB::beginTransaction();
+        try {
+            if (validateIsNumeric($module_id) && $reference_no != '') {
+                $table_names = DB::table('par_modules')->where('id', $module_id)->select('tablename', 'cancellation_table_name')->first();
+                if (isset($table_names->table_name) && isset($table_names->cancellation_table_name)) {
+                    $table_name = $table_names->table_name;
+                    $cancellation_table_name = $table_names->cancellation_table_name;
+                    $table_data = DB::table($table_name)->where('reference_no', $reference_no)->first();
+
+                    if (!empty($table_data)) {
+                        $table_data->app_id = $table_data->id;
+                        unset($table_data->id);
+                        $table_data = (array) $table_data;
+                        $res = insertRecord($cancellation_table_name, $table_data, $user_id);
+                        if (!$res['success']) {
+                            DB::rollBack();
+                            return $res;
+                        }
+                        $cancellation_request_data = array(
+                            'reference_no' => $reference_no,
+                            'app_id' => $table_data['app_id'],
+                            'tracking_no' => $table_data['tracking_no'],
+                            'module_id' => $module_id,
+                            'requested_by' => $requested_by,
+                            'requested_on' => $req->requested_on,
+                            'cancellation_reason_id' => $cancellation_reason_id,
+                            'approved_by_id' => $user_id,
+                            'approved_on' => Carbon::now(),
+                            'remarks' => $remarks,
+                            'cancellation_status_id' => 1
+                        );
+                        $res = insertRecord('tra_registrationcancellation_requests', $cancellation_request_data, $user_id);
+
+                        if (!$res['success']) {
+                            DB::rollBack();
+                            return $res;
+                        }
+                        //delete from main table
+                        $del = DB::table($table_name)->where('reference_no', $reference_no)->delete();
+                        if ($del) {
+                            //flag off submissions
+                            DB::table('tra_submissions')->where('reference_no', $reference_no)->orWhere('tracking_no', $table_data['tracking_no'])->update(['is_done' => 1]);
+                            $res = array('message' => 'Application cancelled successfully', 'success' => true);
+                            //email trader
+                            //trader details
+
+                            $applicant = DB::table($table_name . ' as t1')
+                                ->join('wb_trader_account as t2', 't1.applicant_id', 't2.id')
+                                ->where('reference_no', $reference_no)
+                                ->orWhere('tracking_no', $table_data['tracking_no'])
+                                ->first();
+
+                            $template_id = 19; //email template id
+                            //$email = $applicant->email;
+                            $vars = array(
+                                '{reference_no}' => $reference_no,
+                                '{cancellation_reason}' => getSingleRecordColValue('par_cancellation_reasons', array('id' => $cancellation_reason_id), 'name'),
+                                '{requested_by}' => $requested_by,
+                                '{cancellation_date}' => Carbon::now()
+                            );
+                            //sendTemplatedApplicationNotificationEmail($template_id, $email, $vars);
+                            DB::commit();
+                        } else {
+                            DB::rollBack();
+                            $res = array('message' => 'Failed to cancel application from main table', 'success' => false);
+
+                        }
+                    } else {
+                        DB::rollBack();
+                        $res = array('success' => false, 'message' => 'The provided reference has no entries');
+                    }
+
+
+                } else {
+                    DB::rollBack();
+                    $res = array('success' => false, 'message' => 'Missing transaction/cancellation table name from the selected modules');
+                }
+            } else {
+                DB::rollBack();
+                $res = array('success' => false, 'message' => 'Module or Reference_no was not submitted');
+            }
+        } catch (\Exception $exception) {
+            DB::rollBack();
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            DB::rollBack();
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return \response()->json($res);
+    }
     /*public function saveRegistrationCancellationRequest(Request $req){
           $reference_no = $req->reference_no;
           $module_id = $req->module_id;
@@ -6086,7 +6240,8 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
           }
           return \response()->json($res);
       }*/
-    public function getCancelledRegistrationApplications(Request $req){
+    public function getCancelledRegistrationApplications(Request $req)
+    {
         $start = $req->start;
         $limit = $req->limit;
         $filters = $req->filter;
@@ -6095,21 +6250,21 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         $approved_by_id = $req->approved_by_id;
         $status_id = $req->status_id;
         $qry = DB::table('tra_registrationcancellation_requests as t1')
-            ->leftjoin('par_cancellation_reasons as t2','t1.cancellation_reason_id', 't2.id')
-            ->leftjoin('users as t4','t1.approved_by_id', 't4.id')
-            ->leftjoin('modules as t5','t1.module_id', 't5.id')
-            ->leftjoin('par_cancellation_statuses as t6','t1.cancellation_status_id', 't6.id')
-            ->select('t1.*','t2.name as cancellation_reason','t1.requested_by','t5.name as module_name','t6.name as cancellation_status', DB::raw("CONCAT_WS(' ',decrypt(t4.first_name),decrypt(t4.last_name)) as approved_by"));
-        if(validateIsNumeric($module_id)){
+            ->leftjoin('par_cancellation_reasons as t2', 't1.cancellation_reason_id', 't2.id')
+            ->leftjoin('users as t4', 't1.approved_by_id', 't4.id')
+            ->leftjoin('modules as t5', 't1.module_id', 't5.id')
+            ->leftjoin('par_cancellation_statuses as t6', 't1.cancellation_status_id', 't6.id')
+            ->select('t1.*', 't2.name as cancellation_reason', 't1.requested_by', 't5.name as module_name', 't6.name as cancellation_status', DB::raw("CONCAT_WS(' ',decrypt(t4.first_name),decrypt(t4.last_name)) as approved_by"));
+        if (validateIsNumeric($module_id)) {
             $qry->where('t1.module_id', $module_id);
         }
-        if(validateIsNumeric($requested_by_id)){
+        if (validateIsNumeric($requested_by_id)) {
             $qry->where('t1.requested_by_id', $requested_by_id);
         }
-        if(validateIsNumeric($approved_by_id)){
+        if (validateIsNumeric($approved_by_id)) {
             $qry->where('t1.approved_by_id', $approved_by_id);
         }
-        if(validateIsNumeric($status_id)){
+        if (validateIsNumeric($status_id)) {
             $qry->where('t1.cancellation_status_id', $status_id);
         }
         $whereClauses = array();
@@ -6119,13 +6274,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             if ($filters != NULL) {
                 foreach ($filters as $filter) {
                     switch ($filter->property) {
-                        case 'reference_no' :
+                        case 'reference_no':
                             $whereClauses[] = "t1.reference_no like '%" . ($filter->value) . "%'";
                             break;
-                        case 'tracking_no' :
+                        case 'tracking_no':
                             $whereClauses[] = "t1.tracking_no like '%" . ($filter->value) . "%'";
                             break;
-                        case 'requested_on' :
+                        case 'requested_on':
                             $whereClauses[] = "date_format(t1.requested_on, '%Y%-%m-%d')= '" . formatDate($filter->value) . "'";
                             break;
                     }
@@ -6150,15 +6305,16 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         );
         return \response()->json($res);
     }
-    public function getCancelledRegistrationApplicationDetails(Request $req){
+    public function getCancelledRegistrationApplicationDetails(Request $req)
+    {
         $can_id = $req->can_id;
-        if(validateIsNumeric($can_id)){
+        if (validateIsNumeric($can_id)) {
             $can_data = DB::table('tra_registrationcancellation_requests')->where('id', $can_id)->first();
-            if(isset($can_data->module_id) && isset($can_data->app_id)){
+            if (isset($can_data->module_id) && isset($can_data->app_id)) {
                 $module_id = $can_data->module_id;
                 $app_id = $can_data->app_id;
                 $table_names = DB::table('par_modules')->where('id', $module_id)->select('cancellation_table_name')->first();
-                if(isset($table_names->cancellation_table_name)){
+                if (isset($table_names->cancellation_table_name)) {
                     $cancellation_table_name = $table_names->cancellation_table_name;
 
                     $data = DB::table($cancellation_table_name)->where('app_id', $app_id)->get();
@@ -6167,35 +6323,36 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                         'results' => $data,
                         'message' => 'All is well'
                     );
-                }else{
-                    $res = array('success'=>false, 'message'=>'no cancellation table is set for the Module');
+                } else {
+                    $res = array('success' => false, 'message' => 'no cancellation table is set for the Module');
                 }
 
-            }else{
-                $res = array('success'=>false, 'message'=>'Record not found');
+            } else {
+                $res = array('success' => false, 'message' => 'Record not found');
             }
-        }else{
-            $res = array('success'=>false, 'message'=>'Record id was not passed during request');
+        } else {
+            $res = array('success' => false, 'message' => 'Record id was not passed during request');
         }
         return \response()->json($res);
     }
-    public function RevertRegistrationCancellation(Request $req){
+    public function RevertRegistrationCancellation(Request $req)
+    {
         $can_id = $req->can_id;
         $user_id = $this->user_id;
-        try{
-            if(validateIsNumeric($can_id)){
+        try {
+            if (validateIsNumeric($can_id)) {
                 DB::beginTransaction();
                 $can_data = DB::table('tra_registrationcancellation_requests')->where('id', $can_id)->first();
-                if(isset($can_data->module_id) && isset($can_data->app_id)){
+                if (isset($can_data->module_id) && isset($can_data->app_id)) {
                     $module_id = $can_data->module_id;
                     $app_id = $can_data->app_id;
-                    $table_names = DB::table('par_modules')->where('id', $module_id)->select('cancellation_table_name','tablename')->first();
-                    if(isset($table_names->cancellation_table_name) && isset($table_names->table_name)){
+                    $table_names = DB::table('par_modules')->where('id', $module_id)->select('cancellation_table_name', 'tablename')->first();
+                    if (isset($table_names->cancellation_table_name) && isset($table_names->table_name)) {
                         $cancellation_table_name = $table_names->cancellation_table_name;
                         $table_name = $table_names->table_name;
 
                         $data = DB::table($cancellation_table_name)->where('app_id', $app_id)->first();
-                        if(empty($data)){
+                        if (empty($data)) {
                             return array(
                                 'success' => false,
                                 'message' => 'Application details not found from cancellation table'
@@ -6203,40 +6360,40 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                         }
                         $data->id = $data->app_id;
                         unset($data->app_id);
-                        $table_data =  (array)$data;
+                        $table_data = (array) $data;
                         $res = insertRecord($table_name, $table_data, $user_id);
-                        if(!$res['success']){
+                        if (!$res['success']) {
                             DB::rollBack();
                             return $res;
                         }
                         //delete from main table
                         $del = DB::table($cancellation_table_name)->where('app_id', $app_id)->delete();
-                        if($del){
-                            DB::table('tra_registrationcancellation_requests')->where('id', $can_id)->update(['cancellation_status_id'=>2]);
+                        if ($del) {
+                            DB::table('tra_registrationcancellation_requests')->where('id', $can_id)->update(['cancellation_status_id' => 2]);
                             $res = array(
                                 'success' => true,
                                 'message' => 'Application Reverted back successfully'
                             );
                             DB::commit();
-                        }else{
+                        } else {
                             DB::rollBack();
-                            $res = array('message'=>'Failed to cancel application from cancellation table','success'=>false);
+                            $res = array('message' => 'Failed to cancel application from cancellation table', 'success' => false);
 
                         }
 
-                    }else{
+                    } else {
                         DB::rollBack();
-                        $res = array('success'=>false, 'message'=>'no cancellation table is set for the Module');
+                        $res = array('success' => false, 'message' => 'no cancellation table is set for the Module');
                     }
 
-                }else{
+                } else {
                     DB::rollBack();
-                    $res = array('success'=>false, 'message'=>'Record not found');
+                    $res = array('success' => false, 'message' => 'Record not found');
                 }
-            }else{
-                $res = array('success'=>false, 'message'=>'Record id was not passed during request');
+            } else {
+                $res = array('success' => false, 'message' => 'Record id was not passed during request');
             }
-        }catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             DB::rollBack();
             $res = array(
                 'success' => false,
@@ -6251,39 +6408,39 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
         }
         return \response()->json($res);
     }
-    public function checkWorkflowStageInformationVisibilityMode(Request $req){
+    public function checkWorkflowStageInformationVisibilityMode(Request $req)
+    {
         $stage_id = $req->stage_id;
         $user_id = $this->user_id;
         $user_groups = getUserGroups($user_id);
-        try{
-            if(validateIsNumeric($stage_id)){
+        try {
+            if (validateIsNumeric($stage_id)) {
                 $qry = DB::table('wf_stages_groups as t1')
                     ->select('t1.access_level_id as access_level')
                     ->where('t1.stage_id', $stage_id)
                     ->whereIn('t1.group_id', $user_groups)
                     ->first();
                 $is_super_user = belongsToSuperGroup($user_groups);
-                if($is_super_user){
+                if ($is_super_user) {
                     $res = array(
-                        'success'=>true,
-                        'access_level'=> 3
+                        'success' => true,
+                        'access_level' => 3
                     );
-                }
-                else if(isset($qry->access_level)){
+                } else if (isset($qry->access_level)) {
                     $res = array(
-                        'success'=>true,
-                        'access_level'=> $qry->access_level
+                        'success' => true,
+                        'access_level' => $qry->access_level
                     );
-                }else{
-                    $res = array('success'=>false, 'message'=>'no interface access level set for the stage');
+                } else {
+                    $res = array('success' => false, 'message' => 'no interface access level set for the stage');
                 }
-            }else{
-                $res = array('success'=>false, 'message'=>'no stage captured');
+            } else {
+                $res = array('success' => false, 'message' => 'no stage captured');
             }
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
@@ -6299,13 +6456,13 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             $app_codes = convertStdClassObjToArray($application_codes);
             $codes = convertAssArrayToSimpleArray($app_codes, 'application_code');
             //$logs = DB::table('tra_applicationchecklist_logs')->where(['application_code'=>$application_code, 'workflow_stage_id'=>$workflow_stage_id])->get();
-            $logs = DB::table('tra_applicationchecklist_logs')->where(['workflow_stage_id'=>$workflow_stage_id])->whereIn('application_code', $codes)->get();
+            $logs = DB::table('tra_applicationchecklist_logs')->where(['workflow_stage_id' => $workflow_stage_id])->whereIn('application_code', $codes)->get();
             $submission_ids = array();
             foreach ($logs as $log) {
                 $submission_ids[] = $log->submission_id;
             }
-            if(empty($submission_ids)){
-                $res = array('success'=>true, 'message'=>'all is well', 'results'=>array());
+            if (empty($submission_ids)) {
+                $res = array('success' => true, 'message' => 'all is well', 'results' => array());
                 return \response()->json($res);
             }
             //get checklist per user
@@ -6316,11 +6473,11 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->leftJoin('users as t5', 't3.user_id', '=', 't5.id');
 
             //switch between auditor history and evaluators
-            if(validateIsNumeric($is_auditor)){
-                $qry->select(DB::raw("t2.*,t1.*,t1.auditorpass_status as pass_status, t1.auditor_comment as comment, t1.id as item_resp_id,t1.created_on,CONCAT(decryptval(t4.first_name,".getDecryptFunParams()."),' ',decryptval(t4.last_name,".getDecryptFunParams().")) as captured_by, t3.created_on as submission_date"))
+            if (validateIsNumeric($is_auditor)) {
+                $qry->select(DB::raw("t2.*,t1.*,t1.auditorpass_status as pass_status, t1.auditor_comment as comment, t1.id as item_resp_id,t1.created_on,CONCAT(decryptval(t4.first_name," . getDecryptFunParams() . "),' ',decryptval(t4.last_name," . getDecryptFunParams() . ")) as captured_by, t3.created_on as submission_date"))
                     ->whereIn('t1.submission_id', $submission_ids);
-            }else{
-                $qry->select(DB::raw("t2.*,t1.*,t1.id as item_resp_id,t1.created_on,CONCAT(decryptval(t4.first_name,".getDecryptFunParams()."),' ',decryptval(t4.last_name,".getDecryptFunParams().")) as captured_by, t3.created_on as submission_date"))
+            } else {
+                $qry->select(DB::raw("t2.*,t1.*,t1.id as item_resp_id,t1.created_on,CONCAT(decryptval(t4.first_name," . getDecryptFunParams() . "),' ',decryptval(t4.last_name," . getDecryptFunParams() . ")) as captured_by, t3.created_on as submission_date"))
                     ->whereIn('t1.submission_id', $submission_ids);
             }
 
@@ -6332,15 +6489,15 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => returnMessage($results)
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
     public function getPreviousSubmissionDetails(Request $request)
     {
-        try{
+        try {
             $application_code = $request->input('application_code');
             $submission_data = DB::table('tra_submissions as t1')
                 ->join('par_additionalpayment_types as t2', 't1.additionalpayment_type_id', 't2.id')
@@ -6354,21 +6511,21 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => 'All is well'
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
     public function getApplicationSubmissionRemarks(Request $req)
     {
-        try{
+        try {
             $application_code = $req->application_code;
-            if(validateIsNumeric($application_code)){
+            if (validateIsNumeric($application_code)) {
                 $qry = DB::table('tra_submissions as t1')
                     ->leftJoin('users as t2', 't1.usr_from', 't2.id')
-                    ->select(DB::raw(" CONCAT(decryptval(t2.first_name,".getDecryptFunParams()."),' ',decryptval(t2.last_name,".getDecryptFunParams().")) as remark_by, t1.remarks as remark, t1.created_on as remark_on"))
+                    ->select(DB::raw(" CONCAT(decryptval(t2.first_name," . getDecryptFunParams() . "),' ',decryptval(t2.last_name," . getDecryptFunParams() . ")) as remark_by, t1.remarks as remark, t1.created_on as remark_on"))
                     ->where('t1.application_code', $application_code)
                     ->orderBy('t1.id', 'DESC');
                 $results = $qry->first();
@@ -6377,21 +6534,22 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     'results' => $results,
                     'message' => 'All is well'
                 );
-            }else{
+            } else {
                 $res = array(
                     'success' => false,
                     'message' => 'Failed to get the application'
                 );
             }
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
-    public function getManagerReviewChecklistLogs(Request $req){
+    public function getManagerReviewChecklistLogs(Request $req)
+    {
         try {
             $application_code = $req->input('application_code');
             $is_evaluation = $req->is_evaluation;
@@ -6434,10 +6592,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 2 - Evaluation
                 3 - Audit
             -----------------------------------------------------------*/
-            if(validateIsNumeric($is_evaluation)){
+            if (validateIsNumeric($is_evaluation)) {
                 $qry->where('t7.category_group_id', 2);
             }
-            if(validateIsNumeric($is_auditor)){
+            if (validateIsNumeric($is_auditor)) {
                 $qry->where('t7.category_group_id', 3);
             }
 
@@ -6448,22 +6606,22 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 'message' => returnMessage($results)
             );
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
     }
     public function getApprovalExpiryDate(Request $req)
     {
         $approval_date = $req->approved_date;
-        if($approval_date != ''){
+        if ($approval_date != '') {
             $sub_module_id = $req->sub_module_id;
-            $approval_date =  Carbon::parse($req->approved_date)->format('Y-m-d');
+            $approval_date = Carbon::parse($req->approved_date)->format('Y-m-d');
             $date_ins = Carbon::createFromFormat('Y-m-d', $approval_date);
             //get setup
-            $exp_data = getTableData('par_approval_durations', array('sub_module_id'=>$sub_module_id));
-            if($exp_data){
+            $exp_data = getTableData('par_approval_durations', array('sub_module_id' => $sub_module_id));
+            if ($exp_data) {
                 $expiry_date = $exp_data->duration_days;
                 $dates = $date_ins->addDays($expiry_date);
                 $res = array(
@@ -6471,29 +6629,30 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                     'expiry_date' => $dates->format('Y-m-d'),
                     'message' => 'All is well'
                 );
-            }else{
+            } else {
                 $res = array(
                     'success' => false,
                     'message' => 'Duration Not Configured'
                 );
             }
-        }else{
-             $res = array(
-                    'success' => true,
-                    'message' => 'No approval date was passed'
-                );
+        } else {
+            $res = array(
+                'success' => true,
+                'message' => 'No approval date was passed'
+            );
         }
         return $res;
     }
-    public function deleteWorkflowMappingRecord($workflow_id){
-        try{
+    public function deleteWorkflowMappingRecord($workflow_id)
+    {
+        try {
             DB::beginTransaction();
             $where = array(
                 'workflow_id' => $workflow_id
             );
 
             //delete transitions
-            $res = deleteRecord('wf_workflow_transitions', $where );
+            $res = deleteRecord('wf_workflow_transitions', $where);
             // if(!$res['success']){
             //     DB::rollback();
             //     return $res;
@@ -6503,26 +6662,26 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             foreach ($stages as $stage) {
                 $stage_id = $stage->id;
                 //delete Actions
-                $res = deleteRecord('wf_workflow_actions', ['stage_id'=>$stage_id]);
+                $res = deleteRecord('wf_workflow_actions', ['stage_id' => $stage_id]);
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
                 //delete stage to group mapping
-                $res = deleteRecord('wf_stages_groups', ['stage_id'=>$stage_id]);
+                $res = deleteRecord('wf_stages_groups', ['stage_id' => $stage_id]);
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
                 //delete Stage
-                $res = deleteRecord('wf_workflow_stages', ['id'=>$stage_id]);
+                $res = deleteRecord('wf_workflow_stages', ['id' => $stage_id]);
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
             }
             //wf to menu mapping
-            $res = deleteRecord('wf_menu_workflows', $where );
+            $res = deleteRecord('wf_menu_workflows', $where);
             // if(!$res['success']){
             //     DB::rollback();
             //     return $res;
@@ -6530,9 +6689,9 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             //may delete processes inheriting the workflow
 
             //delete workflow
-            $res = deleteRecord('wf_workflows', ['id'=>$workflow_id] );
+            $res = deleteRecord('wf_workflows', ['id' => $workflow_id]);
 
-            if(!$res['success']){
+            if (!$res['success']) {
                 DB::rollback();
                 return $res;
             }
@@ -6541,14 +6700,14 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
 
 
 
-        }catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return $res;
     }
-     public function getReportApplicableChecklistItems(Request $request)
+    public function getReportApplicableChecklistItems(Request $request)
     {
         $checklist_type = $request->input('checklist_type');
         $application_code = $request->input('application_code');
@@ -6566,10 +6725,10 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             if ($filters != NULL) {
                 foreach ($filters as $filter) {
                     switch ($filter->property) {
-                        case 'status' :
+                        case 'status':
                             $whereClauses[] = "t1.name like '%" . ($filter->value) . "%'";
                             break;
-                        case 'auditorpass_status' :
+                        case 'auditorpass_status':
                             $whereClauses[] = "t2.pass_status = '" . ($filter->value) . "'";
                             break;
                     }
@@ -6580,7 +6739,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 $filter_string = implode(' AND ', $whereClauses);
             }
         }
-        if(validateIsNumeric($pass_status)){
+        if (validateIsNumeric($pass_status)) {
             $whereClauses[] = "t2.pass_status = '" . ($pass_status) . "'";
         }
         try {
@@ -6599,7 +6758,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
                 ->join('par_checklist_categories as t5', 't3.checklist_category_id', '=', 't5.id')
                 ->select(DB::raw("t1.*,t1.id as checklist_item_id, t2.id as item_resp_id,t2.pass_status, t2.comment,t2.observation, t2.auditor_comment, t3.name as checklist_type, t2.auditorpass_status, $module_id as module_id, $sub_module_id as sub_module_id,  t4.query, t4.query_response"));
 
-            if($filter_string != ''){
+            if ($filter_string != '') {
                 $qry->whereRaw($filter_string);
             }
             if (validateIsNumeric($application_code)) {
@@ -6612,7 +6771,7 @@ public function getInitialDocumentCreationWorkflowDetails(Request $request)
             // else {
             //     $qry->whereIn('t1.checklist_type_id', $checklist_types);
             // }
-            if(validateIsNumeric($pass_status)){
+            if (validateIsNumeric($pass_status)) {
                 $qry->where('t2.pass_status', $pass_status);
             }
 

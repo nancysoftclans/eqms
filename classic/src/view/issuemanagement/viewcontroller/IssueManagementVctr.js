@@ -65,6 +65,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
             me.fireEvent(
               "onNewIssueApplication",
               application_type,
+              issue_type_id,
               wrapper_xtype
             );
             win.close();
@@ -89,5 +90,87 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         },
       });
     }
+  },
+
+  quickNavigation: function (btn) {
+    var step = btn.step,
+      wizard = btn.wizard,
+      max_step = btn.max_step,
+      wizardPnl = btn.up(wizard);
+
+    motherPnl = wizardPnl;
+    (panel = motherPnl.up("panel")),
+      (application_id = motherPnl
+        .down("hiddenfield[name=sub_module_id]")
+        .getValue()),
+      (progress = wizardPnl.down("#progress_tbar")),
+      (progressItems = progress.items.items);
+
+    if (step == 1) {
+      var thisItem = progressItems[step];
+      if (!application_id) {
+        thisItem.setPressed(false);
+        toastr.warning(
+          "Please save document details first!!",
+          "Warning Response"
+        );
+        return false;
+      }
+    }
+    if (step == 0) {
+      motherPnl.down("button[name=save]").setVisible(true);
+      panel.getViewModel().set("atBeginning", false);
+      panel.getViewModel().set("atEnd", true);
+      wizardPnl.down("button[name=process_submission_btn]").setVisible(false);
+    } else if (step == max_step) {
+      motherPnl.down("button[name=save]").setVisible(false);
+      panel.getViewModel().set("atBeginning", true);
+      wizardPnl.down("button[name=process_submission_btn]").setVisible(true);
+    } else {
+      panel.getViewModel().set("atBeginning", false);
+      panel.getViewModel().set("atEnd", false);
+      if (wizardPnl.down("button[name=save]")) {
+        wizardPnl.down("button[name=save]").setVisible(false);
+      }
+
+      wizardPnl.down("button[name=process_submission_btn]").setVisible(false);
+    }
+
+    wizardPnl.getLayout().setActiveItem(step);
+    var layout = wizardPnl.getLayout(),
+      item = null,
+      i = 0,
+      activeItem = layout.getActiveItem();
+
+    for (i = 0; i < progressItems.length; i++) {
+      item = progressItems[i];
+
+      if (step === item.step) {
+        item.setPressed(true);
+      } else {
+        item.setPressed(false);
+      }
+
+      if (Ext.isIE8) {
+        item.btnIconEl.syncRepaint();
+      }
+    }
+    activeItem.focus();
+  },
+
+  onPrevCardClick: function (btn) {
+    var wizard = btn.wizard,
+      wizardPnl = btn.up(wizard);
+    wizardPnl.getViewModel().set("atEnd", false);
+    this.navigate(btn, wizardPnl, "prev");
+  },
+
+  onNextCardClick: function (btn) {
+    var wizard = btn.wizard,
+      wizardPnl = btn.up(wizard);
+    motherPnl = wizardPnl.up("panel");
+
+    motherPnl.getViewModel().set("atBeginning", false);
+    this.navigate(btn, wizardPnl, "next");
   },
 });

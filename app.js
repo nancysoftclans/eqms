@@ -2028,3 +2028,28 @@ function syncOnlineApplications() {
         // }
     });
 }
+
+function getIssueManagementWorkflowDetails(module_id, issue_type_id,sub_module_id) {
+    var results = [];
+    Ext.Ajax.request({
+        method: 'GET',
+        async: false,
+        url: 'workflow/getIssueManagementWorkflowDetails',
+        params: {
+            module_id: module_id,
+            sub_module_id: sub_module_id,
+            issue_type_id:issue_type_id
+        },
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
+        success: function (response) {
+            var resp = Ext.JSON.decode(response.responseText),
+                success = resp.success;
+            if (success || success == true || success === true) {
+                results = resp.results;
+            }
+        }
+    });
+    return results;
+}

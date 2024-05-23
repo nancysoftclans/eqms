@@ -8,7 +8,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentDetailsPnl', {
     defaults:{
         margin: 3
     },viewModel: {
-        type: 'importexportpermitsvm'
+        type: 'documentcreationvm'
     },
     // listeners: {
     //     tabchange: 'funcActiveImportOtherInformationTab'
