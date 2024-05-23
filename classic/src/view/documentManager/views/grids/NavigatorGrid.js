@@ -411,4 +411,3 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
     // }
     }]
 });
-

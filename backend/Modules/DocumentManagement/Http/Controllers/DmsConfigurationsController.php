@@ -177,12 +177,12 @@ class DmsConfigurationsController extends Controller
     public function getParameterstableSchema()
     {
         $data = array();
-        $data = DD::select("show tables like '%par%'");
-        foreach ($tables as $table) {
+        $data = DB::select("show tables like '%par%'");
+        foreach ($data as $table) {
             $data[] = array('table_name' => $table_name);
 
         }
-        $response = array('data' => $data, 'success' => true);
+        $res = array('data' => $data, 'success' => true);
         return \response()->json($res);
     }
  

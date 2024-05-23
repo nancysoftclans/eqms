@@ -19,7 +19,8 @@
     },
     frame: true,
     bodyPadding: 8,
-    items: [{
+    items: [
+    {
         xtype: 'hiddenfield',
         margin: '0 20 20 0',
         name: 'table_name',
@@ -46,7 +47,22 @@
         margin: '0 20 20 0',
         name: 'id',
         allowBlank: true
-    }, {
+    },  {
+        xtype:'fieldset',
+        columnWidth: 1,
+        title: "",
+        collapsible: true,
+        defaults: {
+            labelAlign: 'top',
+            allowBlank: false,
+            labelAlign: 'top',
+            margin: 5,
+            xtype: 'textfield',
+            allowBlank: false,
+            columnWidth: 0.33,
+        },
+        layout: 'column',
+        items:[{
         xtype: 'textfield',
         fieldLabel: 'Document Title',
         margin: '0 20 20 0',
@@ -79,17 +95,16 @@
       xtype: 'tagfield',
         fieldLabel: 'Allowed Document Extensions',
         margin: '0 20 20 0',
-        name: 'document_extension_ids',
+        name: 'property_id',
         allowBlank: true,
         forceSelection: true,
-        hidden: true,
         filterPickList: true,
         encodeSubmitValue: true,
-        emptyText: 'Select Document Extensions',
+        emptyText: 'Select Appropriate Property',
         growMax: 100,
         queryMode: 'local',
         valueField: 'id',
-        displayField: 'extension',
+        displayField: 'name',
         listeners: {
             beforerender: {
                 fn: 'setWorkflowCombosStore',
@@ -98,7 +113,7 @@
                     proxy: {
                         url: 'configurations/getConfigParamFromTable',
                         extraParams: {
-                            table_name: 'par_document_extensionstypes'
+                            table_name: 'par_document_properties'
                         }
                     }
                 },
@@ -135,14 +150,70 @@
                 isLoad: true
             }
         }
+    }]
+    },
+
+     {
+    xtype:'fieldset',
+    columnWidth: 1,
+    title: "Review Procedure",
+    collapsible: true,
+    defaults: {
+        labelAlign: 'top',
+        allowBlank: false,
+        labelAlign: 'top',
+        margin: 5,
+        xtype: 'textfield',
+        allowBlank: false,
+        columnWidth: 0.33,
+    },
+    layout: 'column',
+     items:[
+    {
+        xtype: 'textfield',
+        fieldLabel: 'Review period - Months',
+        margin: '0 20 20 0',
+        name: 'review_period'
     },{
-        xtype: 'htmleditor',
-        fieldLabel: 'Description',
-        name: 'description',
+        xtype: 'textarea',
+        fieldLabel: 'Review instructions',
+        name: 'review_instructions',
         allowBlank: true,
         columnWidth: 1,
         labelAlign: 'top'
+    }]
+ },{
+    xtype:'fieldset',
+    columnWidth: 1,
+    title: "Document Expiry",
+    collapsible: true,
+    defaults: {
+        labelAlign: 'top',
+        allowBlank: false,
+        labelAlign: 'top',
+        margin: 5,
+        xtype: 'textfield',
+        allowBlank: false,
+        columnWidth: 0.33,
+    },
+    layout: 'column',
+     items:[{
+        xtype: 'textfield',
+        fieldLabel: 'Expiry period - Months',
+        margin: '0 20 20 0',
+        name: 'expiry_period'
     },{
+        xtype: 'textarea',
+        fieldLabel: 'Disposition instructions',
+        name: 'disposition_instructions',
+        allowBlank: true,
+        columnWidth: 1,
+        labelAlign: 'top'
+    }]
+ },
+
+
+     {
         xtype: 'combo', anyMatch: true,
         name: 'has_document_template',
         store: 'confirmationstr',
