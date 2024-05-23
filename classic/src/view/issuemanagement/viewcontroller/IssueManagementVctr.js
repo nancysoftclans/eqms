@@ -11,16 +11,17 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     this.fireEvent("setCompStore", obj, options);
   },
 
-  showNewIssueApplication: function (btn) {
-    var application_type = btn.app_type,
-      wrapper_xtype = btn.wrapper_xtype;
-    this.fireEvent("onNewIssueApplication", application_type, wrapper_xtype);
+  setGridTreeStore: function (obj, options) {
+    this.fireEvent("setGridTreeStore", obj, options);
+  },
+
+  onViewIssueManagementApplication: function (grid, record) {
+    this.fireEvent("viewApplicationDetails", record);
   },
 
   showIssueTypeConfigParam: function (item) {
     var me = this,
       btn = item.up("button"),
-      // record = btn.getWidgetRecord(),
       childXtype = item.childXtype,
       winTitle = item.winTitle,
       winWidth = item.winWidth,
@@ -30,20 +31,14 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     if (arrayLength > 0) {
       me.fireEvent("refreshStores", storeArray);
     }
-    // form.loadRecord(record);
     funcShowCustomizableWindow(winTitle, winWidth, form, "customizablewindow");
-    /* } else {
-         toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
-         return false;
-     }*/
   },
 
-  doCreateIssueApplicationWin: function (btn) {
-    var me = this,
-      form = btn.up("form");
-    win = btn.up("window");
-    (application_type = btn.app_type), (wrapper_xtype = btn.wrapper_xtype);
-
+  showNewIssueApplication: function (btn) {
+    var form = btn.up("form"),
+      win = btn.up("window"),
+      application_type = btn.app_type,
+      wrapper_xtype = btn.wrapper_xtype;
     // Get the selected Issue Type
     issueType = form.query('combo[name="issue_type_id"]')[0].getValue();
 

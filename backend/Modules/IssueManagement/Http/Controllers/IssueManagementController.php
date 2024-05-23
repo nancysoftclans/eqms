@@ -261,7 +261,7 @@ class IssueManagementController extends Controller
     }
 
 
-    public function getComplaintFormDetails(Request $request) {
+    public function getIssueManagementDetails(Request $request) {
         $application_id = $request->input('application_id');
         $table_name = 'tra_issue_management_applications';
 

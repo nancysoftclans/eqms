@@ -60,7 +60,7 @@ Ext.define("Admin.view.documentManager.views.forms.IssueTypeSelectForm", {
           formBind: true,
           ui: "soft-blue",
           // action_url: "configurations/navigatorFolder",
-          handler: "doCreateIssueApplicationWin",
+          handler: "showNewIssueApplication",
           app_type: 102,
           wrapper_xtype: "issuemanagementdashboard"
         },

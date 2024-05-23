@@ -13,9 +13,8 @@ Ext.define("Admin.view.issuemanagement.views.toolbars.IssueManagementTb", {
     {
       text: "Home",
       iconCls: "x-fa fa-home",
+      sec_dashboard:'issuemanagementwrapper',
       name: "issuemanagementHomeBtn",
-      dash_wrapper: "issuemanagementdashboard",
-      dashboard: "issuemanagementdashboard",
     },
     {
       text: "Issue Initialisation",
