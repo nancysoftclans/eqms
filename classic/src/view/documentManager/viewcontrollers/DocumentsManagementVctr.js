@@ -191,7 +191,7 @@ Ext.define('Admin.view.documentManager.viewcontrollers.DocumentsManagementVctr',
             });
         }
     },
-	doCreateConfigParamWin: function (btn) {
+    doCreateConfigParamWin: function (btn) {
         var me = this,
             url = btn.action_url,
             table = btn.table_name,
@@ -544,7 +544,7 @@ showEditConfigParamWinFrm: function (item) {
     setWorkflowCombosStore: function (obj, options) {
         this.fireEvent('setWorkflowCombosStore', obj, options);
     },
-	setGridTreeStore: function (obj, options) {
+    setGridTreeStore: function (obj, options) {
         this.fireEvent('setGridTreeStore', obj, options);
     },
     doDeleteConfigWidgetParam: function (item) {
@@ -789,4 +789,3 @@ showEditConfigParamWinFrm: function (item) {
     },
     
 });
-

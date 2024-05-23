@@ -2,7 +2,8 @@ Ext.define(
   "Admin.view.issuemanagement.views.dashboards.IssueManagementDashboard",
   {
     extend: "Ext.Container",
-    xtype: "issuemanagementdashboard",
+    xtype: 'issuemanagementwrapper',
+    itemId: "issuemanagementdashboard",
     layout: "border",
     items: [
       {

@@ -1,12 +1,16 @@
-Ext.define('Admin.view.documentManager.views.grids.ApplicationDocPreviewGrid', {
+Ext.define('Admin.view.documentManager.views.grids.ApplicationDocPreviewNavigatorGrid', {
     extend: 'Ext.tree.Panel',
-    controller: 'commoninterfacesVctr',
-    xtype: 'applicationdocpreviewgrid',
+    controller: 'documentsManagementvctr',
+    xtype: 'applicationdocpreviewnavigatorgrid',
     useArrows: true,
     rootVisible: false,
     multiSelect: false,
     singleExpand: true,
     margin: '0 5 0 0',
+    table_name: 'tra_documentmanager_application',
+    viewModel: {
+        type: 'documentcreationvm'
+    },
     selType: 'cellmodel',
     requires: [
         'Ext.grid.*',
@@ -46,104 +50,6 @@ Ext.define('Admin.view.documentManager.views.grids.ApplicationDocPreviewGrid', {
         xtype: 'hiddenfield',
         name: 'active_application_code'
     }, {
-        xtype: 'button',
-        text: 'Upload',
-        name: 'add_upload',
-        iconCls: 'x-fa fa-plus',
-        ui: 'soft-blue',
-        winTitle: 'Document Upload',
-        childXtype: 'applicationDocUploadsFrm',
-        newTab: 'applicationDocUploadsFrm',
-        winWidth: '35%',
-        show_assessor: true,
-        stores: '["applicationDocumentsUploadsStr"]',
-        storeID: 'applicationDocumentsUploadsStr',
-        bind: {
-            hidden: '{isReadOnly}'
-        }
-    }, '->',{
-        xtype: 'combo', anyMatch: true,
-        queryMode: 'local',
-        forceSelection: true,
-        valueField: 'id',
-        columnWidth: 1,
-        displayField: 'name',
-        fieldLabel: 'Review status',
-        name: 'recommendation_id',
-        listeners: {
-            beforerender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 100,
-                    storeId:'configurations/getNonrefParameter',
-                    proxy: {
-                        extraParams:{
-                             table_name: "par_recommendations"
-                         }
-                    }
-                },
-                isLoad: true
-            },
-            change: function (cmb, newVal) {
-
-               var grid = this.up('treepanel'),
-                    store = grid.getStore();
-                store.load();
-
-              // var recommendation = grid.down('combo[name=review_recommendation_id]');
-              //   if (newVal == 1 || newVal === 1 || newVal == 3 || newVal === 3) {
-              //       recommendation.setVisible(true);
-            
-              //   }else if (newVal == 2 || newVal === 2) {
-              //        recommendation.setVisible(false);
-          
-              //   }else{
-              //       recommendation.setVisible(false);
-              //   }
-            }
-        }
-    },{
-        xtype: 'combo', anyMatch: true,
-        queryMode: 'local',
-        forceSelection: true,
-        valueField: 'id',
-        columnWidth: 1,
-        displayField: 'name',
-        fieldLabel: 'Approval Status',
-        name: 'approval_id',
-        listeners: {
-            beforerender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 100,
-                    storeId:'configurations/getNonrefParameter',
-                    proxy: {
-                        extraParams:{
-                             table_name: "par_permits_reviewrecommendations"
-                         }
-                    }
-                },
-                isLoad: true
-            },
-            change: function (cmb, newVal) {
-
-               var grid = this.up('treepanel'),
-                    store = grid.getStore();
-                store.load();
-
-              // var recommendation = grid.down('combo[name=review_recommendation_id]');
-              //   if (newVal == 1 || newVal === 1 || newVal == 3 || newVal === 3) {
-              //       recommendation.setVisible(true);
-            
-              //   }else if (newVal == 2 || newVal === 2) {
-              //        recommendation.setVisible(false);
-          
-              //   }else{
-              //       recommendation.setVisible(false);
-              //   }
-            }
-        }
-    },{
         xtype: 'exportbtn',
         hidden: true
     }, {
@@ -229,7 +135,7 @@ Ext.define('Admin.view.documentManager.views.grids.ApplicationDocPreviewGrid', {
         displayMsg: 'Showing {0} - {1} of {2} total records',
         emptyMsg: 'No Records',
         beforeLoad: function () {
-            this.up('applicationdocpreviewgrid').fireEvent('refresh', this);
+            this.up('applicationdocpreviewnavigatorgrid').fireEvent('refresh', this);
         }
     }],
     autoScroll: true,

@@ -179,7 +179,7 @@ class DmsConfigurationsController extends Controller
         $data = array();
         $data = DB::select("show tables like '%par%'");
         foreach ($data as $table) {
-            $data[] = array('table_name' => $table);
+            $data[] = array('table_name' => $table_name);
 
         }
         $res = array('data' => $data, 'success' => true);
@@ -1187,7 +1187,7 @@ public function getdocdefinationrequirementDetails(Request $req)
                     'id' => $rows->id,
                     'name' => $rows->name,
                     'description' => $rows->description,
-                    'dms_folder' => $rows->dms_folder,
+                    'dms_folder' => $dms_folder,
                     ''
                 );
 

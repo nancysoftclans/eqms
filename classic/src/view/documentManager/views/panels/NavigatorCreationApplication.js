@@ -17,10 +17,10 @@ Ext.define('Admin.view.documentManager.views.panels.NavigatorCreationApplication
         {
             xtype: 'navigatorapplicationwrapper',
             region: 'center'
-        },
-        {
-            xtype: 'navigatortypetb',
-            region: 'south'
         }
+        // {
+        //     xtype: 'navigatortypetb',
+        //     region: 'south'
+        // }
     ]
 });

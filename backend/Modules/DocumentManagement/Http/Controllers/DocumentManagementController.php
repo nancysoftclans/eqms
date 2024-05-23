@@ -236,22 +236,13 @@ public function saveDocDefinationrequirement(Request $request)
                        $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');
                        // $apptype_categorycode = getSingleRecordColValue('par_permit_typecategories', array('id' => $import_typecategory_id ), 'code');
                               
-                    if($sub_module_id == 15){
-                                
-                                $codes_array = array(
-                                    'section_code' => $section_code,
-                                    'zone_code' => $zone_code,
-                                    'apptype_code'=>$apptype_code,
-                                    'app_typecategory'=>$apptype_categorycode
-                                );
-                    }
-                    else{
+            
                                 $codes_array = array(
                                    // 'section_code' => $section_code,
                                     'zone_code' => $zone_code,
                                     'apptype_code'=>$apptype_code
                                 );
-                    }
+                    
    
                        $application_code = generateApplicationCode($sub_module_id, $applications_table);
    
@@ -316,7 +307,10 @@ public function saveDocDefinationrequirement(Request $request)
                       initializeApplicationDMS( $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
    
                        } else {
-                           $res = $response;
+                           $res = array(
+                           'success' => false,
+                           'message' => 'error, contact system admin'
+                       );  
                        }
                      
                }

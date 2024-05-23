@@ -2,7 +2,6 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
   extend: "Ext.grid.Panel",
   controller: "issuemanagementvctr",
   xtype: "issuemanagementgrid",
-  itemId: "issuemanagementgrid",
   useArrows: true,
   rootVisible: false,
   multiSelect: false,
@@ -55,9 +54,9 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
   autoScroll: true,
   listeners: {
     beforerender: {
-      fn: "setGridTreeStore",
+      fn: "setGridStore",
       config: {
-        storeId: "",
+        storeId: "issuemanagementstr",
         proxy: {
           api: {
             read: "issuemanagement/getIssueManagementDetails",
@@ -68,6 +67,39 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     itemdblclick: "onViewIssueManagementApplication",
   },
+  bbar: [
+    {
+      xtype: "button",
+      text: "Back",
+      hidden: true,
+      ui: "soft-blue",
+      iconCls: "x-fa fa-backward",
+      handler: "backFromGroupAllDetails",
+    },
+    {
+      xtype: "pagingtoolbar",
+      // store: 'systemrolestreestr',
+      displayInfo: true,
+      displayMsg: "Showing {0} - {1} of {2} total records",
+      emptyMsg: "No Records",
+      beforeLoad: function () {
+        var store = this.store,
+          grid = this.up("grid");
+        store.getProxy().extraParams = {
+          table_name: "tra_issue_management_applications",
+        };
+      },
+    },
+    "->",
+    {
+      xtype: "button",
+      text: "Sync Changes",
+      hidden: true,
+      ui: "soft-blue",
+      iconCls: "x-fa fa-save",
+      handler: "updateSystemNavigationAccessRoles",
+    },
+  ],
   columns: [
     {
       xtype: "gridcolumn",

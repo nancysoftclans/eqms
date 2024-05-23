@@ -11,8 +11,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     this.fireEvent("setCompStore", obj, options);
   },
 
-  setGridTreeStore: function (obj, options) {
-    this.fireEvent("setGridTreeStore", obj, options);
+  setGridStore: function (obj, options) {
+    this.fireEvent("setGridStore", obj, options);
   },
 
   onViewIssueManagementApplication: function (grid, record) {
@@ -41,6 +41,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       wrapper_xtype = btn.wrapper_xtype;
     // Get the selected Issue Type
     issueType = form.query('combo[name="issue_type_id"]')[0].getValue();
+
+    console.log(issueType);
 
     if (!isNaN(issueType)) {
       //Find Application type and workflow using this

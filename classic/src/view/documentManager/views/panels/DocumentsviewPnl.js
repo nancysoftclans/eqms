@@ -1,7 +1,7 @@
 Ext.define('Admin.view.documentManager.views.panels.DocumentsviewPnl', {
     extend: 'Ext.panel.Panel',
     xtype: 'documentsviewpnl',
-    title: 'Documents Creation Setup',
+    title: 'Documents View Setup',
     userCls: 'big-100 small-100',
     controller: 'documentsManagementvctr',
     height: Ext.Element.getViewportHeight() - 118,
@@ -11,7 +11,12 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentsviewPnl', {
 	
     items: [
         {
-            xtype: 'applicationdocpreviewgrid'
-        }
+            xtype: 'applicationdocpreviewnavigatorgrid'
+        },
+          {
+        xtype: 'hiddenfield',
+        name: '_token',
+        value: token
+    }
     ]
 });
