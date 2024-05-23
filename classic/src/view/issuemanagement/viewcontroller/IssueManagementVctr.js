@@ -66,7 +66,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
               "onNewIssueApplication",
               application_type,
               issue_type_id,
-              wrapper_xtype
+              wrapper_xtype,
+              module_id
             );
             win.close();
           } else {
