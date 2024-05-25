@@ -20,7 +20,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       store = grid.getStore();
     store.load();
   },
-  
+
   onViewIssueManagementApplication: function (grid, record) {
     this.fireEvent("viewApplicationDetails", record);
   },
@@ -179,5 +179,129 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
 
     motherPnl.getViewModel().set("atBeginning", false);
     this.navigate(btn, wizardPnl, "next");
+  },
+
+  saveIssueManagementApplicationReceivingBaseDetails: function (btn) {
+    var wizard = btn.wizardpnl,
+      wizardPnl = btn.up(wizard),
+      action_url = btn.action_url,
+      form_panel = btn.form_panel,
+      mainTabPnl = btn.up("#contentPanel"),
+      containerPnl = mainTabPnl.getActiveTab();
+    var process_id = containerPnl
+        .down("hiddenfield[name=process_id]")
+        .getValue(),
+      module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
+      sub_module_id = containerPnl
+        .down("hiddenfield[name=sub_module_id]")
+        .getValue(),
+      active_application_id = containerPnl
+        .down("hiddenfield[name=active_application_id]")
+        .getValue(),
+      application_status_id = containerPnl
+        .down("hiddenfield[name=application_status_id]")
+        .getValue(),
+      workflow_stage_id = containerPnl
+        .down("hiddenfield[name=workflow_stage_id]")
+        .getValue(),
+      issuemanagementfrm = containerPnl.down("issuemanagementfrm"),
+      complainantdetailsfrm = containerPnl.down("complainantdetailsfrm");
+
+    // Validate both forms
+    if (issuemanagementfrm.isValid() && complainantdetailsfrm.isValid()) {
+      // Gather data from each form
+      var issueManagementData = issuemanagementfrm.getValues();
+      var complainantDetailsData = complainantdetailsfrm.getValues();
+
+      // Combine the data
+      var combinedData = {
+        process_id: process_id,
+        module_id: module_id,
+        sub_module_id: sub_module_id,
+        active_application_id: active_application_id,
+        application_status_id: application_status_id,
+        workflow_stage_id: workflow_stage_id,
+        ...issueManagementData,
+        ...complainantDetailsData,
+      };
+
+      console.log(combinedData);
+
+      // Submit the data to the endpoint
+      // Ext.Ajax.request({
+      //   url: action_url,
+      //   method: "POST",
+      //   params: combinedData,
+      //   success: function (response) {
+      //     var resp = Ext.decode(response.responseText);
+      //     if (resp.success) {
+      //       Ext.Msg.alert("Success", resp.message);
+      //     } else {
+      //       Ext.Msg.alert("Failure", resp.message);
+      //     }
+      //   },
+      //   failure: function (response) {
+      //     Ext.Msg.alert(
+      //       "Error",
+      //       "An error occurred while processing the request."
+      //     );
+      //   },
+      // });
+    } else {
+      toastr.warning(
+        "Please fill all the required fields!!",
+        "Warning Response"
+      );
+    }
+
+    // if (docdefinationrequirementfrm.isValid()) {
+    //   docdefinationrequirementfrm.submit({
+    //     url: "documentmanagement/" + action_url,
+    //     waitMsg: "Please wait...",
+    //     params: {
+    //       process_id: process_id,
+    //       workflow_stage_id: workflow_stage_id,
+    //       active_application_id: active_application_id,
+    //       application_status_id: application_status_id,
+    //       module_id: module_id,
+    //       sub_module_id: sub_module_id,
+    //       _token: token,
+    //     },
+
+    //     headers: {
+    //       Authorization: "Bearer " + access_token,
+    //     },
+    //     success: function (frm, action) {
+    //       var resp = action.result,
+    //         message = resp.message,
+    //         success = resp.success,
+    //         active_application_id = resp.active_application_id,
+    //         application_code = resp.application_code,
+    //         product_id = resp.product_id,
+    //         tracking_no = resp.tracking_no;
+    //       if (success == true || success === true) {
+    //         toastr.success(message, "Success Response");
+    //         containerPnl
+    //           .down("hiddenfield[name=active_application_code]")
+    //           .setValue(application_code);
+    //         containerPnl
+    //           .down("displayfield[name=tracking_no]")
+    //           .setValue(tracking_no);
+    //       } else {
+    //         toastr.error(message, "Failure Response");
+    //       }
+    //     },
+    //     failure: function (frm, action) {
+    //       var resp = action.result,
+    //         message = resp.message;
+    //       toastr.error(message, "Failure Response");
+    //     },
+    //   });
+    // } else {
+    //   toastr.warning(
+    //     "Please fill all the required fields!!",
+    //     "Warning Response"
+    //   );
+    // }
   },
 });

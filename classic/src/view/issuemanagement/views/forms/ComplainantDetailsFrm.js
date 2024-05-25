@@ -23,6 +23,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.ComplainantDetailsFrm", {
       fieldLabel: "Name of Complainant",
       margin: "0 20 20 0",
       name: "complainant_name",
+      allowBlank: false,
     },
     {
       xtype: "textfield",
@@ -51,7 +52,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.ComplainantDetailsFrm", {
       valueField: "id",
       displayField: "name",
       forceSelection: true,
-      allowBlank: false,
+      allowBlank: true,
       queryMode: "local",
       listeners: {
         afterrender: {
@@ -77,7 +78,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.ComplainantDetailsFrm", {
       valueField: "id",
       displayField: "name",
       forceSelection: true,
-      allowBlank: false,
+      allowBlank: true,
       queryMode: "local",
       listeners: {
         afterrender: {

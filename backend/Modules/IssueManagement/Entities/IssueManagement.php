@@ -17,14 +17,19 @@ class IssueManagement extends Model
         'description',
         'target_resolution_date',
         'follow_up_on',
-        'section_id',
+        'section_ids',
         'issue_status_id',
+        'complainant_address',
+        'complainant_name',
+        'complainant_telephone',
+        'complaint_mode_id',
+        'complaint_type_id',
         'created_by',
         'altered_by',
         'created_on',
         'dola',
     ];
-    
+
     // protected static function newFactory()
     // {
     //     return \Modules\IssueManagement\Database\factories\IssueManagementFactory::new();

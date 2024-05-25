@@ -17,6 +17,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issuemanagementtb button[name=issuemanagementHomeBtn]": {
         click: "issueManagementHome",
       },
+      'issuemanagementreceivingapplicationwizard button[name=prev_btn]': {
+        click: 'onPrevCardClick'
+    },
       // "customercomplaintreceivingwizard button[name=save-complaint-button]": {
       //   // click: "saveComplaintDetails",
       // },
@@ -52,6 +55,14 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       dashboardWrapper.add({ xtype: sec_dashboard });
     }
   },
+
+  onPrevCardClick: function (btn) {
+    var mainTabPanel = this.getMainTabPanel(),
+        activeTab = mainTabPanel.getActiveTab(),
+        wizardPnl = activeTab.down('issuemanagementreceivingapplicationwizard');
+    wizardPnl.getViewModel().set('atEnd', false);
+    this.navigate(btn, wizardPnl, 'prev');
+},
 
   // saveComplaintDetails: function () {
   //   var me = this,

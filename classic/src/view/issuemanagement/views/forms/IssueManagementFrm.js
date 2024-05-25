@@ -98,6 +98,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
       margin: "0 20 20 0",
       name: "title",
       columnWidth: 1,
+      allowBlank: false,
     },
     {
       xtype: "textarea",
@@ -105,6 +106,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
       margin: "0 20 20 0",
       name: "description",
       columnWidth: 1,
+      allowBlank: false,
     },
     {
       xtype: "combo",
@@ -142,9 +144,9 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
       xtype: "tagfield",
       fieldLabel: "Organisational Areas",
       margin: "0 20 20 0",
-      name: "section_id",
+      name: "section_ids",
       allowBlank: true,
-      forceSelection: true,
+      // forceSelection: true,
       filterPickList: true,
       encodeSubmitValue: true,
       emptyText: "Select",

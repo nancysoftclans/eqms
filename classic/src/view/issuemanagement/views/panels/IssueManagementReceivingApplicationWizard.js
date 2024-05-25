@@ -155,7 +155,7 @@ Ext.define(
         items: [
           {
             step: 0,
-            iconCls: "fa fa-university",
+            iconCls: "fa fa-exclamation-triangle",
             enableToggle: true,
             pressed: true,
             text: "Issue Management Details",
@@ -192,6 +192,7 @@ Ext.define(
             text: "Previous",
             ui: "soft-blue",
             iconCls: "fa fa-arrow-left",
+            name: "prev_btn",
             max_step: 1,
             bind: {
               disabled: "{atBeginning}",
@@ -203,13 +204,12 @@ Ext.define(
             text: "Save Details",
             ui: "soft-blue",
             iconCls: "fa fa-save",
-            table_name: "tra_documentmanager_application",
             name: "save",
             formBind: true,
-            form_panel: "#docdefinationrequirementfrm",
-            action_url: "saveDocDefinationrequirement",
+            form_panel: "#issuemanagementfrm",
+            action_url: "saveIssueManagement",
             wizard: "issuemanagementreceivingapplicationwizard",
-            handler: "saveDocumentApplicationReceivingBaseDetails",
+            handler: "saveIssueManagementApplicationReceivingBaseDetails",
           },
           {
             text: "Submit Application",
