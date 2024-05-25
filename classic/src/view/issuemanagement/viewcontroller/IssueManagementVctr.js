@@ -228,80 +228,27 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       console.log(combinedData);
 
       // Submit the data to the endpoint
-      // Ext.Ajax.request({
-      //   url: action_url,
-      //   method: "POST",
-      //   params: combinedData,
-      //   success: function (response) {
-      //     var resp = Ext.decode(response.responseText);
-      //     if (resp.success) {
-      //       Ext.Msg.alert("Success", resp.message);
-      //     } else {
-      //       Ext.Msg.alert("Failure", resp.message);
-      //     }
-      //   },
-      //   failure: function (response) {
-      //     Ext.Msg.alert(
-      //       "Error",
-      //       "An error occurred while processing the request."
-      //     );
-      //   },
-      // });
+      Ext.Ajax.request({
+        url: action_url,
+        method: "POST",
+        params: combinedData,
+        success: function (response) {
+          var resp = Ext.decode(response.responseText);
+          if (resp.success) {
+            toastr.success(resp.message, "Success Response");
+          } else {
+            toastr.error(resp.message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          toastr.error(response.message, "Failure Response");
+        },
+      });
     } else {
       toastr.warning(
         "Please fill all the required fields!!",
         "Warning Response"
       );
     }
-
-    // if (docdefinationrequirementfrm.isValid()) {
-    //   docdefinationrequirementfrm.submit({
-    //     url: "documentmanagement/" + action_url,
-    //     waitMsg: "Please wait...",
-    //     params: {
-    //       process_id: process_id,
-    //       workflow_stage_id: workflow_stage_id,
-    //       active_application_id: active_application_id,
-    //       application_status_id: application_status_id,
-    //       module_id: module_id,
-    //       sub_module_id: sub_module_id,
-    //       _token: token,
-    //     },
-
-    //     headers: {
-    //       Authorization: "Bearer " + access_token,
-    //     },
-    //     success: function (frm, action) {
-    //       var resp = action.result,
-    //         message = resp.message,
-    //         success = resp.success,
-    //         active_application_id = resp.active_application_id,
-    //         application_code = resp.application_code,
-    //         product_id = resp.product_id,
-    //         tracking_no = resp.tracking_no;
-    //       if (success == true || success === true) {
-    //         toastr.success(message, "Success Response");
-    //         containerPnl
-    //           .down("hiddenfield[name=active_application_code]")
-    //           .setValue(application_code);
-    //         containerPnl
-    //           .down("displayfield[name=tracking_no]")
-    //           .setValue(tracking_no);
-    //       } else {
-    //         toastr.error(message, "Failure Response");
-    //       }
-    //     },
-    //     failure: function (frm, action) {
-    //       var resp = action.result,
-    //         message = resp.message;
-    //       toastr.error(message, "Failure Response");
-    //     },
-    //   });
-    // } else {
-    //   toastr.warning(
-    //     "Please fill all the required fields!!",
-    //     "Warning Response"
-    //   );
-    // }
   },
 });

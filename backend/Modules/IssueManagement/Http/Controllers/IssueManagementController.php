@@ -8,7 +8,6 @@ use Illuminate\Support\Carbon;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Contracts\Support\Renderable;
 use Modules\IssueManagement\Entities\IssueManagement;
 
 class IssueManagementController extends Controller

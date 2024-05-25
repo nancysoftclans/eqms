@@ -207,7 +207,7 @@ Ext.define(
             name: "save",
             formBind: true,
             form_panel: "#issuemanagementfrm",
-            action_url: "saveIssueManagement",
+            action_url: "issuemanagement/saveNewReceivingBaseDetails",
             wizard: "issuemanagementreceivingapplicationwizard",
             handler: "saveIssueManagementApplicationReceivingBaseDetails",
           },
