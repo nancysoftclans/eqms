@@ -10,22 +10,14 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
   layout: {
     type: "column",
   },
-  //bodyPadding: 5,
+  bodyPadding: 8,
   defaults: {
-    columnWidth: 0.33,
+    columnWidth: 0.5,
     margin: 5,
     labelAlign: "top",
   },
   frame: true,
-  bodyPadding: 8,
   items: [
-    {
-      xtype: "hiddenfield",
-      margin: "0 20 20 0",
-      name: "table_name",
-      value: "tra_documentmanager_application",
-      allowBlank: true,
-    },
     {
       xtype: "hiddenfield",
       name: "module_id",
@@ -52,118 +44,132 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
       name: "id",
       allowBlank: true,
     },
+    // {
+    //   xtype: "fieldset",
+    //   columnWidth: 1,
+    //   title: "Issue Details",
+    //   collapsible: true,
+    //   defaults: {
+    //     labelAlign: "top",
+    //     allowBlank: false,
+    //     labelAlign: "top",
+    //     margin: 5,
+    //     xtype: "textfield",
+    //     allowBlank: false,
+    //     columnWidth: 0.5,
+    //   },
+    //   layout: "column",
+    // items: [
     {
-      xtype: "fieldset",
-      columnWidth: 1,
-      title: "",
-      collapsible: true,
-      defaults: {
-        labelAlign: "top",
-        allowBlank: false,
-        labelAlign: "top",
-        margin: 5,
-        xtype: "textfield",
-        allowBlank: false,
-        columnWidth: 0.33,
+      xtype: "combo",
+      anyMatch: true,
+      fieldLabel: "Issue Type",
+      margin: "0 20 20 0",
+      name: "issue_type_id",
+      valueField: "id",
+      displayField: "name",
+      forceSelection: true,
+      allowBlank: false,
+      queryMode: "local",
+      listeners: {
+        afterrender: {
+          fn: "setCompStore",
+          config: {
+            pageSize: 10000,
+            proxy: {
+              extraParams: {
+                table_name: "par_issue_types",
+              },
+            },
+          },
+          isLoad: true,
+        },
       },
-      layout: "column",
-      items: [
-        {
-          xtype: "textfield",
-          fieldLabel: "Document Title",
-          margin: "0 20 20 0",
-          name: "name",
-        },
-        {
-          xtype: "combo",
-          anyMatch: true,
-          fieldLabel: "Document Type",
-          margin: "0 20 20 0",
-          name: "document_type_id",
-          valueField: "id",
-          displayField: "name",
-          forceSelection: true,
-          allowBlank: false,
-          queryMode: "local",
-          listeners: {
-            afterrender: {
-              fn: "setCompStore",
-              config: {
-                pageSize: 10000,
-                proxy: {
-                  extraParams: {
-                    table_name: "par_document_types",
-                  },
-                },
-              },
-              isLoad: true,
-            },
-          },
-        },
-        {
-          xtype: "tagfield",
-          fieldLabel: "Allowed Document Extensions",
-          margin: "0 20 20 0",
-          name: "property_id",
-          allowBlank: true,
-          forceSelection: true,
-          filterPickList: true,
-          encodeSubmitValue: true,
-          emptyText: "Select Appropriate Property",
-          growMax: 100,
-          queryMode: "local",
-          valueField: "id",
-          displayField: "name",
-          listeners: {
-            beforerender: {
-              fn: "setWorkflowCombosStore",
-              config: {
-                pageSize: 1000,
-                proxy: {
-                  url: "configurations/getConfigParamFromTable",
-                  extraParams: {
-                    table_name: "par_document_properties",
-                  },
-                },
-              },
-              isLoad: true,
-            },
-          },
-        },
-        {
-          xtype: "textfield",
-          fieldLabel: "Version",
-          margin: "0 20 20 0",
-          name: "version",
-        },
-        {
-          xtype: "combo",
-          anyMatch: true,
-          fieldLabel: "Document Owner",
-          margin: "0 20 20 0",
-          name: "document_owner_id",
-          valueField: "id",
-          displayField: `firstname`,
-          forceSelection: true,
-          allowBlank: false,
-          queryMode: "local",
-          listeners: {
-            afterrender: {
-              fn: "setCompStore",
-              config: {
-                pageSize: 10000,
-                proxy: {
-                  url: "usermanagement/documentOwner",
-                  extraParams: {
-                    //table_name: 'par_user_roles'
-                  },
-                },
-              },
-              isLoad: true,
-            },
-          },
-        },
-      ],
     },
+    {
+      xtype: "datefield",
+      fieldLabel: "Creation Date",
+      margin: "0 20 20 0",
+      name: "creation_date",
+    },
+    {
+      xtype: "textfield",
+      fieldLabel: "Title",
+      margin: "0 20 20 0",
+      name: "title",
+      columnWidth: 1,
+    },
+    {
+      xtype: "textarea",
+      fieldLabel: "Description",
+      margin: "0 20 20 0",
+      name: "description",
+      columnWidth: 1,
+    },
+    {
+      xtype: "combo",
+      anyMatch: true,
+      fieldLabel: "Status",
+      margin: "0 20 20 0",
+      name: "issue_status_id",
+      valueField: "id",
+      displayField: "name",
+      forceSelection: true,
+      allowBlank: false,
+      queryMode: "local",
+      listeners: {
+        afterrender: {
+          fn: "setCompStore",
+          config: {
+            pageSize: 10000,
+            proxy: {
+              extraParams: {
+                table_name: "par_issue_statuses",
+              },
+            },
+          },
+          isLoad: true,
+        },
+      },
+    },
+    {
+      xtype: "datefield",
+      fieldLabel: "Target Resolution Date",
+      margin: "0 20 20 0",
+      name: "target_resolution_date",
+    },
+    {
+      xtype: "tagfield",
+      fieldLabel: "Organisational Areas",
+      margin: "0 20 20 0",
+      name: "section_id",
+      allowBlank: true,
+      forceSelection: true,
+      filterPickList: true,
+      encodeSubmitValue: true,
+      emptyText: "Select",
+      growMax: 100,
+      queryMode: "local",
+      valueField: "id",
+      displayField: "name",
+      columnWidth: 1,
+      listeners: {
+        beforerender: {
+          fn: "setWorkflowCombosStore",
+          config: {
+            pageSize: 1000,
+            proxy: {
+              url: "configurations/getConfigParamFromTable",
+              extraParams: {
+                table_name: "par_sections",
+              },
+            },
+          },
+          isLoad: true,
+        },
+      },
+    },
+    // ],
+    // },
   ],
 });

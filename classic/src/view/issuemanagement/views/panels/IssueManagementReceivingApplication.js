@@ -4,10 +4,9 @@ Ext.define(
     extend: "Ext.panel.Panel",
     xtype: "issuemanagementreceivingapplication",
     controller: "issuemanagementvctr",
-    viewModel: {
-      type: "issuemanagementvm",
-    },
+    viewModel: "issuemanagementvm",
     layout: "fit",
+    
     items: [
       {
         xtype: "issuemanagementreceivingapplicationwizard",

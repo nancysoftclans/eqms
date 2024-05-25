@@ -15,6 +15,12 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     this.fireEvent("setGridStore", obj, options);
   },
 
+  reloadParentGridOnChange: function (combo) {
+    var grid = combo.up("grid"),
+      store = grid.getStore();
+    store.load();
+  },
+  
   onViewIssueManagementApplication: function (grid, record) {
     this.fireEvent("viewApplicationDetails", record);
   },

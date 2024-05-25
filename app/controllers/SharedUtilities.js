@@ -9990,6 +9990,7 @@ if (sub_module_id) {
 },
 
 onNewIssueApplication: function (sub_module_id, issue_type_id, wrapper_xtype, module_id) {
+    Ext.getBody().mask('Please wait...');
     var me = this,
         mainTabPanel = me.getMainTabPanel(),
         activeTab = mainTabPanel.getActiveTab(),
@@ -10032,7 +10033,6 @@ onNewIssueApplication: function (sub_module_id, issue_type_id, wrapper_xtype, mo
   },
 
   launchIssueManagementReceivingApplicationWizard: function (pnl) {
-
     Ext.getBody().mask('Please wait...');
     var me = this,
         activeTab = pnl;

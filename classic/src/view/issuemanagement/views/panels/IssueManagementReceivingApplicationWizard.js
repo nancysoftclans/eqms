@@ -5,9 +5,6 @@ Ext.define(
     alias: "widget.issuemanagementreceivingapplicationwizard",
     padding: "2 0 2 0",
     requires: ["Ext.layout.container.*", "Ext.toolbar.Fill"],
-    viewModel: {
-      type: "issuemanagementvm",
-    },
     reference: "wizardpnl",
     layout: "card",
     //bodyPadding: 3,
@@ -40,13 +37,13 @@ Ext.define(
           },
           {
             xtype: "tbseparator",
-            width: 5,
+            width: 20,
           },
           {
             xtype: "displayfield",
             name: "workflow_stage",
             //hidden: true,
-            fieldLabel: "Stage",
+            fieldLabel: "Workflow Stage",
             fieldStyle: {
               color: "green",
               "font-weight": "bold",
@@ -56,7 +53,7 @@ Ext.define(
           {
             xtype: "tbseparator",
             hidden: true,
-            width: 5,
+            width: 20,
           },
           {
             xtype: "displayfield",
@@ -72,7 +69,7 @@ Ext.define(
           },
           {
             xtype: "tbseparator",
-            width: 5,
+            width: 20,
           },
           {
             xtype: "displayfield",
@@ -129,19 +126,11 @@ Ext.define(
     items: [
       {
         xtype: "issuemanagementpnl",
-        dockedItems: [
-          {
-            xtype: "toolbar",
-            ui: "footer",
-            dock: "top",
-            margin: 3,
-          },
-        ],
+        layout: "fit",
+        defaults: {
+          margin: 3,
+        },
       },
-      // {
-      //   xtype: "docuploadsgrid",
-      //   title: "Document Upload",
-      // },
       {
         xtype: "hiddenfield",
         name: "active_application_id",
@@ -180,7 +169,7 @@ Ext.define(
           //   iconCls: "fa fa-product-hunt",
           //   enableToggle: true,
           //   max_step: 1,
-          //   text: "Document Upload",
+          //   text: "Complainant Details",
           //   action: "quickNav",
           //   wizard: "issuemanagementreceivingapplicationwizard",
           //   handler: "quickNavigation",

@@ -14,16 +14,19 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     ],
 
     control: {
-      "customercomplaintreceivingwizard button[name=save-complaint-button]": {
-        // click: "saveComplaintDetails",
+      "issuemanagementtb button[name=issuemanagementHomeBtn]": {
+        click: "issueManagementHome",
       },
-      "customercomplaintreceivingwizard button[action=process_submission_btn]":
-        {
-          // click: "saveComplaintApplicationSubmissionWin",
-        },
-      customercomplaintbasicinfofrm: {
-        // afterrender: "prepareNewComplaintAssessment",
-      },
+      // "customercomplaintreceivingwizard button[name=save-complaint-button]": {
+      //   // click: "saveComplaintDetails",
+      // },
+      // "customercomplaintreceivingwizard button[action=process_submission_btn]":
+      //   {
+      //     click: "saveComplaintApplicationSubmissionWin",
+      //   },
+      // customercomplaintbasicinfofrm: {
+      //   afterrender: "prepareNewComplaintAssessment",
+      // },
     },
   },
 
@@ -38,7 +41,17 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     },
   },
 
-  
+  issueManagementHome: function (btn) {
+    var me = this,
+      mainTabPanel = me.getMainTabPanel(),
+      sec_dashboard = btn.sec_dashboard,
+      activeTab = mainTabPanel.getActiveTab(),
+      dashboardWrapper = activeTab.down(btn.homeDashWrapper);
+    if (!dashboardWrapper.down(sec_dashboard)) {
+      dashboardWrapper.removeAll();
+      dashboardWrapper.add({ xtype: sec_dashboard });
+    }
+  },
 
   // saveComplaintDetails: function () {
   //   var me = this,

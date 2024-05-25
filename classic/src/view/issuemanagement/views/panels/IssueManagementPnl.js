@@ -17,6 +17,11 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
       title: "ISSUE DETAILS",
     },
     {
+      xtype: "complainantdetailsfrm",
+      autoScroll: true,
+      title: "COMPLAINANT DETAILS",
+    },
+    {
       xtype: "hiddenfield",
       name: "_token",
       value: token,

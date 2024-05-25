@@ -3,7 +3,6 @@
 namespace Modules\IssueManagement\Database\Seeders;
 
 use Illuminate\Database\Seeder;
-use Illuminate\Database\Eloquent\Model;
 
 class IssueManagementDatabaseSeeder extends Seeder
 {
@@ -14,8 +13,9 @@ class IssueManagementDatabaseSeeder extends Seeder
      */
     public function run()
     {
-        Model::unguard();
-
-        // $this->call("OthersTableSeeder");
+        $this->call([
+            ComplaintModesSeederTableSeeder::class,
+            ComplaintTypesSeederTableSeeder::class,
+        ]);
     }
 }

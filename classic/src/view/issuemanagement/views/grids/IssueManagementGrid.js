@@ -2,30 +2,11 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
   extend: "Ext.grid.Panel",
   controller: "issuemanagementvctr",
   xtype: "issuemanagementgrid",
-  useArrows: true,
-  rootVisible: false,
-  multiSelect: false,
-  singleExpand: true,
-  margin: "0 5 0 0",
-  selType: "cellmodel",
-
-  // autoScroll: true,
-  // autoHeight: true,
-  // width: "100%",
-  plugins: [
-    {
-      ptype: "cellediting",
-      clicksToEdit: 1,
-    },
-  ],
-
-  features: [
-    {
-      ftype: "searching",
-      minChars: 2,
-      mode: "local",
-    },
-  ],
+  itemId: "issuemanagementgrid",
+  cls: "dashboard-todo-list",
+  autoScroll: true,
+  autoHeight: true,
+  width: "100%",
   viewConfig: {
     deferEmptyText: false,
     emptyText: "Nothing to display",
@@ -36,22 +17,97 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       }
     },
   },
-  autoScroll: true,
+  tbar: [
+    {
+      xtype: "exportbtn",
+    },
+    {
+      xtype: "tbspacer",
+      width: 50,
+    },
+    {
+      xtype: "combo",
+      anyMatch: true,
+      fieldLabel: "Issue Type",
+      labelWidth: 80,
+      width: 320,
+      valueField: "id",
+      displayField: "name",
+      forceSelection: true,
+      name: "issue_type_id",
+      queryMode: "local",
+      fieldStyle: {
+        color: "green",
+        "font-weight": "bold",
+      },
+      listeners: {
+        beforerender: {
+          fn: "setCompStore",
+          config: {
+            pageSize: 1000,
+            proxy: {
+              extraParams: {
+                table_name: "par_issue_types",
+              },
+            },
+          },
+          isLoad: true,
+        },
+        change: "reloadParentGridOnChange",
+      },
+      triggers: {
+        clear: {
+          type: "clear",
+          hideWhenEmpty: true,
+          hideWhenMouseOut: false,
+          clearOnEscape: true,
+        },
+      },
+    },
+  ],
+  plugins: [
+    {
+      ptype: "gridexporter",
+    },
+  ],
   listeners: {
     beforerender: {
       fn: "setGridStore",
       config: {
+        pageSize: 1000,
+        autoLoad: false,
+        defaultRootId: "root",
+        enablePaging: true,
         storeId: "issuemanagementstr",
-        proxy: {
-          api: {
-            read: "issuemanagement/getIssueManagementDetails",
+        grouper: {
+          groupFn: function (item) {
+            return item.get("process_id") + item.get("workflow_stage_id");
           },
+        },
+        proxy: {
+          url: "issuemanagement/getIssueManagementDetails",
         },
       },
       isLoad: true,
     },
     itemdblclick: "onViewIssueManagementApplication",
   },
+  features: [
+    {
+      ftype: "searching",
+      minChars: 2,
+      mode: "local",
+    },
+    {
+      ftype: "grouping",
+      startCollapsed: true,
+      groupHeaderTpl:
+        'Process: {[values.rows[0].data.process_name]}, Stage: {[values.rows[0].data.workflow_stage]} [{rows.length} {[values.rows.length > 1 ? "Items" : "Item"]}]',
+      hideGroupedHeader: true,
+      enableGroupingMenu: false,
+    },
+  ],
+
   bbar: [
     {
       xtype: "button",

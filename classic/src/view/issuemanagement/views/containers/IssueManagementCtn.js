@@ -1,7 +1,6 @@
 Ext.define("Admin.view.issuemanagement.views.containers.IssueManagementPnl", {
   extend: "Ext.Container",
   xtype: "issuemanagement",
-  itemId: "issuemanagement",
   controller: "issuemanagementvctr",
   layout: "border",
   items: [
