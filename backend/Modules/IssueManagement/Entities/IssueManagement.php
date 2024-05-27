@@ -3,12 +3,9 @@
 namespace Modules\IssueManagement\Entities;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class IssueManagement extends Model
 {
-    use HasFactory;
-
     protected $table = 'tra_issue_management_applications';
 
     protected $fillable = [
@@ -30,8 +27,5 @@ class IssueManagement extends Model
         'dola',
     ];
 
-    // protected static function newFactory()
-    // {
-    //     return \Modules\IssueManagement\Database\factories\IssueManagementFactory::new();
-    // }
+    public $timestamps = false;
 }

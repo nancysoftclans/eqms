@@ -20,14 +20,6 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
   items: [
     {
       xtype: "hiddenfield",
-      name: "module_id",
-    },
-    {
-      xtype: "hiddenfield",
-      name: "sub_module_id",
-    },
-    {
-      xtype: "hiddenfield",
       name: "application_code",
     },
     {

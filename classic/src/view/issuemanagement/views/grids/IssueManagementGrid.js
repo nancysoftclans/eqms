@@ -144,6 +144,21 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
   columns: [
     {
       xtype: "gridcolumn",
+      dataIndex: "reference_no",
+      text: "ID",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "raised_date",
+      text: "Date Raised",
+      flex: 1,
+      tdCls: "wrap",
+      renderer: Ext.util.Format.dateRenderer('d M Y')
+    },
+    {
+      xtype: "gridcolumn",
       dataIndex: "title",
       text: "Title",
       flex: 1,
@@ -151,8 +166,29 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "description",
-      text: "Description",
+      dataIndex: "issue_status",
+      text: "Status",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "owner",
+      text: "Owner",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "target_resolution_date",
+      text: "Target Date",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "target_resolution_date",
+      text: "Date Closed",
       flex: 1,
       tdCls: "wrap",
     },

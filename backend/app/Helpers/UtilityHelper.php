@@ -1789,7 +1789,7 @@ class UtilityHelper
 
     static function generateApplicationViewID()
     {
-        $view_id = 'brims' . str_random(10) . date('s');
+        $view_id = 'eqms' . str_random(10) . date('s');
         return $view_id;
     }
 
