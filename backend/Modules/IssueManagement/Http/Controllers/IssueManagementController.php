@@ -161,8 +161,53 @@ class IssueManagementController extends Controller
                     't4.name as process_name',
                     't1.created_on as raised_date',
                     't5.name as issue_status',
+                    't1.id as active_application_id',
+                    't2.current_stage as workflow_stage_id',
                     DB::raw("CONCAT_WS(' ',decrypt(t6.first_name),decrypt(t6.last_name)) as owner")
                 )
+                ->get();
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well!!'
+            );
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                "success" => false,
+                "message" => $throwable->getMessage()
+            );
+        }
+
+        return \response()->json($res);
+    }
+
+    public function getIssueManagementDetailsById(Request $request)
+    {
+        $active_application_id = $request->active_application_id;
+        try {
+            $results = IssueManagement::from('tra_issue_management_applications as t1')
+                ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
+                ->leftJoin('wf_workflow_stages as t3', 't2.current_stage', '=', 't3.id')
+                ->leftjoin('wf_processes as t4', 't2.process_id', '=', 't4.id')
+                ->join('par_issue_statuses as t5', 't1.issue_status_id', 't5.id')
+                ->join('users as t6', 't1.created_by', 't6.id')
+                ->select(
+                    't2.*',
+                    't1.*',
+                    't3.name as workflow_stage',
+                    't4.name as process_name',
+                    't1.created_on as raised_date',
+                    't5.name as issue_status',
+                    't1.id as active_application_id',
+                    't2.current_stage as workflow_stage_id',
+                    DB::raw("CONCAT_WS(' ',decrypt(t6.first_name),decrypt(t6.last_name)) as owner")
+                )
+                ->where('t1.id', $active_application_id)
                 ->get();
             $res = array(
                 'success' => true,

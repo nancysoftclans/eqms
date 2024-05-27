@@ -10043,17 +10043,13 @@ onNewIssueApplication: function (sub_module_id, issue_type_id, wrapper_xtype, mo
         sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
        // reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
         workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
-
-
-          activeTab.down('button[name=recommendation]').setVisible(false);
-          activeTab.down('button[name=approval]').setVisible(false);
-
-        
+        activeTab.down('button[name=recommendation]').setVisible(false);
+        activeTab.down('button[name=approval]').setVisible(false);        
    
     if (active_application_id) {
         Ext.Ajax.request({
             method: 'GET',
-            url: 'issuemanagement/getIssueManagementDetails',
+            url: 'issuemanagement/getIssueManagementDetailsById',
             params: {
                 active_application_id: active_application_id
             },
@@ -10069,15 +10065,12 @@ onNewIssueApplication: function (sub_module_id, issue_type_id, wrapper_xtype, mo
                     model = Ext.create('Ext.data.Model', results);
                
 
-                if (success == true || success === true) {
-                    
+                if (success == true || success === true) {                    
                     issuemanagementfrm.loadRecord(model);
-
                     activeTab.down('displayfield[name=workflow_stage]').setValue(results.workflow_stage);
 
                   //  activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
-                    activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);
-                 
+                    activeTab.down('displayfield[name=tracking_no]').setValue(results.tracking_no);         
                 
                     
                 } else {
