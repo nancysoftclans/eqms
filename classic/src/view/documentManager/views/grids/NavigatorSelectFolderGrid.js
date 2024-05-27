@@ -1,7 +1,7 @@
-Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
+Ext.define('Admin.view.documentManager.views.grids.NavigatorSelectFolderGrid', {
     extend: 'Ext.tree.Panel',
-    xtype: 'navigatorgrid',
-    itemId: 'navigatorgrid',
+    xtype: 'navigatorselectfoldergrid',
+    itemId: 'navigatorselectfoldergrid',
     controller: 'documentsManagementvctr',
     useArrows: true,
     rootVisible: false,
@@ -69,12 +69,12 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 isLoad: true
             },
             change: function (cmbo, newVal) {
-                var grid = cmbo.up('#navigatorgrid'),
+                var grid = cmbo.up('#navigatorselectfoldergrid'),
                     subModuleStore = grid.down('combo[name=sub_module_id]').getStore();
                     subModuleStore.removeAll();
                     subModuleStore.load({params: {module_id: newVal}});
 
-                var store = this.up('#navigatorgrid').getStore();
+                var store = this.up('#navigatorselectfoldergrid').getStore();
                 store.reload();                 
             }
         }
@@ -105,7 +105,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 isLoad: false
             },
             change: function (cmbo, newVal) {
-               var store = this.up('#navigatorgrid').getStore();
+               var store = this.up('#navigatorselectfoldergrid').getStore();
                 store.reload();
             }
         }
@@ -134,7 +134,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 },
                 isLoad: true
             },change: function (cmbo, newVal) {
-               var store = this.up('#navigatorgrid').getStore();
+               var store = this.up('#navigatorselectfoldergrid').getStore();
                 store.reload();
             }
         }
@@ -163,7 +163,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 },
                 isLoad: true
             },change: function (cmbo, newVal) {
-               var store = this.up('#navigatorgrid').getStore();
+               var store = this.up('#navigatorselectfoldergrid').getStore();
                 store.reload();
             }
         }
@@ -181,8 +181,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 },
             },
             isLoad: true
-        },
-        itemdblclick: 'onViewDocumentDetails'
+        }
     },
    
     bbar: [
@@ -218,7 +217,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
         }],
     columns: [{
         xtype: 'treecolumn',
-        dataIndex: 'navigator_foldername',
+        dataIndex: 'recoil',
         text: 'Title',
         flex: 1,
         sortable: true

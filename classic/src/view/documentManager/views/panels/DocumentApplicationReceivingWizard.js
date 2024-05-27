@@ -109,6 +109,9 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                 }, {
                     xtype: 'hiddenfield',
                     name: 'application_status_id'
+                },{
+                    xtype: 'hiddenfield',
+                    name: 'stage_category_id'
                 }]
         }
 

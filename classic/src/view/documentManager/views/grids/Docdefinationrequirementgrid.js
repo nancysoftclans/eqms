@@ -104,13 +104,13 @@ Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid'
     },{
        // xtype: 'treecolumn',
         xtype: 'gridcolumn',
-        dataIndex: 'name',
+        dataIndex: 'doc_title',
         text: 'Title',
         flex: 1,
         sortable: true
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'version',
+        dataIndex: 'doc_version',
         text: 'Version',
         flex: 1
     },{

@@ -144,7 +144,8 @@ Ext.define('Admin.view.documentManager.views.grids.ApplicationDocPreviewNavigato
         //mode: 'SINGLE'
     },
 
-    columns: [{
+    columns: [
+    {
         xtype: 'treecolumn',
         dataIndex: 'file_name',
         text: 'File Name',

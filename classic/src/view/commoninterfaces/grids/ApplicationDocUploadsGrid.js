@@ -46,6 +46,9 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         xtype: 'hiddenfield',
         name: 'active_application_code'
     }, {
+        xtype: 'hiddenfield',
+        name: 'stage_category_id'
+    },{
         xtype: 'button',
         text: 'Upload',
         name: 'add_upload',

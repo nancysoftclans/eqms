@@ -3,14 +3,27 @@ Ext.define('Admin.view.documentManager.views.forms.DocumentTypeForm',{
     xtype: 'documenttypeform',
     controller: 'documentsManagementvctr',
     autoScroll: true,
-    layout: 'form',
-    frame: true,
+    scrollable: true,
+    //frame: true,
     bodyPadding: 8,
     defaults: {
         labelAlign: 'top',
         allowBlank: false
     },
-    
+    viewModel: {
+        type: 'documentcreationvm'
+    },
+    layout: {
+        type: 'column'
+    },
+    bodyPadding: 5,
+    defaults: {
+        columnWidth: 0.33,
+        margin: 5,
+        labelAlign: 'top'
+    },
+    //frame: true,
+    bodyPadding: 8,
     items: [{
         xtype: 'hiddenfield',
         margin: '0 20 20 0',
@@ -30,13 +43,7 @@ Ext.define('Admin.view.documentManager.views.forms.DocumentTypeForm',{
         name: 'id',
         allowBlank: true
     }, 
-    {
-        xtype: 'textfield',
-        fieldLabel: 'Title',
-        margin: '0 20 20 0',
-        name: 'name',
-        allowBlank: false
-    },{
+   {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Module',
         margin: '0 20 20 0',
@@ -117,6 +124,7 @@ Ext.define('Admin.view.documentManager.views.forms.DocumentTypeForm',{
         forceSelection: true,
         filterPickList: true,
         encodeSubmitValue: true,
+        hidden: true,
         emptyText: 'Select Document Extensions',
         growMax: 100,
         queryMode: 'local',
@@ -163,174 +171,113 @@ Ext.define('Admin.view.documentManager.views.forms.DocumentTypeForm',{
               isLoad: true,
             },   
         }
-    },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Has Parent',
+    },
+
+    {
+    xtype:'fieldset',
+    columnWidth: 1,
+    title: "Create Document Type",
+    collapsible: true,
+    defaults: {
+        labelAlign: 'top',
+        allowBlank: false,
+        labelAlign: 'top',
+        margin: 5,
+        xtype: 'textfield',
+        allowBlank: false,
+        columnWidth: 0.33,
+    },
+    layout: 'column',
+     items:[
+        {
+        xtype: 'textfield',
+        fieldLabel: 'Title',
         margin: '0 20 20 0',
-        name: 'has_parent_level',
+        name: 'name',
+        allowBlank: false
+       },
+
+         {
+        xtype: 'textfield',
+        fieldLabel: 'Prefix',
+        margin: '0 20 20 0',
+        name: 'prefix',
+        allowBlank: false
+        },
+        {
+      xtype: 'tagfield',
+        fieldLabel: 'Properties',
+        margin: '0 20 20 0',
+        name: 'property_id',
+        allowBlank: true,
+        forceSelection: true,
+        filterPickList: true,
+        encodeSubmitValue: true,
+        emptyText: 'Select Appropriate Property',
+        growMax: 100,
+        queryMode: 'local',
         valueField: 'id',
         displayField: 'name',
-        forceSelection: true,
-        allowBlank: true,
-        hidden: true,
-        queryMode: 'local',
         listeners: {
             beforerender: {
-                fn: 'setCompStore',
+                fn: 'setWorkflowCombosStore',
                 config: {
+                    pageSize: 1000,
                     proxy: {
-                       
+                        url: 'configurations/getConfigParamFromTable',
                         extraParams: {
-                            table_name: 'par_confirmations'
+                            table_name: 'par_document_properties'
                         }
                     }
-                   },
-              isLoad: true
-            },
-            change: 'showHideParent'
-        }
-    },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Parent Document',
-        margin: '0 20 20 0',
-        name: 'docparent_id',
-        valueField: 'id',
-        hidden: true,
-        displayField: 'name',
-        forceSelection: true,
-        allowBlank: true,
-        queryMode: 'local',
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                       
-                        extraParams: {
-                            table_name: 'par_form_categories'
-                        }
-                     }
                 },
                 isLoad: true
             }
         }
     },
-    //{
-    //     xtype: 'combo', anyMatch: true,
-    //     fieldLabel: 'Section',
-    //     margin: '0 20 20 0',
-    //     name: 'section_id',
-    //     valueField: 'id',
-    //     hidden: true,
-    //     allowBlank: true,
-    //     displayField: 'name',
-    //     forceSelection: true,
-    //     queryMode: 'local',
-    //     listeners: {
-    //         beforerender: {
-    //             fn: 'setCompStore',
-    //             config: {
-    //                 proxy: {
-                        
-    //                     extraParams: {
-    //                         table_name: 'par_sections'
-    //                     }
-    //                 }
-    //                },
-    //           isLoad: true
-    //         },
-    //         change: function(combo, newVal, oldval, eopts){
-    //             var form = combo.up('form'),
-    //                 prodclassStr = form.down('combo[name=prodclass_category_id]').getStore(),
-    //                 premiseStr = form.down('combo[name=premise_type_id]').getStore(),
-    //                 filters = JSON.stringify({'section_id': newVal});
-    //                 prodclassStr.removeAll();
-    //                 premiseStr.removeAll();
-    //                 prodclassStr.load({params: {filters: filters}});
-    //                 premiseStr.load({params: {filters: filters}});
-    //         }
-           
-    //     }
-    // },{
-    //     xtype: 'combo', anyMatch: true,
-    //     fieldLabel: 'Prodclass Category',
-    //     margin: '0 20 20 0',
-    //     name: 'prodclass_category_id',
-    //     valueField: 'id',
-    //     allowBlank: true,
-    //     displayField: 'name',
-    //     hidden: true,
-    //     forceSelection: true,
-    //     queryMode: 'local',
-    //     listeners: {
-    //         beforerender: {
-    //             fn: 'setCompStore',
-    //             config: {
-    //                 proxy: {
-                        
-    //                     extraParams: {
-    //                         table_name: 'par_prodclass_categories'
-    //                     }
-    //                 }
-    //                },
-    //           isLoad: false
-    //         }
-           
-    //     }
-    // },{
-    //     xtype: 'combo', anyMatch: true,
-    //     fieldLabel: 'Premise Type',
-    //     margin: '0 20 20 0',
-    //     name: 'premise_type_id',
-    //     valueField: 'id',
-    //     allowBlank: true,
-    //     displayField: 'name',
-    //     forceSelection: true,
-    //     hidden: true,
-    //     queryMode: 'local',
-    //     listeners: {
-    //         beforerender: {
-    //             fn: 'setCompStore',
-    //             config: {
-    //                 proxy: {
-                        
-    //                     extraParams: {
-    //                         table_name: 'par_premises_types'
-    //                     }
-    //                 }
-    //                },
-    //           isLoad: true
-    //         }
-           
-    //     }
-    // },{
-    //     xtype: 'combo', anyMatch: true,
-    //     fieldLabel: 'Import Permit Type',
-    //     margin: '0 20 20 0',
-    //     name: 'importexport_permittype_id',
-    //     valueField: 'id',
-    //     allowBlank: true,
-    //     displayField: 'name',
-    //     forceSelection: true,
-    //     hidden: true,
-    //     queryMode: 'local',
-    //     listeners: {
-    //         beforerender: {
-    //             fn: 'setCompStore',
-    //             config: {
-    //                 proxy: {
-                        
-    //                     extraParams: {
-    //                         table_name: 'par_importexport_permittypes'
-    //                     }
-    //                 }
-    //                },
-    //           isLoad: true
-    //         }
-           
-    //     }
-    // },
+   ]
+ },{
+    xtype:'fieldset',
+    columnWidth: 1,
+    title: "Document Expiry",
+    collapsible: true,
+    defaults: {
+        labelAlign: 'top',
+        allowBlank: false,
+        labelAlign: 'top',
+        margin: 5,
+        xtype: 'textfield',
+        allowBlank: false,
+        columnWidth: 0.33,
+    },
+    layout: 'column',
+     items:[
+      {
+        xtype: 'textfield',
+        fieldLabel: 'Review period - Months',
+        margin: '0 20 20 0',
+        name: 'review_period'
+    },{
+        xtype: 'textarea',
+        fieldLabel: 'Review instructions',
+        name: 'review_instructions',
+        allowBlank: true,
+        columnWidth: 1,
+        labelAlign: 'top'
+    },{
+        xtype: 'textfield',
+        fieldLabel: 'Expiry period - Months',
+        margin: '0 20 20 0',
+        name: 'expiry_period'
+    },{
+        xtype: 'textarea',
+        fieldLabel: 'Disposition instructions',
+        name: 'disposition_instructions',
+        allowBlank: true,
+        columnWidth: 1,
+        labelAlign: 'top'
+    }]
+ },
+
     {
         xtype: 'textarea',
         fieldLabel: 'Description',

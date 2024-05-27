@@ -909,6 +909,10 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                 click: 'documenttypeRegHome'
             },'applicationcommentsFrm button[name=save_comment]': {
                 click: 'saveApplicationComment'
+            },'docdefinationrequirementfrm button[action=search_navigator]': {
+                click: 'showNavigatorSelectionList'
+            },'navigatorselectfoldergrid': {
+                itemdblclick: 'onNavigatorSelectionListDblClick'
             },
             'issuemanagementreceivingapplicationwizard': {
                 afterrender: 'launchIssueManagementReceivingApplicationWizard'
@@ -1637,6 +1641,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         Ext.getBody().mask('Please wait...');
         var me = this,
             mainTabPanel = me.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
             process_id = record.get('process_id'),
             workflow_stage_id = record.get('workflow_stage_id'),
             workflow_stage = record.get('workflow_stage'),
@@ -1646,8 +1651,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             view_id = record.get('view_id'),
             html_id = record.get('destination_html_id'),
             title_suffix = ref_no;
-            
-    workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
+
+            //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
         Ext.getBody().unmask();
         toastr.warning('Problem encountered while fetching workflow details-->Possibly workflow not set!!', 'Warning Response');
@@ -1670,45 +1675,13 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             id: view_id,
             closable: true
         });
-        //set prerequsites
-        if(newTab.down('hiddenfield[name=prodclass_category_id]')){
-            newTab.down('hiddenfield[name=prodclass_category_id]').setValue(record.get('prodclass_category_id'));
-        }
-        if(newTab.down('hiddenfield[name=premise_type_id]')){
-            newTab.down('hiddenfield[name=premise_type_id]').setValue(record.get('premise_type_id'));
-        }
-        if(newTab.down('hiddenfield[name=report_type_id]')){
-            newTab.down('hiddenfield[name=report_type_id]').setValue(record.get('report_type_id'));
-        }
-        if(newTab.down('hiddenfield[name=importexport_permittype_id]')){
-            newTab.down('hiddenfield[name=importexport_permittype_id]').setValue(record.get('importexport_permittype_id'));
-        }
+  
         //updates the access control on the interface to be rendered.
-        me.updateVisibilityAccess(newTab, workflow_stage_id);
+        //me.updateVisibilityAccess(newTab, workflow_stage_id);
+        me.updateVisibilityAccess(newTab, stage_category_id);
         //prepare the interface and populates it accordingly
         me.prepareApplicationBaseDetails(newTab, record);
         mainTabPanel.add(newTab);
-        //manipulate other details for product medical devices screens
-        if(record.get('sub_module_id') == 79){
-        }
-
-        else {
-        if(record.get('section_id') == 4 && record.get('module_id') == 1 && record.get('sub_module_id') != 75){
-            if(newTab.down('drugsIngredientsGrid')){
-                newTab.down('drugsIngredientsGrid').destroy();
-            }
-            if(newTab.down('productApiManuctureringGrid')){
-                newTab.down('productApiManuctureringGrid').destroy();
-            }
-            if(newTab.down('productGmpInspectionDetailsGrid')){
-                newTab.down('productGmpInspectionDetailsGrid').setTitle('GMP/QMS Inspection Details');
-            }
-            if(newTab.down('inspectioninothercountriesGrid')){
-                newTab.down('inspectioninothercountriesGrid').setTitle('GMP/QMS Inspection In Other Countries');
-            }
-        }
-    }
-        //set save button 
         var sub_module_id = record.get('sub_module_id');
         // if(sub_module_id == 8 && newTab.down('button[name=save_btn]')){
         //     newTab.getViewModel().set('isReadOnly', true);
@@ -2046,6 +2019,10 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
         workflowContainer.down('hiddenfield[name=module_id]').setValue(module_id);
         workflowContainer.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
         workflowContainer.down('hiddenfield[name=application_status_id]').setValue(workflow_details.initialStageId);
+        workflowContainer.down('hiddenfield[name=stage_category_id]').setValue(workflow_details.stage_category_id);
+
+        console.log(workflow_details.stage_category_id);
+
         dashboardWrapper.add(workflowContainer);
 
         Ext.Function.defer(function () {
@@ -2646,7 +2623,19 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
             module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
-            workflow_stage = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
+            workflow_stage = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            stage_category_id = activeTab.down('hiddenfield[name=stage_category_id]').getValue();
+
+                        console.log(stage_category_id);
+
+                if(stage_category_id == 1 || stage_category_id === 1){
+                    activeTab.down('button[name=recommendation]').setVisible(false);
+                    activeTab.down('button[name=approval]').setVisible(false);
+                    activeTab.down('combo[name=recommendation_id]').setVisible(false);
+                    activeTab.down('combo[name=approval_id]').setVisible(false);
+                    activeTab.down('button[name=add_upload]').setHidden(true);
+                };
+       
            
             store.getProxy().extraParams = {
                 application_code: application_code,
@@ -3439,14 +3428,22 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             process_id = activeTab.down('hiddenfield[name=process_id]').getValue(),
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
            // reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
-            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
+            workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            stage_category_id = activeTab.down('hiddenfield[name=stage_category_id]').getValue();
 
+                        console.log("saved: ", stage_category_id);
+
+            if(stage_category_id == 1 || stage_category_id === 1){
 
               activeTab.down('button[name=recommendation]').setVisible(false);
               activeTab.down('button[name=approval]').setVisible(false);
-
-            
+              activeTab.down('combo[name=recommendation_id]').setVisible(false);
+              activeTab.down('combo[name=approval_id]').setVisible(false);
+              activeTab.down('button[name=add_upload]').setHidden(true);
        
+            };
+       
+            
         if (application_code) {
             Ext.Ajax.request({
                 method: 'GET',
@@ -3469,7 +3466,6 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
                     if (success == true || success === true) {
                         
                         docdefinationrequirementfrm.loadRecord(model);
-
                         activeTab.down('displayfield[name=workflow_stage]').setValue(results.workflow_stage);
 
                       //  activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
@@ -9987,7 +9983,55 @@ if (sub_module_id) {
         } else {
             toastr.warning('Please fill all the required fields!!', 'Warning Response');
         }
-},
+},showNavigatorSelectionList:function(btn){
+        var me = this,
+            childXtype = btn.childXtype,
+            winTitle = btn.winTitle,
+            winWidth = btn.winWidth,
+            mainTabPanel = me.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            
+            activeTab = mainTabPanel.getActiveTab();
+
+            if(activeTab.down('hiddenfield[name=section_id]')){
+                section_id = activeTab.down('hiddenfield[name=section_id]').getValue();
+            }
+            if(activeTab.down('hiddenfield[name=active_application_code]')){
+                section_id = activeTab.down('hiddenfield[name=active_application_code]').getValue();
+            }
+            gmp_type_id = 0;
+        var childObject = Ext.widget(childXtype);
+        childObject.setHeight(450);
+           
+            if(childObject.down('hiddenfield[name=application_code]')){
+            childObject.down('hiddenfield[name=application_code]').setValue(application_code);
+              }
+            funcShowCustomizableWindow(winTitle, winWidth, childObject, 'customizablewindow');
+
+    },
+    onNavigatorSelectionListDblClick: function (view, record, item, index, e, eOpts) {
+        
+        var me = this,
+            grid = view.grid,
+            folder_id = record.get('id'),
+            win = grid.up('window'),
+            mainTabPanel = me.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+                mask = new Ext.LoadMask({
+                msg: 'Please wait...',
+                target: win
+            });
+        mask.show();
+            var docdefinationrequirementfrm = activeTab.down('docdefinationrequirementfrm');
+            
+            docdefinationrequirementfrm.loadRecord(record);
+
+        Ext.Function.defer(function () {
+            mask.hide();
+            win.close();
+        }, 200);
+    },
+
 
 onNewIssueApplication: function (sub_module_id, issue_type_id, wrapper_xtype, module_id) {
     Ext.getBody().mask('Please wait...');

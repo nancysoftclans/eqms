@@ -41,7 +41,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 ui: 'soft-blue',
                 childXtype: 'documenttypeform',
                 winTitle: 'Create Document Type',
-                winWidth: '40%',
+                winWidth: '80%',
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
     },{

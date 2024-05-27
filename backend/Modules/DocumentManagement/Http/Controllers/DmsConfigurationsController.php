@@ -255,7 +255,7 @@ public function getdocdefinationrequirementDetails(Request $req)
     try {
      $results = DB::table('tra_documentmanager_application as t1')
     ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
-    ->leftJoin('users as t3', 't1.document_owner_id', '=', 't3.id')
+    ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
     ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
@@ -263,12 +263,20 @@ public function getdocdefinationrequirementDetails(Request $req)
         // DB::raw("CONCAT_WS(decrypt(t3.first_name), ' ', COALESCE(decrypt(t3.last_name), '')) as owner"),
         DB::raw("CONCAT_WS(' ',decrypt(t3.first_name),decrypt(t3.last_name)) as owner"),
         't1.*',
-        't1.name AS mtype',
+        't1.doc_title AS mtype',
         't2.name AS document_type',
         't6.name AS status',
-        't5.name AS process_name'
+        't5.name AS process_name',
+
+                // DB::raw("(SELECT  t.navigator_folder_name
+                //             FROM tra_documentmanager_application t  
+                //             WHERE t.id = t.docparent_id) AS navigator_foldername")
+        DB::raw("(SELECT t2.navigator_folder_name
+          FROM tra_documentmanager_application t2
+          WHERE t1.navigator_folder_id = t2.id) as recoil")
+
     )
-    ->whereNull('t1.folder_name');
+    ->whereNull('t1.navigator_folder_name');
 
 
 //CONCAT(t11.brand_name,' ',COALESCE(t12.name,'')) as brand_name,
@@ -356,20 +364,25 @@ public function getdocdefinationrequirementDetails(Request $req)
             ->leftJoin('wf_workflow_stages as t6', 't1.workflow_stage_id', '=', 't6.id')
             ->leftJoin('wf_processes as t7', 't1.process_id', '=', 't7.id')
             ->leftJoin('par_system_statuses as t8', 't1.application_status_id', '=', 't8.id')
+            ->leftJoin('tra_application_uploadeddocuments as t9', 't1.application_code', '=', 't9.application_code')
             ->select(
-                't1.*',
-                DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
-                't1.name AS mtype',
-                't3.name AS module_name',
-                't4.name AS sub_module',
-                't5.name AS parent_level',
-                't8.name AS status',
-                't7.name AS process_name',
-
-                DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
-                            FROM tra_docupload_reqextensions t 
-                            INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 
-                            WHERE t.documentupload_requirement_id = t1.id) AS allowed_extensions")
+                //'t1.*',
+                DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil"),
+                't1.doc_title AS navigator_doc_title',
+                't1.id',
+                't1.tracking_no',
+                't1.doc_version as navigator_version',
+                't1.dola',
+                't1.id AS navigator_folder_id',
+                't1.doc_description AS navigator_description',
+               // 't1.description AS navigator_descriptions',
+                // 't1.navigator_folder_name AS navigator_foldername',
+                // 't2.name AS navigator_foldername',
+                // 't3.name AS module_name',
+                // 't4.name AS sub_module',
+                // 't5.name AS parent_level',
+                // 't8.name AS status',
+                // 't7.name AS process_name',
             );
 
         if (validateIsNumeric($parent_id)) {

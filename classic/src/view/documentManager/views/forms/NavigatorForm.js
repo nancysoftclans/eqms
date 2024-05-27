@@ -33,18 +33,17 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
         xtype: 'textfield',
         fieldLabel: 'Title',
         margin: '0 20 20 0',
-        name: 'folder_name',
+        name: 'navigator_folder_name',
         allowBlank: false
     },{
         xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Has Parent',
+        fieldLabel: 'Has Associated Folder',
         margin: '0 20 20 0',
         name: 'has_parent_level',
         valueField: 'id',
         displayField: 'name',
         forceSelection: true,
         allowBlank: true,
-        hidden: true,
         queryMode: 'local',
         listeners: {
             beforerender: {
@@ -63,12 +62,12 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
         }
     },{
         xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Parent Document',
+        fieldLabel: 'Associated Folder',
         margin: '0 20 20 0',
         name: 'docparent_id',
         valueField: 'id',
         hidden: true,
-        displayField: 'name',
+        displayField: 'navigator_folder_name',
         forceSelection: true,
         allowBlank: true,
         queryMode: 'local',
@@ -80,7 +79,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
                     proxy: {
                        
                         extraParams: {
-                            table_name: 'par_document_types'
+                            table_name: 'tra_documentmanager_application'
                         }
                      }
                 },
@@ -221,7 +220,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
                     text: 'Save Details',
                     iconCls: 'x-fa fa-save',
                     action: 'save',
-                    table_name: 'tra_documentmanager_application',
+                    table_name: 'par_navigator_folder',
                     storeID: 'docdefinationrequirementstr',
                     formBind: true,
                     ui: 'soft-blue',

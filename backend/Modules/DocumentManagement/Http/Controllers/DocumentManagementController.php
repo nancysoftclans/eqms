@@ -182,18 +182,22 @@ public function saveDocDefinationrequirement(Request $request)
                $app_data = array(
                             "process_id" => $request->input('process_id'),
                             "workflow_stage_id" => $request->input('workflow_stage_id'),
+                            "stage_category_id" => $request->input('stage_category_id'),
                             "applicant_id" => $request->input('applicant_id'),
                             "sub_module_id" => $sub_module_id,
                             "module_id" =>$module_id,
-                            "name" => $request->input('name'),
-                            "document_type_id" => $request->input('document_type_id'),
+                            "doc_title" => $request->input('doc_title'),
+                            "owner_user_id" => $request->input('owner_user_id'),
+                            "owner_group_id" => $request->input('owner_group_id'),
                             "has_parent_level" => $request->input('has_parent_level'),
                             "docparent_id" => $request->input('docparent_id'),
-                            "description" => $request->input('description'),
-                            "document_owner_id" => $request->input('document_owner_id'),
-                            "version" => $request->input('version'),
+                            "doc_description" => $request->input('doc_description'),
+                            "owner_type_id" => $request->input('owner_type_id'),
+                            "doc_version" => $request->input('doc_version'),
                             "assessment_date" => $request->input('assessment_date'),
                             "application_status_id" => $request->input('application_status_id'),
+                            "document_type_id" => $request->input('document_type_id'),
+                            "navigator_folder_id" => $request->input('navigator_folder_id'),
                          
                  );
 
@@ -264,7 +268,6 @@ public function saveDocDefinationrequirement(Request $request)
                       
                        $res = insertRecord($applications_table, $app_data, $user_id);
 
-
                       
                        $active_application_id = $res['record_id'];
 
@@ -304,8 +307,10 @@ public function saveDocDefinationrequirement(Request $request)
                            'nodeType' => 'cm:folder');
 
                        if ($res['success']) {
-                      initializeApplicationDMS( $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-   
+                      $dd = initializeApplicationDMS( $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+
+
+                           dd($dd);
                        } else {
                            $res = array(
                            'success' => false,
@@ -516,7 +521,7 @@ $table_name = $request->input('table_name');
         try {
             $main_qry = DB::table('tra_documentmanager_application as t1')
                 ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
-                ->select('t1.*','t2.name as workflow_stage')
+                ->select('t1.*','t2.name as workflow_stage', 't2.stage_category_id')
                 ->where('t1.application_code', $application_code);
 
             $results = $main_qry->first();
@@ -1171,6 +1176,8 @@ $table_name = $request->input('table_name');
 
             DB::beginTransaction();
             $app_rootnode = getApplicationRootNode($application_code);
+
+            dd($app_rootnode);
 
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
             $table_name = 'tra_application_uploadeddocuments';

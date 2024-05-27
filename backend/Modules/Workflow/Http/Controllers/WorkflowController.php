@@ -150,7 +150,7 @@ class WorkflowController extends Controller
                         ->on('t3.stage_status', '=', DB::raw(1));
                 })
                 ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
-                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId');
+                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId', 't3.stage_category_id');
 
 
 
@@ -839,7 +839,7 @@ class WorkflowController extends Controller
                 ->leftJoin('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
                 ->join('wf_workflow_stages as t3', 't3.workflow_id', '=', 't2.id')
                 ->leftJoin('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
-                ->select('t1.workflow_id', 't2.name', 't4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId');
+                ->select('t1.workflow_id', 't2.name', 't4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId', 't3.stage_category_id');
             $qry->where($where);
 
             $results = $qry->first();

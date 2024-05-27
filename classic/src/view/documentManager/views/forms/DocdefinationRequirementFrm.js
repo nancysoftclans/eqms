@@ -50,7 +50,7 @@
     },  {
         xtype:'fieldset',
         columnWidth: 1,
-        title: "",
+        title: "Create Document",
         collapsible: true,
         defaults: {
             labelAlign: 'top',
@@ -66,7 +66,7 @@
         xtype: 'textfield',
         fieldLabel: 'Document Title',
         margin: '0 20 20 0',
-        name: 'name'
+        name: 'doc_title'
     },{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Document Type',
@@ -92,48 +92,55 @@
             }
         }
     },{
-      xtype: 'tagfield',
-        fieldLabel: 'Allowed Document Extensions',
-        margin: '0 20 20 0',
-        name: 'property_id',
-        allowBlank: true,
-        forceSelection: true,
-        filterPickList: true,
-        encodeSubmitValue: true,
-        emptyText: 'Select Appropriate Property',
-        growMax: 100,
-        queryMode: 'local',
-        valueField: 'id',
-        displayField: 'name',
-        listeners: {
-            beforerender: {
-                fn: 'setWorkflowCombosStore',
-                config: {
-                    pageSize: 1000,
-                    proxy: {
-                        url: 'configurations/getConfigParamFromTable',
-                        extraParams: {
-                            table_name: 'par_document_properties'
-                        }
-                    }
-                },
-                isLoad: true
-            }
-        }
-    },{
         xtype: 'textfield',
         fieldLabel: 'Version',
         margin: '0 20 20 0',
-        name: 'version'
+        name: 'doc_version'
     },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Document Owner',
-        margin: '0 20 20 0',
-        name: 'document_owner_id',
+            xtype: 'combo',
+            queryMode: 'local',
+            forceSelection: true,
+            valueField: 'id',
+            margin: '0 20 20 0',
+            displayField: 'name',
+            fieldLabel: 'Owner Type',
+            name: 'owner_type_id',
+            //store: 'confirmationstr',
+            listeners: {
+                change: function (cmb, newVal) {
+                    var form = cmb.up('form'),
+                        owneruser = form.down('combo[name=owner_user_id]'),
+                        ownergroup = form.down('combo[name=owner_group_id]');
+                    if (newVal == 1 || newVal === 1) {
+                        owneruser.setVisible(true);
+                    } else {
+                        ownergroup.setVisible(true);
+                    }
+                },beforerender: {
+                    fn: 'setCompStore',
+                    config: {
+                        pageSize: 1000,
+                        proxy: {
+                            url: 'configurations/getNonrefParameter',
+                            extraParams: {
+                                table_name: 'par_owner_type'
+                            }
+                        }
+                    },
+                    isLoad: true
+                }
+            }
+            
+        },{
+        xtype: 'combo', 
+        fieldLabel: 'Owner User',
+        name: 'owner_user_id',
         valueField: 'id',
+        margin: '0 20 20 0',
         displayField: `firstname`,
         forceSelection: true,
-        allowBlank: false,
+        allowBlank: true,
+        hidden: true,
         queryMode: 'local',
         listeners: {
             afterrender: {
@@ -150,67 +157,73 @@
                 isLoad: true
             }
         }
-    }]
+    },{
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Owner Group',
+        name: 'owner_group_id',
+        valueField: 'id',
+        displayField: `name`,
+        margin: '0 20 20 0',
+        forceSelection: true,
+        allowBlank: true,
+        hidden: true,
+        queryMode: 'local',
+        listeners: {
+            afterrender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 10000,
+                    proxy: {
+                        //url: 'usermanagement/documentOwner',
+                        extraParams: {
+                            table_name: 'par_groups'
+                        }
+                    }
+                },
+                isLoad: true
+            }
+        }
+    },{
+        xtype: 'textarea',
+        fieldLabel: 'Description',
+        name: 'doc_description',
+        allowBlank: true,
+        columnWidth: 1,
+        labelAlign: 'top'
+    } , {
+                    xtype: 'textfield',
+                    name: 'recoil',
+                    columnWidth: 0.9,
+                    allowBlank: false,
+                    fieldLabel: 'Navigator folders',
+                   readOnly: true
+                },{
+                    xtype: 'textfield',
+                    name: 'navigator_folder_id',
+                    columnWidth: 0.9,
+                    allowBlank: false,
+                    hidden: true,
+                    fieldLabel: 'DOC ID',
+                   readOnly: true
+                },
+                {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-search',
+                    columnWidth: 0.1,
+                    tooltip: 'Search',
+                    action: 'search_navigator',
+                    childXtype: 'navigatorselectfoldergrid',
+                    winTitle: 'Select Folder',
+                    winWidth: '90%',
+                    margin: '34 0 0 0',
+                    bind: {
+                        disabled: '{isReadOnly}'
+                    }
+                }
+    ]
     },
 
-     {
-    xtype:'fieldset',
-    columnWidth: 1,
-    title: "Review Procedure",
-    collapsible: true,
-    defaults: {
-        labelAlign: 'top',
-        allowBlank: false,
-        labelAlign: 'top',
-        margin: 5,
-        xtype: 'textfield',
-        allowBlank: false,
-        columnWidth: 0.33,
-    },
-    layout: 'column',
-     items:[
-    {
-        xtype: 'textfield',
-        fieldLabel: 'Review period - Months',
-        margin: '0 20 20 0',
-        name: 'review_period'
-    },{
-        xtype: 'textarea',
-        fieldLabel: 'Review instructions',
-        name: 'review_instructions',
-        allowBlank: true,
-        columnWidth: 1,
-        labelAlign: 'top'
-    }]
- },{
-    xtype:'fieldset',
-    columnWidth: 1,
-    title: "Document Expiry",
-    collapsible: true,
-    defaults: {
-        labelAlign: 'top',
-        allowBlank: false,
-        labelAlign: 'top',
-        margin: 5,
-        xtype: 'textfield',
-        allowBlank: false,
-        columnWidth: 0.33,
-    },
-    layout: 'column',
-     items:[{
-        xtype: 'textfield',
-        fieldLabel: 'Expiry period - Months',
-        margin: '0 20 20 0',
-        name: 'expiry_period'
-    },{
-        xtype: 'textarea',
-        fieldLabel: 'Disposition instructions',
-        name: 'disposition_instructions',
-        allowBlank: true,
-        columnWidth: 1,
-        labelAlign: 'top'
-    }]
- },
+   
 
 
      {

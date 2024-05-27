@@ -440,6 +440,7 @@ showEditConfigParamWinFrm: function (item) {
             active_application_id = containerPnl.down('hiddenfield[name=active_application_id]').getValue(),
             application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
             workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            stage_category_id = containerPnl.down('hiddenfield[name=stage_category_id]').getValue(),
             docdefinationrequirementfrm = containerPnl.down('docdefinationrequirementfrm');
 
            // docdefinationrequirementfrm = docdefinationrequirementfrm.getForm();
@@ -462,6 +463,7 @@ showEditConfigParamWinFrm: function (item) {
                 params: {
                     process_id: process_id,
                     workflow_stage_id: workflow_stage_id,
+                    stage_category_id: stage_category_id,
                     active_application_id: active_application_id,
                     application_status_id: application_status_id,
                     module_id: module_id,

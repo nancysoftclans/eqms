@@ -221,7 +221,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorMoveForm',{
                     text: 'Save Details',
                     iconCls: 'x-fa fa-save',
                     action: 'save',
-                    table_name: 'tra_documentmanager_application',
+                    table_name: 'par_navigator_folder',
                     storeID: 'docdefinationrequirementstr',
                     formBind: true,
                     ui: 'soft-blue',

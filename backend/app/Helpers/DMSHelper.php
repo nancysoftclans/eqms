@@ -948,6 +948,7 @@ class DMSHelper
             return $auth_resp;
         }
         $ticket = $auth_resp['ticket'];
+
         $client = new Client([
             'base_uri' => Config('constants.dms.dms_url'),
             'auth' => [Config('constants.dms.dms_adminusr'), Config('constants.dms.dms_adminpassword')],
@@ -956,6 +957,7 @@ class DMSHelper
                 'Content-Type' => 'application/json',
             ]
         ]);
+
         try {
             $response = $client->request('POST', 'api/-default-/public/alfresco/versions/1/nodes/' . $parent_node . '/children?alf_ticket=' . $ticket,
                 [
@@ -968,7 +970,6 @@ class DMSHelper
             if (isset($response->entry)) {
 
                 $node_details = $response->entry;
-
                 $data = array('success' => true, 'message' => 'DMS Node Children', 'node_details' => $node_details);
 
             } else {
@@ -1458,9 +1459,10 @@ class DMSHelper
                 'nodeType' => 'cm:folder'
             );
             $dms_res = self::dmsCreateAppRootNodesChildren($parentNode_ref, $node_details);
+
+            dd($dms_res);
             if ($dms_res['success']) {
                 $dms_node_id = $dms_res['node_details']->id;
-
                 return self::saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, '', $ref_number, $dms_node_id, $user_id);
             }
         }else{
