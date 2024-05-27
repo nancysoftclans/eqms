@@ -208,7 +208,7 @@ class IssueManagementController extends Controller
                     DB::raw("CONCAT_WS(' ',decrypt(t6.first_name),decrypt(t6.last_name)) as owner")
                 )
                 ->where('t1.id', $active_application_id)
-                ->get();
+                ->first();
             $res = array(
                 'success' => true,
                 'results' => $results,

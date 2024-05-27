@@ -1652,6 +1652,8 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
             html_id = record.get('destination_html_id'),
             title_suffix = ref_no;
 
+            workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
+
             //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
         Ext.getBody().unmask();
@@ -1678,7 +1680,7 @@ Ext.define('Admin.controller.SharedUtilitiesCtr', {
   
         //updates the access control on the interface to be rendered.
         //me.updateVisibilityAccess(newTab, workflow_stage_id);
-        me.updateVisibilityAccess(newTab, stage_category_id);
+        me.updateVisibilityAccess(newTab, workflow_stage_id);
         //prepare the interface and populates it accordingly
         me.prepareApplicationBaseDetails(newTab, record);
         mainTabPanel.add(newTab);
