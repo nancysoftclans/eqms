@@ -20,7 +20,6 @@ Ext.application({
 
 Ext.Ajax.on("beforerequest", function(event, request) {
         if(request.headers && request.headers.Authorization){
-            // console.log('headers already set');
         }else{
             Ext.apply(request, {
                 headers: {
@@ -726,7 +725,6 @@ function showWorkflowSubmissionWin(document_id, application_code, table_name, fo
                     Ext.each(extraParams, function (extraParam) {
 
                         if (form.down(extraParam.field_type + '[name=' + extraParam.field_name + ']')) {
-                            console.log(extraParam.field_type);
                             form.down(extraParam.field_type + '[name=' + extraParam.field_name + ']').setValue(extraParam.value);
                         }
                     });

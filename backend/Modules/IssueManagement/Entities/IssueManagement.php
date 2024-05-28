@@ -18,6 +18,7 @@ class IssueManagement extends Model
         'issue_status_id',
         'complainant_address',
         'complainant_name',
+        'organisation_name',
         'complainant_telephone',
         'complaint_mode_id',
         'complaint_type_id',
@@ -25,6 +26,7 @@ class IssueManagement extends Model
         'altered_by',
         'created_on',
         'dola',
+        'date_closed'
     ];
 
     public $timestamps = false;

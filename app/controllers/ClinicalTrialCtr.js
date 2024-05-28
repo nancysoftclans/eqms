@@ -1188,7 +1188,6 @@ panel_width = '95%';
     },
    
     onPrevCtProgressReportCardClick: function (btn) {
-        console.log('this is my event')
         // var mainTabPanel = this.getMainTabPanel(),
         //     activeTab = mainTabPanel.getActiveTab(),
         //     wizardPnl = activeTab.down('ctrprogressreportreceivingwizard');

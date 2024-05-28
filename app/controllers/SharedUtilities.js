@@ -1830,8 +1830,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       winTitle = "Document",
       winWidth = "80%";
 
-    console.log(mainTabPanel);
-
     workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
     // if (!workflow_details || workflow_details.length < 1) {
     //     Ext.getBody().unmask();
@@ -2199,7 +2197,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       .down("hiddenfield[name=stage_category_id]")
       .setValue(workflow_details.stage_category_id);
 
-    console.log(workflow_details.stage_category_id);
 
     dashboardWrapper.add(workflowContainer);
 
@@ -3032,7 +3029,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         .down("hiddenfield[name=stage_category_id]")
         .getValue();
 
-    console.log(stage_category_id);
 
     if (stage_category_id == 1 || stage_category_id === 1) {
       activeTab.down("button[name=recommendation]").setVisible(false);
@@ -4064,7 +4060,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         .down("hiddenfield[name=stage_category_id]")
         .getValue());
 
-    console.log("saved: ", stage_category_id);
 
     if (stage_category_id == 1 || stage_category_id === 1) {
       activeTab.down("button[name=recommendation]").setVisible(false);
@@ -4634,7 +4629,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       prodclass_category_id = activeTab
         .down("hiddenfield[name=prodclass_category_id]")
         .getValue();
-      console.log(prodclass_category_id);
       if (section_id == 4) {
         view = "exemptionMDProductsDetailsPnl";
       } else if (prodclass_category_id) {
@@ -5243,8 +5237,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       form = btn.up("form"),
       decision_id = form.down("combo[name=decision_id]").getValue(),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
-    console.log(module_id);
-    console.log(decision_id);
     (frm = form.getForm()),
       (win = form.up("window")),
       (action_url =
@@ -11068,7 +11060,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       winWidth = btn.winWidth,
       categorize_selected = btn.categorize_selected,
       activeTab = mainTabPanel.getActiveTab();
-    console.log(activeTab);
     (module_id = activeTab.down("hiddenfield[name=module_id]").getValue()),
       (section_id = activeTab.down("hiddenfield[name=section_id]").getValue()),
       (application_id = activeTab
@@ -11921,7 +11912,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       (workflow_stage = activeTab
         .down("hiddenfield[name=workflow_stage_id]")
         .getValue());
-    console.log(process_id);
     (applicableChecklistStr = me
       .down("combo[name=applicable_checklist]")
       .getStore()),
@@ -12039,7 +12029,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           var resp = action.result;
 
           message = resp.message;
-          console.log(message);
           toastr.error(message, "Failure Response");
         },
       });

@@ -109,6 +109,25 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       .down("hiddenfield[name=sub_module_id]")
       .setValue(sub_module_id);
 
+    var issuemanagementfrm = workflowContainer.down("issuemanagementfrm");
+
+    issuemanagementfrm
+      .down("combo[name=issue_type_id]")
+      .setValue(issue_type_id);
+    issuemanagementfrm.down("combo[name=issue_status_id]").setValue(1);
+    issuemanagementfrm
+      .down("datefield[name=creation_date]")
+      .setValue(new Date());
+      
+    // Calculate the date 10 days from now
+    var targetDate = new Date();
+    targetDate.setDate(targetDate.getDate() + 10);
+
+    // Set the target resolution date field to 10 days from now
+    issuemanagementfrm
+      .down("datefield[name=target_resolution_date]")
+      .setValue(targetDate);
+
     dashboardWrapper.add(workflowContainer);
 
     Ext.Function.defer(function () {
@@ -119,22 +138,23 @@ Ext.define("Admin.controller.IssueManagementCtr", {
   launchIssueManagementReceivingApplicationWizard: function (pnl) {
     Ext.getBody().mask("Please wait...");
     var me = this,
-      activeTab = pnl;
-    (application_status_id = activeTab
-      .down("hiddenfield[name=application_status_id]")
-      .getValue()),
-      (issuemanagementfrm = activeTab.down("issuemanagementfrm")),
-      (active_application_id = activeTab
+      activeTab = pnl,
+      application_status_id = activeTab
+        .down("hiddenfield[name=application_status_id]")
+        .getValue(),
+      issuemanagementfrm = activeTab.down("issuemanagementfrm"),
+      complainantdetailsfrm = activeTab.down("complainantdetailsfrm"),
+      active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
-        .getValue()),
-      (process_id = activeTab.down("hiddenfield[name=process_id]").getValue()),
-      (sub_module_id = activeTab
+        .getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab
         .down("hiddenfield[name=sub_module_id]")
-        .getValue()),
-      // reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
-      (workflow_stage_id = activeTab
+        .getValue(),
+      workflow_stage_id = activeTab
         .down("hiddenfield[name=workflow_stage_id]")
-        .getValue());
+        .getValue();
+
     activeTab.down("button[name=recommendation]").setVisible(false);
     activeTab.down("button[name=approval]").setVisible(false);
 
@@ -158,14 +178,16 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
           if (success == true || success === true) {
             issuemanagementfrm.loadRecord(model);
+            complainantdetailsfrm.loadRecord(model);
             activeTab
               .down("displayfield[name=workflow_stage]")
               .setValue(results.workflow_stage);
-
-            //  activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
             activeTab
               .down("displayfield[name=tracking_no]")
-              .setValue(results.tracking_no);
+              .setValue(results.reference_no);
+            issuemanagementfrm
+              .down("datefield[name=creation_date]")
+              .setValue(new Date(results.creation_date));
           } else {
             toastr.error(message, "Failure Response");
           }
