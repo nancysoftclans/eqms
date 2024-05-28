@@ -418,7 +418,6 @@ Ext.define('Admin.controller.WorkflowManagementCtr', {
 
             // }
             grid = activeTab.down('portalSubmissionReceivingGrid');
-            console.log(grid);
             //console.log(gridXtype);
             selected = this.buildApplicationsToSubmit(grid, mode,activeTab);
 

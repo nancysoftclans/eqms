@@ -187,7 +187,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "target_resolution_date",
+      dataIndex: "date_closed",
       text: "Date Closed",
       flex: 1,
       tdCls: "wrap",

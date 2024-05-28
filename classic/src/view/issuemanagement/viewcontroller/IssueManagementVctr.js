@@ -225,6 +225,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         ...complainantDetailsData,
       };
 
+      console.log(combinedData);
       // Submit the data to the endpoint
       Ext.Ajax.request({
         url: action_url,

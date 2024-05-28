@@ -642,7 +642,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
             filter = {section_id: section_id},
             workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
-            // console.log(enforcement_id)
         app_doc_types_store.removeAll();
         app_doc_types_store.load({
             params: {
@@ -669,7 +668,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
                         results = resp.results,
                         model = Ext.create('Ext.data.Model', results);
                     // ltr_model = Ext.create('Ext.data.Model', ltrResults);
-                    //console.log(results);
                     if (success == true || success === true) {
                         complainantfrm.loadRecord(model);
                         suspectinfoFrm.loadRecord(model);
@@ -764,7 +762,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
                target: win
            });
        mask.show();
-       console.log(form);
        if (activeTab.down('licenseInformationFrm')){
         form.down('hiddenfield[name=reg_premise_id]').setValue(record.get('reg_premise_id'));
         form.down('hiddenfield[name=premise_id]').setValue(record.get('premise_id'));
@@ -812,8 +809,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
                target: win
            });
        mask.show();
-    //    console.log(name);
-       console.log(grid);
        form.down('textfield[name=responsible_personnel]').setValue(record.get('name'));
 
        Ext.Function.defer(function () {
@@ -977,8 +972,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
             section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
             workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
-         console.log(workplanfrm);
-         console.log(activeTab);
 
         if (application_id) {
             Ext.Ajax.request({
@@ -1000,9 +993,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
                         // ltrResults = resp.ltrDetails,
                         ///joint_investigation_id
                         model = Ext.create('Ext.data.Model', results);
-                       console.log(results);
-                       console.log(results.joint_investigation_id);
-                       console.log(results.enforcement_id);
                     if (success == true || success === true) {
                           //complainantfrm.loadRecord(model);
                           //suspectinfoFrm.loadRecord(model);
@@ -1050,7 +1040,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
     //             sub_module_id = activeTab.down('hiddenfield[name=sub_module_id]').getValue(),
     //             filter = {section_id: section_id},
     //             workflow_stage_id = activeTab.down('hiddenfield[name=workflow_stage_id]').getValue();
-    //             console.log(enforcement_id)
     //         app_doc_types_store.removeAll();
     //         app_doc_types_store.load({
     //             params: {
@@ -1078,7 +1067,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
     //                         // ltrResults = resp.ltrDetails,
     //                         model = Ext.create('Ext.data.Model', results);
     //                     // ltr_model = Ext.create('Ext.data.Model', ltrResults);
-    //                     //console.log(results);
     //                     if (success == true || success === true) {
     //                         complainantfrm.loadRecord(model);
     //                         suspectinfoFrm.loadRecord(model);
@@ -1136,7 +1124,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
         workflowContainer.down('hiddenfield[name=section_id]').setValue(section_id);
         dashboardWrapper.add(workflowContainer);
         //reload Stores 
-        //console.log(section_id);
         var app_doc_types_store = activeTab.down('combo[name=applicable_documents]').getStore();
         app_doc_types_store.removeAll();
         app_doc_types_store.load({
@@ -1178,7 +1165,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
         workflowContainer.down('hiddenfield[name=section_id]').setValue(section_id);
         dashboardWrapper.add(workflowContainer);
         //reload Stores 
-        //console.log(section_id);
         var app_doc_types_store = activeTab.down('combo[name=applicable_documents]').getStore();
         app_doc_types_store.removeAll();
         app_doc_types_store.load({
@@ -1203,7 +1189,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
             is_dataammendment_request =0,
             
             storeID = 'enforcementStr';
-            console.log(application_code);
             if(activeTab.down('hiddenfield[name=is_dataammendment_request]')){
                 is_dataammendment_request = activeTab.down('hiddenfield[name=is_dataammendment_request]').getValue();
             }
@@ -1244,7 +1229,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
        
             if (valid == true){
                 showWorkflowSubmissionWin(application_id, application_code, table_name, 'workflowsubmissionsstrictrecommfrm', winWidth, storeID,extraParams);
-                console.log(is_investigation_submission);
             } else {
                 Ext.getBody().unmask();
                 toastr.warning('Please Enter All the required Enforcment Details!!', 'Warning Response');
@@ -1399,7 +1383,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
             storeID = btn.storeID,
             store = Ext.getStore(storeID),
             frm = form.getForm();
-            console.log(enforcement_id);
         if (frm.isValid()) {
             frm.submit({
                 url: url,
@@ -1578,7 +1561,6 @@ Ext.define('Admin.controller.EnforcementCtr', {
             selected_records = sm.getSelection(),
             application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
             selected = [];
-            console.log(form);
         Ext.each(selected_records, function (item) {
             application_code = item.data.application_code;
             enforcement_id = item.data.enforcement_id;
