@@ -212,10 +212,10 @@ class IssueManagementController extends Controller
                     DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
                 )
                 ->get();
-            
-            $results = convertStdClassObjToArray($results);            
+
+            $results = convertStdClassObjToArray($results);
             $results = decryptArray($results);
-            
+
             $res = array(
                 'success' => true,
                 'results' => $results,
