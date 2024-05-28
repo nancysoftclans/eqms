@@ -958,6 +958,7 @@ class DMSHelper
             ]
         ]);
 
+        
         try {
             $response = $client->request('POST', 'api/-default-/public/alfresco/versions/1/nodes/' . $parent_node . '/children?alf_ticket=' . $ticket,
                 [
@@ -1186,7 +1187,7 @@ class DMSHelper
     static function getApplicationSubModuleNodeDetails($module_id, $sub_module_id, $user_id, $con = 'mysql')
     {
         $root_site_id = Config('constants.dms.dms_approotsite_id');
-
+        
         $rec = DB::table('tra_sectionssubmodule_docdefination as t1')
             ->select('t1.node_ref')
             ->join('tra_sections_docdefination as t2', 't1.doc_section_id', '=', 't2.id')
@@ -1194,7 +1195,6 @@ class DMSHelper
             ->where(array('t3.site_id' => $root_site_id, 't1.sub_module_id' => $sub_module_id))
             ->first();
 
-           
         if ($rec) {
             $record = $rec;
         } else {
@@ -1352,6 +1352,8 @@ class DMSHelper
             ->select('t1.*')
             ->where(array('t1.application_code' => $application_code, 't1.document_type_id' => $document_type_id))
             ->first();
+
+            
         if ($rec) {
             $record = $rec;
         } else {
@@ -1378,6 +1380,7 @@ class DMSHelper
 
             }
         }
+        
         return $record;
     }
 
@@ -1462,10 +1465,9 @@ class DMSHelper
                 'nodeType' => 'cm:folder'
             );
             $dms_res = self::dmsCreateAppRootNodesChildren($parentNode_ref, $node_details);
-
             if ($dms_res['success']) {
                 $dms_node_id = $dms_res['node_details']->id;
-
+                
                 return self::saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, '', $ref_number, $dms_node_id, $user_id);
             }
         }else{
