@@ -913,7 +913,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       itemdblclick: "onMeetingGroupSelectionListDblClick",
     },
     documentapplicationreceivingwizard: {
-      afterrender: "prepapreDocumentApplicationReceiving",
+      beforerender: "prepapreDocumentApplicationReceiving",
     },
     documentsubmissionpnl: {
       afterrender: "prepapreDocumentApplicationScreening",
@@ -4046,28 +4046,15 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-    (application_status_id = activeTab
-      .down("hiddenfield[name=application_status_id]")
-      .getValue()),
-      (docdefinationrequirementfrm = activeTab.down(
-        "docdefinationrequirementfrm"
-      )),
-      (application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue()),
-      (process_id = activeTab.down("hiddenfield[name=process_id]").getValue()),
-      (sub_module_id = activeTab
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue()),
+      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+      docdefinationrequirementfrm = activeTab.down("docdefinationrequirementfrm"),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
       // reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
-      (workflow_stage_id = activeTab
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue()),
-      (stage_category_id = activeTab
-        .down("hiddenfield[name=stage_category_id]")
-        .getValue());
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
+      stage_category_id = activeTab.down("hiddenfield[name=stage_category_id]").getValue();
 
-    console.log("saved: ", stage_category_id);
 
     if (stage_category_id == 1 || stage_category_id === 1) {
       activeTab.down("button[name=recommendation]").setVisible(false);
@@ -4097,14 +4084,17 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
 
           if (success == true || success === true) {
             docdefinationrequirementfrm.loadRecord(model);
-            activeTab
-              .down("displayfield[name=workflow_stage]")
-              .setValue(results.workflow_stage);
+            activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
+            activeTab.down('hiddenfield[name=stage_category_id]').setValue(results.stage_category_id);
+            activeTab.down("displayfield[name=tracking_no]").setValue(results.tracking_no);
 
-            //  activeTab.down('displayfield[name=reference_no]').setValue(results.reference_no);
-            activeTab
-              .down("displayfield[name=tracking_no]")
-              .setValue(results.tracking_no);
+            if (results.stage_category_id == 1 || results.stage_category_id === 1) {
+                activeTab.down("button[name=recommendation]").setVisible(false);
+                activeTab.down("button[name=approval]").setVisible(false);
+                activeTab.down("combo[name=recommendation_id]").setVisible(false);
+                activeTab.down("combo[name=approval_id]").setVisible(false);
+                activeTab.down("button[name=add_upload]").setHidden(true);
+            }
           } else {
             toastr.error(message, "Failure Response");
           }

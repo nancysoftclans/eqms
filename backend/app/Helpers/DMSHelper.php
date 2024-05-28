@@ -1149,7 +1149,6 @@ class DMSHelper
     {
         $auth_resp = authDms('');
 		if(!isset($auth_resp['ticket'])){
-			dd($auth_resp);
 		}
         $ticket = $auth_resp['ticket'];
     //get document name
@@ -1441,8 +1440,12 @@ class DMSHelper
             'sub_module_id' => $sub_module_id,
             'created_by' => $user,
             'created_on' => Carbon::now());
+
+
         $resp = insertRecord('tra_application_documentsdefination', $dmsapp_data, $user, $con);
         return $resp;
+
+
     }
 
     static function initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id)
@@ -1460,9 +1463,9 @@ class DMSHelper
             );
             $dms_res = self::dmsCreateAppRootNodesChildren($parentNode_ref, $node_details);
 
-            dd($dms_res);
             if ($dms_res['success']) {
                 $dms_node_id = $dms_res['node_details']->id;
+
                 return self::saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, '', $ref_number, $dms_node_id, $user_id);
             }
         }else{

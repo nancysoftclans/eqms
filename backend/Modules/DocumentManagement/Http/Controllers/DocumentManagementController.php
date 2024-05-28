@@ -78,7 +78,7 @@ class DocumentManagementController extends Controller
             $qry = DB::table('tra_proc_applicable_doctypes as t1')
                 ->join('par_document_types as t2', 't1.doctype_id', '=', 't2.id')
                 ->join('tra_documentmanager_application as t3', 't2.id', '=', 't3.document_type_id')
-                ->select('t2.id', 't2.name', 't2.is_assessment_doc');
+                ->select('t2.id', 't2.name');
             /*-------------------------------------------------------
                 For Document originating from query window identified by
                 query id rewrite the query not tied to process
@@ -307,10 +307,7 @@ public function saveDocDefinationrequirement(Request $request)
                            'nodeType' => 'cm:folder');
 
                        if ($res['success']) {
-                      $dd = initializeApplicationDMS( $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-
-
-                           dd($dd);
+                      initializeApplicationDMS( $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                        } else {
                            $res = array(
                            'success' => false,
@@ -521,7 +518,7 @@ $table_name = $request->input('table_name');
         try {
             $main_qry = DB::table('tra_documentmanager_application as t1')
                 ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
-                ->select('t1.*','t2.name as workflow_stage', 't2.stage_category_id')
+                ->select('t1.*','t2.name as workflow_stage')
                 ->where('t1.application_code', $application_code);
 
             $results = $main_qry->first();
@@ -1177,8 +1174,6 @@ $table_name = $request->input('table_name');
             DB::beginTransaction();
             $app_rootnode = getApplicationRootNode($application_code);
 
-            dd($app_rootnode);
-
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
@@ -1220,7 +1215,6 @@ $table_name = $request->input('table_name');
                         'assessment_by'=>$assessment_by,
                         'reg_serial' => $reg_serial
                     );
-
                     $where = array('application_code'=>$application_code);
                     $table_name = 'tra_application_documents';
 
@@ -1252,6 +1246,7 @@ $table_name = $request->input('table_name');
 
                         $res = insertRecord($table_name, $doc_app_details);
 
+
                     }
  
                     if(isset($res['success']) && $res['success']==true){
@@ -1271,6 +1266,7 @@ $table_name = $request->input('table_name');
                     }else{
                         //upload doc
                         $res = $this->uploadDocument($file, $parent_id, $application_document_id, $document_requirement_id, $app_rootnode, $node_ref, $application_code);
+                        //dd($res);
                     }
 
                 }else {
@@ -1473,7 +1469,6 @@ $table_name = $request->input('table_name');
         //confirm extension if allowed dms_node_id
         $docextension_check = $this->validateDocumentExtension($extension, $document_requirement_id);
         $is_allowedextension = $docextension_check['is_allowedextension'];
-
         if(!$is_allowedextension){
                 $allowed_filetypes = $docextension_check['allowed_filetypes'];
                 $res = array('success'=>false, 'message'=>'Uploaded file should only contain the following allowed file formats :.'.$allowed_filetypes);
@@ -1481,9 +1476,10 @@ $table_name = $request->input('table_name');
         }else{
             //$file->move($destination, $savedName);
         $document_path = $destination . $savedName;
-        //check if tje dpcument type has been mapped and not autoCreate the folder
-        $document_requirement = getParameterItem('tra_documentmanager_application', $document_requirement_id);
 
+        //check if tje dpcument type has been mapped and not autoCreate the folder
+        $document_requirement = getParameterItem('par_document_types', $document_requirement_id);
+//dd($document_requirement);
         //get the application root folder
 
         $uploadfile_name = $document_requirement . str_random(5) . '.' . $extension;
