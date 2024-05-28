@@ -162,7 +162,7 @@ Ext.define(
             max_step: 1,
             action: "quickNav",
             wizard: "issuemanagementreceivingapplicationwizard",
-            handler: "quickNavigation",
+            // handler: "quickNavigation",
           },
           // {
           //   step: 1,
@@ -188,18 +188,18 @@ Ext.define(
             hidden: true,
           },
           "->",
-          {
-            text: "Previous",
-            ui: "soft-blue",
-            iconCls: "fa fa-arrow-left",
-            name: "prev_btn",
-            max_step: 1,
-            bind: {
-              disabled: "{atBeginning}",
-            },
-            wizard: "issuemanagementreceivingapplicationwizard",
-            handler: "onPrevCardClick",
-          },
+          // {
+          //   text: "Previous",
+          //   ui: "soft-blue",
+          //   iconCls: "fa fa-arrow-left",
+          //   name: "prev_btn",
+          //   max_step: 1,
+          //   bind: {
+          //     disabled: "{atBeginning}",
+          //   },
+          //   wizard: "issuemanagementreceivingapplicationwizard",
+          //   handler: "onPrevCardClick",
+          // },
           {
             text: "Save Details",
             ui: "soft-blue",
@@ -244,19 +244,19 @@ Ext.define(
             comment_type_id: 3,
             stores: "[]",
           },
-          {
-            text: "Next",
-            ui: "soft-blue",
-            reference: "nextbutton",
-            iconCls: "fa fa-arrow-right",
-            iconAlign: "right",
-            max_step: 1,
-            bind: {
-              disabled: "{atEnd}",
-            },
-            wizard: "issuemanagementreceivingapplicationwizard",
-            handler: "onNextCardClick",
-          },
+          // {
+          //   text: "Next",
+          //   ui: "soft-blue",
+          //   reference: "nextbutton",
+          //   iconCls: "fa fa-arrow-right",
+          //   iconAlign: "right",
+          //   max_step: 1,
+          //   bind: {
+          //     disabled: "{atEnd}",
+          //   },
+          //   wizard: "issuemanagementreceivingapplicationwizard",
+          //   handler: "onNextCardClick",
+          // },
         ],
       };
       me.callParent(arguments);
