@@ -22,6 +22,10 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
       title: "COMPLAINANT DETAILS",
     },
     {
+      xtype: "issuemanagementdocuploadsgrid",
+      title: "APPLICABLE DOCUMENTS",
+    },
+    {
       xtype: "hiddenfield",
       name: "_token",
       value: token,

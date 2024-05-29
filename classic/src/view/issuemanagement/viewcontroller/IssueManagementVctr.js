@@ -117,10 +117,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       var thisItem = progressItems[step];
       if (!application_id) {
         thisItem.setPressed(false);
-        toastr.warning(
-          "Please save document details first!!",
-          "Warning Response"
-        );
+        toastr.warning("Please save issue details first!!", "Warning Response");
         return false;
       }
     }
@@ -128,11 +125,11 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       motherPnl.down("button[name=save]").setVisible(true);
       panel.getViewModel().set("atBeginning", false);
       panel.getViewModel().set("atEnd", true);
-      wizardPnl.down("button[name=process_submission_btn]").setVisible(false);
+      // wizardPnl.down("button[name=process_submission_btn]").setVisible(false);
     } else if (step == max_step) {
       motherPnl.down("button[name=save]").setVisible(false);
       panel.getViewModel().set("atBeginning", true);
-      wizardPnl.down("button[name=process_submission_btn]").setVisible(true);
+      // wizardPnl.down("button[name=process_submission_btn]").setVisible(true);
     } else {
       panel.getViewModel().set("atBeginning", false);
       panel.getViewModel().set("atEnd", false);
@@ -140,7 +137,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         wizardPnl.down("button[name=save]").setVisible(false);
       }
 
-      wizardPnl.down("button[name=process_submission_btn]").setVisible(false);
+      // wizardPnl.down("button[name=process_submission_btn]").setVisible(false);
     }
 
     wizardPnl.getLayout().setActiveItem(step);
@@ -163,6 +160,18 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       }
     }
     activeItem.focus();
+  },
+
+  onBackToListClick: function (btn) {
+    var me = this,
+      mainTabPanel = me.getMainTabPanel(),
+      sec_dashboard = btn.sec_dashboard,
+      activeTab = mainTabPanel.getActiveTab(),
+      dashboardWrapper = activeTab.down(btn.homeDashWrapper);
+    if (!dashboardWrapper.down(sec_dashboard)) {
+      dashboardWrapper.removeAll();
+      dashboardWrapper.add({ xtype: sec_dashboard });
+    }
   },
 
   onPrevCardClick: function (btn) {
@@ -225,7 +234,6 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         ...complainantDetailsData,
       };
 
-      console.log(combinedData);
       // Submit the data to the endpoint
       Ext.Ajax.request({
         url: action_url,

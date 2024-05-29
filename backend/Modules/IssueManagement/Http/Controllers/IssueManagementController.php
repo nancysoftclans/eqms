@@ -2,6 +2,7 @@
 
 namespace Modules\IssueManagement\Http\Controllers;
 
+use App\Models\Submission;
 use App\Models\WfProcess;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -86,6 +87,9 @@ class IssueManagementController extends Controller
                         "success" => true,
                         "message" => 'Data Updated Successfully!!',
                     );
+                    $Submission = Submission::where('application_code', $application_code)->first();
+                    $ref_number = $Submission->reference_no;
+                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                 }
             } else {
                 $applications_table = 'tra_issue_management_applications';
@@ -135,7 +139,7 @@ class IssueManagementController extends Controller
 
                 $data = $request->all();
 
-                
+
 
                 $issue_data = array(
                     'submission_id' => $res['record_id'],
@@ -165,6 +169,7 @@ class IssueManagementController extends Controller
                         "message" => 'Data Saved Successfully!!',
                         "record_id" => $res['record_id']
                     );
+                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                 }
             }
             DB::commit();
@@ -204,9 +209,13 @@ class IssueManagementController extends Controller
                     't1.id as active_application_id',
                     't2.current_stage as workflow_stage_id',
                     't1.created_on as creation_date',
-                    DB::raw("CONCAT_WS(' ',decrypt(t6.first_name),decrypt(t6.last_name)) as owner")
+                    DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
                 )
                 ->get();
+
+            $results = convertStdClassObjToArray($results);
+            $results = decryptArray($results);
+
             $res = array(
                 'success' => true,
                 'results' => $results,

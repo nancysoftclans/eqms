@@ -155,7 +155,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       text: "Date Raised",
       flex: 1,
       tdCls: "wrap",
-      renderer: Ext.util.Format.dateRenderer('d M Y')
+      renderer: Ext.util.Format.dateRenderer("d M Y"),
     },
     {
       xtype: "gridcolumn",
@@ -173,11 +173,17 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "owner",
       text: "Owner",
       flex: 1,
       tdCls: "wrap",
+      renderer: function (value, metaData, record) {
+        // Concatenate first_name and last_name
+        var firstName = record.get("first_name");
+        var lastName = record.get("last_name");
+        return firstName + " " + lastName;
+      },
     },
+
     {
       xtype: "gridcolumn",
       dataIndex: "target_resolution_date",
