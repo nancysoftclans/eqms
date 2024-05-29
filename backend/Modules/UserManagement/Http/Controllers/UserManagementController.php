@@ -263,26 +263,15 @@ class UserManagementController extends Controller
                     
                 ->whereNull('t6.id');
 
-                //CONCAT(decryptval(first_name,".getDecryptFunParams()."),' ',decryptval(last_name,".getDecryptFunParams().")) as name
-            // if (isset($group_id) && $group_id != '') {
-            //     $users = DB::table('tra_user_group')
-            //         ->select('user_id')
-            //         ->where('group_id', $group_id)
-            //         ->get();
-            //     $users = convertStdClassObjToArray($users);
-            //     $users = convertAssArrayToSimpleArray($users, 'user_id');
-            //     $qry->whereIn('t1.id', $users);
-            // }
 
-            // if(validateIsNumeric($department_id)){
-            //     $qry->where('t1.department_id',$department_id);
-            // }
-            // if(validateIsNumeric($directorate_id)){
-            //     $qry->where('t1.directorate_id',$directorate_id);
-            // }
             $results = $qry->get();
             $results = convertStdClassObjToArray($results);
+
             $results = decryptArray($results);
+
+            foreach ($results as &$result) {
+            $result['fullname'] = $result['firstname'] . ' ' . $result['lastname'];
+             }
 
             $res = array(
                 'success' => true,

@@ -1,10 +1,10 @@
 /**
  * Created by Softclans.
  */
-Ext.define('Admin.view.documentManager.views.forms.DocumentReviewRecommFrm', {
+Ext.define('Admin.view.documentManager.views.forms.DocumentApprovalFrm', {
     extend: 'Ext.form.Panel',
-    xtype: 'documentreviewrecommfrm',
-    itemId: 'documentreviewrecommfrmItemId',
+    xtype: 'documentapprovalfrm',
+    itemId: 'documentapprovalfrmItemId',
     controller:'documentsManagementvctr',
     layout: 'form',
     frame: true,
@@ -249,7 +249,7 @@ Ext.define('Admin.view.documentManager.views.forms.DocumentReviewRecommFrm', {
                 name: 'signature_btn',
                 margin: '20 0 0 0',
                 formBind: true,
-                callerPnl: 'documentreviewrecommfrmItemId', //item id for reference, all calls are done from widget with itemId
+                callerPnl: 'documentapprovalfrmItemId', //item id for reference, all calls are done from widget with itemId
                 handler: 'addAuthSignature'
             },{
                 xtype: 'fieldset',

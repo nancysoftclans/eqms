@@ -137,7 +137,7 @@
         name: 'owner_user_id',
         valueField: 'id',
         margin: '0 20 20 0',
-        displayField: `firstname`,
+        displayField: `fullname`,
         forceSelection: true,
         allowBlank: true,
         hidden: true,

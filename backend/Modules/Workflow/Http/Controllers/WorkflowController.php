@@ -2627,6 +2627,8 @@ class WorkflowController extends Controller
     {
         $current_stage = $request->input('current_stage');
         $action = $request->input('action');
+
+
         $where = array(
             't1.stage_id' => $current_stage,
             't1.action_id' => $action
@@ -2970,16 +2972,17 @@ class WorkflowController extends Controller
         $prev_stage = $request->input('curr_stage_id');
         $action = $request->input('action');
         $to_stage = $request->input('next_stage');
+        $to_stage_category = $request->input('stage_category_id');
         $is_dataammendment_request = $request->input('is_dataammendment_request');
         $is_inspection_submission = $request->input('is_inspection_submission');
         $user_id = $this->user_id;
         DB::beginTransaction();
+dd($to_stage_category);
         try {
             //get application_details
             //notify submission
 
             if (validateIsNumeric($request->responsible_user)) {
-                dd('ff');
                 $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
                 $process_name = getSingleRecordColValue('wf_processes', array('id' => $request->process_id), 'name');
                 $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
@@ -2992,7 +2995,6 @@ class WorkflowController extends Controller
                 );
                 sendTemplatedApplicationNotificationEmail(12, $email_address, $vars);
             }
-
 
             $module_id = $request->input('module_id');
             if ($table_name == '') {
@@ -3017,6 +3019,8 @@ class WorkflowController extends Controller
             }
 
             $application_status_id = getApplicationTransitionStatus($prev_stage, $action, $to_stage);
+
+            dd($application_status_id);
             if ($keep_status == true) {//for approvals
                 $application_status_id = $application_details->application_status_id;
             }

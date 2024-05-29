@@ -190,24 +190,35 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentSubmissionPnl', {
                     iconCls: 'fa fa-plus',
                     name: 'approval',
                     handler: 'getDocumentReleaseRecommendationDetails',
-                    approval_frm: 'documentreviewrecommfrm',
+                    approval_frm: 'documentapprovalfrm',
                     vwcontroller: 'documentsManagementvctr',
                     stores: '["productApprovalDecisionsStr"]',
                     table_name: 'tra_documentmanager_application',
                     is_siginig:0
+                },{
+                    text: 'Recommendation',
+                    iconCls: 'fa fa-clipboard-check',
+                    name: 'recommendation',
+                    handler: 'getDocumentReviewRecommendationDetails',
+                    recomm_frm: 'applicationcommentsFrm',
+                    vwcontroller: 'documentsManagementvctr',
+                    stores: '[]',
+                   // table_name: 'tra_documentmanager_application',
+                    is_siginig:0
                 },
 
-                {
-                    text: 'Recommendations & Comments',
-                    ui: 'soft-blue', 
-                    iconCls: 'fa fa-clipboard-check',
-                    childXtype: 'applicationcommentspnl',
-                    winTitle: 'Process Comments',
-                    winWidth: '60%',
-                    name:'recommendation',
-                    comment_type_id: 3,
-                    stores: '[]'
-                },
+                // {
+                //     text: 'Recommendations & Comments',
+                //     ui: 'soft-blue', 
+                //     iconCls: 'fa fa-clipboard-check',
+                //   //  childXtype: 'applicationcommentspnl',
+                //     winTitle: 'Process Comments',
+                //     winWidth: '60%',
+                //     name:'recommendation',
+                //     handler: 'AddGeneralComment',
+                //     comment_type_id: 3,
+                //     stores: '[]'
+                // },
                 // {
                 //     text: 'Preview Permit/Letter',
                 //     iconCls: 'fa fa-print',

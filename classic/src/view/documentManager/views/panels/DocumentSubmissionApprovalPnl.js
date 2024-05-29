@@ -190,7 +190,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentSubmissionApprovalPn
                     iconCls: 'fa fa-plus',
                     name: 'approval',
                     handler: 'getDocumentReleaseRecommendationDetails',
-                    approval_frm: 'documentreviewrecommfrm',
+                    approval_frm: 'documentapprovalfrm',
                     vwcontroller: 'documentsManagementvctr',
                     stores: '["productApprovalDecisionsStr"]',
                     table_name: 'tra_documentmanager_application',
