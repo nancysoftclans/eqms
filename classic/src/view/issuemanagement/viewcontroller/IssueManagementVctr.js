@@ -207,6 +207,9 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       active_application_id = containerPnl
         .down("hiddenfield[name=active_application_id]")
         .getValue(),
+        application_code = containerPnl
+        .down("hiddenfield[name=active_application_code]")
+        .getValue(),
       application_status_id = containerPnl
         .down("hiddenfield[name=application_status_id]")
         .getValue(),
@@ -227,6 +230,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         process_id: process_id,
         module_id: module_id,
         sub_module_id: sub_module_id,
+        application_code: application_code,
         active_application_id: active_application_id,
         application_status_id: application_status_id,
         workflow_stage_id: workflow_stage_id,
@@ -240,9 +244,20 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         method: "POST",
         params: combinedData,
         success: function (response) {
-          var resp = Ext.decode(response.responseText);
+          var resp = Ext.decode(response.responseText),
+            results = resp.results,
+            model = Ext.create("Ext.data.Model", results);
           if (resp.success) {
-            toastr.success(resp.message, "Success Response");
+            containerPnl
+              .down("displayfield[name=tracking_no]")
+              .setValue(results.reference_no);
+              containerPnl
+              .down("hiddenfield[name=active_application_id]")
+              .setValue(results.active_application_id);
+              containerPnl
+              .down("hiddenfield[name=active_application_code]")
+              .setValue(results.application_code);
+              toastr.success(resp.message, "Success Response");
           } else {
             toastr.error(resp.message, "Failure Response");
           }

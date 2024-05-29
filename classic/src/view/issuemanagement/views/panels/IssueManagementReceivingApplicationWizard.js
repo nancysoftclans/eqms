@@ -82,17 +82,6 @@ Ext.define(
             },
           },
           {
-            xtype: "displayfield",
-            name: "reference_no",
-            hidden: true,
-            fieldLabel: "Ref No",
-            fieldStyle: {
-              color: "green",
-              "font-weight": "bold",
-              "font-size": "10px",
-            },
-          },
-          {
             xtype: "hiddenfield",
             name: "process_id",
           },

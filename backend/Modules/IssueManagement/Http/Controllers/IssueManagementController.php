@@ -47,19 +47,21 @@ class IssueManagementController extends Controller
         $module_id = $request->input('module_id');
         $sub_module_id = $request->input('sub_module_id');
         $application_code = $request->input('application_code');
+        $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
         $view_id = generateApplicationViewID();
         $zone_id = $request->input('zone_id');
         $dateString = $request->target_resolution_date;
         $date = Carbon::createFromFormat('d M Y', $dateString);
 
-        DB::beginTransaction();
         try {
-            if (validateIsNumeric($application_code)) {
+            if (validateIsNumeric($active_application_id)) {
+
                 $data = $request->all();
+                $where_app['id'] = $active_application_id;
 
                 $issue_data = array(
-                    'id' => $data['id'],
+                    'id' => $data['active_application_id'],
                     'issue_type_id' => $data['issue_type_id'],
                     'title' => $data['title'],
                     'description' => $data['description'],
@@ -78,14 +80,16 @@ class IssueManagementController extends Controller
                     'created_by' => $user_id,
                     'altered_by' => $user_id,
                 );
+                $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
+                    ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
+                    ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
+                $IssueManagement->update($issue_data);
 
-                // dd($issue_data);
-
-                $IssueManagement = IssueManagement::updateOrInsert(['id' => $issue_data['id']], $issue_data);
                 if ($IssueManagement) {
                     $res = array(
                         "success" => true,
                         "message" => 'Data Updated Successfully!!',
+                        "results" => $IssueManagement
                     );
                     $Submission = Submission::where('application_code', $application_code)->first();
                     $ref_number = $Submission->reference_no;
@@ -138,9 +142,6 @@ class IssueManagementController extends Controller
                 $res = insertRecord('tra_submissions', $submission_params);
 
                 $data = $request->all();
-
-
-
                 $issue_data = array(
                     'submission_id' => $res['record_id'],
                     'issue_type_id' => $data['issue_type_id'],
@@ -162,17 +163,23 @@ class IssueManagementController extends Controller
                     'altered_by' => $user_id,
                 );
 
-                $IssueManagement = IssueManagement::updateOrInsert(['submission_id' => $issue_data['submission_id']], $issue_data);
+
+                $IssueManagement = new IssueManagement();
+                // $IssueManagement['submission_id'] = $res['record_id'];
+                $IssueManagement->create($issue_data);
                 if ($IssueManagement) {
+                    $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
+                        ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
+                        ->where('t1.submission_id', $res['record_id'])->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
+
                     $res = array(
                         "success" => true,
                         "message" => 'Data Saved Successfully!!',
-                        "record_id" => $res['record_id']
+                        "results" => $IssueManagement
                     );
                     initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                 }
             }
-            DB::commit();
         } catch (\Exception $exception) {
             DB::rollback();
             $res = array(
@@ -236,9 +243,8 @@ class IssueManagementController extends Controller
         return \response()->json($res);
     }
 
-    public function getIssueManagementDetailsById(Request $request)
+    public function getIssueManagementDetailsById($active_application_id)
     {
-        $active_application_id = $request->active_application_id;
         try {
             $results = IssueManagement::from('tra_issue_management_applications as t1')
                 ->join('tra_submissions as t2', 't1.submission_id', 't2.id')

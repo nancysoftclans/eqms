@@ -16,6 +16,6 @@ use Modules\IssueManagement\Http\Controllers\IssueManagementController;
 Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function () {
     Route::post('saveNewReceivingBaseDetails', [IssueManagementController::class, 'saveNewReceivingBaseDetails']);
     Route::get('getIssueManagementDetails', [IssueManagementController::class, 'getIssueManagementDetails']);
-    Route::get('getIssueManagementDetailsById', [IssueManagementController::class, 'getIssueManagementDetailsById']);
+    Route::get('getIssueManagementDetailsById/{active_application_id}', [IssueManagementController::class, 'getIssueManagementDetailsById']);
     Route::get('getIssueProcessDetails', [IssueManagementController::class, 'getIssueProcessDetails']);
 });

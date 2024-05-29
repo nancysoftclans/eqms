@@ -20,10 +20,6 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
   items: [
     {
       xtype: "hiddenfield",
-      name: "application_code",
-    },
-    {
-      xtype: "hiddenfield",
       margin: "0 20 20 0",
       name: "_token",
       value: token,

@@ -118,7 +118,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     issuemanagementfrm
       .down("datefield[name=creation_date]")
       .setValue(new Date());
-      
+
     // Calculate the date 10 days from now
     var targetDate = new Date();
     targetDate.setDate(targetDate.getDate() + 10);
@@ -161,10 +161,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     if (active_application_id) {
       Ext.Ajax.request({
         method: "GET",
-        url: "issuemanagement/getIssueManagementDetailsById",
-        params: {
-          active_application_id: active_application_id,
-        },
+        url:
+          "issuemanagement/getIssueManagementDetailsById/" +
+          active_application_id,
         headers: {
           Authorization: "Bearer " + access_token,
         },
