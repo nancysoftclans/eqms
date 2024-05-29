@@ -56,43 +56,37 @@ class IssueManagementController extends Controller
 
         try {
             if (validateIsNumeric($active_application_id)) {
-
-                $data = $request->all();
-                $where_app['id'] = $active_application_id;
-
-                $issue_data = array(
-                    'id' => $data['active_application_id'],
-                    'issue_type_id' => $data['issue_type_id'],
-                    'title' => $data['title'],
-                    'description' => $data['description'],
+                //Update
+                $IssueManagement = IssueManagement::findOrFail($active_application_id);
+                $IssueManagement->fill([
+                    'title'                 => $request->title,
+                    'issue_type_id'         => $request->issue_type_id,
+                    'description'           => $request->description,
                     'target_resolution_date' => $date->format('Y-m-d'),
-                    // 'follow_up_on' => $data['follow_up_on'],
-                    'section_ids' => $data['section_ids'],
-                    'issue_status_id' => $data['issue_status_id'],
-                    'complainant_address' => $data['complainant_address'],
-                    'complainant_name' => $data['complainant_name'],
-                    'organisation_name' => $data['organisation_name'],
-                    'complainant_telephone' => $data['complainant_telephone'],
-                    'complaint_mode_id' => $data['complaint_mode_id'],
-                    'complaint_type_id' => $data['complaint_type_id'],
-                    'created_on' => Carbon::now(),
-                    'dola' => Carbon::now(),
-                    'created_by' => $user_id,
-                    'altered_by' => $user_id,
-                );
+                    'section_ids'            => $request->section_ids,
+                    'issue_status_id'       => $request->issue_status_id,
+                    'complainant_name'       => $request->complainant_name,
+                    'complainant_address'   => $request->complainant_address,
+                    'organisation_name'    => $request->organisation_name,
+                    'complainant_telephone' => $request->complainant_telephone,
+                    'complaint_mode_id'     => $request->complaint_mode_id,
+                    'complaint_type_id'     => $request->complaint_type_id,
+                    'dola'                   => Carbon::now(),
+                    'altered_by'             => $user_id,
+                ]);
+                $IssueManagement->save();
+                //End Update
+
                 $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
                     ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
                     ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
-                $IssueManagement->update($issue_data);
-
                 if ($IssueManagement) {
                     $res = array(
                         "success" => true,
                         "message" => 'Data Updated Successfully!!',
                         "results" => $IssueManagement
                     );
-                    $Submission = Submission::where('application_code', $application_code)->first();
-                    $ref_number = $Submission->reference_no;
+                    $ref_number = $IssueManagement->reference_no;
                     initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                 }
             } else {
@@ -148,7 +142,6 @@ class IssueManagementController extends Controller
                     'title' => $data['title'],
                     'description' => $data['description'],
                     'target_resolution_date' => $date->format('Y-m-d'),
-                    // 'follow_up_on' => $data['follow_up_on'],
                     'section_ids' => $data['section_ids'],
                     'issue_status_id' => $data['issue_status_id'],
                     'complainant_address' => $data['complainant_address'],
@@ -165,7 +158,6 @@ class IssueManagementController extends Controller
 
 
                 $IssueManagement = new IssueManagement();
-                // $IssueManagement['submission_id'] = $res['record_id'];
                 $IssueManagement->create($issue_data);
                 if ($IssueManagement) {
                     $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')

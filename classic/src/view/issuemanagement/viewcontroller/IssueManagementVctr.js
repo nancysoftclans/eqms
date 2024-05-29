@@ -207,7 +207,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       active_application_id = containerPnl
         .down("hiddenfield[name=active_application_id]")
         .getValue(),
-        application_code = containerPnl
+      application_code = containerPnl
         .down("hiddenfield[name=active_application_code]")
         .getValue(),
       application_status_id = containerPnl
@@ -234,30 +234,36 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         active_application_id: active_application_id,
         application_status_id: application_status_id,
         workflow_stage_id: workflow_stage_id,
-        ...issueManagementData,
-        ...complainantDetailsData,
       };
+
+      for (var key in issueManagementData) {
+        combinedData[key] = issueManagementData[key];
+      }
+
+      for (var key in complainantDetailsData) {
+        combinedData[key] = complainantDetailsData[key];
+      }
 
       // Submit the data to the endpoint
       Ext.Ajax.request({
         url: action_url,
+        waitMsg: "Please wait...",
         method: "POST",
         params: combinedData,
         success: function (response) {
           var resp = Ext.decode(response.responseText),
-            results = resp.results,
-            model = Ext.create("Ext.data.Model", results);
+            results = resp.results;
           if (resp.success) {
             containerPnl
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
-              containerPnl
+            containerPnl
               .down("hiddenfield[name=active_application_id]")
               .setValue(results.active_application_id);
-              containerPnl
+            containerPnl
               .down("hiddenfield[name=active_application_code]")
               .setValue(results.application_code);
-              toastr.success(resp.message, "Success Response");
+            toastr.success(resp.message, "Success Response");
           } else {
             toastr.error(resp.message, "Failure Response");
           }
