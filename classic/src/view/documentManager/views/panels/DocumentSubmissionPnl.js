@@ -199,11 +199,13 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentSubmissionPnl', {
                     text: 'Recommendation',
                     iconCls: 'fa fa-clipboard-check',
                     name: 'recommendation',
-                    handler: 'getDocumentReviewRecommendationDetails',
-                    recomm_frm: 'applicationcommentsFrm',
-                    vwcontroller: 'documentsManagementvctr',
-                    stores: '[]',
-                   // table_name: 'tra_documentmanager_application',
+                    //handler: 'getDocumentReviewRecommendationDetails',
+                    //handler: 'getDocumentReleaseRecommendationDetails',
+
+                    // recomm_frm: 'applicationcommentsFrm',
+                    // vwcontroller: 'documentsManagementvctr',
+                    // stores: '["productApprovalDecisionsStr"]',
+                    // table_name: 'tra_documentmanager_application',
                     is_siginig:0
                 },
 

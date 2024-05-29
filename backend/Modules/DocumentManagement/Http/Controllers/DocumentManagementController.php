@@ -331,58 +331,138 @@ class DocumentManagementController extends Controller
         return \response()->json($res);
     }
 
-    public function saveDocumentRecommendationComments(Request $req)
+    // public function saveDocumentRecommendationComments(Request $req)
+    // {
+    //     try {
+    //         $user_id = \Auth::user()->id;
+    //         $post_data = $req->all();
+    //         $table_name = 'tra_evaluation_recommendations';
+    //         $id = $post_data['id'];
+    //         $workflow_stage_id = $post_data['workflow_stage_id'];
+    //         //unset unnecessary values
+    //         unset($post_data['_token']);
+    //         unset($post_data['table_name']);
+    //         unset($post_data['model']);
+    //         unset($post_data['id']);
+    //         unset($post_data['unset_data']);
+    //         $unsetData = $req->input('unset_data');
+    //         if (isset($unsetData)) {
+    //             $unsetData = explode(",", $unsetData);
+    //             $post_data = unsetArrayData($post_data, $unsetData);
+    //         }
+
+    //         $table_data = $post_data;
+    //         //add extra params
+    //         $table_data['created_on'] = Carbon::now();
+    //         $table_data['created_by'] = $user_id;
+    //         $where = array(
+    //             'id' => $id
+    //         );
+    //         $res = array();
+    //         //check stage category
+    //         if (!validateIsNumeric($workflow_stage_id)) {
+    //             return array('success' => false, 'message' => "Faild to fetch stage details");
+    //         }
+    //         $stage_data = getTableData('wf_workflow_stages', array('id' => $workflow_stage_id));
+    //         $stage_category_id = $stage_data->stage_category_id;
+    //         $table_data['stage_category_id'] = $stage_category_id;
+    //         if (isset($id) && $id != "") {
+    //             if (recordExists($table_name, $where)) {
+    //                 unset($table_data['created_on']);
+    //                 unset($table_data['created_by']);
+    //                 $table_data['dola'] = Carbon::now();
+    //                 $table_data['altered_by'] = $user_id;
+
+    //                 dd($table_data);
+    //                 $res = updateRecord($table_name, $where, $table_data);
+    //             }
+    //         } else {
+    //             dd($table_data);
+    //             $res = insertRecord($table_name, $table_data);
+    //         }
+    //     } catch (\Exception $exception) {
+    //         $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    //     } catch (\Throwable $throwable) {
+    //         $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    //     }
+    //     return response()->json($res);
+    // }
+
+    public function saveDocumentRecommendationComments(Request $request)
     {
         try {
-            $user_id = \Auth::user()->id;
-            $post_data = $req->all();
             $table_name = 'tra_evaluation_recommendations';
-            $id = $post_data['id'];
-            $workflow_stage_id = $post_data['workflow_stage_id'];
-            //unset unnecessary values
-            unset($post_data['_token']);
-            unset($post_data['table_name']);
-            unset($post_data['model']);
-            unset($post_data['id']);
-            unset($post_data['unset_data']);
-            $unsetData = $req->input('unset_data');
-            if (isset($unsetData)) {
-                $unsetData = explode(",", $unsetData);
-                $post_data = unsetArrayData($post_data, $unsetData);
-            }
+            $application_code = $request->input('application_code');
 
-            $table_data = $post_data;
-            //add extra params
-            $table_data['created_on'] = Carbon::now();
-            $table_data['created_by'] = $user_id;
-            $where = array(
-                'id' => $id
-            );
-            $res = array();
-            //check stage category
-            if (!validateIsNumeric($workflow_stage_id)) {
-                return array('success' => false, 'message' => "Faild to fetch stage details");
-            }
-            $stage_data = getTableData('wf_workflow_stages', array('id' => $workflow_stage_id));
-            $stage_category_id = $stage_data->stage_category_id;
-            $table_data['stage_category_id'] = $stage_category_id;
-            if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
-                    unset($table_data['created_on']);
-                    unset($table_data['created_by']);
-                    $table_data['dola'] = Carbon::now();
-                    $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data);
+            return DB::transaction(function () use ($application_code, $table_name, $request) {
+                $id = $request->input('id');
+
+                $recommendation_id = $request->input('recommendation_id');
+                $module_id = $request->input('module_id');
+                $workflow_stage_id = $request->input('workflow_stage_id');
+                $remarks = $request->input('remarks');
+
+                // Ensure $permit_signatory is properly set
+                $user_id = $this->user_id;
+
+                $params = [
+                    'application_code' => $application_code,
+                    'recommendation_id' => $recommendation_id,
+                    'module_id' => $module_id,
+                    'workflow_stage_id' => $workflow_stage_id,
+                    'remarks' => $remarks,
+                    'created_by' => $user_id,
+                    'created_on' => Carbon::now()
+                ];
+
+
+                if (validateIsNumeric($id)) {
+                    // Update existing record
+                    $where = ['id' => $id];
+                    $params['dola'] = Carbon::now();
+                    $params['altered_by'] = $user_id;
+                    updateRecord('tra_evaluation_recommendations', [], $where, $params, $user_id);
+                } else {
+                    // Insert new record
+                    $res = insertRecord('tra_evaluation_recommendations', $params, $user_id);
+                    $id = $res['record_id'];
                 }
-            } else {
-                $res = insertRecord($table_name, $table_data);
-            }
+
+                // Update manager permits review
+                $record = DB::table('tra_evaluation_recommendations')
+                    ->where('application_code', $application_code)
+                    ->first();
+
+                if ($record) {
+                    $prevrecomm_id = $record->recommendation_id;
+                    $where = ['id' => $record->id, 'application_code' => $application_code];
+                    $data = [
+                        'recommendation_id' => $recommendation_id,
+                    ];
+
+
+                    $res = updateRecord('tra_evaluation_recommendations', $where, $data, $user_id);
+                }
+                // Prepare response
+                $res = getSingleRecordColValue('par_recommendations', ['id' => $recommendation_id], 'name');
+
+
+                $message = ($recommendation_id == 1)
+                    ? "This is to notify you that the Application for the Document Recommendation has been Granted, Submit for Approval."
+                    : "This is to notify you that the Application for the Document Recommendation has been rejected.";
+
+                // Send mail notification
+                // sendMailNotification($rec->name, $rec->email, "{$rec->reference_no} Permit Approval Recommendation: {$approval_decision}", $message);
+
+                return response()->json(['success' => true, 'results' => $res ,'message' => 'Document Recommendation saved successfully']);
+            });
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+            return response()->json(['success' => false, 'message' => $exception->getMessage()]);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+            return response()->json(['success' => false, 'message' => $throwable->getMessage()]);
         }
-        return response()->json($res);
+
+        return \response()->json($res);
     }
 
     public function saveDocumentApplicationRecommendationDetails(Request $request)
@@ -463,7 +543,7 @@ class DocumentManagementController extends Controller
                 // Send mail notification
                 // sendMailNotification($rec->name, $rec->email, "{$rec->reference_no} Permit Approval Recommendation: {$approval_decision}", $message);
 
-                return response()->json(['success' => true, 'message' => 'Document Recommendation saved successfully']);
+                return response()->json(['success' => true, 'results' => $approval_decision, 'message' => 'Document Recommendation saved successfully']);
             });
         } catch (\Exception $exception) {
             return response()->json(['success' => false, 'message' => $exception->getMessage()]);
@@ -484,7 +564,9 @@ class DocumentManagementController extends Controller
                 ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
                 ->leftJoin('tra_managerpermits_review as t3', 't1.application_code', '=', 't3.application_code')
                 ->leftJoin('tra_evaluation_recommendations as t4', 't1.application_code', '=', 't4.application_code')
-                ->select('t1.*', 't2.name as workflow_stage', 't3.decision_id', 't4.recommendation_id')
+                ->leftJoin('par_recommendations as t5', 't4.recommendation_id', '=', 't5.id')
+                ->leftJoin('par_approval_decisions as t6', 't3.decision_id', '=', 't6.id')
+                ->select('t1.*', 't2.name as workflow_stage', 't6.name as approval', 't5.name as recommendation')
                 ->where('t1.application_code', $application_code);
 
 
