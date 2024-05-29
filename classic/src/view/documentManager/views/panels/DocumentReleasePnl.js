@@ -191,7 +191,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentReleasePnl', {
                     name: 'approval',
                     hidden: true,
                     handler: 'getDocumentReleaseRecommendationDetails',
-                    approval_frm: 'documentreviewrecommfrm',
+                    approval_frm: 'documentapprovalfrm',
                     vwcontroller: 'documentsManagementvctr',
                     stores: '["productApprovalDecisionsStr"]',
                     table_name: 'tra_documentmanager_application',

@@ -261,7 +261,7 @@ public function getdocdefinationrequirementDetails(Request $req)
     ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
     ->select(
         // DB::raw("CONCAT_WS(decrypt(t3.first_name), ' ', COALESCE(decrypt(t3.last_name), '')) as owner"),
-        DB::raw("CONCAT_WS(' ',decrypt(t3.first_name),decrypt(t3.last_name)) as owner"),
+        DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
         't1.*',
         't1.doc_title AS mtype',
         't2.name AS document_type',
@@ -276,18 +276,18 @@ public function getdocdefinationrequirementDetails(Request $req)
           WHERE t1.navigator_folder_id = t2.id) as recoil")
 
     )
-    ->whereNull('t1.navigator_folder_name');
+    ->whereNull('t1.navigator_folder_name')
+    ->get();
 
-
-//CONCAT(t11.brand_name,' ',COALESCE(t12.name,'')) as brand_name,
-
-        $results = $results->get();
+        $results = convertStdClassObjToArray($results);
+        $res = decryptArray($results);
+        
     } catch (\Exception $exception) {
-        $results = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
     } catch (\Throwable $throwable) {
-        $results = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
     }
-    return $results;
+    return $res;
 }
     public function getdoctypesDetails(Request $req){
         $module_id = $req->module_id;

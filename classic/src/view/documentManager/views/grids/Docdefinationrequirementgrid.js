@@ -118,12 +118,20 @@ Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid'
         dataIndex: 'status',
         text: 'Status',
         flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'owner',
-        text: 'Owner',
-        flex: 1
-    },{
+    }, {
+      xtype: "gridcolumn",
+      text: "Owner",
+      flex: 1,
+      tdCls: "wrap",
+      renderer: function (value, metaData, record) {
+        // Concatenate first_name and last_name
+        var firstName = record.get("first_name");
+        var lastName = record.get("last_name");
+        return firstName + " " + lastName;
+      },
+    },
+
+    {
         xtype: 'gridcolumn',
         dataIndex: 'document_type',
         text: 'Document Type',

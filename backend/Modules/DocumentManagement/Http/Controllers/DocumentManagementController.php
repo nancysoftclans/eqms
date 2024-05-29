@@ -518,7 +518,7 @@ $table_name = $request->input('table_name');
         try {
             $main_qry = DB::table('tra_documentmanager_application as t1')
                 ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
-                ->select('t1.*','t2.name as workflow_stage')
+                ->select('t1.*','t2.name as workflow_stage', 't2.stage_category_id')
                 ->where('t1.application_code', $application_code);
 
             $results = $main_qry->first();
