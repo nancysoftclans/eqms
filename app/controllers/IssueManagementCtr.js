@@ -190,11 +190,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
             // Parse the string using JSON.parse() (assuming valid JSON format)
             const section_ids_array = JSON.parse(results.section_ids);
-
-            var section_ids_field = issuemanagementfrm.down(
-              "tagfield[name=section_ids]"
-            );
-            section_ids_field.setValue(section_ids_array);
+            issuemanagementfrm.down("tagfield[name=section_ids]").setValue(section_ids_array);
           } else {
             toastr.error(message, "Failure Response");
           }
