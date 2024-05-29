@@ -9,6 +9,7 @@ class IssueManagement extends Model
     protected $table = 'tra_issue_management_applications';
 
     protected $fillable = [
+        'submission_id',
         'issue_type_id',
         'title',
         'description',

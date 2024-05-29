@@ -7,7 +7,7 @@ Ext.define(
     requires: ["Ext.layout.container.*", "Ext.toolbar.Fill"],
     reference: "wizardpnl",
     layout: "card",
-    //bodyPadding: 3,
+    bodyPadding: 3,
     flex: 1,
     autoScroll: true,
     cls: "wizard three shadow",
@@ -17,10 +17,10 @@ Ext.define(
         xtype: "toolbar",
         dock: "top",
         ui: "footer",
-        height: 55,
+        // height: 55,
         defaults: {
           labelAlign: "left",
-          margin: "-12 5 0 5",
+          // margin: "-12 5 0 5",
           labelStyle: "color:#595959;font-size:10px",
         },
         items: [
@@ -28,7 +28,7 @@ Ext.define(
           {
             xtype: "displayfield",
             name: "process_name",
-            fieldLabel: "Process",
+            fieldLabel: "PROCESS",
             fieldStyle: {
               color: "green",
               "font-weight": "bold",
@@ -42,8 +42,21 @@ Ext.define(
           {
             xtype: "displayfield",
             name: "workflow_stage",
-            //hidden: true,
-            fieldLabel: "Workflow Stage",
+            fieldLabel: "WORKFLOW STAGE",
+            fieldStyle: {
+              color: "green",
+              "font-weight": "bold",
+              "font-size": "10px",
+            },
+          },
+          {
+            xtype: "tbseparator",
+            width: 20,
+          },
+          {
+            xtype: "displayfield",
+            name: "tracking_no",
+            fieldLabel: "TRACKING NO",
             fieldStyle: {
               color: "green",
               "font-weight": "bold",
@@ -65,31 +78,6 @@ Ext.define(
               "font-weight": "bold",
               "font-size": "12px",
               "margin-top": "-2px",
-            },
-          },
-          {
-            xtype: "tbseparator",
-            width: 20,
-          },
-          {
-            xtype: "displayfield",
-            name: "tracking_no",
-            fieldLabel: "Tracking No",
-            fieldStyle: {
-              color: "green",
-              "font-weight": "bold",
-              "font-size": "10px",
-            },
-          },
-          {
-            xtype: "displayfield",
-            name: "reference_no",
-            hidden: true,
-            fieldLabel: "Ref No",
-            fieldStyle: {
-              color: "green",
-              "font-weight": "bold",
-              "font-size": "10px",
             },
           },
           {
@@ -158,7 +146,7 @@ Ext.define(
             iconCls: "fa fa-exclamation-triangle",
             enableToggle: true,
             pressed: true,
-            text: "Issue Management Details",
+            text: "ISSUE MANAGEMENT DETAILS",
             max_step: 1,
             action: "quickNav",
             wizard: "issuemanagementreceivingapplicationwizard",
