@@ -422,7 +422,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       click: "showApplicationCommentsWin",
     },
     "documentsubmissionpnl button[name=recommendation]": {
-      click: "showApplicationCommentsWin",
+      click: "AddGeneralComment",
     },
     "drugnewauditingpnl toolbar menu menuitem[name=comments_btn]": {
       click: "showApplicationCommentsWin",
@@ -592,7 +592,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     "productApprovalRecommFrm button[name=save_recommendation]": {
       click: "saveApplicationApprovalDetails",
     },
-    "documentreviewrecommfrm button[name=save_recommendation]": {
+    "documentapprovalfrm button[name=save_recommendation]": {
       click: "saveDocumentReviewRecommendationDetails",
     },
     "approvalrecommendationfrm button[name=save_recommendation]": {
@@ -1022,7 +1022,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         showReceivingApplicationSubmissionWin:
           "showReceivingApplicationSubmissionWin",
         getDocumentReleaseRecommendationDetails:
-          "getDocumentReleaseRecommendationDetails",        
+          "getDocumentReleaseRecommendationDetails",     
       },
     },
   },
@@ -1422,89 +1422,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           }
           funcShowCustomizableWindow(
             "Document Approval Recommendation",
-            "40%",
-            form,
-            "customizablewindow"
-          );
-        } else {
-          toastr.error(message, "Failure Response");
-        }
-      },
-      failure: function (response) {
-        Ext.getBody().unmask();
-        var resp = Ext.JSON.decode(response.responseText),
-          message = resp.message;
-        toastr.error(message, "Failure Response");
-      },
-      error: function (jqXHR, textStatus, errorThrown) {
-        Ext.getBody().unmask();
-        toastr.error("Error: " + errorThrown, "Error Response");
-      },
-    });
-  },
-
-  getDocumentReviewRecommendationDetails: function (btn) {
-    Ext.getBody().mask("Please wait...");
-    var me = this,
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      application_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
-      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
-      reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
-      tracking_no = activeTab.down("displayfield[name=tracking_no]").getValue(),
-      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
-      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
-      is_siginig = btn.is_siginig,
-      approval_frm = "applicationcommentsFrm",
-      table_name = "tra_documentmanager_application",
-      vwcontroller = "documentsManagementvctr",
-      stores = '["productApprovalDecisionsStr"]',
-      form = Ext.widget(approval_frm),
-      storeArray = eval(stores),
-      arrayLength = storeArray.length;
-
-  //  form.down("hiddenfield[name=table_name]").setValue(table_name);
-    Ext.Ajax.request({
-      method: "GET",
-      url: "common/getPermitReleaseRecommendationDetails",
-      params: {
-        application_id: application_id,
-        application_code: application_code,
-      },
-      headers: {
-        Authorization: "Bearer " + access_token,
-      },
-      success: function (response) {
-        Ext.getBody().unmask();
-        var resp = Ext.JSON.decode(response.responseText),
-          success = resp.success,
-          message = resp.message,
-          results = resp.results,
-          model = Ext.create("Ext.data.Model", results);
-        if (success == true || success === true) {
-          if (results) {
-            permit_no = results.permit_no;
-            expiry_date = results.expiry_date;
-          } else {
-            permit_no = "";
-            expiry_date = "";
-          }
-          form.loadRecord(model);
-          form
-            .down("hiddenfield[name=application_id]")
-            .setValue(application_id);
-          form
-            .down("hiddenfield[name=application_code]")
-            .setValue(application_code);
-          form.down("textfield[name=certificate_no]").setValue(permit_no);
-          form.down("datefield[name=expiry_date]").setValue(expiry_date);
-          form.down("hiddenfield[name=process_id]").setValue(process_id);
-          form
-            .down("hiddenfield[name=workflow_stage_id]")
-            .setValue(workflow_stage_id);
-    
-          funcShowCustomizableWindow(
-            "Recommendation",
             "40%",
             form,
             "customizablewindow"
@@ -3084,8 +3001,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   refreshApplicationDocUploadsGrid: function (me) {
     var store = me.store,
       grid = me.up("treepanel"),
-      decision_id = grid.down("combo[name=approval_id]").getValue(),
-      approval_id = grid.down("combo[name=recommendation_id]").getValue(),
+      decision_id = grid.down("textfield[name=approval_id]").getValue(),
+      approval_id = grid.down("textfield[name=recommendation_id]").getValue(),
       mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
       application_code = activeTab
@@ -3108,8 +3025,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     if (stage_category_id == 1 || stage_category_id === 1) {
       activeTab.down("button[name=recommendation]").setVisible(false);
       activeTab.down("button[name=approval]").setVisible(false);
-      activeTab.down("combo[name=recommendation_id]").setVisible(false);
-      activeTab.down("combo[name=approval_id]").setVisible(false);
+      activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+      activeTab.down("textfield[name=approval_id]").setVisible(false);
       activeTab.down("button[name=add_upload]").setHidden(true);
     }
 
@@ -3186,13 +3103,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   saveApplicationComment: function (btn) {
     var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
-      workflow_stage_id = activeTab
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue(),
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
+      grid = activeTab.down("docuploadsgrid"),
       formPnl = btn.up("form"),
       frm = formPnl.getForm(),
       store = Ext.getStore(btn.storeID),
@@ -3211,11 +3125,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           var response = Ext.decode(action.response.responseText),
             success = response.success,
             message = response.message;
+            reccomendation = response.results;
+
+            console.log(reccomendation);
           if (success == true || success === true) {
             toastr.success(message, "Success Response");
-            store.removeAll();
-            store.load();
+            grid.down("textfield[name=recommendation_id]").setValue(reccomendation);
             win.close();
+            
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -3866,32 +3783,20 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-    (grid = Ext.widget("applicationdocuploadsgrid")),
-      (application_status_id = activeTab
-        .down("hiddenfield[name=application_status_id]")
-        .getValue()),
-      (docdefinationrequirementfrm = activeTab.down(
-        "docdefinationrequirementfrm"
-      )),
+      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+      docdefinationrequirementfrm = activeTab.down("docdefinationrequirementfrm"),
+      grid = activeTab.down("applicationdocuploadsgrid"),
       // grid = activeTab.down('docuploadsgrid'),
-      (application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue()),
-      (process_id = activeTab.down("hiddenfield[name=process_id]").getValue()),
-      (sub_module_id = activeTab
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue()),
-      (reference_no = activeTab
-        .down("displayfield[name=reference_no]")
-        .getValue()),
-      (workflow_stage_id = activeTab
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue());
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+      reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(false);
     activeTab.down("button[name=approval]").setVisible(true);
-    activeTab.down("combo[name=recommendation_id]").setVisible(false);
-    activeTab.down("combo[name=approval_id]").setVisible(true);
+    activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+    activeTab.down("textfield[name=approval_id]").setVisible(true);
     activeTab.down("button[name=add_upload]").setHidden(true);
 
     if (application_code) {
@@ -3914,16 +3819,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
 
           if (success == true || success === true) {
             docdefinationrequirementfrm.loadRecord(model);
-
-            activeTab
-              .down("combo[name=approval_id]")
-              .setValue(results.decision_id);
-            activeTab
-              .down("combo[name=recommendation_id]")
-              .setValue(results.recommendation_id);
-            activeTab
-              .down("displayfield[name=workflow_stage]")
-              .setValue(results.workflow_stage);
+            grid.down("button[name=add_upload]").setHidden(true);
+            activeTab.down("textfield[name=approval_id]").setValue(results.approval);
+            activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -3960,8 +3858,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
 
     activeTab.down("button[name=recommendation]").setVisible(true);
     activeTab.down("button[name=approval]").setVisible(false);
-    activeTab.down("combo[name=recommendation_id]").setVisible(true);
-    activeTab.down("combo[name=approval_id]").setVisible(false);
+    activeTab.down("textfield[name=recommendation_id]").setVisible(true);
+    activeTab.down("textfield[name=approval_id]").setVisible(false);
 
     if (application_code) {
       Ext.Ajax.request({
@@ -3984,16 +3882,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           if (success == true || success === true) {
             docdefinationrequirementfrm.loadRecord(model);
             grid.down("button[name=add_upload]").setHidden(true);
-
-            activeTab
-              .down("combo[name=approval_id]")
-              .setValue(results.decision_id);
-            activeTab
-              .down("combo[name=recommendation_id]")
-              .setValue(results.recommendation_id);
-            activeTab
-              .down("displayfield[name=workflow_stage]")
-              .setValue(results.workflow_stage);
+            activeTab.down("textfield[name=recommendation_id]").setValue(results.recommendation);
+            activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -4019,32 +3909,21 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-    (grid = Ext.widget("applicationdocuploadsgrid")),
-      (application_status_id = activeTab
-        .down("hiddenfield[name=application_status_id]")
-        .getValue()),
-      (docdefinationrequirementfrm = activeTab.down(
-        "docdefinationrequirementfrm"
-      )),
+      grid = Ext.widget("applicationdocuploadsgrid"),
+      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+      docdefinationrequirementfrm = activeTab.down("docdefinationrequirementfrm"),
+      grid = activeTab.down("docuploadsgrid"),
       // grid = activeTab.down('docuploadsgrid'),
-      (application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue()),
-      (process_id = activeTab.down("hiddenfield[name=process_id]").getValue()),
-      (sub_module_id = activeTab
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue()),
-      (reference_no = activeTab
-        .down("displayfield[name=reference_no]")
-        .getValue()),
-      (workflow_stage_id = activeTab
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue());
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+      reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(false);
     activeTab.down("button[name=approval]").setVisible(false);
-    activeTab.down("combo[name=recommendation_id]").setVisible(false);
-    activeTab.down("combo[name=approval_id]").setVisible(false);
+    activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+    activeTab.down("textfield[name=approval_id]").setVisible(false);
     activeTab.down("button[name=add_upload]").setHidden(true);
 
     if (application_code) {
@@ -4067,16 +3946,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
 
           if (success == true || success === true) {
             docdefinationrequirementfrm.loadRecord(model);
-
-            activeTab
-              .down("combo[name=approval_id]")
-              .setValue(results.decision_id);
-            activeTab
-              .down("combo[name=recommendation_id]")
-              .setValue(results.recommendation_id);
-            activeTab
-              .down("displayfield[name=workflow_stage]")
-              .setValue(results.workflow_stage);
+            grid.down("button[name=add_upload]").setHidden(true);
+            activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -4115,8 +3986,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     if (stage_category_id == 1 || stage_category_id === 1) {
       activeTab.down("button[name=recommendation]").setVisible(false);
       activeTab.down("button[name=approval]").setVisible(false);
-      activeTab.down("combo[name=recommendation_id]").setVisible(false);
-      activeTab.down("combo[name=approval_id]").setVisible(false);
+      activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+      activeTab.down("textfield[name=approval_id]").setVisible(false);
       activeTab.down("button[name=add_upload]").setHidden(false);
     }
 
@@ -4147,8 +4018,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             if (results.stage_category_id == 1 || results.stage_category_id === 1) {
                 activeTab.down("button[name=recommendation]").setVisible(false);
                 activeTab.down("button[name=approval]").setVisible(false);
-                activeTab.down("combo[name=recommendation_id]").setVisible(false);
-                activeTab.down("combo[name=approval_id]").setVisible(false);
+                activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+                activeTab.down("textfield[name=approval_id]").setVisible(false);
                 activeTab.down("button[name=add_upload]").setHidden(false);
             }
           } else {
@@ -5290,6 +5161,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       activeTab = mainTabPanel.getActiveTab(),
       form = btn.up("form"),
       decision_id = form.down("combo[name=decision_id]").getValue(),
+      grid = activeTab.down("docuploadsgrid"),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
     (frm = form.getForm()),
       (win = form.up("window")),
@@ -5310,13 +5182,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           var response = Ext.decode(action.response.responseText),
             success = response.success,
             message = response.message;
+            approval = response.results;
           if (success == true || success === true) {
-            if (activeTab.down("combo[name=approval_id]")) {
-              activeTab.down("combo[name=approval_id]").setValue(decision_id);
-            } else {
-              mainStore.load();
-            }
             toastr.success(message, "Success Response");
+             grid.down("textfield[name=approval_id]").setValue(approval);
             win.close();
           } else {
             toastr.error(message, "Failure Response");
@@ -12156,6 +12025,11 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       win.close();
     }, 200);
   },
+   AddGeneralComment: function (argument) {
+        var form = Ext.widget('applicationcommentsFrm');
+        funcShowCustomizableWindow('Application Recommendation', '50%', form, 'customizablewindow');
+    },
+
 
   
 });

@@ -2977,7 +2977,6 @@ class WorkflowController extends Controller
         $is_inspection_submission = $request->input('is_inspection_submission');
         $user_id = $this->user_id;
         DB::beginTransaction();
-dd($to_stage_category);
         try {
             //get application_details
             //notify submission
@@ -3019,8 +3018,6 @@ dd($to_stage_category);
             }
 
             $application_status_id = getApplicationTransitionStatus($prev_stage, $action, $to_stage);
-
-            dd($application_status_id);
             if ($keep_status == true) {//for approvals
                 $application_status_id = $application_details->application_status_id;
             }

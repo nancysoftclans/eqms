@@ -1,6 +1,6 @@
 
 Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
-    extend: 'Ext.tree.Panel',
+    extend: 'Ext.grid.Panel',
     xtype: 'documenttypegrid',
     itemId: 'documenttypegrid',
     controller: 'documentsManagementvctr',
@@ -44,6 +44,9 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 winWidth: '80%',
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
+    },{
+      xtype: "tbspacer",
+      width: 100,
     },{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Module',

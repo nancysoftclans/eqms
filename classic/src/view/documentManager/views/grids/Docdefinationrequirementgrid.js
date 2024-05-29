@@ -1,5 +1,5 @@
 Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid', {
-    extend: 'Ext.tree.Panel',
+    extend: 'Ext.grid.Panel',
     xtype: 'docdefinationrequirementgrid',
     itemId: 'docdefinationrequirementgrid',
     useArrows: true,
@@ -8,6 +8,11 @@ Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid'
     singleExpand: true,
     margin: '0 5 0 0',
     selType: 'cellmodel',
+    cls: "dashboard-todo-list",
+      autoScroll: true,
+      autoHeight: true,
+      width: "100%",
+
     requires: [
         'Ext.grid.*',
         'Ext.tree.*'
@@ -32,7 +37,12 @@ Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid'
             }
         }
     },
-    tbar: [{
+    tbar: [
+    {
+      xtype: "tbspacer",
+      hidden: true,
+      width: 100,
+    },{
         xtype: 'button',
         text: 'Add',
         iconCls: 'x-fa fa-plus',
@@ -77,13 +87,17 @@ Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid'
             displayInfo: true,
             displayMsg: 'Showing {0} - {1} of {2} total records',
             emptyMsg: 'No Records',
-            beforeLoad: function() {
-                var store = this.store,
-                   grid = this.up('grid');
-                    store.getProxy().extraParams = {
-                        table_name:'tra_documentmanager_application'
-                    };
-            
+
+            beforeLoad: function () {
+              var grid = this.up("grid"),
+                pnl = grid.up("documentcreationapps"),
+                wrapper = pnl.up("documentapplicationwrapper"),
+                cnt = wrapper.up(),
+                store = this.store,
+                grid = this.up("grid");
+              store.getProxy().extraParams = {
+                table_name: "tra_documentmanager_application",
+              };
             },
         },
         '->',

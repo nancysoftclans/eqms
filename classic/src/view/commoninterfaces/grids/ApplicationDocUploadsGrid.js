@@ -64,88 +64,18 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         bind: {
             hidden: '{isReadOnly}'
         }
-    }, '->',{
-        xtype: 'combo', anyMatch: true,
-        queryMode: 'local',
-        forceSelection: true,
-        valueField: 'id',
+    }, '->',
+
+    {
+        xtype: 'textfield',
+        name: 'recommendation_id',//authSignature
         columnWidth: 1,
-        displayField: 'name',
-        fieldLabel: 'Review status',
-        name: 'recommendation_id',
-        listeners: {
-            beforerender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 100,
-                    storeId:'configurations/getNonrefParameter',
-                    proxy: {
-                        extraParams:{
-                             table_name: "par_recommendations"
-                         }
-                    }
-                },
-                isLoad: true
-            },
-            change: function (cmb, newVal) {
-
-               var grid = this.up('treepanel'),
-                    store = grid.getStore();
-                store.load();
-
-              // var recommendation = grid.down('combo[name=review_recommendation_id]');
-              //   if (newVal == 1 || newVal === 1 || newVal == 3 || newVal === 3) {
-              //       recommendation.setVisible(true);
-            
-              //   }else if (newVal == 2 || newVal === 2) {
-              //        recommendation.setVisible(false);
-          
-              //   }else{
-              //       recommendation.setVisible(false);
-              //   }
-            }
-        }
-    },{
-        xtype: 'combo', anyMatch: true,
-        queryMode: 'local',
-        forceSelection: true,
-        valueField: 'id',
+        allowBlank: false
+    }, {
+        xtype: 'textfield',
+        name: 'approval_id',//authSignature
         columnWidth: 1,
-        displayField: 'name',
-        fieldLabel: 'Approval Status',
-        name: 'approval_id',
-        listeners: {
-            beforerender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 100,
-                    storeId:'configurations/getNonrefParameter',
-                    proxy: {
-                        extraParams:{
-                             table_name: "par_permits_reviewrecommendations"
-                         }
-                    }
-                },
-                isLoad: true
-            },
-            change: function (cmb, newVal) {
-
-               var grid = this.up('treepanel'),
-                    store = grid.getStore();
-                store.load();
-
-              // var recommendation = grid.down('combo[name=review_recommendation_id]');
-              //   if (newVal == 1 || newVal === 1 || newVal == 3 || newVal === 3) {
-              //       recommendation.setVisible(true);
-            
-              //   }else if (newVal == 2 || newVal === 2) {
-              //        recommendation.setVisible(false);
-          
-              //   }else{
-              //       recommendation.setVisible(false);
-              //   }
-            }
-        }
+        allowBlank: false
     },{
         xtype: 'exportbtn',
         hidden: true
@@ -342,6 +272,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
                     handler: 'updateApplicationDocUploadWin',
                     stores: '[]',
                     action: 'update',
+                    name: 'update',
                     bind: {
                         hidden: '{isReadOnly}'  // false
                     }
@@ -349,6 +280,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
                 }, {
                     text: 'Delete',
                     iconCls: 'x-fa fa-trash',
+                    name: 'delete',
                     tooltip: 'Delete Record',
                     table_name: 'tra_application_uploadeddocuments',
                     storeID: 'applicationDocumentsUploads',
