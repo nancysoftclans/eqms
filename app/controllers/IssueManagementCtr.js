@@ -30,9 +30,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
   listen: {
     controller: {
-      // This selector matches any originating Controller, you can specify controller name instead of *
       "*": {
         onNewIssueApplication: "onNewIssueApplication",
+        showIssueManagementSubmissionWin: "showIssueManagementSubmissionWin",
       },
     },
   },
@@ -190,7 +190,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
             // Parse the string using JSON.parse() (assuming valid JSON format)
             const section_ids_array = JSON.parse(results.section_ids);
-            issuemanagementfrm.down("tagfield[name=section_ids]").setValue(section_ids_array);
+            issuemanagementfrm
+              .down("tagfield[name=section_ids]")
+              .setValue(section_ids_array);
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -210,5 +212,105 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     } else {
       Ext.getBody().unmask();
     }
+  },
+
+  showIssueManagementSubmissionWin: function (btn) {
+    Ext.getBody().mask("Please wait...");
+    var mainTabPanel = this.getMainTabPanel(),
+      storeID = btn.storeID,
+      table_name = btn.table_name,
+      winWidth = btn.winWidth,
+      activeTab = mainTabPanel.getActiveTab(),
+      workflow_stage_id = activeTab
+        .down("hiddenfield[name=workflow_stage_id]")
+        .getValue(),
+      active_application_id = activeTab
+        .down("hiddenfield[name=active_application_id]")
+        .getValue(),
+      application_code = activeTab
+        .down("hiddenfield[name=active_application_code]")
+        .getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+      sub_module_id = activeTab
+        .down("hiddenfield[name=sub_module_id]")
+        .getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      valid = this.validateNewReceivingSubmission();
+
+    if (valid) {
+      Ext.Ajax.request({
+        method: "POST",
+        url: "issuemanagement/submitIssueManagementApplication",
+        params: {
+          application_code: application_code,
+          workflow_stage_id: workflow_stage_id,
+          active_application_id: active_application_id,
+          _token: token,
+        },
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          if (success == true || success === true) {
+            extraParams = [
+              {
+                field_type: "hiddenfield",
+                field_name: "has_queries",
+                // value: hasQueries
+              },
+            ];
+            showWorkflowSubmissionWin(
+              active_application_id,
+              application_code,
+              table_name,
+              "workflowsubmissionsreceivingfrm",
+              winWidth,
+              storeID,
+              extraParams,
+              ""
+            );
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+      toastr.warning(
+        "Please Enter All the required Details!!",
+        "Warning Response"
+      );
+      return;
+    }
+  },
+
+  validateNewReceivingSubmission: function (btn) {
+    var mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      active_application_id = activeTab
+        .down("hiddenfield[name=active_application_id]")
+        .getValue();
+
+    if (!active_application_id) {
+      toastr.warning("Please Save Application Details!!", "Warning Response");
+      return false;
+    }
+
+    return true;
   },
 });

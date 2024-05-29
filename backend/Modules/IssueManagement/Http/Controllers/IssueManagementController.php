@@ -2,14 +2,15 @@
 
 namespace Modules\IssueManagement\Http\Controllers;
 
-use App\Models\Submission;
 use App\Models\WfProcess;
+use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Modules\IssueManagement\Entities\IssueStatus;
 use Modules\IssueManagement\Entities\IssueManagement;
 
 class IssueManagementController extends Controller
@@ -310,6 +311,34 @@ class IssueManagementController extends Controller
             );
         }
 
+        return \response()->json($res);
+    }
+
+    public function submitIssueManagementApplication(Request $request)
+    {
+        try {
+            $application_code = $request->application_code;
+            $workflow_stage_id = $request->workflow_stage_id;
+            $active_application_id = $request->active_application_id;
+
+            $IssueManagement = IssueManagement::findOrFail($active_application_id);
+            $IssueStatus = IssueStatus::where('name', 'In Progress')->first();
+
+            if ($IssueManagement && $IssueStatus) {
+                $IssueManagement->fill([
+                    'issue_status_id'       => $IssueStatus->id,
+                    'dola'                   => Carbon::now(),
+                    'altered_by'             => $this->user_id,
+                ]);
+                $IssueManagement->save();
+
+                $res = array('success' => true, 'message' => 'validated');
+            }
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
+        }
         return \response()->json($res);
     }
 }

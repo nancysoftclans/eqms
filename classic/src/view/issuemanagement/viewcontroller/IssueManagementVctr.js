@@ -25,6 +25,22 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     this.fireEvent("viewApplicationDetails", record);
   },
 
+  showIssueManagementSubmissionWin: function (btn) {
+    this.fireEvent("showIssueManagementSubmissionWin", btn);
+  },
+
+  doDeleteConfigWidgetParam: function (item) {
+    //if (this.fireEvent('checkFullAccess')) {
+    var me = this,
+      btn = item.up("button"),
+      record = btn.getWidgetRecord(),
+      id = record.get("submission_id"),
+      storeID = item.storeID,
+      table_name = item.table_name,
+      url = item.action_url;
+    this.fireEvent("deleteRecord", id, table_name, storeID, url);
+  },
+
   showIssueTypeConfigParam: function (item) {
     var me = this,
       btn = item.up("button"),

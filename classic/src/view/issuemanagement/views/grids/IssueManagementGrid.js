@@ -198,5 +198,31 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       flex: 1,
       tdCls: "wrap",
     },
+    {
+      xtype: "widgetcolumn",
+      text: "Actions",
+      flex: 1,
+      widget: {
+        textAlign: "left",
+        xtype: "splitbutton",
+        iconCls: "x-fa fa-th-list",
+        ui: "gray",
+        menu: {
+          xtype: "menu",
+          items: [
+            {
+              text: "Delete",
+              iconCls: "x-fa fa-trash",
+              tooltip: "Delete Record",
+              table_name: "tra_submissions",
+              storeID: "",
+              action_url: "configurations/deleteConfigRecord",
+              action: "actual_delete",
+              // hidden: record.issue_status !== 'Draft'
+            },
+          ],
+        },
+      },
+    },
   ],
 });

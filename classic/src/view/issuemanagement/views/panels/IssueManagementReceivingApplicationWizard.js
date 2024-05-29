@@ -176,18 +176,18 @@ Ext.define(
             hidden: true,
           },
           "->",
-          // {
-          //   text: "Previous",
-          //   ui: "soft-blue",
-          //   iconCls: "fa fa-arrow-left",
-          //   name: "prev_btn",
-          //   max_step: 1,
-          //   bind: {
-          //     disabled: "{atBeginning}",
-          //   },
-          //   wizard: "issuemanagementreceivingapplicationwizard",
-          //   handler: "onPrevCardClick",
-          // },
+          {
+            text: "Previous",
+            ui: "soft-blue",
+            iconCls: "fa fa-arrow-left",
+            name: "prev_btn",
+            max_step: 1,
+            bind: {
+              disabled: "{atBeginning}",
+            },
+            wizard: "issuemanagementreceivingapplicationwizard",
+            handler: "onPrevCardClick",
+          },
           {
             text: "Save Details",
             ui: "soft-blue",
@@ -205,9 +205,9 @@ Ext.define(
             iconCls: "fa fa-check",
             name: "process_submission_btn",
             storeID: "drugproductregistrationstr",
-            table_name: "tra_documentmanager_application",
+            table_name: "tra_issue_management_applications",
             winWidth: "50%",
-            handler: "showReceivingApplicationSubmissionWin",
+            handler: "showIssueManagementSubmissionWin",
           },
           {
             text: "Add Approval Decision",
