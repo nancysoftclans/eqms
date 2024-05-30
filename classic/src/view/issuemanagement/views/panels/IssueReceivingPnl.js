@@ -1,15 +1,15 @@
 Ext.define(
-  "Admin.view.issuemanagement.views.panels.IssueManagementReceivingApplication",
+  "Admin.view.issuemanagement.views.panels.IssueReceivingPnl",
   {
     extend: "Ext.panel.Panel",
-    xtype: "issuemanagementreceivingapplication",
+    xtype: "issuereceiving",
     controller: "issuemanagementvctr",
     viewModel: "issuemanagementvm",
     layout: "fit",
     
     items: [
       {
-        xtype: "issuemanagementreceivingapplicationwizard",
+        xtype: "issuereceivingwizard",
       },
     ],
   }

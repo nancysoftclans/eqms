@@ -27,7 +27,8 @@ class IssueManagement extends Model
         'altered_by',
         'created_on',
         'dola',
-        'date_closed'
+        'date_closed',
+        'application_code'
     ];
 
     public $timestamps = false;

@@ -17,11 +17,11 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issuemanagementtb button[name=issuemanagementHomeBtn]": {
         click: "issueManagementHome",
       },
-      "issuemanagementreceivingapplicationwizard button[name=prev_btn]": {
+      "issuereceivingwizard button[name=prev_btn]": {
         click: "onPrevCardClick",
       },
-      issuemanagementreceivingapplicationwizard: {
-        afterrender: "launchIssueManagementReceivingApplicationWizard",
+      issuereceivingwizard: {
+        afterrender: "launchissuereceivingWizard",
       },
     },
   },
@@ -52,7 +52,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
   onPrevCardClick: function (btn) {
     var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      wizardPnl = activeTab.down("issuemanagementreceivingapplicationwizard");
+      wizardPnl = activeTab.down("issuereceivingwizard");
     wizardPnl.getViewModel().set("atEnd", false);
     this.navigate(btn, wizardPnl, "prev");
   },
@@ -135,7 +135,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     }, 300);
   },
 
-  launchIssueManagementReceivingApplicationWizard: function (pnl) {
+  launchissuereceivingWizard: function (pnl) {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl,

@@ -74,6 +74,7 @@ class IssueManagementController extends Controller
                     'complaint_type_id'     => $request->complaint_type_id,
                     'dola'                   => Carbon::now(),
                     'altered_by'             => $user_id,
+                    'application_code' => $application_code
                 ]);
                 $IssueManagement->save();
                 //End Update
@@ -155,6 +156,7 @@ class IssueManagementController extends Controller
                     'dola' => Carbon::now(),
                     'created_by' => $user_id,
                     'altered_by' => $user_id,
+                    'application_code' => $application_code
                 );
 
 

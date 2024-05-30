@@ -1,8 +1,8 @@
 Ext.define(
-  "Admin.view.issuemanagement.views.panels.IssueManagementReceivingApplicationWizard",
+  "Admin.view.issuemanagement.views.panels.IssueReceivingWizard",
   {
     extend: "Ext.panel.Panel",
-    alias: "widget.issuemanagementreceivingapplicationwizard",
+    alias: "widget.issuereceivingwizard",
     padding: "2 0 2 0",
     requires: ["Ext.layout.container.*", "Ext.toolbar.Fill"],
     reference: "wizardpnl",
@@ -149,7 +149,7 @@ Ext.define(
             text: "ISSUE MANAGEMENT DETAILS",
             max_step: 1,
             action: "quickNav",
-            wizard: "issuemanagementreceivingapplicationwizard",
+            wizard: "issuereceivingwizard",
             // handler: "quickNavigation",
           },
           // {
@@ -159,7 +159,7 @@ Ext.define(
           //   max_step: 1,
           //   text: "Complainant Details",
           //   action: "quickNav",
-          //   wizard: "issuemanagementreceivingapplicationwizard",
+          //   wizard: "issuereceivingwizard",
           //   handler: "quickNavigation",
           // },
         ],
@@ -185,7 +185,7 @@ Ext.define(
             bind: {
               disabled: "{atBeginning}",
             },
-            wizard: "issuemanagementreceivingapplicationwizard",
+            wizard: "issuereceivingwizard",
             handler: "onPrevCardClick",
           },
           {
@@ -196,7 +196,7 @@ Ext.define(
             formBind: true,
             form_panel: "#issuemanagementfrm",
             action_url: "issuemanagement/saveNewReceivingBaseDetails",
-            wizard: "issuemanagementreceivingapplicationwizard",
+            wizard: "issuereceivingwizard",
             handler: "saveIssueManagementApplicationReceivingBaseDetails",
           },
           {
@@ -242,7 +242,7 @@ Ext.define(
           //   bind: {
           //     disabled: "{atEnd}",
           //   },
-          //   wizard: "issuemanagementreceivingapplicationwizard",
+          //   wizard: "issuereceivingwizard",
           //   handler: "onNextCardClick",
           // },
         ],

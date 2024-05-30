@@ -910,8 +910,8 @@ class WorkflowController extends Controller
                             't4.name as applicationStatus',
                             't4.id as applicationStatusId',
                             't2.module_id',
-                            't5.sub_module_id',
-                            't5.section_id'
+                            't1.sub_module_id',
+                            't1.section_id'
                         )
                         ->where(array('current_stage' => $workflow_stage_id, 'is_done' => 0));
 
@@ -1023,8 +1023,8 @@ class WorkflowController extends Controller
                             't4.name as applicationStatus',
                             't4.id as applicationStatusId',
                             't2.module_id',
-                            't5.sub_module_id',
-                            't5.section_id'
+                            't1.sub_module_id',
+                            't1.section_id'
                         )
                         ->where('t3.stage_status', '<>', 3)
                         ->whereNotIn('t3.stage_status', [3, 4])
