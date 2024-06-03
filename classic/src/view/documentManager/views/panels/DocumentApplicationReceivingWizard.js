@@ -203,7 +203,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                     table_name: 'tra_documentmanager_application',
                     name: 'save', 
                    // formBind: true,
-                    form_panel:'#docdefinationrequirementfrm',
+                    form_panel:'#qmsdoclistfrm',
                     action_url:'saveDocDefinationrequirement',
                     wizard: 'documentapplicationreceivingwizard',
                     handler: 'saveDocumentApplicationReceivingBaseDetails'
@@ -224,7 +224,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                     name: 'approval',
                     hidden: true,
                     handler: 'getDocumentReleaseRecommendationDetails',
-                    approval_frm: 'documentapprovalfrm',
+                    approval_frm: 'documentreviewrecommfrm',
                     vwcontroller: 'documentsManagementvctr',
                     stores: '["productApprovalDecisionsStr"]',
                     table_name: 'tra_documentmanager_application',

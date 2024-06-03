@@ -1,7 +1,7 @@
 
- Ext.define('Admin.view.documentManager.views.forms.DocdefinationRequirementFrm', {
+ Ext.define('Admin.view.documentManager.views.forms.QmsDocListFrm', {
     extend: 'Ext.form.Panel',
-    xtype: 'docdefinationrequirementfrm',
+    xtype: 'qmsdoclistfrm',
     height: Ext.Element.getViewportHeight() - 118,
     controller: 'documentsManagementvctr',
     autoScroll: true,
@@ -192,7 +192,7 @@
         labelAlign: 'top'
     } , {
                     xtype: 'textfield',
-                    name: 'recoil',
+                    name: 'navigator_name',
                     columnWidth: 0.9,
                     allowBlank: false,
                     fieldLabel: 'Navigator folders',
@@ -222,71 +222,5 @@
                 }
     ]
     },
-
-   
-
-
-     {
-        xtype: 'combo', anyMatch: true,
-        name: 'has_document_template',
-        store: 'confirmationstr',
-        valueField: 'id',
-        displayField: 'name',
-        queryMode: 'local',
-        readOnly: true,
-        forceSelection: true,
-        hidden: true,
-        fieldLabel: 'Has Document Template?',
-        value: 2,
-        // listeners: {
-        //     change: function (cmb, newVal) {
-        //         var form = cmb.up('form'),
-        //         document_template = form.down('filefield[name=document_template]');
-        //         if (newVal == 1 || newVal === 1) {
-        //             document_template.allowBlank = false;
-        //             document_template.validate();
-        //             document_template.setVisible(true);
-        //         } else {
-        //             document_template.allowBlank = true;
-        //             document_template.validate();
-        //             document_template.setVisible(false);
-        //         }
-        //     }
-        // }
-    },
-    // {
-    //     xtype: 'filefield',
-    //     fieldLabel: 'Document Template',
-    //     allowBlank: true,
-    //     hidden: true,
-    //     name: 'document_template'
-    // },
    ]
-    //dockedItems:[
-    // {
-    //         xtype: 'toolbar',
-    //         ui: 'footer',
-    //         dock: 'bottom',
-    //         items:[
-    //             '->',{
-    //                 text: 'Save Details',
-    //                 iconCls: 'x-fa fa-save',
-    //                 action: 'save',
-    //                 table_name: 'tra_documentupload_requirements',
-    //                 storeID: 'docdefinationrequirementstr',
-    //                 formBind: true,
-    //                 ui: 'soft-purple',
-    //                 action_url: 'configurations/saveDocDefinationrequirement',
-    //                 handler: 'doCreateConfigParamWin'
-    //             },{
-    //                 text: 'Reset',
-    //                 iconCls: 'x-fa fa-close',
-    //                 ui: 'soft-purple',
-    //                 handler: function (btn) {
-    //                     btn.up('form').getForm().reset();
-    //                 }
-    //             }
-    //         ]
-    //     }
-    //]
 });

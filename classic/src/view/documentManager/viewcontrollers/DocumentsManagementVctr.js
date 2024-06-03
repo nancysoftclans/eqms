@@ -332,12 +332,56 @@ showEditConfigParamWinFrm: function (item) {
             me.fireEvent('refreshStores', storeArray);
         }
         form.loadRecord(record);
+        form.setHeight(650);
         funcShowCustomizableWindow(winTitle, winWidth, form, 'customizablewindow');
         /* } else {
              toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
              return false;
          }*/
     },
+
+    showEditDocumentTypeConfigParamWinFrm: function (item) {
+        //if (this.fireEvent('checkFullAccess') || this.fireEvent('checkWriteUpdate')) {
+        var me = this,
+            btn = item.up('button'),
+            record = btn.getWidgetRecord(),
+            childXtype = item.childXtype,
+            winTitle=item.winTitle,
+            winWidth=item.winWidth,
+            form = Ext.widget(childXtype),
+            storeArray = eval(item.stores),
+            arrayLength = storeArray.length;
+        if (arrayLength > 0) {
+            me.fireEvent('refreshStores', storeArray);
+        }
+        form.loadRecord(record);
+
+        // const property_ids_array = JSON.parse(record.get('property_ids'));
+
+        // console.log(property_ids_array);
+        // form.down("tagfield[name=property_ids]").setValue(property_ids_array);
+
+        form.on('afterrender', function() {
+        try {
+            const property_ids = record.get('property_ids');
+
+            console.log(property_ids);
+            if (property_ids) {
+                const property_ids_array = JSON.parse(property_ids);
+                form.down("tagfield[name=property_ids]").setValue(property_ids_array);
+            }
+        } catch (e) {
+            console.error('Error parsing property_ids:', e);
+        }
+        });
+        form.setHeight(650);
+        funcShowCustomizableWindow(winTitle, winWidth, form, 'customizablewindow');
+        /* } else {
+             toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
+             return false;
+         }*/
+    },
+
 
     
     onViewDocumentApplication: function (grid, record) {
@@ -441,9 +485,9 @@ showEditConfigParamWinFrm: function (item) {
             application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
             workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
             stage_category_id = containerPnl.down('hiddenfield[name=stage_category_id]').getValue(),
-            docdefinationrequirementfrm = containerPnl.down('docdefinationrequirementfrm');
+            qmsdoclistfrm = containerPnl.down('qmsdoclistfrm');
 
-           // docdefinationrequirementfrm = docdefinationrequirementfrm.getForm();
+           // qmsdoclistfrm = qmsdoclistfrm.getForm();
            
         // if (!applicant_id) {
         //     //
@@ -456,8 +500,8 @@ showEditConfigParamWinFrm: function (item) {
         //     return false;
         // }
        
-        if (docdefinationrequirementfrm.isValid()) {
-            docdefinationrequirementfrm.submit({
+        if (qmsdoclistfrm.isValid()) {
+            qmsdoclistfrm.submit({
                 url: 'documentmanagement/'+action_url,
                 waitMsg: 'Please wait...',
                 params: {
@@ -531,6 +575,7 @@ showEditConfigParamWinFrm: function (item) {
             var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
             child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
         }
+        child.setHeight(600);
         funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
        
     },

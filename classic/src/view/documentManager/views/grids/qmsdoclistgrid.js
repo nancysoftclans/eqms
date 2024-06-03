@@ -1,7 +1,7 @@
-Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid', {
+Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'docdefinationrequirementgrid',
-    itemId: 'docdefinationrequirementgrid',
+    xtype: 'qmsdoclistgrid',
+    itemId: 'qmsdoclistgrid',
     useArrows: true,
     rootVisible: false,
     multiSelect: false,
@@ -38,6 +38,10 @@ Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid'
         }
     },
     tbar: [
+       {
+                    xtype: 'panel',
+                    html: '<h2>Double Click To View Document Details</h2>'
+                },
     {
       xtype: "tbspacer",
       hidden: true,
@@ -49,7 +53,7 @@ Ext.define('Admin.view.documentManager.views.grids.Docdefinationrequirementgrid'
         action: 'add',
         ui: 'soft-blue',
         hidden: true,
-        childXtype: 'docdefinationrequirementfrm',
+        childXtype: 'QmsDocListFrm',
         winTitle: 'Documents requirements Defination',
         winWidth: '40%',
         handler: 'showAddConfigParamWinFrm',

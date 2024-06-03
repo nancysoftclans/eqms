@@ -14,7 +14,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentDetailsPnl', {
     //     tabchange: 'funcActiveImportOtherInformationTab'
     // },
     items: [{
-            xtype: 'docdefinationrequirementfrm',
+            xtype: 'qmsdoclistfrm',
             autoScroll: true, 
             title: 'DOCUMENT DETAILS'
            },

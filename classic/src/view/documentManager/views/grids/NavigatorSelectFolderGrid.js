@@ -217,7 +217,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorSelectFolderGrid', {
         }],
     columns: [{
         xtype: 'treecolumn',
-        dataIndex: 'recoil',
+        dataIndex: 'navigator_name',
         text: 'Title',
         flex: 1,
         sortable: true

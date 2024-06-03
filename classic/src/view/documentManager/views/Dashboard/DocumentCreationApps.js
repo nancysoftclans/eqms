@@ -15,7 +15,7 @@ Ext.define('Admin.view.documentManager.views.dashboards.DocumentCreationApps', {
             value: 101
         },
       {
-            xtype: 'docdefinationrequirementgrid',
+            xtype: 'qmsdoclistgrid',
             region: 'center',
             title: 'Active Tasks',
             margin: 2

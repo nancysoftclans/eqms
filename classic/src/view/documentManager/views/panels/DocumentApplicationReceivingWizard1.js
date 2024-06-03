@@ -288,7 +288,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                     table_name: 'tra_documentmanager_application',
                     name: 'save', 
                    // formBind: true,
-                    form_panel:'#docdefinationrequirementfrm',
+                    form_panel:'#qmsdoclistfrm',
                     action_url:'saveDocDefinationrequirement',
                     wizard: 'documentapplicationreceivingwizard1',
                     handler: 'saveDocumentApplicationReceivingBaseDetails'

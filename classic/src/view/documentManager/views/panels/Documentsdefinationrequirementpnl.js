@@ -11,7 +11,7 @@ Ext.define('Admin.view.documentManager.views.panels.Documentsdefinationrequireme
 	
     items: [
         {
-            xtype: 'docdefinationrequirementgrid'
+            xtype: 'qmsdoclistgrid'
         }
     ]
 });

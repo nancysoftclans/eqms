@@ -203,7 +203,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 var grid = this.up('treepanel'),
                     store= this.getStore();
                     store.getProxy().extraParams = {
-                        table_name:'tra_documentmanager_application'
+                        table_name:'par_navigator_folders'
                     };
             
             },
@@ -218,15 +218,23 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
         }],
     columns: [{
         xtype: 'treecolumn',
-        dataIndex: 'navigator_foldername',
+        dataIndex: 'navigator_name',
         text: 'Title',
         flex: 1,
         sortable: true
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'id',
+        dataIndex: 'doc_id',
         text: 'ID',
-        flex: 1
+        flex: 1,
+        renderer: function (value, metaData) {
+            if (value === null || value === '') {
+                metaData.tdStyle = 'color:grey;';
+                return '<i> - </i>';
+            }else {
+                return value;
+            }
+        }
     },{
         xtype: 'gridcolumn',
         dataIndex: 'attachments',

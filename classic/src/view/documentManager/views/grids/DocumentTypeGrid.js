@@ -357,8 +357,8 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                     action: 'edit',
                     childXtype: 'documenttypeform',
                     winTitle: 'Edit Document Type',
-                    winWidth: '40%',
-                    handler: 'showEditConfigParamWinFrm',bind: {
+                    winWidth: '80%',
+                    handler: 'showEditDocumentTypeConfigParamWinFrm',bind: {
             disabled: '{isReadOnly}'
         },
                     stores: '[]'

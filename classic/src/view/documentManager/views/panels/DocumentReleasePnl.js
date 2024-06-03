@@ -143,7 +143,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentReleasePnl', {
                     },
                     items: [
                         {
-                            xtype: 'docdefinationrequirementfrm',
+                            xtype: 'qmsdoclistfrm',
                             // fieldLabel: 'Applicant Details',
                             // name: 'applicant_details'
                         },

@@ -933,7 +933,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     "applicationcommentsFrm button[name=save_comment]": {
       click: "saveApplicationComment",
     },
-    "docdefinationrequirementfrm button[action=search_navigator]": {
+    "qmsdoclistfrm button[action=search_navigator]": {
       click: "showNavigatorSelectionList",
     },
     navigatorselectfoldergrid: {
@@ -3784,7 +3784,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     var me = this,
       activeTab = pnl;
       application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
-      docdefinationrequirementfrm = activeTab.down("docdefinationrequirementfrm"),
+      qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       grid = activeTab.down("applicationdocuploadsgrid"),
       // grid = activeTab.down('docuploadsgrid'),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
@@ -3818,7 +3818,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             model = Ext.create("Ext.data.Model", results);
 
           if (success == true || success === true) {
-            docdefinationrequirementfrm.loadRecord(model);
+            qmsdoclistfrm.loadRecord(model);
             grid.down("button[name=add_upload]").setHidden(true);
             activeTab.down("textfield[name=approval_id]").setValue(results.approval);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
@@ -3847,7 +3847,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     var me = this,
       activeTab = pnl;
       application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
-      docdefinationrequirementfrm = activeTab.down("docdefinationrequirementfrm"),
+      qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       grid = activeTab.down("docuploadsgrid"),
       // grid = activeTab.down('docuploadsgrid'),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
@@ -3880,7 +3880,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             model = Ext.create("Ext.data.Model", results);
 
           if (success == true || success === true) {
-            docdefinationrequirementfrm.loadRecord(model);
+            qmsdoclistfrm.loadRecord(model);
             grid.down("button[name=add_upload]").setHidden(true);
             activeTab.down("textfield[name=recommendation_id]").setValue(results.recommendation);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
@@ -3911,7 +3911,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       activeTab = pnl;
       grid = Ext.widget("applicationdocuploadsgrid"),
       application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
-      docdefinationrequirementfrm = activeTab.down("docdefinationrequirementfrm"),
+      qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       grid = activeTab.down("docuploadsgrid"),
       // grid = activeTab.down('docuploadsgrid'),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
@@ -3945,7 +3945,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             model = Ext.create("Ext.data.Model", results);
 
           if (success == true || success === true) {
-            docdefinationrequirementfrm.loadRecord(model);
+            qmsdoclistfrm.loadRecord(model);
             grid.down("button[name=add_upload]").setHidden(true);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
           } else {
@@ -3974,7 +3974,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     var me = this,
       activeTab = pnl;
       application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
-      docdefinationrequirementfrm = activeTab.down("docdefinationrequirementfrm"),
+      qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
       sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
@@ -4010,7 +4010,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             model = Ext.create("Ext.data.Model", results);
 
           if (success == true || success === true) {
-            docdefinationrequirementfrm.loadRecord(model);
+            qmsdoclistfrm.loadRecord(model);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
             activeTab.down('hiddenfield[name=stage_category_id]').setValue(results.stage_category_id);
             activeTab.down("displayfield[name=tracking_no]").setValue(results.tracking_no);
@@ -4352,7 +4352,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   validateNewReceivingSubmission: function (btn) {
     var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      applicantFrm = activeTab.down("docdefinationrequirementfrm"),
+      applicantFrm = activeTab.down("qmsdoclistfrm"),
       document_id = applicantFrm
         .down("combo[name=document_type_id]")
         .getValue();
@@ -5963,7 +5963,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       // applicantFrm = activeTab.down('importexportapplicantdetailsfrm'),
       //senderreceiverdetailsfrm = activeTab.down('#senderreceiverdetailsfrm'),
       //application_id = activeTab.down('hiddenfield[name=active_application_id]').getValue(),
-      (documentdetailsfrm = activeTab.down("docdefinationrequirementfrm")),
+      (documentdetailsfrm = activeTab.down("qmsdoclistfrm")),
       (process_id = activeTab.down("hiddenfield[name=process_id]").getValue()),
       (sub_module_id = activeTab
         .down("hiddenfield[name=sub_module_id]")
@@ -12014,11 +12014,11 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         target: win,
       });
     mask.show();
-    var docdefinationrequirementfrm = activeTab.down(
-      "docdefinationrequirementfrm"
+    var qmsdoclistfrm = activeTab.down(
+      "qmsdoclistfrm"
     );
 
-    docdefinationrequirementfrm.loadRecord(record);
+    qmsdoclistfrm.loadRecord(record);
 
     Ext.Function.defer(function () {
       mask.hide();

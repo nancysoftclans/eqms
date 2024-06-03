@@ -250,8 +250,7 @@ class DmsConfigurationsController extends Controller
 
 public function getdocdefinationrequirementDetails(Request $req)
 {
-    $parent_id = $req->node;
-
+ 
     try {
      $results = DB::table('tra_documentmanager_application as t1')
     ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
@@ -259,29 +258,23 @@ public function getdocdefinationrequirementDetails(Request $req)
     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
     ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
+    ->leftJoin('par_navigator_folders as t7', 't1.navigator_folder_id', '=', 't7.id')
     ->select(
-        // DB::raw("CONCAT_WS(decrypt(t3.first_name), ' ', COALESCE(decrypt(t3.last_name), '')) as owner"),
         DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
-        't1.*',
         't1.doc_title AS mtype',
         't2.name AS document_type',
         't6.name AS status',
         't5.name AS process_name',
+        't7.name AS navigator_name',
+        't1.*',
+        // DB::raw("(SELECT t2.navigator_folder_name
+        //   FROM tra_documentmanager_application t2
+        //   WHERE t1.navigator_folder_id = t2.id) as navigator_name")
 
-                // DB::raw("(SELECT  t.navigator_folder_name
-                //             FROM tra_documentmanager_application t  
-                //             WHERE t.id = t.docparent_id) AS navigator_foldername")
-        DB::raw("(SELECT t2.navigator_folder_name
-          FROM tra_documentmanager_application t2
-          WHERE t1.navigator_folder_id = t2.id) as recoil")
-
-    )
-    ->whereNull('t1.navigator_folder_name')
-    ->get();
+    )->get();
 
         $results = convertStdClassObjToArray($results);
         $res = decryptArray($results);
-        
     } catch (\Exception $exception) {
         $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
     } catch (\Throwable $throwable) {
@@ -290,7 +283,7 @@ public function getdocdefinationrequirementDetails(Request $req)
     return $res;
 }
     public function getdoctypesDetails(Request $req){
-        $module_id = $req->module_id;
+    $module_id = $req->module_id;
     $sub_module_id = $req->sub_module_id;
     $section_id = $req->section_id;
     $premise_type_id = $req->premise_type_id;
@@ -298,13 +291,8 @@ public function getdocdefinationrequirementDetails(Request $req)
 
     try {
         $results = DB::table('par_document_types as t1')
-          // ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
             ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
             ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
-           // ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
-            // ->leftJoin('par_prodclass_categories as t6', 't1.prodclass_category_id', '=', 't6.id')
-            // ->leftJoin('wf_processes as t7', 't1.process_id', '=', 't7.id')
-           // ->leftJoin('par_form_categories as t8', 't1.document_type_id', '=', 't8.id')
             ->leftJoin('par_confirmations as t9', 't1.has_parent_level', '=', 't9.id')
             ->select(
                 't1.*',
@@ -348,7 +336,7 @@ public function getdocdefinationrequirementDetails(Request $req)
 
     }
 
-     public function getNavigatorDetails(Request $req){
+       public function getNavigatorDetails(Request $req){
         $module_id = $req->module_id;
     $sub_module_id = $req->sub_module_id;
     $section_id = $req->section_id;
@@ -356,33 +344,19 @@ public function getdocdefinationrequirementDetails(Request $req)
     $parent_id = $req->node;
 
     try {
-        $results = DB::table('tra_documentmanager_application as t1')
-            ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
-            ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
-            ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
-            ->leftJoin('par_confirmations as t5', 't1.has_parent_level', '=', 't5.id')
-            ->leftJoin('wf_workflow_stages as t6', 't1.workflow_stage_id', '=', 't6.id')
-            ->leftJoin('wf_processes as t7', 't1.process_id', '=', 't7.id')
-            ->leftJoin('par_system_statuses as t8', 't1.application_status_id', '=', 't8.id')
-            ->leftJoin('tra_application_uploadeddocuments as t9', 't1.application_code', '=', 't9.application_code')
+        $results = DB::table('par_navigator_folders as t1')
+            ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
+            ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
             ->select(
-                //'t1.*',
-                DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil"),
-                't1.doc_title AS navigator_doc_title',
+                //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
+                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+                't1.name AS navigator_name',
                 't1.id',
-                't1.tracking_no',
-                't1.doc_version as navigator_version',
+                't2.doc_version AS navigator_version', 
                 't1.dola',
                 't1.id AS navigator_folder_id',
-                't1.doc_description AS navigator_description',
-               // 't1.description AS navigator_descriptions',
-                // 't1.navigator_folder_name AS navigator_foldername',
-                // 't2.name AS navigator_foldername',
-                // 't3.name AS module_name',
-                // 't4.name AS sub_module',
-                // 't5.name AS parent_level',
-                // 't8.name AS status',
-                // 't7.name AS process_name',
+                
+      
             );
 
         if (validateIsNumeric($parent_id)) {
