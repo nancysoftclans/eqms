@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.views.dashboard.AuditMgmntDashCnt', {
+Ext.define('Admin.view.auditManagement.views.dashboard.AuditMgmntDashCnt', {
     extend: 'Ext.Container',
     xtype: 'auditMgmntDashCtn',
     controller: 'auditMgmntVctr',

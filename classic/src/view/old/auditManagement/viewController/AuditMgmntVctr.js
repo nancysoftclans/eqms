@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
+Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
     extend: 'Ext.app.ViewController',
     alias: 'controller.auditMgmntVctr',
 
@@ -16,7 +16,7 @@ Ext.define('Admin.view.QMS.auditManagement.viewController.AuditMgmntVctr', {
         Audit Types
      */
     showAuditTypesRecords: function(btn){
-        var grid = Ext.widget('auditTypesGrid'),
+        var grid = Ext.widget('audittypes'),
         form = btn.up('form');
         funcShowCustomizableWindowWithObject('Audit Types Selection','90%',grid,'customizablewindow',form);
     },

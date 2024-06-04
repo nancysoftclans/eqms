@@ -349,15 +349,23 @@ public function getdocdefinationrequirementDetails(Request $req)
             ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
             ->select(
                 //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
-                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
-                't1.name AS navigator_name',
+                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
+                 DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),
+               // 't1.name AS navigator_name',
                 't1.id',
+                't2.doc_version AS navigator_version', 
                 't2.doc_version AS navigator_version', 
                 't1.dola',
                 't1.id AS navigator_folder_id',
+                't3.id AS T3ID',
+                't2.application_code'
+
                 
       
-            );
+            )
+            ->groupBy('t1.id');
+
+
 
         if (validateIsNumeric($parent_id)) {
             $results->where('t1.docparent_id', $parent_id);
@@ -366,12 +374,38 @@ public function getdocdefinationrequirementDetails(Request $req)
         }
  
         $results = $results->get();
+        $data = [];
+        $docs = [];
+
+        foreach ($results as $folder) {
+            $doc = DB::table('par_navigator_folders as t1')
+                ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
+                ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
+                ->select(
+                    DB::raw("true as leaf, RAND() as id"),
+                    't1.name AS navigator_name',
+                    't2.doc_version AS navigator_version', 
+                    't2.doc_version AS navigator_version', 
+                    't1.dola',
+                    't1.id AS navigator_folder_id',
+                    't3.id AS T3ID',
+                    't2.application_code'
+                )
+                ->groupBy('t1.id')
+                ->where('t2.application_code', $folder->application_code)
+                ->get();
+            
+            $docs[] = $doc; // Adding $doc to $docs array
+        }
+
+        $data = $results->merge($docs);
+
     } catch (\Exception $exception) {
-        $results = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        $data = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
     } catch (\Throwable $throwable) {
-        $results = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        $data = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
     }
-    return $results;
+    return $data;
 
     }
 

@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditTypeCustomFormsGrd',{
+Ext.define('Admin.view.auditManagement.views.grids.AuditTypeCustomFormsGrd',{
     extend: 'Ext.grid.Panel',
     xtype: 'auditTypeCustomFieldsGrd',
     cls: 'dashboard-todo-list',

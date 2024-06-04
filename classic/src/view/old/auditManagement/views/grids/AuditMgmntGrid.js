@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.views.grids.AuditMgmntGrid', {
+Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
     extend: 'Ext.grid.Panel',
     xtype: 'AuditMgmntGrid',
     itemId: 'AuditMgmntGrid',

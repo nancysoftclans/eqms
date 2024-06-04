@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.views.forms.AuditTypeCustomFieldsFrm', {
+Ext.define('Admin.view.auditManagement.views.forms.AuditTypeCustomFieldsFrm', {
     extend: 'Ext.form.Panel',
     xtype: 'auditTypeCustomFieldsFrm',
     controller: 'auditMgmntVctr',

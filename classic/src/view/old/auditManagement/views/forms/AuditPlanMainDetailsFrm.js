@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.panels.AuditPlanMainDetailsFrm',{
+Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
     extend: 'Ext.form.Panel',
     xtype: 'auditPlanMainDetailsFrm',
     controller: 'auditMgmntVctr',

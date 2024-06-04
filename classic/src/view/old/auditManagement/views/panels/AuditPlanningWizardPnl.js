@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.panels.AuditPlanningWizardPnl',{
+Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
     extend: 'Ext.panel.Panel',
     alias: 'widget.auditPlanningWizardPnl',
     padding: '2 0 2 0',

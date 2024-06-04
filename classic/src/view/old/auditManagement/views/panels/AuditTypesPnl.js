@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.views.panels.AuditTypesPnl', {
+Ext.define('Admin.view.auditManagement.views.panels.AuditTypesPnl', {
     extend: 'Ext.panel.Panel',
     xtype: 'auditTypesPnl',
     controller: 'auditMgmntVctr',

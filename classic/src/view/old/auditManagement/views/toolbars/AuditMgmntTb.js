@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.views.toolbars.AuditMgmntTb.js', {
+Ext.define('Admin.view.auditManagement.views.toolbars.AuditMgmntTb.js', {
     extend: 'Ext.toolbar.Toolbar',
     xtype:'auditManagementDashTb',
     ui: 'footer', 

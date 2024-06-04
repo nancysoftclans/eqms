@@ -5,7 +5,8 @@ Ext.define('Admin.view.documentManager.views.dashboards.DocumentApplicationWrapp
     layout: 'fit',
     items: [
         {
-            xtype: 'documentcreationapps'
+            xtype: 'documentcreationapps',
+            title: 'create',
         }
     ]
 });

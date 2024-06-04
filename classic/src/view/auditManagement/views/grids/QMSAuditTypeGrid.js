@@ -1,9 +1,9 @@
 
-Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
+Ext.define('Admin.view.auditManagement.views.grids.QMSAuditTypeGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'documenttypegrid',
-    itemId: 'documenttypegrid',
-    controller: 'documentsManagementvctr',
+    xtype: 'qmsaudittypegrid',
+    itemId: 'qmsaudittypegrid',
+    //controller: 'documentsManagementvctr',
     useArrows: true,
     rootVisible: false,
     multiSelect: false,
@@ -73,12 +73,12 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 isLoad: true
             },
             change: function (cmbo, newVal) {
-                var grid = cmbo.up('#documenttypegrid'),
+                var grid = cmbo.up('#qmsaudittypegrid'),
                     subModuleStore = grid.down('combo[name=sub_module_id]').getStore();
                     subModuleStore.removeAll();
                     subModuleStore.load({params: {module_id: newVal}});
 
-                var store = this.up('#documenttypegrid').getStore();
+                var store = this.up('#qmsaudittypegrid').getStore();
                 store.reload();                 
             }
         }
@@ -109,7 +109,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 isLoad: false
             },
             change: function (cmbo, newVal) {
-               var store = this.up('#documenttypegrid').getStore();
+               var store = this.up('#qmsaudittypegrid').getStore();
                 store.reload();
             }
         }
@@ -138,7 +138,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 },
                 isLoad: true
             },change: function (cmbo, newVal) {
-               var store = this.up('#documenttypegrid').getStore();
+               var store = this.up('#qmsaudittypegrid').getStore();
                 store.reload();
             }
         }
@@ -167,7 +167,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 },
                 isLoad: true
             },change: function (cmbo, newVal) {
-               var store = this.up('#documenttypegrid').getStore();
+               var store = this.up('#qmsaudittypegrid').getStore();
                 store.reload();
             }
         }

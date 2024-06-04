@@ -305,6 +305,8 @@ class ConfigurationsController extends Controller
             } else {
                 $table_data['dola'] = Carbon::now();
                 $res = insertRecord($table_name, $table_data);
+
+                //dd($res);
                 $id = $res['record_id'];
 
             }
@@ -2341,6 +2343,12 @@ class ConfigurationsController extends Controller
             if ($value['label'] == ucwords('updated_at')) {
                 unset($param_columns[$key]);
             }
+            if ($value['label'] == ucwords('updated_by')) {
+                unset($param_columns[$key]);
+            }
+            if ($value['label'] == ucwords('description')) {
+                unset($param_columns[$key]);
+            }
         }
 
 
@@ -3164,7 +3172,7 @@ class ConfigurationsController extends Controller
         if ($con == 'Portal DB') {
             $con = 'portal_db';
         } else {
-            $con = 'pgsql';
+            $con = 'mysql';
         }
         if ($table_name != '') {
             $columns = DB::Connection($con)->getSchemaBuilder()->getColumnListing($table_name);
