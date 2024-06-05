@@ -121,6 +121,7 @@ class IssueManagementController extends Controller
                     'process_id' => $process_id,
                     'application_code' => $application_code,
                     'reference_no' => $ref_number,
+                    'tracking_no' => $ref_number,
                     'usr_from' => $user_id,
                     'usr_to' => $user_id,
                     'previous_stage' => $workflow_stage_id,
