@@ -161,6 +161,8 @@ class IssueManagementController extends Controller
                     'application_code' => $application_code,
                     'workflow_stage_id' => $data['workflow_stage_id'],
                     'application_status_id' => $application_status->status_id,
+                    'reference_no' => $ref_number,
+                    'tracking_no' => $ref_number,
                 );
 
 

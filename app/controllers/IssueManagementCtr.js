@@ -271,7 +271,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               winWidth,
               storeID,
               extraParams,
-              ""
+              "",
+              "",
+              workflow_stage_id
             );
           } else {
             toastr.error(message, "Failure Response");

@@ -1106,7 +1106,6 @@ class WorkflowController extends Controller
                 )
                 ->where('t1.id', $submission_id);
             $results = $qry->first();
-
             $res = array(
                 'success' => true,
                 'results' => $results,

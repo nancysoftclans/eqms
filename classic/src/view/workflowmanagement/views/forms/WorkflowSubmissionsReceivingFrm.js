@@ -164,7 +164,6 @@ Ext.define('Admin.view.workflowmanagement.views.forms.WorkflowSubmissionsReceivi
                             store = responsible_users.store;
                         responsible_users.reset();
                         if (record && record != null) {
-                            console.log(record);
                             needs_responsible_user = record.get('needs_responsible_user');
                         }
                        

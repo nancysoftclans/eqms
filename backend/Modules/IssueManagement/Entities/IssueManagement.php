@@ -30,7 +30,9 @@ class IssueManagement extends Model
         'date_closed',
         'application_code',
         'workflow_stage_id',
-        'application_status_id'
+        'application_status_id',
+        'reference_no',
+        'tracking_no'
     ];
 
     public $timestamps = false;
