@@ -57,12 +57,12 @@ class WorkflowController extends Controller
         } else {
             $this->middleware(function ($request, $next) {
                 if (!Auth::check()) {
-                    $res = array (
+                    $res = array(
                         'success' => false,
                         'message' => '<p>NO SESSION, SERVICE NOT ALLOWED!!<br>PLEASE RELOAD THE SYSTEM!!</p>'
                     );
                     echo json_encode($res);
-                    exit ();
+                    exit();
                 }
                 $this->user_id = Auth::user()->id;
                 return $next($request);
@@ -116,7 +116,6 @@ class WorkflowController extends Controller
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -169,7 +168,6 @@ class WorkflowController extends Controller
                 'results' => $results,
                 'message' => 'All is well'
             );
-
         } catch (\Exception $exception) {
             $res = array(
                 'success' => false,
@@ -223,7 +221,6 @@ class WorkflowController extends Controller
                 'results' => $results,
                 'message' => 'All is well'
             );
-
         } catch (\Exception $exception) {
             $res = array(
                 'success' => false,
@@ -261,7 +258,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -284,7 +280,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -325,7 +320,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -349,7 +343,6 @@ class WorkflowController extends Controller
             $res = softDeleteRecord($table_name, $where, $user_id);
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -373,7 +366,6 @@ class WorkflowController extends Controller
             $res = undoSoftDeletes($table_name, $previous_data, $where, $user_id);
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -394,10 +386,8 @@ class WorkflowController extends Controller
             } else {
                 $res = deleteRecord($table_name, $where);
             }
-
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -425,7 +415,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -476,7 +465,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -500,7 +488,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -525,7 +512,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -597,7 +583,6 @@ class WorkflowController extends Controller
             }
             if (validateIsNumeric($has_queries)) {
                 /* $qry->where('t1.query_raised_submission', 1);*/
-
             } else {
                 if (validateIsNumeric($is_submission) && $is_submission == 1) {
                     $qry->where(function ($query) {
@@ -617,7 +602,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -644,7 +628,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -679,7 +662,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -700,7 +682,6 @@ class WorkflowController extends Controller
             );
             if (validateIsNumeric($section_id)) {
                 $where['t1.section_id'] = $section_id;
-
             }
             $qry = DB::table('wf_processes as t1')
                 ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
@@ -714,7 +695,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -786,7 +766,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -820,7 +799,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -853,7 +831,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -876,7 +853,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -970,7 +946,6 @@ class WorkflowController extends Controller
 
                         ->where(array('t1.application_code' => $application_code, 'current_stage' => $workflow_stage_id, 'is_done' => 0));
                 }
-
             } else if (validateIsNumeric($stage_status)) {
 
                 $qry = DB::table($table_name . ' as t1')
@@ -1055,10 +1030,7 @@ class WorkflowController extends Controller
                                 't2.section_id'
                             )
                             ->where(array('t1.id' => $application_id, 't3.stage_status' => 1));
-
                     }
-
-
                 } else {
                     $qry = DB::table('tra_submissions as t1')
                         ->leftJoin('wf_processes as t2', 't1.process_id', '=', 't2.id')
@@ -1085,9 +1057,6 @@ class WorkflowController extends Controller
 
 
                 }
-
-
-
             }
 
             $results = $qry->first();
@@ -1099,7 +1068,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1146,7 +1114,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1179,7 +1146,6 @@ class WorkflowController extends Controller
             $where = array(
                 't1.id' => $process_id
             );
-
         } else {
             $where = array(
                 't1.sub_module_id' => $sub_module_id
@@ -1202,12 +1168,12 @@ class WorkflowController extends Controller
                  */
             }
             $qry = DB::table('wf_processes as t1');
-            if (isset($status_type_id) && ($status_type_id == 3)) {//manager query response
+            if (isset($status_type_id) && ($status_type_id == 3)) { //manager query response
                 $qry->join('wf_workflow_stages as t2', function ($join) {
                     $join->on('t2.workflow_id', '=', 't1.workflow_id')
                         ->on('t2.is_manager_query_response', '=', DB::raw(1));
                 });
-            } else if (isset($status_type_id) && ($status_type_id == 2) && $has_queries == 0) {//manager query response
+            } else if (isset($status_type_id) && ($status_type_id == 2) && $has_queries == 0) { //manager query response
                 $qry->join('wf_workflow_stages as t2', function ($join) {
                     $join->on('t2.workflow_id', '=', 't1.workflow_id')
                         ->on('t2.is_portalapp_initialstage', '=', DB::raw(1));
@@ -1254,7 +1220,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1303,7 +1268,6 @@ class WorkflowController extends Controller
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1368,7 +1332,6 @@ class WorkflowController extends Controller
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1395,7 +1358,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1422,7 +1384,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1450,7 +1411,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1478,7 +1438,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1518,7 +1477,6 @@ class WorkflowController extends Controller
                 $product_type_id = $whereProductType['product_type_id'];
                 $where2['product_type_id'] = $product_type_id;
             } else {
-
             }
             //get applicable checklist categories
             $qry1 = DB::table('tra_proc_applicable_checklists')
@@ -1538,7 +1496,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1607,7 +1564,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -1689,7 +1645,7 @@ class WorkflowController extends Controller
             $qry = DB::table('par_checklist_items as t1')
                 ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
 
-                    if (isset ($query_id) && $query_id != '') {
+                    if (isset($query_id) && $query_id != '') {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
                     } else if (validateIsNumeric($is_auditor)) {
@@ -1735,16 +1691,12 @@ class WorkflowController extends Controller
                 'results' => $results,
                 'message' => returnMessage($results)
             );
-
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
         return \response()->json($res);
-
-
     }
     public function getProcessApplicableChecklistItems(Request $request)
     {
@@ -1835,7 +1787,6 @@ class WorkflowController extends Controller
                     $section_id = $where2['section_id'];
                     unset($where2['premise_type_id']);
                 }
-
             }
             if ($module_id == 1) {
                 if ($section_id == 3) {
@@ -1879,28 +1830,28 @@ class WorkflowController extends Controller
                     $checklist_categories = [19];
                 } else {
                     switch ($product_type) {
-                        case 7://small molecules
+                        case 7: //small molecules
                             // code...
                             $checklist_categories = [20];
                             break;
-                        case 8://Biologicals
+                        case 8: //Biologicals
                             // code...
                             $checklist_categories = [18];
                             break;
-                        case 8999999999://B lIsted
+                        case 8999999999: //B lIsted
                             // code...
                             $checklist_categories = [19];
                             break;
-                        //vet
-                        case 10://pharm / small mole
+                            //vet
+                        case 10: //pharm / small mole
                             // code...
                             $checklist_categories = [21];
                             break;
-                        case 11://Biological
+                        case 11: //Biological
                             // code...
                             $checklist_categories = [23];
                             break;
-                        case 12://comps
+                        case 12: //comps
                             // code...
                             $checklist_categories = [22];
                             break;
@@ -1912,7 +1863,6 @@ class WorkflowController extends Controller
                             $checklist_categories = $qry1->get();
                             $checklist_categories = convertStdClassObjToArray($checklist_categories);
                             $checklist_categories = convertAssArrayToSimpleArray($checklist_categories, 'checklist_category_id');
-
                     }
                 }
             } else {
@@ -1930,7 +1880,7 @@ class WorkflowController extends Controller
             $added_categories = DB::table('par_checklist_items as t1')
                 ->join('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
 
-                    if (isset ($query_id) && $query_id != '') {
+                    if (isset($query_id) && $query_id != '') {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
                     } else if (validateIsNumeric($is_auditor)) {
@@ -1962,7 +1912,7 @@ class WorkflowController extends Controller
             $qry = DB::table('par_checklist_items as t1')
                 ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
 
-                    if (isset ($query_id) && $query_id != '') {
+                    if (isset($query_id) && $query_id != '') {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
                     } else if (validateIsNumeric($is_auditor)) {
@@ -2054,7 +2004,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2142,7 +2091,7 @@ class WorkflowController extends Controller
                 ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $is_previous) {
                     $join->on('t2.checklist_item_id', '=', 't1.id')
                         ->where('t2.application_code', $application_code);
-                    if (isset ($is_previous) && $is_previous != '') {
+                    if (isset($is_previous) && $is_previous != '') {
                         $join->where('t2.status', 0);
                     } else {
                         $join->where('t2.status', 1);
@@ -2168,7 +2117,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2187,9 +2135,9 @@ class WorkflowController extends Controller
         );
         try {
             DB::transaction(function () use ($selected_ids, $process_id, $stage_id, $where) {
-                $params = array ();
+                $params = array();
                 foreach ($selected_ids as $selected_id) {
-                    $params[] = array (
+                    $params[] = array(
                         'process_id' => $process_id,
                         'stage_id' => $stage_id,
                         'checklist_category_id' => $selected_id,
@@ -2208,7 +2156,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2227,9 +2174,9 @@ class WorkflowController extends Controller
         );
         try {
             DB::transaction(function () use ($selected_ids, $process_id, $stage_id, $where) {
-                $params = array ();
+                $params = array();
                 foreach ($selected_ids as $selected_id) {
-                    $params[] = array (
+                    $params[] = array(
                         'process_id' => $process_id,
                         'stage_id' => $stage_id,
                         'doctype_id' => $selected_id,
@@ -2248,7 +2195,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2269,11 +2215,11 @@ class WorkflowController extends Controller
         );
         try {
             DB::transaction(function () use ($selected_ids, $selected_part_ids, $process_id, $form_id, $where) {
-                $params = array ();
-                $params2 = array ();
+                $params = array();
+                $params2 = array();
                 if (count($selected_ids) > 0) {
                     foreach ($selected_ids as $selected_id) {
-                        $params[] = array (
+                        $params[] = array(
                             'process_id' => $process_id,
                             'form_id' => $form_id,
                             'field_id' => $selected_id,
@@ -2283,7 +2229,7 @@ class WorkflowController extends Controller
                 }
                 if (count($selected_part_ids) > 0) {
                     foreach ($selected_part_ids as $selected_part_id) {
-                        $params2[] = array (
+                        $params2[] = array(
                             'process_id' => $process_id,
                             'part_id' => $selected_part_id,
                             'created_by' => $this->user_id
@@ -2309,7 +2255,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2326,9 +2271,9 @@ class WorkflowController extends Controller
         );
         try {
             DB::transaction(function () use ($selected_ids, $stage_id, $where) {
-                $params = array ();
+                $params = array();
                 foreach ($selected_ids as $selected_id) {
-                    $params[] = array (
+                    $params[] = array(
                         'stage_id' => $stage_id,
                         'group_id' => $selected_id,
                         'created_by' => $this->user_id
@@ -2346,7 +2291,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2376,7 +2320,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2404,7 +2347,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2420,13 +2362,13 @@ class WorkflowController extends Controller
         try {
             DB::transaction(function () use ($menu_id, $workflow_id, $workflow_stages, &$res) {
                 $workflow_stages = json_decode($workflow_stages);
-                $params = array ();
+                $params = array();
                 DB::table('wf_menus_stages')
                     ->where('menu_id', $menu_id)
                     ->delete();
-                if (isset ($workflow_stages) > 0) {
+                if (isset($workflow_stages) > 0) {
                     foreach ($workflow_stages as $workflow_stage) {
-                        $params[] = array (
+                        $params[] = array(
                             'menu_id' => $menu_id,
                             'stage_id' => $workflow_stage,
                             'created_on' => Carbon::now(),
@@ -2438,7 +2380,7 @@ class WorkflowController extends Controller
                 }
                 DB::table('par_menus')
                     ->where('id', $menu_id)
-                    ->update(array ('workflow_id' => $workflow_id));
+                    ->update(array('workflow_id' => $workflow_id));
             }, 5);
             $res = array(
                 'success' => true,
@@ -2446,7 +2388,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2461,13 +2402,13 @@ class WorkflowController extends Controller
         try {
             DB::transaction(function () use ($menu_id, $workflow_ids, &$res) {
                 $workflow_ids = json_decode($workflow_ids);
-                $params = array ();
+                $params = array();
                 DB::table('wf_menu_workflows')
                     ->where('menu_id', $menu_id)
                     ->delete();
                 if (count($workflow_ids) > 0) {
                     foreach ($workflow_ids as $workflow_id) {
-                        $params[] = array (
+                        $params[] = array(
                             'menu_id' => $menu_id,
                             'workflow_id' => $workflow_id,
                             'created_on' => Carbon::now(),
@@ -2484,7 +2425,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2507,7 +2447,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2527,14 +2466,13 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
         return \response()->json($res);
     }
 
-    public function getWorkflowStageResponsibleGroups(Request $request)//deprecated
+    public function getWorkflowStageResponsibleGroups(Request $request) //deprecated
     {
         $workflow_id = $request->input('workflow_id');
         try {
@@ -2561,7 +2499,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2617,12 +2554,10 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
         return response()->json($res);
-
     }
 
     public function getSubmissionNextStageDetails(Request $request)
@@ -2649,7 +2584,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2685,7 +2619,7 @@ class WorkflowController extends Controller
                 //             ->whereIn('t3.group_id', $stage_groups);
                 //     })
                 $qry2 = DB::table('users as t2')
-                    ->select(DB::raw("t2.id,CONCAT_WS(' ',decrypt(t2.first_name),decrypt(t2.last_name)) as name"))
+                    ->select('t2.id', 't2.first_name', 't2.last_name')
                     ->whereIn('t2.id', function ($query) use ($stage_groups) {
                         $query->select(DB::raw('t3.user_id'))
                             ->from('tra_user_group as t3')
@@ -2700,6 +2634,13 @@ class WorkflowController extends Controller
                     });
 
                 $results = $qry2->get();
+
+                $results = convertStdClassObjToArray($results);
+                $results = decryptArray($results);
+
+                foreach ($results as &$result) {
+                    $result['name'] = $result['first_name'] . ' ' . $result['last_name'];
+                }
             }
             //return
             $res = array(
@@ -2709,7 +2650,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -2718,7 +2658,7 @@ class WorkflowController extends Controller
 
     public function getInspectionSubmissionResponsibleUsers($inspection_id, $module_id)
     {
-        if ($module_id == 3) {//GMP
+        if ($module_id == 3) { //GMP
             $table_name = 'gmp_inspectorsdetails';
         } else {
             $table_name = 'tra_premiseinspection_inspectors';
@@ -2772,7 +2712,6 @@ class WorkflowController extends Controller
     public function handleRevenueRequestApplicationSubmission(Request $request)
     {
         $this->processRevenueApplicationSubmission($request);
-
     }
 
     public function handleApplicationSubmission(Request $request)
@@ -2783,53 +2722,51 @@ class WorkflowController extends Controller
         $table_name = returnTableNamefromModule($table_name, $module_id);
 
         $module_id = $request->input('module_id');
-        if ($module_id == 1) {//PRODUCT REGISTRATION
+        if ($module_id == 1) { //PRODUCT REGISTRATION
             $this->processProductsApplicationSubmission($request);
-        } else if ($module_id == 2) {//PREMISE REGISTRATION
+        } else if ($module_id == 2) { //PREMISE REGISTRATION
             $this->processPremiseApplicationSubmission($request);
-        } else if ($module_id == 3) {//GMP APPLICATIONS
+        } else if ($module_id == 3) { //GMP APPLICATIONS
             $this->processGmpApplicationsSubmission($request);
-        } else if ($module_id == 7) {//CLINICAL TRIAL
+        } else if ($module_id == 7) { //CLINICAL TRIAL
             $this->processClinicalTrialApplicationsSubmission($request);
-        } else if ($module_id == 5) {//SURVEILLANCE
+        } else if ($module_id == 5) { //SURVEILLANCE
             $this->processSurveillanceApplicationsSubmission($request);
-        } else if ($module_id == 14) {//PROMOTION MATERIALS
+        } else if ($module_id == 14) { //PROMOTION MATERIALS
             $this->processNormalApplicationSubmissionForPromoAndAdverts($request);
-
         } else if ($module_id == 6) {
             $this->processProductsNotificationSubmission($request);
-
-        } else if ($module_id == 4) {//PRODUCT REGISTRATION
+        } else if ($module_id == 4) { //PRODUCT REGISTRATION
             $this->processImportExportApplicationSubmission($request);
-        } else if ($module_id == 15) {//PRODUCT REGISTRATION
+        } else if ($module_id == 15) { //PRODUCT REGISTRATION
             $this->processDisposalApplicationSubmission($request);
-        } else if ($module_id == 17) {//PRODUCT REGISTRATION
+        } else if ($module_id == 17) { //PRODUCT REGISTRATION
             $this->processRevenueApplicationSubmission($request);
-        } else if ($module_id == 18) {//inventory REGISTRATION
+        } else if ($module_id == 18) { //inventory REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 20) {//PRODUCT REGISTRATION
+        } else if ($module_id == 20) { //PRODUCT REGISTRATION
             $this->processImportExportApplicationSubmission($request);
-        } else if ($module_id == 12) {//PRODUCT REGISTRATION
+        } else if ($module_id == 12) { //PRODUCT REGISTRATION
             $this->processImportExportApplicationSubmission($request);
-        } else if ($module_id == 19) {//PRODUCT REGISTRATION
+        } else if ($module_id == 19) { //PRODUCT REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 21) {//MIR REGISTRATION
+        } else if ($module_id == 21) { //MIR REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 22) {//MIR REGISTRATION
+        } else if ($module_id == 22) { //MIR REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 8) {//ENFORCEMENT REGISTRATION
+        } else if ($module_id == 8) { //ENFORCEMENT REGISTRATION
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 9) {//POE Inspection
+        } else if ($module_id == 9) { //POE Inspection
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 24) {//RMU Inspection
+        } else if ($module_id == 24) { //RMU Inspection
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 16) {//Revenue management
+        } else if ($module_id == 16) { //Revenue management
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 25) {//Psur Applications
+        } else if ($module_id == 25) { //Psur Applications
             $this->processNormalApplicationSubmission($request);
         } else if ($module_id == 26) {
             $this->processNormalApplicationSubmission($request);
-        } else if ($module_id == 34) {//Issue Management Applications
+        } else if ($module_id == 28) { //Issue Management Applications
             $this->processNormalApplicationSubmission($request);
         } else {
             echo "module not set";
@@ -2839,43 +2776,43 @@ class WorkflowController extends Controller
     public function handleManagersApplicationSubmissions(Request $request)
     {
         $module_id = $request->input('module_id');
-        if ($module_id == 1) {//PRODUCT REGISTRATION
+        if ($module_id == 1) { //PRODUCT REGISTRATION
             $this->processProductManagersApplicationSubmission($request);
-        } else if ($module_id == 2) {//PREMISE REGISTRATION
+        } else if ($module_id == 2) { //PREMISE REGISTRATION
             $this->processNormalManagersApplicationSubmission($request);
         } else if ($module_id == 3) { //GMP APPLICATIONS
             $this->processGmpManagersApplicationSubmission($request);
-        } else if ($module_id == 7) {//CLINICAL TRIAL
+        } else if ($module_id == 7) { //CLINICAL TRIAL
             $this->processClinicalTrialManagersApplicationSubmission($request);
-        } else if ($module_id == 5) {//SURVEILLANCE
+        } else if ($module_id == 5) { //SURVEILLANCE
             $this->processSurveillanceManagersApplicationSubmission($request);
-        } else if ($module_id == 14) {//PROMOTION MATERIALS
+        } else if ($module_id == 14) { //PROMOTION MATERIALS
             $this->processNormalManagersApplicationSubmission($request);
-        } else if ($module_id == 6) {// NOTIFICATION
+        } else if ($module_id == 6) { // NOTIFICATION
             $this->processProductNotificationManagersSubmission($request);
-        } else if ($module_id == 4 || $module_id == 20) {//IMPORT EXPORT
+        } else if ($module_id == 4 || $module_id == 20) { //IMPORT EXPORT
             $this->processImportExportManagersApplicationSubmission($request);
-        } else if ($module_id == 15) {//IMPORT EXPORT
+        } else if ($module_id == 15) { //IMPORT EXPORT
             $this->processImportExportManagersApplicationSubmission($request);
-        } else if ($module_id == 12) {//IMPORT EXPORT
+        } else if ($module_id == 12) { //IMPORT EXPORT
             $this->processImportExportManagersApplicationSubmission($request);
-        } else if ($module_id == 21) {//PV MATERIALS
+        } else if ($module_id == 21) { //PV MATERIALS
             $this->processNormalManagersApplicationSubmission($request);
-        } else if ($module_id == 22) {//MIR MATERIALS
+        } else if ($module_id == 22) { //MIR MATERIALS
             $this->processNormalManagersApplicationSubmission($request);
-        } else if ($module_id == 23) {//PMS Program
+        } else if ($module_id == 23) { //PMS Program
             $this->processNormalManagersApplicationSubmission($request);
-        } else if ($module_id == 8) {//Enforcement
+        } else if ($module_id == 8) { //Enforcement
             $this->processManagerInvestigationApplicationSubmission($request);
-        } else if ($module_id == 16) {//Revenue Management
+        } else if ($module_id == 16) { //Revenue Management
             $this->processNormalManagersApplicationSubmission($request);
-        } else if ($module_id == 24) {//Revenue Management
+        } else if ($module_id == 24) { //Revenue Management
             $this->processNormalManagersApplicationSubmission($request);
-        } else if ($module_id == 25) {//Psur Applications
+        } else if ($module_id == 25) { //Psur Applications
             $this->processNormalManagersApplicationSubmission($request);
-        } else if ($module_id == 25) {//Psur Applications
+        } else if ($module_id == 25) { //Psur Applications
             $this->processNormalManagersApplicationSubmission($request);
-        } else if ($module_id == 11) {//Facility Schedule Applications
+        } else if ($module_id == 11) { //Facility Schedule Applications
             $this->processNormalManagersApplicationSubmission($request);
         } else {
             //unknown module
@@ -2885,9 +2822,9 @@ class WorkflowController extends Controller
     {
         $module_id = $request->input('module_id');
         $res = array();
-        if ($module_id == 1) {//PRODUCT REGISTRATION
+        if ($module_id == 1) { //PRODUCT REGISTRATION
             $res = $this->saveProductOnlineApplicationDetails($request);
-        } else if ($module_id == 2) {//PREMISE REGISTRATION
+        } else if ($module_id == 2) { //PREMISE REGISTRATION
             $res = $this->savePremiseOnlineApplicationDetails($request);
         } else if ($module_id == 3) { //GMP APPLICATIONS
             $res = $this->saveGmpOnlineApplicationDetails($request);
@@ -2899,7 +2836,6 @@ class WorkflowController extends Controller
             $res = $this->receivePromoAdvertsOnlineApplicationDetails($request);
         } else if ($module_id == 6) { //PRODUCT NOTIFICATION
             $res = $this->saveMedicalNotificationOnlineApplicationDetails($request);
-
         } else if ($module_id == 15) { //IMPORT & EXPORT
             $res = $this->saveDisposalOnlineApplicationDetails($request);
         } else if ($module_id == 20) { //IMPORT & EXPORT
@@ -2929,8 +2865,6 @@ class WorkflowController extends Controller
                 // deleteRecord('tra_onlinesubmissions', $previous_data, $where, $user_id);
 
             }
-
-
         }
         return \response()->json($res);
     }
@@ -2939,9 +2873,9 @@ class WorkflowController extends Controller
 
         $module_id = $request->input('module_id');
         $res = array();
-        if ($module_id == 1) {//PRODUCT REGISTRATION
+        if ($module_id == 1) { //PRODUCT REGISTRATION
             $res = $this->saveProductsOnlineapplicationreceiceinvoiceDetails($request);
-        } else if ($module_id == 2) {//PREMISE REGISTRATION
+        } else if ($module_id == 2) { //PREMISE REGISTRATION
             $res = $this->savePremisesOnlinereceiceinvoiceDetails($request);
         } else if ($module_id == 3) { //GMP APPLICATIONS
             $res = $this->saveGmpOnlinereceiceinvoiceDetails($request);
@@ -2953,7 +2887,6 @@ class WorkflowController extends Controller
             $res = $this->receivePromoAdvertsOnlineApplicationDetails($request);
         } else if ($module_id == 6) { //PRODUCT NOTIFICATION
             $res = $this->saveMedicalNotificationOnlineApplicationDetails($request);
-
         } else if ($module_id == 15) { //IMPORT & EXPORT
             $res = $this->saveDisposalOnlineApplicationDetails($request);
         } else if ($module_id == 17) { //adhoc
@@ -3006,7 +2939,8 @@ class WorkflowController extends Controller
             }
 
             $application_details = DB::table($table_name)
-                ->where('application_code', $application_code)
+                ->join('tra_submissions', $table_name . '.application_code', 'tra_submissions.application_code')
+                ->where($table_name . '.application_code', $application_code)
                 ->first();
 
             if (is_null($application_details)) {
@@ -3019,7 +2953,7 @@ class WorkflowController extends Controller
             }
 
             $application_status_id = getApplicationTransitionStatus($prev_stage, $action, $to_stage);
-            if ($keep_status == true) {//for approvals
+            if ($keep_status == true) { //for approvals
                 $application_status_id = $application_details->application_status_id;
             }
             $where = array(
@@ -3056,7 +2990,6 @@ class WorkflowController extends Controller
                         ->where('t1.stage_id', '<>', $samples_nextstage)
                         ->update(array('stage_id' => $samples_nextstage));
                 }
-
             }
             //check if MIR final stage
             $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $to_stage], 'stage_status');
@@ -3101,8 +3034,6 @@ class WorkflowController extends Controller
             }
 
             $this->updateApplicationSubmission($request, $application_details, $application_status_id);
-
-
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
             echo json_encode($res);
@@ -3143,7 +3074,6 @@ class WorkflowController extends Controller
         if ($table_name == '') {
             $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename');
             $request['table_name'] = $table_name;
-
         }
         try {
             //get application_details
@@ -3397,7 +3327,6 @@ class WorkflowController extends Controller
                         );
 
                         insertRecord('tra_manager_assignements_logs', $assignment_log, 1, 'pgsql');
-
                     }
                     if ($has_appdate_defination == 1) {
                         $application_processdefdata[] = array(
@@ -3430,7 +3359,6 @@ class WorkflowController extends Controller
                     // $submission_data[] = $usersubmission_data;
 
                 }
-
             }
             //application update
             $update_params = array(
@@ -3443,12 +3371,11 @@ class WorkflowController extends Controller
                 $appdate_defination = array($appdate_defination => Carbon::now(), 'dola' => Carbon::now());
                 $app_update = DB::table($table_name . ' as t1')
                     ->whereIn('application_code', $selected_appCodes)
-                    ->update($appdate_defination);//dd($app_update);
+                    ->update($appdate_defination); //dd($app_update);
             }
             if (count($application_processdefdata) > 0) {
                 DB::table('tra_applications_processdefinations')
                     ->insert($application_processdefdata);
-
             }
 
             if ($is_dataammendment_request != 1) {
@@ -3462,7 +3389,6 @@ class WorkflowController extends Controller
                     $app_update = DB::table($table_name . ' as t1')
                         ->whereIn('id', convertStdClassObjToArray($selected_ids))
                         ->update($update_params);
-
                 }
 
                 //    if ($app_update < 1) {
@@ -3501,7 +3427,6 @@ class WorkflowController extends Controller
             } else {
 
                 $rest = insertMultipleRecords('tra_submissions', $submission_params);
-
             }
 
             updateInTraySubmissionsBatch($selected_ids, $application_codes, $from_stage, $user_id);
@@ -3528,7 +3453,6 @@ class WorkflowController extends Controller
                     '{lead_inspector}' => $inspection_details->lead_inspector
                 );
                 sendTemplatedApplicationNotificationEmail($preminspmail_msg_id, $inspectors_email, $vars);
-
             }
             if ($has_email_notification == 1) {
                 $applicant_email = getTraderEmail($application_detail->applicant_id);
@@ -3538,7 +3462,6 @@ class WorkflowController extends Controller
                 );
 
                 sendTemplatedApplicationNotificationEmail($email_message_id, $applicant_email, $vars);
-
             }
             if ($has_technicalmeeting_notification == 1) {
                 //get the emails
@@ -3576,7 +3499,6 @@ class WorkflowController extends Controller
                     $participantEmails = explode(';', $meeting_attendantsemail);
                     foreach ($participantEmails as $participantEmail) {
                         $res = sendInvitationMail($technicalmeetinemail_msg_id, $participantEmail, $vars);
-
                     }
                     //send an email to the rest of the users
                     $records = DB::table('tc_meeting_participants')
@@ -3606,7 +3528,7 @@ class WorkflowController extends Controller
                                     'user_category_id' => 2
                                 );
                                 $this->createExternalUserAccountDetails($table_data,$email_address,$participant_id,$vars);
-                            }*///endif
+                            }*/ //endif
 
                             $table_data = array(
                                 'first_name' => $rec->participant_name,
@@ -3615,14 +3537,10 @@ class WorkflowController extends Controller
                                 'user_category_id' => 2
                             );
                             $this->createExternalUserAccountDetails($table_data, $email_address, $participant_id, $vars);
-
-
-                        }//endforeach
-                    }//endif
+                        } //endforeach
+                    } //endif
 
                 }
-
-
             }
 
 
@@ -3653,7 +3571,7 @@ class WorkflowController extends Controller
         if (!$email_exists) {
 
             $password = str_random(8);
-            $uuid = generateUniqID();//unique user ID
+            $uuid = generateUniqID(); //unique user ID
             $pwd = hashPwd($encryptedEmail, $uuid, $password);
             //add extra params
             $table_data['email'] = $encryptedEmail;
@@ -3671,8 +3589,8 @@ class WorkflowController extends Controller
             if ($results['success'] == true) {
                 $insertId = $results['record_id'];
                 DB::table('tc_meeting_participants')->where(array('id' => $participant_id))->update(array('user_id' => $insertId));
-            }//endif
-        }//endif
+            } //endif
+        } //endif
         else {
 
             $base_url = url('/');
@@ -3681,9 +3599,9 @@ class WorkflowController extends Controller
             $vars['base_url'] = $base_url;
 
             $email_res = sendTemplatedApplicationNotificationEmail(15, $email_address, $vars);
-        }//endelse
+        } //endelse
 
-    }//endfunction
+    } //endfunction
 
     public function getPremisesInspectionDetails($application_code)
     {
@@ -3736,7 +3654,6 @@ class WorkflowController extends Controller
         }
         $inspectors_email = implode(';', $inspectors_email);
         return $inspectors_email;
-
     }
     public function getMeetingAttendantsEmails($application_code)
     {
@@ -3756,7 +3673,6 @@ class WorkflowController extends Controller
         }
         $meeting_attendantsemail = implode(';', $meeting_attendantsemail);
         return $meeting_attendantsemail;
-
     }
     public function getApplicationInspEvaUsers($application_code)
     {
@@ -3836,7 +3752,7 @@ class WorkflowController extends Controller
                     $application_status_id = $application_detail->application_status_id;
                 }
                 //update registration table
-                if ($application_detail->application_status_id == 6) {//approved
+                if ($application_detail->application_status_id == 6) { //approved
                     $reg_status_id = 2;
                     $validity_id = 2;
                     $portal_status_id = 10;
@@ -3879,7 +3795,7 @@ class WorkflowController extends Controller
                     'tracking_no' => $application_detail->tracking_no,
                     'usr_from' => $user_id,
                     'usr_to' => $user_id,
-                    'previous_stage' => $from_stage,//directorate_name
+                    'previous_stage' => $from_stage, //directorate_name
                     'current_stage' => $to_stage,
                     'module_id' => $module_id,
                     'sub_module_id' => $sub_module_id,
@@ -3903,7 +3819,6 @@ class WorkflowController extends Controller
                         'created_on' => Carbon::NOW()
                     );
                 }
-
             }
 
             if ($has_appdate_defination == 1) {
@@ -3918,7 +3833,6 @@ class WorkflowController extends Controller
 
                 DB::table('tra_applications_processdefinations')
                     ->insert($application_processdefdata);
-
             }
             //application update
             if ($is_dataammendment_request != 1) {
@@ -3965,7 +3879,7 @@ class WorkflowController extends Controller
     }
 
     public function processSubsequentApprovalApplicationSubmission(Request $request)
-    {//after New...(Renewals,Alterations/Amendments,Withdrawals, etc)
+    { //after New...(Renewals,Alterations/Amendments,Withdrawals, etc)
         $process_id = $request->input('process_id');
         $table_name = $request->input('table_name');
         $selected = $request->input('selected');
@@ -4092,7 +4006,6 @@ class WorkflowController extends Controller
                         'created_on' => Carbon::NOW()
                     );
                 }
-
             }
             if ($has_appdate_defination == 1) {
 
@@ -4106,7 +4019,6 @@ class WorkflowController extends Controller
 
                 DB::table('tra_applications_processdefinations')
                     ->insert($application_processdefdata);
-
             }
 
             //application update
@@ -4161,14 +4073,14 @@ class WorkflowController extends Controller
             'created_by' => $user_id,
             'status_id' => 2
         );
-        if ($module_id == 1) {//Products
+        if ($module_id == 1) { //Products
             $reg_table = 'tra_registered_products';
             $reg_column = 'reg_product_id';
-        } else if ($module_id == 2) {//Premises
+        } else if ($module_id == 2) { //Premises
             $reg_table = 'tra_registered_premises';
             $reg_column = 'reg_premise_id';
             $reg_params['tra_premise_id'] = $application_detail->premise_id;
-        } else if ($module_id == 3) {//GMP
+        } else if ($module_id == 3) { //GMP
             $reg_table = 'registered_manufacturing_sites';
             $reg_column = 'reg_site_id';
             $reg_params['tra_site_id'] = $application_detail->manufacturing_site_id;
@@ -4186,13 +4098,13 @@ class WorkflowController extends Controller
     {
         $table_name = '';
         $table_column = '';
-        if ($module_id == 1) {//Products
+        if ($module_id == 1) { //Products
             $table_name = '';
             $table_column = '';
-        } else if ($module_id == 2) {//Premises
+        } else if ($module_id == 2) { //Premises
             $table_name = 'tra_registered_premises';
             $table_column = 'tra_premise_id';
-        } else if ($module_id == 3) {//GMP
+        } else if ($module_id == 3) { //GMP
             $table_name = 'registered_manufacturing_sites';
             $table_column = 'tra_site_id';
         }
@@ -4206,22 +4118,22 @@ class WorkflowController extends Controller
     }
 
     public function updateRegTableRecordStatusOnApproval($application_detail, $module_id, $status_id)
-    {//New Applications
+    { //New Applications
         $reg_table = '';
         $app_reg_column = '';
         $reg_params = array(
             'approval_date' => Carbon::now()
         );
-        if ($module_id == 1) {//Products
+        if ($module_id == 1) { //Products
             $reg_table = 'tra_registered_products';
             $app_reg_column = 'reg_product_id';
-        } else if ($module_id == 2) {//Premises
+        } else if ($module_id == 2) { //Premises
             $reg_table = 'tra_registered_premises';
             $app_reg_column = 'reg_premise_id';
-        } else if ($module_id == 3) {//GMP
+        } else if ($module_id == 3) { //GMP
             $reg_table = 'registered_manufacturing_sites';
             $app_reg_column = 'reg_site_id';
-        } else if ($module_id == 7) {//Clinical Trial
+        } else if ($module_id == 7) { //Clinical Trial
             $reg_table = 'registered_clinical_trials';
             $app_reg_column = 'reg_clinical_trial_id';
         } else {
@@ -4234,27 +4146,27 @@ class WorkflowController extends Controller
     }
 
     public function updateRegTableRecordTraIDOnApproval($application_detail, $module_id)
-    {//Subsequent Applications (Renewal,Alterations/Amendments, etc)
+    { //Subsequent Applications (Renewal,Alterations/Amendments, etc)
         $table_name = '';
         $tra_table_column = '';
         $reg_id_column = '';
         $current_id_column = '';
-        if ($module_id == 1) {//Products
+        if ($module_id == 1) { //Products
             $table_name = '';
             $tra_table_column = '';
             $reg_id_column = '';
             $current_id_column = '';
-        } else if ($module_id == 2) {//Premises
+        } else if ($module_id == 2) { //Premises
             $table_name = 'tra_registered_premises';
             $tra_table_column = 'tra_premise_id';
             $reg_id_column = 'reg_premise_id';
             $current_id_column = 'premise_id';
-        } else if ($module_id == 3) {//GMP
+        } else if ($module_id == 3) { //GMP
             $table_name = 'registered_manufacturing_sites';
             $tra_table_column = 'tra_site_id';
             $reg_id_column = 'reg_site_id';
             $current_id_column = 'manufacturing_site_id';
-        } else if ($module_id == 7) {//Clinical Trial
+        } else if ($module_id == 7) { //Clinical Trial
             $table_name = 'registered_clinical_trials';
             $tra_table_column = 'tra_clinical_trial_id';
             $reg_id_column = 'reg_clinical_trial_id';
@@ -4419,7 +4331,6 @@ class WorkflowController extends Controller
             }
             $portal_update = false;
             if ($module_id == 1) {
-
             } else if ($module_id == 2) {
                 $portal_update = $this->updateRejectedPremiseApplicationPortal($request, $application_details);
             } else if ($module_id == 3) {
@@ -4683,7 +4594,7 @@ class WorkflowController extends Controller
             echo json_encode($res);
             exit();
         }
-        if ($directive_id == 2 || $directive_id == 4) {//redo inspection(2),evaluation(4)
+        if ($directive_id == 2 || $directive_id == 4) { //redo inspection(2),evaluation(4)
             $invalidate_checklist = true;
         }
         DB::beginTransaction();
@@ -4800,7 +4711,6 @@ class WorkflowController extends Controller
 
                 DB::table('tra_applications_processdefinations')
                     ->insert($application_processdefdata);
-
             }
             $update_params = array(
                 'workflow_stage_id' => $to_stage,
@@ -5124,7 +5034,6 @@ class WorkflowController extends Controller
                 $portal_table = getPortalApplicationsTable($module_id);
 
                 $proceed = updatePortalApplicationStatus($application_id, $portal_status_id, $table_name, $portal_table);
-
             }
 
             if ($has_appdate_defination == 1) {
@@ -5193,12 +5102,10 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
         return \response()->json($res);
-
     }
     // has_appdate_defination
     public function getActionTransitionDetails($action_id)
@@ -5213,7 +5120,7 @@ class WorkflowController extends Controller
     public function getApplicationStatuses(Request $request)
     {
         $workflow_id = $request->input('workflow_id');
-        try {//assumptions no workflow has null module_id
+        try { //assumptions no workflow has null module_id
             $qry1 = DB::table('wf_workflows')
                 ->select('module_id', 'sub_module_id')
                 ->where('id', $workflow_id);
@@ -5238,7 +5145,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5261,7 +5167,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5292,7 +5197,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         }
         return response()->json($res);
     }
@@ -5316,7 +5220,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5338,7 +5241,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5367,7 +5269,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5393,7 +5294,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5422,7 +5322,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5451,7 +5350,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5475,7 +5373,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5495,7 +5392,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5589,7 +5485,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5620,7 +5515,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5788,7 +5682,6 @@ class WorkflowController extends Controller
             } else {
                 $invoice_id = $inv_details->id;
                 $invoice_no = $inv_details->invoice_no;
-
             }
 
             $res = array(
@@ -5797,10 +5690,8 @@ class WorkflowController extends Controller
                 'invoice_no' => $invoice_no,
                 'message' => 'Invoice details saved successfully!!'
             );
-
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -5844,9 +5735,7 @@ class WorkflowController extends Controller
                     $app_details = $app_details['results'];
 
                     $res = updateRecord($table_name, $app_details, $where_app, $ammendment_requestdata, $user_id);
-
                 }
-
             } else {
                 $ammendment_requestdata['requested_on'] = Carbon::now();
                 $ammendment_requestdata['created_on'] = Carbon::now();
@@ -5889,15 +5778,12 @@ class WorkflowController extends Controller
                     'appdata_ammendementrequest_id' => $appdata_ammendementrequest_id
                 );
             }
-
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
         return \response()->json($res);
-
     }
 
     // public function getAllWorkflow(Request $req){
@@ -6057,9 +5943,7 @@ class WorkflowController extends Controller
                     ->where('id', '<', $latest_entry->id)
                     ->update(array('is_done' => 1));
             }
-
         }
-
     }
     public function saveRegistrationCancellationRequest(Request $req)
     {
@@ -6135,14 +6019,11 @@ class WorkflowController extends Controller
                         } else {
                             DB::rollBack();
                             $res = array('message' => 'Failed to cancel application from main table', 'success' => false);
-
                         }
                     } else {
                         DB::rollBack();
                         $res = array('success' => false, 'message' => 'The provided reference has no entries');
                     }
-
-
                 } else {
                     DB::rollBack();
                     $res = array('success' => false, 'message' => 'Missing transaction/cancellation table name from the selected modules');
@@ -6328,7 +6209,6 @@ class WorkflowController extends Controller
                 } else {
                     $res = array('success' => false, 'message' => 'no cancellation table is set for the Module');
                 }
-
             } else {
                 $res = array('success' => false, 'message' => 'Record not found');
             }
@@ -6380,14 +6260,11 @@ class WorkflowController extends Controller
                         } else {
                             DB::rollBack();
                             $res = array('message' => 'Failed to cancel application from cancellation table', 'success' => false);
-
                         }
-
                     } else {
                         DB::rollBack();
                         $res = array('success' => false, 'message' => 'no cancellation table is set for the Module');
                     }
-
                 } else {
                     DB::rollBack();
                     $res = array('success' => false, 'message' => 'Record not found');
@@ -6514,7 +6391,6 @@ class WorkflowController extends Controller
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -6544,7 +6420,6 @@ class WorkflowController extends Controller
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
@@ -6699,9 +6574,6 @@ class WorkflowController extends Controller
             }
 
             DB::commit();
-
-
-
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         } catch (\Throwable $throwable) {
@@ -6749,7 +6621,6 @@ class WorkflowController extends Controller
                 ->join('tra_checklistitems_responses as t2', function ($join) use ($application_code) {
                     $join->on('t2.checklist_item_id', '=', 't1.id')
                         ->where('t2.application_code', $application_code);
-
                 })
                 ->leftJoin('tra_checklistitems_queries as t4', function ($join) use ($query_id) {
                     $join->on('t4.checklist_item_id', '=', 't1.id')
