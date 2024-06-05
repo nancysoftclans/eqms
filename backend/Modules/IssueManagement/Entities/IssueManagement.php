@@ -28,7 +28,9 @@ class IssueManagement extends Model
         'created_on',
         'dola',
         'date_closed',
-        'application_code'
+        'application_code',
+        'workflow_stage_id',
+        'application_status_id'
     ];
 
     public $timestamps = false;

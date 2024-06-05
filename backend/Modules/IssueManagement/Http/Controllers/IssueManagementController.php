@@ -72,6 +72,7 @@ class IssueManagementController extends Controller
                     'complainant_telephone' => $request->complainant_telephone,
                     'complaint_mode_id'     => $request->complaint_mode_id,
                     'complaint_type_id'     => $request->complaint_type_id,
+                    'workflow_stage_id'     => $request->workflow_stage_id,
                     'dola'                   => Carbon::now(),
                     'altered_by'             => $user_id,
                     'application_code' => $application_code
@@ -157,7 +158,9 @@ class IssueManagementController extends Controller
                     'dola' => Carbon::now(),
                     'created_by' => $user_id,
                     'altered_by' => $user_id,
-                    'application_code' => $application_code
+                    'application_code' => $application_code,
+                    'workflow_stage_id' => $data['workflow_stage_id'],
+                    'application_status_id' => $application_status->status_id,
                 );
 
 
@@ -197,8 +200,8 @@ class IssueManagementController extends Controller
     {
         try {
             $results = IssueManagement::from('tra_issue_management_applications as t1')
-                ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
-                ->leftJoin('wf_workflow_stages as t3', 't2.current_stage', '=', 't3.id')
+                ->leftjoin('tra_submissions as t2', 't1.submission_id', 't2.id')
+                ->leftJoin('wf_workflow_stages as t3', 't1.workflow_stage_id', '=', 't3.id')
                 ->leftjoin('wf_processes as t4', 't2.process_id', '=', 't4.id')
                 ->join('par_issue_statuses as t5', 't1.issue_status_id', 't5.id')
                 ->join('users as t6', 't1.created_by', 't6.id')
@@ -210,7 +213,7 @@ class IssueManagementController extends Controller
                     't1.created_on as raised_date',
                     't5.name as issue_status',
                     't1.id as active_application_id',
-                    't2.current_stage as workflow_stage_id',
+                    't1.workflow_stage_id',
                     't1.created_on as creation_date',
                     DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
                 )
