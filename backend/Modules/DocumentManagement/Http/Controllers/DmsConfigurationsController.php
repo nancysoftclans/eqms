@@ -338,68 +338,143 @@ public function getdocdefinationrequirementDetails(Request $req)
 
        public function getNavigatorDetails(Request $req){
         $module_id = $req->module_id;
-    $sub_module_id = $req->sub_module_id;
-    $section_id = $req->section_id;
-    $premise_type_id = $req->premise_type_id;
-    $parent_id = $req->node;
+        $sub_module_id = $req->sub_module_id;
+        $section_id = $req->section_id;
+        $premise_type_id = $req->premise_type_id;
+        $parent_id = $req->node;
 
     try {
-        $results = DB::table('par_navigator_folders as t1')
-            ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
-            ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
-            ->select(
-                //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
-                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
-                 DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),
-               // 't1.name AS navigator_name',
-                't1.id',
-                't2.doc_version AS navigator_version', 
-                't2.doc_version AS navigator_version', 
-                't1.dola',
-                't1.id AS navigator_folder_id',
-                't3.id AS T3ID',
-                't2.application_code'
-
-                
-      
-            )
-            ->groupBy('t1.id');
-
-
-
         if (validateIsNumeric($parent_id)) {
-            $results->where('t1.docparent_id', $parent_id);
-        } else {
-            $results->whereNull('t1.docparent_id');
-        }
- 
-        $results = $results->get();
-        $data = [];
-        $docs = [];
+            //all folders of the parent
+                $folders = DB::table('par_navigator_folders as t1')
+                    ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
+                    ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
+                    ->select(
+                        //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
+                        DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
+                         //DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),
+                       't1.name AS navigator_name',
+                        't1.id',
+                        't1.id AS navigator_folder_id',
+                        't3.id AS T3ID',
+                        't2.application_code',
+                        't2.module_id',
+                        't2.sub_module_id',
+                        't2.workflow_stage_id',
 
-        foreach ($results as $folder) {
-            $doc = DB::table('par_navigator_folders as t1')
-                ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
-                ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
+                        
+              
+                    )
+                    // ->groupBy('t1.id')
+                    ->where('t1.docparent_id', $parent_id)
+                    ->get();
+
+                //all documents of the parent
+                $docs = DB::table('par_navigator_folders as t1')
+                ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
+                ->join('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
                 ->select(
                     DB::raw("true as leaf, RAND() as id"),
-                    't1.name AS navigator_name',
+                    't3.initial_file_name AS navigator_name',
+                    
                     't2.doc_version AS navigator_version', 
                     't2.doc_version AS navigator_version', 
                     't1.dola',
                     't1.id AS navigator_folder_id',
                     't3.id AS T3ID',
-                    't2.application_code'
+                    't3.application_code',
+                    't2.module_id',
+                    't2.sub_module_id',
+                    't2.workflow_stage_id',
+                    't2.process_id',
+          
                 )
-                ->groupBy('t1.id')
-                ->where('t2.application_code', $folder->application_code)
+               // ->groupBy('t1.id')
+                ->WHERE('t2.navigator_folder_id', $parent_id)
                 ->get();
-            
-            $docs[] = $doc; // Adding $doc to $docs array
+
+            //merge both
+            $data = $folders->merge($docs);
+
+
+        } else {
+            $data = DB::table('par_navigator_folders as t1')
+                    ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
+                    ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
+                    ->select(
+                        //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
+                        DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
+                         //DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),
+                       't1.name AS navigator_name',
+                        't1.id',
+                        't1.id AS navigator_folder_id',
+                        't3.id AS T3ID',
+                        't2.application_code',
+                        't2.module_id',
+                        't2.sub_module_id',
+                        't2.workflow_stage_id',
+
+                        
+              
+                    )
+                    // ->groupBy('t1.id')
+                    ->whereNull('t1.docparent_id')
+                    ->get();
         }
-
-        $data = $results->merge($docs);
-
+ 
+        // $results = $results->get();
+        // $data = [];
+        // if(count($results) == 0){
+        //     $docs = DB::table('par_navigator_folders as t1')
+        //         ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
+        //         ->join('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
+        //         ->select(
+        //             DB::raw("true as leaf, RAND() as id"),
+        //             't3.initial_file_name AS navigator_name',
+                    
+        //             't2.doc_version AS navigator_version', 
+        //             't2.doc_version AS navigator_version', 
+        //             't1.dola',
+        //             't1.id AS navigator_folder_id',
+        //             't3.id AS T3ID',
+        //             't3.application_code',
+        //             't2.module_id',
+        //             't2.sub_module_id',
+        //             't2.workflow_stage_id',
+          
+        //         )
+        //        // ->groupBy('t1.id')
+        //         ->WHERE('t2.navigator_folder_id', $parent_id)
+        //         //->whereRaw("(SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.navigator_folder_id = ?) = 0", [$folder->id])
+        //         ->get();
+        //     $data=$docs;
+        // }
+        
+        // foreach ($results as $folder) {
+        //      $docs = DB::table('par_navigator_folders as t1')
+        //     ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
+        //     ->join('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
+        //     ->select(
+        //         DB::raw("true as leaf, RAND() as id"),
+        //         't3.initial_file_name AS navigator_name',
+                
+        //         't2.doc_version AS navigator_version', 
+        //         't2.doc_version AS navigator_version', 
+        //         't1.dola',
+        //         't1.id AS navigator_folder_id',
+        //         't3.id AS T3ID',
+        //         't3.application_code',
+        //         't2.module_id',
+        //         't2.sub_module_id',
+        //         't2.workflow_stage_id',
+      
+        //     )
+        //    // ->groupBy('t1.id')
+        //     ->WHERE('t2.navigator_folder_id', $folder->id)
+        //     //->whereRaw("(SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.navigator_folder_id = ?) = 0", [$folder->id])
+        //     ->get();
+        //     $data = $results->merge($docs);
+        // }
     } catch (\Exception $exception) {
         $data = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
     } catch (\Throwable $throwable) {

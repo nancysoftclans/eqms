@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Renderable;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 
 class AuditManagementController extends Controller
@@ -34,79 +35,92 @@ class AuditManagementController extends Controller
     }
 
     public function saveAuditType(Request $req) {
-        $user_id = \Auth::user()->id;
-        try{
-            $record_id = $req->id;
-            $audit_type_data = array(
-                'audit_type_code' => $req->audit_type_code,
-                'audit_title' => $req->audit_title,
-                'audit_prefix_id' => $req->audit_prefix_id,
+          try {
+             DB::beginTransaction();
+            $user_id = \Auth::user()->id;
+            $post_data = $req->post();
+            $table_name = $post_data['table_name'];
+            $id = $post_data['id'];
+
+            //unset unnecessary values
+            unset($post_data['_token']);
+            unset($post_data['table_name']);
+            unset($post_data['model']);
+            unset($post_data['id']);
+            unset($post_data['unset_data']);
+
+            $table_data = $post_data;
+            //dd($table_data);
+            //add extra params
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+
+
+            $where = array(
+                'id' => $id
             );
-            $con = DB::connection();
+            //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
 
-            $table_name = 'qms_audit_types';
-            $con->beginTransaction();
-            if(validateIsNumeric($record_id)) {
-                $previous_data = getPreviousRecords($table_name,['id'=>$record_id]);
-                // dd($previous_data);
-                $where_clause = array('id' => $record_id);
-                $resp = updateRecord($table_name,$where_clause,$audit_type_data,$user_id);
-                
-                if($resp['success']) {
-                    $res = array
-                    (
-                        'success' => true,
-                        'message' => 'record successfully updated',
-                        'record_id' => $record_id,
-                    );
-                    $con->commit();
-                }
-                else{
+            if (isset($id) && $id != "") {
+                if (recordExists($table_name, $where)) {
 
-                    $res = array(
+                    unset($table_data['created_on']);
+                    unset($table_data['created_by']);
+                    $table_data['dola'] = Carbon::now();
+                    $table_data['altered_by'] = $user_id;
+                    $res = updateRecord($table_name, $where, $table_data);
+                    
+                    if($res['success'] == false) {
+
+                    DB::rollBack();
+                    $res = array(   
                         'success' => false,
-                        'message' => 'record not updated',
-                        'error' => $resp['error']
+                        'message' => 'Details Not Updated',
+                        'error' => $res['message']
                     );
-                    $con->rollBack();
+                }
+                else {
+                    DB::commit();
+                    $res = array(
+                        'success' => true,
+                        'message' => 'Details SuccessFully Updated',
+                        'record_id' => $res['record_id']
+                    );
+                }
+                }
+            } else {
+                $table_data['dola'] = Carbon::now();
+                $res = insertRecord($table_name, $table_data);
+
+                if($res['success'] == false) {
+
+                    DB::rollBack();
+                    $res = array(   
+                        'success' => false,
+                        'message' => 'Details Not Updated',
+                        'error' => $res['message']
+                    );
+                }
+                else {
+                    DB::commit();
+                    $res = array(
+                        'success' => true,
+                        'message' => 'Details SuccessFully Updated',
+                        'record_id' => $res['record_id']
+                    );
                 }
 
             }
-            else {
-                
-                $resp = insertRecord($table_name,$audit_type_data,$user_id);
-                if($resp['success']) {
-                   
-                    $record_id = $resp['record_id'];
-                    $res = array
-                    (
-                        'success' => true,
-                        'message' => 'record successfully updated',
-                        'record_id' => $record_id,
-                    );
-                    $con->commit();
-                }
-                else{
+            //save the documetn extension types
+         
 
-                    $res = array(
-                        'success' => false,
-                        'message' => 'record not updated',
-                        'error' => $resp['message']
-                    );
-                    $con->rollBack();
-                }
-            }
-            
-
-            
-        }
-        catch (\Exception $exception) {
+        } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
 
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
         }
-        return \response()->json($res);
+        return response()->json($res);
 
     }
 
@@ -114,10 +128,7 @@ class AuditManagementController extends Controller
          
         try{
            
-            $audit_types_data = DB::table('qms_audit_types as t1')
-            ->leftJoin('par_audit_types as t2','t1.audit_prefix_id','t2.id')
-            ->select(DB::raw('t1.*,t2.name as audit_prefix_type'))
-            ->get();
+            $audit_types_data = DB::table('par_qms_audit_types as t1')->get();
             
             $res = array(
                 'success' => true,

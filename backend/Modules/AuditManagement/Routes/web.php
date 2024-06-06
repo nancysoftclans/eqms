@@ -12,19 +12,19 @@
 */
 
 use Modules\AuditManagement\Http\Controllers\AuditManagementController;
-use Illuminate\Support\Facades\Route;
+//use Illuminate\Support\Facades\Route;
 
-Route::prefix('auditmanagement')->group(function() {
-    Route::get('/', 'AuditManagementController@index');
-});
 
 Route::group(['prefix' => 'auditManagement', 'middleware' => ['auth:api', 'web']], function() {
     
-    Route::post('/saveAuditType',[AuditManagementController::class,'saveAuditType']);
-    Route::get('/getAuditTypes',[AuditManagementController::class,'getAuditTypes']);
+    Route::post('saveAuditType',[AuditManagementController::class,'saveAuditType']);
+    Route::get('getAuditTypes',[AuditManagementController::class,'getAuditTypes']);
 
-    Route::get('/getAuditTypesMetadata',[AuditManagementController::class, 'getAuditTypeMetaData']);
-    Route::post('/saveAuditTypeMetaData', [AuditManagementController::class, 'saveAuditTypeMetaData']);
-    // Route::get('/getAuditTypeMetaData',[AuditManagementController::class, 'getAuditTypeMetaData']);
+    Route::get('getAuditTypesMetadata',[AuditManagementController::class, 'getAuditTypeMetaData']);
+    Route::post('saveAuditTypeMetaData', [AuditManagementController::class, 'saveAuditTypeMetaData']);
+    // Route::get('/getAuditTypeMetaData',[AuditManagementController::class, 'getAuditTypeMetaData'])
+
+
+    Route::get('index',[AuditManagementController::class, 'index']);
    
 });

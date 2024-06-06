@@ -55,62 +55,8 @@ Ext.define('Admin.view.documentManager.views.grids.ApplicationDocPreviewNavigato
     }, {
         xtype: 'tbspacer',
         width: 20
-    },{
-        xtype: 'hiddenfield',
-        name: 'prodclass_category_id'
-    },{
-        xtype: 'hiddenfield',
-        name: 'premise_type_id'
-    },{
-        xtype: 'hiddenfield',
-        name: 'importexport_permittype_id'
-    },{
-        xtype: 'hiddenfield',
-        name: 'query_ref_id'
-    },{
-        xtype: 'hiddenfield',
-        name: 'isvalidate_uploaded_by'
-    }, 
-    // {
-    //     xtype: 'combo', anyMatch: true,
-    //     fieldLabel: 'Applicable Documents',
-    //     labelWidth: 150,
-    //     valueField: 'id',
-    //     displayField: 'name',
-    //     forceSelection: true,
-    //     name: 'applicable_documents',
-    //     queryMode: 'local',
-    //     width: 500,
-    //     labelStyle: "font-weight:bold",
-    //     bind: {
-    //         hidden: '{isReadOnly}'  // negated
-    //     },
-    //     listeners: {
-    //         beforerender: {
-    //             fn: 'setWorkflowCombosStore',
-    //             config: {
-    //                 pageSize: 1000,
-    //                 proxy: {
-    //                     url: 'documentmanagement/getProcessApplicableDocTypes'
-    //                 }
-    //             },
-    //             isLoad: false
-    //         },
-    //         change: function () {
-    //             var grid = this.up('treepanel'),
-    //                 store = grid.getStore();
-    //             store.load();
-    //         }
-    //     },
-    //     triggers: {
-    //         clear: {
-    //             type: 'clear',
-    //             hideWhenEmpty: true,
-    //             hideWhenMouseOut: false,
-    //             clearOnEscape: true
-    //         }
-    //     }
-    // }
+    },
+  
     ],
     autoScroll: true,
     listeners: {

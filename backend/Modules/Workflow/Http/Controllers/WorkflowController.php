@@ -2698,7 +2698,7 @@ class WorkflowController extends Controller
                     });
 
                 $results = $qry2->get();
-                dd($results);
+        
             }
             //return
             $res = array(

@@ -1,6 +1,6 @@
 <?php
 
-use Illuminate\Http\Request;
+//use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -12,7 +12,9 @@ use Illuminate\Http\Request;
 | is assigned the "api" middleware group. Enjoy building your API!
 |
 */
-
+use Modules\AuditManagement\Http\Controllers\AuditManagementController;
 Route::middleware('auth:api')->get('/auditmanagement', function (Request $request) {
     return $request->user();
 });
+
+

@@ -4,26 +4,26 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
     xtype: 'documenttypegrid',
     itemId: 'documenttypegrid',
     controller: 'documentsManagementvctr',
-    useArrows: true,
-    rootVisible: false,
-    multiSelect: false,
-    singleExpand: true,
-    margin: '0 5 0 0',
-    selType: 'cellmodel',
+    // useArrows: true,
+    // rootVisible: false,
+    // multiSelect: false,
+    //singleExpand: true,
+    //margin: '0 5 0 0',
+    //selType: 'cellmodel',
     // requires: [
     //     'Ext.grid.*',
     //     'Ext.tree.*'
     // ],
-    plugins: [{
-        ptype: 'cellediting',
-        clicksToEdit: 1
-    }],
+    // plugins: [{
+    //     ptype: 'cellediting',
+    //     clicksToEdit: 1
+    // }],
 
-    features: [{
-        ftype: 'searching',
-        minChars: 2,
-        mode: 'local'
-    }],
+    // features: [{
+    //     ftype: 'searching',
+    //     minChars: 2,
+    //     mode: 'local'
+    // }],
     viewConfig: {
         deferEmptyText: false,
         emptyText: 'Nothing to display',
@@ -44,10 +44,12 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 winWidth: '80%',
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
-    },{
-      xtype: "tbspacer",
-      width: 100,
-    },{
+    },
+    // {
+    //   xtype: "tbspacer",
+    //   width: 100,
+    // },
+    {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Module',
         name: 'module_id',
