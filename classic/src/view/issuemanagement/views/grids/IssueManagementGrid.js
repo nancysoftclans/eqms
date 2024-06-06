@@ -100,7 +100,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     {
       ftype: "grouping",
-      startCollapsed: true,
+      startCollapsed: false,
       groupHeaderTpl:
         'Process: {[values.rows[0].data.process_name]}, Stage: {[values.rows[0].data.workflow_stage]} [{rows.length} {[values.rows.length > 1 ? "Items" : "Item"]}]',
       hideGroupedHeader: true,
