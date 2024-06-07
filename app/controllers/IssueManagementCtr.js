@@ -23,6 +23,12 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuereceivingwizard: {
         afterrender: "launchissuereceivingWizard",
       },
+      issuesubmissionwizard: {
+        afterrender: "prepapreIssueApplicationReview",
+      },
+      "issuesubmissionwizard button[name=recommendation]": {
+        click: "AddGeneralComment",
+      },
     },
   },
 
@@ -47,6 +53,16 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       dashboardWrapper.removeAll();
       dashboardWrapper.add({ xtype: sec_dashboard });
     }
+  },
+
+  AddGeneralComment: function (argument) {
+    var form = Ext.widget("applicationcommentsFrm");
+    funcShowCustomizableWindow(
+      "Issue Recommendation",
+      "50%",
+      form,
+      "customizablewindow"
+    );
   },
 
   onPrevCardClick: function (btn) {
@@ -314,5 +330,100 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     }
 
     return true;
+  },
+
+  prepapreIssueApplicationReview: function (pnl) {
+    Ext.getBody().mask("Please wait...");
+    var me = this,
+      activeTab = pnl,
+      application_status_id = activeTab
+        .down("hiddenfield[name=application_status_id]")
+        .getValue(),
+      issuemanagementfrm = activeTab.down("issuemanagementfrm"),
+      complainantdetailsfrm = activeTab.down("complainantdetailsfrm"),
+      active_application_id = activeTab
+        .down("hiddenfield[name=active_application_id]")
+        .getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab
+        .down("hiddenfield[name=sub_module_id]")
+        .getValue(),
+      workflow_stage_id = activeTab
+        .down("hiddenfield[name=workflow_stage_id]")
+        .getValue();
+
+    activeTab.down("button[name=recommendation]").setVisible(true);
+    activeTab.down("button[name=approval]").setVisible(false);
+    activeTab.down("textfield[name=recommendation_id]").setVisible(true);
+    activeTab.down("textfield[name=approval_id]").setVisible(false);
+
+    if (active_application_id) {
+      Ext.Ajax.request({
+        method: "GET",
+        url:
+          "issuemanagement/getIssueManagementDetailsById/" +
+          active_application_id,
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success,
+            results = resp.results,
+            model = Ext.create("Ext.data.Model", results);
+
+          if (success == true || success === true) {
+            issuemanagementfrm.loadRecord(model);
+            complainantdetailsfrm.loadRecord(model);
+            activeTab
+              .down("displayfield[name=workflow_stage]")
+              .setValue(results.workflow_stage);
+            activeTab
+              .down("displayfield[name=tracking_no]")
+              .setValue(results.reference_no);
+            issuemanagementfrm
+              .down("datefield[name=creation_date]")
+              .setValue(new Date(results.creation_date));
+
+            issuemanagementfrm.down("textfield[name=title]").setReadOnly(true);
+            issuemanagementfrm
+              .getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+            complainantdetailsfrm
+              .getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+
+            // Parse the string using JSON.parse() (assuming valid JSON format)
+            const section_ids_array = JSON.parse(results.section_ids);
+            issuemanagementfrm
+              .down("tagfield[name=section_ids]")
+              .setValue(section_ids_array);
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+    }
   },
 });

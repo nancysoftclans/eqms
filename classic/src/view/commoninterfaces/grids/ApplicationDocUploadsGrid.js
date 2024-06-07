@@ -177,7 +177,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         text: 'File Name',
         sortable: true,
         tdCls: 'wrap',
-        // width: 400
+        flex: 1
     },{
         xtype: 'gridcolumn',
         dataIndex: 'document_type',

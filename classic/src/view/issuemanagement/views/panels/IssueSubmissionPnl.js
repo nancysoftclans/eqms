@@ -6,7 +6,7 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueSubmissionPnl", {
   layout: "fit",
   items: [
     {
-      xtype: "issuereceivingwizard",
+      xtype: "issuesubmissionwizard",
     },
   ],
 });
