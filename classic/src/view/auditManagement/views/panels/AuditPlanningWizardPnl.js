@@ -102,19 +102,31 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
         }
         
     ],
-    items: [{
-        xtype: 'tabpanel',
-        layout: 'fit',
-        defaults: {
-            margin: 3
+      items: [{
+            xtype: 'auditsmaindetailspnl',
+            dockedItems: [
+                {
+                    xtype: 'toolbar',
+                    ui: 'footer',
+                    dock: 'top',
+                    margin: 3,
+                }
+            ],
+        }, {
+            xtype: 'docuploadsgrid',
+            title: 'Questionnaire'
+        },{
+            xtype: 'docuploadsgrid',
+            title: 'Findings'
+        },{
+            xtype: 'docuploadsgrid',
+            title: 'Associated items'
         },
-        items: [
-            {
-                xtype: 'auditPlanMainDetailsFrm',
-                title: 'MainDetails',
-            }
-        ]
-    }],
+        {
+            xtype: 'hiddenfield',
+            name: 'active_application_id'
+        }
+    ],
 
     initComponent: function () {
          
@@ -127,17 +139,68 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
             style: {
                 "color": "#90c258"
             },
-            bodyStyle: {
-                "background-color": "#90c258"
+            bodystyle: {
+                "color": "#90c258"
             },
             layout: {
                 pack: 'center'
             },
+            items: [
+                
+                {
+                    step: 0,
+                    iconCls: 'fa fa-university',
+                    enableToggle: true,
+                    pressed: true,
+                    text: 'Audit Details',
+                    max_step:3,
+                    action: 'quickNav', wizard: 'auditPlanningWizardPnl',
+                    handler: 'quickNavigation'
+                }, {
+                    step: 1,
+                    iconCls: 'fa fa-clipboard',
+                    enableToggle: true,
+                    max_step:3,
+                    text: 'Questionnaire',
+                    action: 'quickNav', 
+                    wizard: 'auditPlanningWizardPnl',
+                    handler: 'quickNavigation'
+                },{
+                    step: 2,
+                    iconCls: 'fa fa-search',
+                    enableToggle: true,
+                    max_step:3,
+                    text: 'Findings',
+                    action: 'quickNav', 
+                    wizard: 'auditPlanningWizardPnl',
+                    handler: 'quickNavigation'
+                },{
+                    step: 3,
+                    iconCls: 'fa fa-link',
+                    enableToggle: true,
+                    max_step:3,
+                    text: 'Associated items',
+                    action: 'quickNav', 
+                    wizard: 'auditPlanningWizardPnl',
+                    handler: 'quickNavigation'
+                }
+            ]
         };
         this.bbar = {
             reference: 'navigation-toolbar',
             ui: 'footer',
             items: ['->',
+                 {
+                    text: 'Previous',
+                    ui: 'soft-blue',
+                    iconCls: 'fa fa-arrow-left',
+                    max_step:3,
+                    bind: {
+                        disabled: '{atBeginning}'
+                    },
+                    wizard:'auditPlanningWizardPnl',
+                    handler: 'onPrevCardClick'
+                },
                 {
                     text: 'Save Audit Details',
                     ui: 'soft-blue',
@@ -157,6 +220,18 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     name: 'process_submission_btn',
                     winWidth: '50%',
                     handler: 'showReceivingApplicationSubmissionWin',
+                },
+                 {
+                    text: 'Next',
+                    ui: 'soft-blue',
+                    reference: 'nextbutton',
+                    iconCls: 'fa fa-arrow-right',
+                    iconAlign: 'right',
+                    max_step:3,
+                    bind: {
+                        disabled: '{atEnd}'
+                    },wizard:'auditPlanningWizardPnl',
+                    handler: 'onNextCardClick'
                 }
             ]
         };

@@ -1,4 +1,4 @@
-Ext.define('Admin.view.QMS.auditManagement.views.panels.AuditMgmntDashPnl',{ 
+Ext.define('Admin.view.QMS.auditManagement.views.dashboard.AuditMgmntDashPnl',{ 
     extend: 'Ext.Container',
     xtype: 'auditMgmntDashPnl',
     layout: 'border',
@@ -23,3 +23,24 @@ Ext.define('Admin.view.QMS.auditManagement.views.panels.AuditMgmntDashPnl',{
     ]
 
 });
+
+
+
+// layout: 'border',
+//     items: [{
+//         xtype: 'hiddenfield',
+//         name: 'module_id',
+//         value: 26
+//     },
+//     {
+//             xtype: 'hiddenfield',
+//             name: 'sub_module_id',
+//             value: 101
+//         },
+//       {
+//             xtype: 'qmsdoclistgrid',
+//             region: 'center',
+//             title: 'Active Tasks',
+//             margin: 2
+//         }
+//     ]

@@ -9,7 +9,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
     },
     bodyPadding: 5,
     defaults: {
-        columnWidth: 1,
+        columnWidth: 0.33,
         margin: 5,
         allowBlank: true,
         labelAlign: 'top'

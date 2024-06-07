@@ -5,6 +5,6 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningPnl',{
     layout: 'fit',
 
     items: [{
-        xtype: 'auditPlanningWizardPnl'
+        xtype: 'auditMgmntDashCtn'
     }]
 })

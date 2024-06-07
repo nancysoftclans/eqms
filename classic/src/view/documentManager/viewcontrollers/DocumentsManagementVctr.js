@@ -383,15 +383,16 @@ showEditConfigParamWinFrm: function (item) {
     },
 
 
+    onViewDocumentDetails: function (grid, record) {
+
+        this.fireEvent('viewNavigatorDocDetails', record);
+
+    },
+
     
     onViewDocumentApplication: function (grid, record) {
 
         this.fireEvent('viewApplicationDetails', record);
-
-    },
-    onViewDocumentDetails: function (grid, record) {
-
-        this.fireEvent('onViewDocumentDetails', record);
 
     },
 
@@ -834,5 +835,68 @@ showEditConfigParamWinFrm: function (item) {
         store.removeAll();
         store.load({})
     },
+
+
+//     onViewDocumentDetails: function (item) {
+//     Ext.getBody().mask("Please wait...");
+//     var me = this,
+//       btn = item.up("button"),
+//       record = btn.getWidgetRecord(),
+//       childXtype = item.childXtype,
+//       pnl = Ext.widget('documentsviewpnl'),
+//       ApplicationCode = record.get('application_code'),
+//       ModuleID = record.get('module_id'),
+//       SuboduleID = record.get('sub_module_id'),
+//       grid = Ext.widget('applicationdocpreviewnavigatorgrid'),
+//       WorkFlowStage = record.get('workflow_stage_id');
+      
+//       console.log(ApplicationCode, ModuleID, SuboduleID, WorkFlowStage);
+      
+//       winTitle = "Document",
+//       winWidth = "80%";
+//        pnl.down("hiddenfield[name=application_code]").setValue(ApplicationCode),
+//        pnl.down("hiddenfield[name=module_id]").setValue(ModuleID),
+//        pnl.down("hiddenfield[name=sub_module_id]").setValue(SuboduleID),
+//        pnl.down("hiddenfield[name=workflow_stage_id]").setValue(WorkFlowStage);
+
+  
+//     funcShowCustomizableWindow(
+//       winTitle,
+//       "60%",
+//       pnl,
+//       "customizablewindow"
+//     );
+
+//     me.refreshApplicationDocPreviewNavigatorGrid(pnl);
+//   },
+//   refreshApplicationDocPreviewNavigatorGrid: function (pnl) {
+//     var me = this,
+//         store = me.store,
+//         previewPnl = pnl.down('documentsviewpnl'); // Correctly reference the grid within the panel
+
+//     if (!previewPnl) {
+//         console.error("Error: previewPnl not found. Ensure 'applicationdocpreviewnavigatorgrid' exists within the panel.");
+//         return;
+//     }
+
+//     var application_code = previewPnl.down("hiddenfield[name=application_code]").getValue(),
+//         module_id = previewPnl.down("hiddenfield[name=module_id]").getValue(),
+//         sub_module_id = previewPnl.down("hiddenfield[name=sub_module_id]").getValue(),
+//         workflow_stage = previewPnl.down("hiddenfield[name=workflow_stage_id]").getValue();
+
+//     if (!application_code || !module_id || !sub_module_id || !workflow_stage) {
+//         console.error("Error: One or more hidden fields not found within the panel.");
+//         return;
+//     }
+
+//     store.getProxy().extraParams = {
+//         application_code: application_code,
+//         module_id: module_id,
+//         sub_module_id: sub_module_id,
+//         workflow_stage: workflow_stage
+//     };
+
+//     store.load(); // Load the store with the new parameters
+// },
     
 });

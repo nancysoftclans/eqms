@@ -5,7 +5,7 @@ Ext.define('Admin.view.auditManagement.views.panels.AuditTypesPnl', {
     layout: 'fit',
     items: [
         {
-            xtype: 'auditTypesGrid'
+            xtype: 'audittypesgrid'
         }
     ]
 

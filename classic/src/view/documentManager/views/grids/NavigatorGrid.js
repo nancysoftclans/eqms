@@ -44,6 +44,9 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
     },{
+                    xtype: 'panel',
+                    html: '<h2>Double Click Document To Preview</h2>'
+                },{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Module',
         name: 'module_id',
@@ -183,6 +186,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             isLoad: true
         },
         itemdblclick: 'onViewDocumentDetails'
+        //itemdblclick: 'onViewDocumentApplication'
     },
    
     bbar: [
@@ -279,6 +283,16 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     winTitle: 'Edit Document Type',
                     winWidth: '40%',
                     handler: 'showEditConfigParamWinFrm',bind: {
+            disabled: '{isReadOnly}'
+        }},{
+                    text: 'Preview Document',
+                    iconCls: 'x-fa fa-edit',
+                    tooltip: 'Preview Document',
+                    //action: 'edit',
+                    childXtype: 'documentsviewpnl',
+                    winTitle: 'Edit Document Type',
+                    winWidth: '40%',
+                    handler: 'onViewDocumentDetails',bind: {
             disabled: '{isReadOnly}'
         },
                     stores: '[]'

@@ -1,4 +1,4 @@
-Ext.define('Admin.view.auditManagement.views.panels.AuditMgmntDashWrapperPnl.js', {
+Ext.define('Admin.view.auditManagement.views.dashboard.AuditMgmntDashWrapperPnl.js', {
     extend: 'Ext.Container',
     xtype: 'auditManagementDashWrapperPnl',
     itemId:  'auditManagementDashWrapperPnl',

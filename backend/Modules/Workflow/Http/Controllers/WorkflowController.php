@@ -705,15 +705,7 @@ class WorkflowController extends Controller
     {
         $module_id = $request->input('module_id');
         $sub_module_id = $request->input('sub_module_id');
-        $section_id = $request->input('section_id');
 
-
-        //$premise_type_id = 12;
-        $is_dataammendment_request = $request->input('is_dataammendment_request');
-        $prodclass_category_id = $request->input('prodclass_category_id');
-        $importexport_permittype_id = $request->input('importexport_permittype_id');
-        // $importexport_permittype_id = $request->importexport_permittype_id;
-        $premise_type_id = $request->input('premise_type_id');
 
         try {
             //get workflow id
@@ -721,39 +713,19 @@ class WorkflowController extends Controller
                 't1.module_id' => $module_id,
                 't1.sub_module_id' => $sub_module_id
             );
-            if (validateIsNumeric($prodclass_category_id)) {
-                $where['t1.prodclass_category_id'] = $prodclass_category_id;
-            }
-            if (validateIsNumeric($premise_type_id)) {
-                $where['t1.premise_type_id'] = $premise_type_id;
-            }
-            if (validateIsNumeric($is_dataammendment_request)) {
 
-                $where['t1.is_dataammendment_request'] = $is_dataammendment_request;
-            }
-            if (validateIsNumeric($section_id)) {
-                $where['t1.section_id'] = $section_id;
-            }
-
-            // if(validateIsNumeric($prodclass_category_id)){
-            //     $where['t1.prodclass_category_id'] = $prodclass_category_id;
-            // }
-            if (validateIsNumeric($importexport_permittype_id)) {
-                $where['t1.importexport_permittype_id'] = $importexport_permittype_id;
-            }
 
             $qry = DB::table('wf_processes as t1')
                 ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
                 ->join('wf_workflow_stages as t3', function ($join) {
-                    $join->on('t2.id', '=', 't3.workflow_id')
-                        ->on('t3.stage_status', '=', DB::raw(1));
+                    $join->on('t2.id', '=', 't3.workflow_id');
+                        //->on('t3.stage_status', '=', DB::raw(1));
                 })
                 ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
-                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId', 't1.prodclass_category_id', 't1.importexport_permittype_id', 't1.premise_type_id');
+                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId');
 
             $qry->where($where);
             $results = $qry->first();
-
             //initial status details
             $statusDetails = getApplicationInitialStatus($module_id, $sub_module_id);
             if (!is_null($results)) {
@@ -2633,7 +2605,6 @@ class WorkflowController extends Controller
                     });
 
                 $results = $qry2->get();
-
                 $results = convertStdClassObjToArray($results);
                 $results = decryptArray($results);
 

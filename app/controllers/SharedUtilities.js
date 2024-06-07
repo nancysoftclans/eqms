@@ -227,6 +227,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       refresh: "refreshApplicationDocUploadsGrid",
     },
     applicationdocpreviewnavigatorgrid: {
+      refresh: "refreshApplicationDocUploadsGrid",
+    },
+    applicationdocpreviewnavigatorgrid: {
       refresh: "refreshApplicationDocPreviewNavigatorGrid",
     },
     ctrvariationrequestsgrid: {
@@ -918,14 +921,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     documentsubmissionpnl: {
       afterrender: "prepapreDocumentApplicationScreening",
     },
+    documentsviewpnl: {
+      afterrender: "prepapreDocumentApplicationNavigator",
+    },
     documentsubmissionapprovalpnl: {
       afterrender: "prepapreDocumentApplicationApproval",
     },
     documentreleasepnl: {
       afterrender: "prepapreDocumentApplicationRelease",
-    },
-    documentsviewpnl: {
-      afterrender: "refreshApplicationDocPreviewNavigatorGrid",
     },
     "documenttypetb button[name=disposalpermitstbRegHomeBtn]": {
       click: "documenttypeRegHome",
@@ -950,7 +953,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         setGridStore: "setGridStore",
         setGridTreeStore: "setGridTreeStore",
         viewApplicationDetails: "onViewApplicationDetails",
-        onViewDocumentDetails: "onViewDocumentDetails",
         setCompStore: "setCompStore",
         deleteRecord: "deleteRecordByID",
         showInvoiceReceipts: "showInvoiceReceipts",
@@ -1022,7 +1024,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         showReceivingApplicationSubmissionWin:
           "showReceivingApplicationSubmissionWin",
         getDocumentReleaseRecommendationDetails:
-          "getDocumentReleaseRecommendationDetails",     
+          "getDocumentReleaseRecommendationDetails",    
+          viewNavigatorDocDetails: "onViewNavigatorDocDetails" 
       },
     },
   },
@@ -1771,7 +1774,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     if (!tab) {
       //
       var newTab = Ext.widget(workflow_details.viewtype, {
-        title: title,
+        title: "Document",
         id: view_id,
         closable: true,
       });
@@ -1804,116 +1807,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     }, 300);
   },
 
-  onViewDocumentDetails: function (record) {
-    Ext.getBody().mask("Please wait...");
-    var me = this,
-      //mainTabPanel = me.getMainTabPanel(),
-      mainTabPanel = Ext.widget("documentsviewpnl"),
-      process_id = record.get("process_id"),
-      workflow_stage_id = record.get("workflow_stage_id"),
-      active_application_code = record.get("active_application_code"),
-      workflow_stage = record.get("workflow_stage"),
-      ref_no = record.get("reference_no"),
-      tracking_no = record.get("tracking_no"),
-      isGeneral = record.get("is_general"),
-      view_id = record.get("view_id"),
-      html_id = record.get("destination_html_id"),
-      title_suffix = ref_no,
-      winTitle = "Document",
-      winWidth = "80%";
 
-    workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
-    // if (!workflow_details || workflow_details.length < 1) {
-    //     Ext.getBody().unmask();
-    //     toastr.warning('Problem encountered while fetching workflow details-->Possibly workflow not set!!', 'Warning Response');
-    //     return false;
-    // }
-    // if (!ref_no || ref_no == '' || ref_no == null) {
-    //     title_suffix = tracking_no;
-    // }
-
-    // var tab = mainTabPanel.getComponent(view_id),
-    //     title = workflow_stage + '-' + title_suffix;
-    //     title = workflow_stage; //+ '-' + title_suffix;
-    // if ((isGeneral) && (isGeneral == 1 || isGeneral === 1)) {
-    //     title = workflow_stage;
-    //     view_id = view_id + Math.floor(Math.random() * 100015);
-    // }
-    // if (!tab) {//
-    //     var newTab = Ext.widget(workflow_details.viewtype, {
-    //         title: title,
-    //         id: view_id,
-    //         closable: true
-    //     });
-
-    //     console.log(newTab)
-    //     //set prerequsites
-    //     if(newTab.down('hiddenfield[name=prodclass_category_id]')){
-    //         newTab.down('hiddenfield[name=prodclass_category_id]').setValue(record.get('prodclass_category_id'));
-    //     }
-    //     if(newTab.down('hiddenfield[name=premise_type_id]')){
-    //         newTab.down('hiddenfield[name=premise_type_id]').setValue(record.get('premise_type_id'));
-    //     }
-    //     if(newTab.down('hiddenfield[name=report_type_id]')){
-    //         newTab.down('hiddenfield[name=report_type_id]').setValue(record.get('report_type_id'));
-    //     }
-    //     if(newTab.down('hiddenfield[name=importexport_permittype_id]')){
-    //         newTab.down('hiddenfield[name=importexport_permittype_id]').setValue(record.get('importexport_permittype_id'));
-    //     }
-    //     //updates the access control on the interface to be rendered.
-    //     me.updateVisibilityAccess(newTab, workflow_stage_id);
-    //     //prepare the interface and populates it accordingly
-    //     me.prepareApplicationBaseDetails(newTab, record);
-    //     mainTabPanel.add(newTab);
-    //     //manipulate other details for product medical devices screens
-    //     if(record.get('sub_module_id') == 79){
-    //     }
-
-    //     else {
-    //     if(record.get('section_id') == 4 && record.get('module_id') == 1 && record.get('sub_module_id') != 75){
-    //         if(newTab.down('drugsIngredientsGrid')){
-    //             newTab.down('drugsIngredientsGrid').destroy();
-    //         }
-    //         if(newTab.down('productApiManuctureringGrid')){
-    //             newTab.down('productApiManuctureringGrid').destroy();
-    //         }
-    //         if(newTab.down('productGmpInspectionDetailsGrid')){
-    //             newTab.down('productGmpInspectionDetailsGrid').setTitle('GMP/QMS Inspection Details');
-    //         }
-    //         if(newTab.down('inspectioninothercountriesGrid')){
-    //             newTab.down('inspectioninothercountriesGrid').setTitle('GMP/QMS Inspection In Other Countries');
-    //         }
-    //     }
-    // }
-    //     //set save button
-    //     var sub_module_id = record.get('sub_module_id');
-    // if(sub_module_id == 8 && newTab.down('button[name=save_btn]')){
-    //     newTab.getViewModel().set('isReadOnly', true);
-    //     newTab.down('button[name=save_btn]').action_url = 'saveRenAltProductReceivingBaseDetails';
-    // }
-    // if(sub_module_id == 9 && newTab.down('button[name=save_btn]')){
-    //     newTab.getViewModel().set('isReadOnly', true);
-    //     newTab.down('button[name=save_btn]').action_url = 'saveRenAltProductReceivingBaseDetails';
-    // }
-
-    //var lastTab = mainTabPanel.items.length - 1;
-    // mainTabPanel.setActiveTab(lastTab);
-    funcShowCustomizableWindow(
-      winTitle,
-      "60%",
-      mainTabPanel,
-      "customizablewindow"
-    );
-    // } else {
-    //     me.prepareApplicationBaseDetails(tab, record);
-    //     mainTabPanel.setActiveTab(tab);
-    // }
-
-    Ext.Function.defer(function () {
-      Ext.getBody().unmask();
-      me.updateSubmissionsTable(record, "isRead");
-    }, 300);
-  },
   updateVisibilityAccess: function (me, workflow_stage_id) {
     Ext.Ajax.request({
       url: "workflow/checkWorkflowStageInformationVisibilityMode",
@@ -3042,40 +2936,81 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     };
   },
 
-  refreshApplicationDocPreviewNavigatorGrid: function (me) {
-    var store = me.store,
-      grid = me.up("treepanel"),
-      // decision_id = grid.down('combo[name=approval_id]').getValue(),
-      // approval_id = grid.down('combo[name=recommendation_id]').getValue(),
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      application_code = activeTab
-        .down("hiddenfield[name=application_code]")
-        .getValue(),
-      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
-      section_id = activeTab.down("hiddenfield[name=section_id]").getValue(),
-      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
-      sub_module_id = activeTab
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue(),
-      workflow_stage = activeTab
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue();
+  // refreshApplicationDocPreviewNavigatorGrid: function (me) {
+  //   var 
+  //       store = me.store,
+  //     //grid = me.up("treepanel"),
+  //     // decision_id = grid.down('combo[name=approval_id]').getValue(),
+  //     // approval_id = grid.down('combo[name=recommendation_id]').getValue(),
+  //     //mainTabPanel = this.getMainTabPanel(),
+  //     // mainTabPanel = this.getMainTabPanel(),
+  //     // previewPnl = mainTabPanel.down("#documentsviewpnl"), 
+  //     // activeTab = pnl,
+  //     //  previewPnl = activeTab.down("panel[itemId=documentsviewpnl]");
+  //       previewPnl = Ext.widget('applicationdocpreviewnavigatorgrid');
+
+  //      if (!previewPnl) {
+  //       console.error("Error: previewPnl not found. Ensure 'documentsviewpnl' is the correct itemId or id.");
+  //       return;
+  //   }
+
+  //     application_code = previewPnl.down("hiddenfield[name=application_code]").getValue(),
+  //     module_id = previewPnl.down("hiddenfield[name=module_id]").getValue(),
+  //     sub_module_id = previewPnl.down("hiddenfield[name=sub_module_id]").getValue(),
+  //     workflow_stage = previewPnl.down("hiddenfield[name=workflow_stage_id]").getValue();
+
+  //     console.log(application_code, module_id, sub_module_id, workflow_stage);
+
+  //      if (!application_code || !module_id || !sub_module_id || !workflow_stage) {
+  //       console.error("Error: One or more hidden fields not found within previewPnl.");
+  //       return;
+  //   }
+
+  //   store.getProxy().extraParams = {
+  //     application_code: application_code,
+  //     module_id: module_id,
+  //     sub_module_id: sub_module_id,
+  //     workflow_stage: workflow_stage,
+  //   };
+
+  //   store.load();
+
+  //   /* } else {
+  //            toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
+  //            return false;
+  //        }*/
+  // },
+
+  refreshApplicationDocPreviewNavigatorGrid: function (pnl) {
+    var me = this,
+        store = me.store,
+        previewPnl = pnl.down('applicationdocpreviewnavigatorgrid'); // Correctly reference the grid within the panel
+
+    if (!previewPnl) {
+        console.error("Error: previewPnl not found. Ensure 'applicationdocpreviewnavigatorgrid' exists within the panel.");
+        return;
+    }
+
+    var application_code = pnl.down("hiddenfield[name=application_code]").getValue(),
+        module_id = pnl.down("hiddenfield[name=module_id]").getValue(),
+        sub_module_id = pnl.down("hiddenfield[name=sub_module_id]").getValue(),
+        workflow_stage = pnl.down("hiddenfield[name=workflow_stage_id]").getValue();
+
+    if (!application_code || !module_id || !sub_module_id || !workflow_stage) {
+        console.error("Error: One or more hidden fields not found within the panel.");
+        return;
+    }
 
     store.getProxy().extraParams = {
-      application_code: application_code,
-      process_id: process_id,
-      section_id: section_id,
-      module_id: module_id,
-      sub_module_id: sub_module_id,
-      workflow_stage: workflow_stage,
+        application_code: application_code,
+        module_id: module_id,
+        sub_module_id: sub_module_id,
+        workflow_stage: workflow_stage
     };
 
-    /* } else {
-             toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
-             return false;
-         }*/
-  },
+    store.load(); // Load the store with the new parameters
+},
+
   showApplicationChecklistRevisions: function (btn) {
     var mainTabPanel = this.getMainTabPanel(),
       panel = mainTabPanel.getActiveTab(),
@@ -3884,6 +3819,64 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             grid.down("button[name=add_upload]").setHidden(true);
             activeTab.down("textfield[name=recommendation_id]").setValue(results.recommendation);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+    }
+  },
+
+  prepapreDocumentApplicationNavigator: function (pnl) {
+    Ext.getBody().mask("Please wait...");
+    var me = this,
+      activeTab = pnl;
+      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+      qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
+      grid = activeTab.down("docuploadsgrid"),
+      // grid = activeTab.down('docuploadsgrid'),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+      reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
+
+    if (application_code) {
+      Ext.Ajax.request({
+        method: "GET",
+        url: "documentmanagement/prepapreDocumentApplicationScreening",
+        params: {
+          application_code: application_code,
+        },
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success,
+            results = resp.results,
+            model = Ext.create("Ext.data.Model", results);
+
+          if (success == true || success === true) {
+            grid.down("button[name=add_upload]").setHidden(true);
+            grid.down("textfield[name=recommendation_id]").setHidden(true);
+            grid.down("textfield[name=approval_id]").setHidden(true);
+      
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -12029,6 +12022,76 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         var form = Ext.widget('applicationcommentsFrm');
         funcShowCustomizableWindow('Application Recommendation', '50%', form, 'customizablewindow');
     },
+
+  onViewNavigatorDocDetails: function (record) {
+    Ext.getBody().mask("Please wait...");
+    var me = this,
+      // mainTabPanel = me.getMainTabPanel(),
+      // activeTab = mainTabPanel.getActiveTab(),
+      mainTabPanel = this.getMainTabPanel(), // Assuming this method returns the main tab panel
+      viewtype = mainTabPanel.down("#documentsviewpnl"),
+      process_id = record.get("process_id"),
+      workflow_stage_id = record.get("workflow_stage_id"),
+      workflow_stage = record.get("workflow_stage"),
+      ref_no = record.get("reference_no"),
+      tracking_no = record.get("tracking_no"),
+      isGeneral = record.get("is_general"),
+      view_id = record.get("view_id");
+
+
+    workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
+
+    //console.log(stage_category_id);
+    if (!workflow_details || workflow_details.length < 1) {
+      Ext.getBody().unmask();
+      toastr.warning(
+        "Warning Response",
+        "You're attempting to open a folder, drop the folder down to open a document!!"
+        
+      );
+      return false;
+    }
+    if (!ref_no || ref_no == "" || ref_no == null) {
+      title_suffix = tracking_no;
+    }
+
+    var tab = mainTabPanel.getComponent(view_id),
+      title = workflow_stage + "-" + title_suffix;
+    title = workflow_stage; //+ '-' + title_suffix;
+    if (isGeneral && (isGeneral == 1 || isGeneral === 1)) {
+      title = workflow_stage;
+      view_id = view_id + Math.floor(Math.random() * 100015);
+    }
+    if (!tab) {
+   // Assuming this method returns the main tab panel
+      viewtype = "documentsviewpnl";
+      //
+      var newTab = Ext.widget(viewtype, {
+        title: "Preview Doc",
+        id: view_id,
+        closable: true,
+      });
+
+      //updates the access control on the interface to be rendered.
+      me.updateVisibilityAccess(newTab, workflow_stage_id);
+      me.updateVisibilityAccess(newTab, workflow_stage_id);
+      //prepare the interface and populates it accordingly
+      me.prepareApplicationBaseDetails(newTab, record);
+      mainTabPanel.add(newTab);
+      var sub_module_id = record.get("sub_module_id");
+    
+      var lastTab = mainTabPanel.items.length - 1;
+      mainTabPanel.setActiveTab(lastTab);
+    } else {
+      me.prepareApplicationBaseDetails(tab, record);
+      mainTabPanel.setActiveTab(tab);
+    }
+
+    Ext.Function.defer(function () {
+      Ext.getBody().unmask();
+      me.updateSubmissionsTable(record, "isRead");
+    }, 300);
+  },
 
 
   

@@ -13,18 +13,16 @@ Ext.define('Admin.view.auditManagement.views.toolbars.AuditMgmntTb.js', {
     overflowHandler: 'scroller',
     items: [
         {
-            xtype: 'hiddenfield',
-            name: 'section_id',
-            value: 8
+            text: 'Home',
+            iconCls: 'x-fa fa-home',
+            sec_dashboard:'documentapplicationwrapper',
+            name: 'disposalpermitstbRegHomeBtn'
         },
         {
             text: 'Plan Audit',
-            iconCls: 'x-fa fa-plus',
+            iconCls: 'x-fa fa-plus-square',
             handler: 'onInitiateAuditPlan',
-            xtypeWrapper: '#auditManagementDashWrapperPnl',
-            module_id: 28,
-            app_type: 102,
-            section_id: 8 //N/A
+            app_type: 103
         },
     ]
 });

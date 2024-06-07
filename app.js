@@ -525,7 +525,7 @@ function getBasicWorkflowDetails(module_id, section_id, sub_module_id) {
     return results;
 }
 
-function getInitialWorkflowDetails(module_id, section_id, sub_module_id) {
+function getInitialWorkflowDetails(module_id, sub_module_id) {
     var results = [];
     Ext.Ajax.request({
         method: 'GET',
@@ -533,12 +533,7 @@ function getInitialWorkflowDetails(module_id, section_id, sub_module_id) {
         url: 'workflow/getInitialWorkflowDetails',
         params: {
             module_id: module_id,
-            section_id: section_id,
-            sub_module_id: sub_module_id,
-            // prodclass_category_id: prodclass_category_id,
-            // importexport_permittype_id:importexport_permittype_id,
-            // premise_type_id: premise_type_id,
-            // is_dataammendment_request:is_dataammendment_request
+            sub_module_id: sub_module_id
         },
         headers: {
             'Authorization': 'Bearer ' + access_token
