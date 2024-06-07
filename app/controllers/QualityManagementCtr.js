@@ -27,15 +27,16 @@ Ext.define('Admin.controller.QualityManagementCtr',{
     },
    
 
-    onInitiateNewAuditPlan: function(sub_module_id,section_id,xtypeWrapper,module_id) {
+    onInitiateNewAuditPlan: function(sub_module_id) {
         Ext.getBody().mask('Please wait...');
 
         var me = this,
             mainTabPanel = me.getMainTabPanel(),
             activeTab = mainTabPanel.getActiveTab(),
-            dashboardWrapper = activeTab.down(xtypeWrapper),
+            dashboardWrapper = activeTab.down("#auditManagementDashWrapperPnl"),
+            module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
         
-            workflow_details = getInitialWorkflowDetails(module_id, section_id, sub_module_id);
+            workflow_details = getInitialWorkflowDetails(module_id, sub_module_id);
             if (!workflow_details) {
                 Ext.getBody().unmask();
                 toastr.warning('Problem encountered while fetching workflow details-->Possibly workflow not set!!', 'Warning Response');
@@ -52,7 +53,6 @@ Ext.define('Admin.controller.QualityManagementCtr',{
             workflowContainer.down('hiddenfield[name=workflow_stage_id]').setValue(workflow_details.initialStageId);
             workflowContainer.down('hiddenfield[name=module_id]').setValue(module_id);
             workflowContainer.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
-            workflowContainer.down('hiddenfield[name=section_id]').setValue(section_id);
             dashboardWrapper.add(workflowContainer);
             Ext.Function.defer(function () {
                 Ext.getBody().unmask();

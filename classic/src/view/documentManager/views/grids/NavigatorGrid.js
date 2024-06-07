@@ -44,6 +44,9 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
     },{
+                    xtype: 'panel',
+                    html: '<h2>Double Click Document To Preview</h2>'
+                },{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Module',
         name: 'module_id',

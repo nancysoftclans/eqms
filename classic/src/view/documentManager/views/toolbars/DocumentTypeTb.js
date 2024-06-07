@@ -27,16 +27,6 @@ Ext.define('Admin.view.documentManager.views.toolbars.DocumentTypeTb', {
             iconCls: 'x-fa fa-plus-square',
             handler:'onInitiateDocumentApplication',
             app_type: 101
-            // menu:{
-            //     xtype: 'menu',
-            //     items:[{
-            //         text: 'Create Document',
-            //         iconCls: 'x-fa fa-sitemap',
-            //         handler:'onInitiateDocumentApplication',
-            //         app_type: 101
-            //     }
-            //     ]
-            // }
         },
        
     ]

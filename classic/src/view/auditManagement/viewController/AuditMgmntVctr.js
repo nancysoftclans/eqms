@@ -67,12 +67,9 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
      * New Audit Plan
      */
     onInitiateAuditPlan: function(btn) {
-       var application_type = btn.app_type,
-            section_id= btn.section_id,
-            xtypeWrapper = btn.xtypeWrapper,
-            module_id = btn.module_id;
+       var application_type = btn.app_type;
 
-            this.fireEvent('onInitiateNewAuditPlan',application_type,section_id,xtypeWrapper,module_id);
+            this.fireEvent('onInitiateNewAuditPlan',application_type);
     },
 
     onAuditPlanSchedule: function(btn) {

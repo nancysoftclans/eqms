@@ -21,6 +21,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentsviewPnl', {
             items: ['->', {
                 xtype: 'displayfield',
                 name: 'process_name',
+                hidden: true,
                 fieldLabel: 'Process',
                 fieldStyle: {
                     'color': 'green',
@@ -29,10 +30,12 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentsviewPnl', {
                 }
             }, {
                 xtype: 'tbseparator',
+                hidden: true,
                 width: 20
             }, {
                 xtype: 'displayfield',
                 name: 'workflow_stage',
+                hidden: true,
                 fieldLabel: 'Stage',
                 fieldStyle: {
                     'color': 'green',
@@ -55,11 +58,12 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentsviewPnl', {
                 }
             }, {
                 xtype: 'tbseparator',
+                hidden: true,
                 width: 20
             },{
                 xtype: 'displayfield',
                 name: 'tracking_no',
-               // hidden: true,
+                hidden: true,
                 fieldLabel: 'Tracking No',
                 fieldStyle: {
                     'color': 'green',
@@ -116,139 +120,6 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentsviewPnl', {
                 xtype: 'docuploadsgrid',
                 
             }]
-        },
-        // {
-        //     title: 'Other Details',
-        //     region: 'east',
-        //     width: 800,
-        //     collapsed: true,
-        //     collapsible: true,
-        //     titleCollapse: true,
-        //     items: [
-        //         {
-        //             xtype: 'form',
-        //             bodyPadding: 5,
-        //             defaults: {
-        //                 margin: 2,
-        //                 labelAlign: 'top'
-        //             },
-        //             fieldDefaults: {
-        //                 fieldStyle: {
-        //                     'color': 'green',
-        //                     'font-weight': 'bold'
-        //                 }
-        //             },
-        //             items: [
-        //                 {
-        //                     xtype: 'qmsdoclistfrm',
-        //                     // fieldLabel: 'Applicant Details',
-        //                     // name: 'applicant_details'
-        //                 },
-        //                 // {
-        //                 //     xtype: 'displayfield',
-        //                 //     fieldLabel: 'Premises Details',
-        //                 //     name: 'premises_details'
-        //                 // }
-        //             ]
-        //         }
-        //     ]
-        // },
-        {
-            xtype: 'toolbar',
-            ui: 'footer',
-            scrollable: true,
-            autoScroll: true,
-            region: 'south',
-            height: 45,
-            split: false,
-            defaults: {
-                margin: 5
-            },
-            items: [
-                '->', 
-                // {
-                //     text: 'Preview & documents Permit Details',
-                //     iconCls: 'fa fa-edit',
-                //     isReadOnly: 0,
-                //     is_detached: 1,
-                //     handler:'showApplicationMoreDetails',
-                //     stores: '[]'
-                // },
-                // {
-                //     text: 'Previous Permits',
-                //     iconCls: 'fa fa-upload',
-                //     childXtype: 'previmportexportpermitreleasegrid',
-                //     winTitle: 'Preview Previous Permits',
-                //     winWidth: '80%',
-                //     handler: 'showPrevimportexportPermitreleasegrid',
-                // },  
-                {
-                    text: 'Add Approval Decision',
-                    hidden: true,
-                    iconCls: 'fa fa-plus',
-                    name: 'approval',
-                    handler: 'getDocumentReleaseRecommendationDetails',
-                    approval_frm: 'documentapprovalfrm',
-                    vwcontroller: 'documentsManagementvctr',
-                    stores: '["productApprovalDecisionsStr"]',
-                    table_name: 'tra_documentmanager_application',
-                    is_siginig:0
-                },{
-                    text: 'Recommendation',
-                    hidden: true,
-                    iconCls: 'fa fa-clipboard-check',
-                    name: 'recommendation',
-                    //handler: 'getDocumentReviewRecommendationDetails',
-                    //handler: 'getDocumentReleaseRecommendationDetails',
-
-                    // recomm_frm: 'applicationcommentsFrm',
-                    // vwcontroller: 'documentsManagementvctr',
-                    // stores: '["productApprovalDecisionsStr"]',
-                    // table_name: 'tra_documentmanager_application',
-                    is_siginig:0
-                },
-
-                // {
-                //     text: 'Recommendations & Comments',
-                //     ui: 'soft-blue', 
-                //     iconCls: 'fa fa-clipboard-check',
-                //   //  childXtype: 'applicationcommentspnl',
-                //     winTitle: 'Process Comments',
-                //     winWidth: '60%',
-                //     name:'recommendation',
-                //     handler: 'AddGeneralComment',
-                //     comment_type_id: 3,
-                //     stores: '[]'
-                // },
-                // {
-                //     text: 'Preview Permit/Letter',
-                //     iconCls: 'fa fa-print',
-                //     childXtype: 'previmportexportpermitreleasegrid',
-                //     winTitle: 'Preview permit letter details',
-                //     winWidth: '80%',
-                //     handler: 'printPreviewPermitForApproval',
-                // },
-                // {
-                //     text: 'Submit for signing',
-                //     iconCls: 'fa fa-check',
-                //     handler: 'getPermitReleaseRecommendationDetails',
-                //     approval_frm: 'importexportreviewrecommfrm',
-                //     vwcontroller: 'importexportpermitsvctr',
-                //     stores: '["productApprovalDecisionsStr"]',
-                //     table_name: 'tra_documentmanager_application',
-                //     is_siginig:1
-                // },
-                {
-                    text: 'Submit',
-                    ui: 'soft-blue',
-                    hidden: true,
-                    iconCls: 'fa fa-check',
-                    name: 'process_submission_btn',
-                    table_name: 'tra_documentmanager_application',
-                    winWidth: '50%',
-                    handler: 'showReceivingApplicationSubmissionWin'
-                }
-                ]
         }
     ]
 });

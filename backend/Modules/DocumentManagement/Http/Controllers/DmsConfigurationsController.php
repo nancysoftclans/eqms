@@ -352,15 +352,15 @@ public function getdocdefinationrequirementDetails(Request $req)
                     ->select(
                         //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
                         DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
-                         //DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),
+                         //DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),attachments
                        't1.name AS navigator_name',
                         't1.id',
                         't1.id AS navigator_folder_id',
-                        't3.id AS T3ID',
                         't2.application_code',
                         't2.module_id',
                         't2.sub_module_id',
                         't2.workflow_stage_id',
+                       
 
                         
               
@@ -381,12 +381,13 @@ public function getdocdefinationrequirementDetails(Request $req)
                     't2.doc_version AS navigator_version', 
                     't1.dola',
                     't1.id AS navigator_folder_id',
-                    't3.id AS T3ID',
+                    't3.id AS doc_id',
                     't3.application_code',
                     't2.module_id',
                     't2.sub_module_id',
                     't2.workflow_stage_id',
                     't2.process_id',
+                    't2.tracking_no AS attachments',
           
                 )
                // ->groupBy('t1.id')

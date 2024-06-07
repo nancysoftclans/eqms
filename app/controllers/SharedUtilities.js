@@ -227,6 +227,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       refresh: "refreshApplicationDocUploadsGrid",
     },
     applicationdocpreviewnavigatorgrid: {
+      refresh: "refreshApplicationDocUploadsGrid",
+    },
+    applicationdocpreviewnavigatorgrid: {
       refresh: "refreshApplicationDocPreviewNavigatorGrid",
     },
     ctrvariationrequestsgrid: {
@@ -919,7 +922,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       afterrender: "prepapreDocumentApplicationScreening",
     },
     documentsviewpnl: {
-      afterrender: "prepapreDocumentApplicationScreening",
+      afterrender: "prepapreDocumentApplicationNavigator",
     },
     documentsubmissionapprovalpnl: {
       afterrender: "prepapreDocumentApplicationApproval",
@@ -1771,7 +1774,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     if (!tab) {
       //
       var newTab = Ext.widget(workflow_details.viewtype, {
-        title: title,
+        title: "Document",
         id: view_id,
         closable: true,
       });
@@ -3816,6 +3819,64 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             grid.down("button[name=add_upload]").setHidden(true);
             activeTab.down("textfield[name=recommendation_id]").setValue(results.recommendation);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+    }
+  },
+
+  prepapreDocumentApplicationNavigator: function (pnl) {
+    Ext.getBody().mask("Please wait...");
+    var me = this,
+      activeTab = pnl;
+      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+      qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
+      grid = activeTab.down("docuploadsgrid"),
+      // grid = activeTab.down('docuploadsgrid'),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+      reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
+
+    if (application_code) {
+      Ext.Ajax.request({
+        method: "GET",
+        url: "documentmanagement/prepapreDocumentApplicationScreening",
+        params: {
+          application_code: application_code,
+        },
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success,
+            results = resp.results,
+            model = Ext.create("Ext.data.Model", results);
+
+          if (success == true || success === true) {
+            grid.down("button[name=add_upload]").setHidden(true);
+            grid.down("textfield[name=recommendation_id]").setHidden(true);
+            grid.down("textfield[name=approval_id]").setHidden(true);
+      
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -11975,7 +12036,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       ref_no = record.get("reference_no"),
       tracking_no = record.get("tracking_no"),
       isGeneral = record.get("is_general"),
-      view_id = record.get("view_id"),
+      view_id = record.get("view_id");
 
 
     workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
@@ -11984,8 +12045,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     if (!workflow_details || workflow_details.length < 1) {
       Ext.getBody().unmask();
       toastr.warning(
-        "Problem encountered while fetching workflow details-->Possibly workflow not set!!",
-        "Warning Response"
+        "Warning Response",
+        "You're attempting to open a folder, drop the folder down to open a document!!"
+        
       );
       return false;
     }
