@@ -23,7 +23,7 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
     },
     {
       xtype: "issuemanagementdocuploadsgrid",
-      title: "APPLICABLE DOCUMENTS",
+      title: "ASSOCIATED DOCUMENTS",
     },
     {
       xtype: "hiddenfield",

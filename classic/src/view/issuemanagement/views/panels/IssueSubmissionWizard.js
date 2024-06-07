@@ -1,8 +1,8 @@
 Ext.define(
-  "Admin.view.issuemanagement.views.panels.IssueReceivingWizard",
+  "Admin.view.issuemanagement.views.panels.IssueSubmissionWizard",
   {
     extend: "Ext.panel.Panel",
-    alias: "widget.issuereceivingwizard",
+    alias: "widget.issuesubmissionwizard",
     padding: "2 0 2 0",
     requires: ["Ext.layout.container.*", "Ext.toolbar.Fill"],
     reference: "wizardpnl",
@@ -126,34 +126,33 @@ Ext.define(
     ],
     initComponent: function () {
       var me = this;
-      this.tbar = {
-        reference: "progress",
-        itemId: "progress_tbar",
-        defaultButtonUI: "wizard-blue",
-        cls: "wizardprogressbar",
-        style: {
-          color: "#90c258",
-        },
-        bodystyle: {
-          color: "#90c258",
-        },
-        layout: {
-          pack: "center",
-        },
-        items: [
-          {
-            step: 0,
-            iconCls: "fa fa-exclamation-triangle",
-            enableToggle: true,
-            pressed: true,
-            text: "ISSUE MANAGEMENT DETAILS",
-            max_step: 1,
-            action: "quickNav",
-            wizard: "issuereceivingwizard",
-            handler: "quickNavigation",
-          },
-        ],
-      };
+      // this.tbar = {
+      //   reference: "progress",
+      //   itemId: "progress_tbar",
+      //   defaultButtonUI: "wizard-blue",
+      //   cls: "wizardprogressbar",
+      //   style: {
+      //     color: "#90c258",
+      //   },
+      //   bodystyle: {
+      //     color: "#90c258",
+      //   },
+      //   layout: {
+      //     pack: "center",
+      //   },
+      //   items: [
+      //     {
+      //       step: 0,
+      //       iconCls: "fa fa-exclamation-triangle",
+      //       enableToggle: true,
+      //       pressed: true,
+      //       text: "ISSUE MANAGEMENT DETAILS",
+      //       max_step: 1,
+      //       action: "quickNav",
+      //       wizard: "issuereceivingwizard",
+      //     },
+      //   ],
+      // };
       this.bbar = {
         reference: "navigation-toolbar",
         ui: "footer",
@@ -189,6 +188,18 @@ Ext.define(
             action_url: "issuemanagement/saveNewReceivingBaseDetails",
             wizard: "issuereceivingwizard",
             handler: "saveIssueManagementApplicationReceivingBaseDetails",
+            hidden: true,
+          },
+          {
+            text: "Recommendations & Comments",
+            ui: "soft-blue",
+            iconCls: "fa fa-clipboard-check",
+            childXtype: "applicationcommentspnl",
+            winTitle: "Process Comments",
+            winWidth: "60%",
+            name: "recommendation",
+            comment_type_id: 3,
+            stores: "[]",
           },
           {
             text: "Submit Application",
@@ -210,33 +221,20 @@ Ext.define(
             stores: '["productApprovalDecisionsStr"]',
             table_name: "tra_documentmanager_application",
             is_siginig: 0,
-          },
-
-          {
-            text: "Recommendations & Comments",
-            ui: "soft-blue",
-            iconCls: "fa fa-clipboard-check",
-            childXtype: "applicationcommentspnl",
-            winTitle: "Process Comments",
-            winWidth: "60%",
-            name: "recommendation",
-            comment_type_id: 3,
-            stores: "[]",
-          },
-          {
-            text: "Next",
-            ui: "soft-blue",
-            reference: "nextbutton",
-            iconCls: "fa fa-arrow-right",
-            iconAlign: "right",
-            max_step: 1,
-            bind: {
-              disabled: "{atEnd}",
-            },
-            wizard: "issuereceivingwizard",
-            handler: "onNextCardClick",
-            hidden: true,
-          },
+          },          
+          // {
+          //   text: "Next",
+          //   ui: "soft-blue",
+          //   reference: "nextbutton",
+          //   iconCls: "fa fa-arrow-right",
+          //   iconAlign: "right",
+          //   max_step: 1,
+          //   bind: {
+          //     disabled: "{atEnd}",
+          //   },
+          //   wizard: "issuereceivingwizard",
+          //   handler: "onNextCardClick",
+          // },
         ],
       };
       me.callParent(arguments);

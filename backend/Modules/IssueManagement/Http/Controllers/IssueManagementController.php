@@ -75,7 +75,8 @@ class IssueManagementController extends Controller
                     'workflow_stage_id'     => $request->workflow_stage_id,
                     'dola'                   => Carbon::now(),
                     'altered_by'             => $user_id,
-                    'application_code' => $application_code
+                    'application_code' => $application_code,
+                    'process_id' => $request->process_id,
                 ]);
                 $IssueManagement->save();
                 //End Update
@@ -163,6 +164,7 @@ class IssueManagementController extends Controller
                     'application_status_id' => $application_status->status_id,
                     'reference_no' => $ref_number,
                     'tracking_no' => $ref_number,
+                    'process_id' => $process_id,
                 );
 
 
