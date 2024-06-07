@@ -223,7 +223,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorSelectFolderGrid', {
         sortable: true
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'id',
+        dataIndex: 'doc_id',
         text: 'ID',
         flex: 1
     },{
