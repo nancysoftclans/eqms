@@ -282,6 +282,77 @@ public function getdocdefinationrequirementDetails(Request $req)
     }
     return $res;
 }
+
+public function getArchivedDocdDetails(Request $req)
+{
+ 
+    try {
+     $results = DB::table('tra_documentmanager_archive as t1')
+    ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+    ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
+    ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
+    ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
+    ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
+    ->leftJoin('par_navigator_folders as t7', 't1.navigator_folder_id', '=', 't7.id')
+    ->select(
+        DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
+        't1.doc_title AS mtype',
+        't2.name AS document_type',
+        't6.name AS status',
+        't5.name AS process_name',
+        't7.name AS navigator_name',
+        't1.*',
+        // DB::raw("(SELECT t2.navigator_folder_name
+        //   FROM tra_documentmanager_application t2
+        //   WHERE t1.navigator_folder_id = t2.id) as navigator_name")
+
+    )->get();
+
+        $results = convertStdClassObjToArray($results);
+        $res = decryptArray($results);
+    } catch (\Exception $exception) {
+        $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    } catch (\Throwable $throwable) {
+        $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    }
+    return $res;
+}
+    public function getlivedocumentDetails(Request $req)
+    {
+ 
+    try {
+     $results = DB::table('tra_documentmanager_application as t1')
+    ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+    ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
+    ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
+    ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
+    ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
+    ->leftJoin('par_navigator_folders as t7', 't1.navigator_folder_id', '=', 't7.id')
+    ->select(
+        DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
+        't1.doc_title AS mtype',
+        't2.name AS document_type',
+        't6.name AS status',
+        't5.name AS process_name',
+        't7.name AS navigator_name',
+        't1.*',
+        // DB::raw("(SELECT t2.navigator_folder_name
+        //   FROM tra_documentmanager_application t2
+        //   WHERE t1.navigator_folder_id = t2.id) as navigator_name")
+
+    )
+     ->where('t1.application_status_id',4)
+     ->get();
+
+        $results = convertStdClassObjToArray($results);
+        $res = decryptArray($results);
+    } catch (\Exception $exception) {
+        $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    } catch (\Throwable $throwable) {
+        $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    }
+    return $res;
+    }
     public function getdoctypesDetails(Request $req){
     $module_id = $req->module_id;
     $sub_module_id = $req->sub_module_id;
@@ -423,59 +494,6 @@ public function getdocdefinationrequirementDetails(Request $req)
                     ->get();
         }
  
-        // $results = $results->get();
-        // $data = [];
-        // if(count($results) == 0){
-        //     $docs = DB::table('par_navigator_folders as t1')
-        //         ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
-        //         ->join('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
-        //         ->select(
-        //             DB::raw("true as leaf, RAND() as id"),
-        //             't3.initial_file_name AS navigator_name',
-                    
-        //             't2.doc_version AS navigator_version', 
-        //             't2.doc_version AS navigator_version', 
-        //             't1.dola',
-        //             't1.id AS navigator_folder_id',
-        //             't3.id AS T3ID',
-        //             't3.application_code',
-        //             't2.module_id',
-        //             't2.sub_module_id',
-        //             't2.workflow_stage_id',
-          
-        //         )
-        //        // ->groupBy('t1.id')
-        //         ->WHERE('t2.navigator_folder_id', $parent_id)
-        //         //->whereRaw("(SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.navigator_folder_id = ?) = 0", [$folder->id])
-        //         ->get();
-        //     $data=$docs;
-        // }
-        
-        // foreach ($results as $folder) {
-        //      $docs = DB::table('par_navigator_folders as t1')
-        //     ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
-        //     ->join('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
-        //     ->select(
-        //         DB::raw("true as leaf, RAND() as id"),
-        //         't3.initial_file_name AS navigator_name',
-                
-        //         't2.doc_version AS navigator_version', 
-        //         't2.doc_version AS navigator_version', 
-        //         't1.dola',
-        //         't1.id AS navigator_folder_id',
-        //         't3.id AS T3ID',
-        //         't3.application_code',
-        //         't2.module_id',
-        //         't2.sub_module_id',
-        //         't2.workflow_stage_id',
-      
-        //     )
-        //    // ->groupBy('t1.id')
-        //     ->WHERE('t2.navigator_folder_id', $folder->id)
-        //     //->whereRaw("(SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.navigator_folder_id = ?) = 0", [$folder->id])
-        //     ->get();
-        //     $data = $results->merge($docs);
-        // }
     } catch (\Exception $exception) {
         $data = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
     } catch (\Throwable $throwable) {

@@ -173,9 +173,10 @@ class DocumentManagementController extends Controller
             $process_id = $request->input('process_id');
             $workflow_stage_id = $request->input('workflow_stage_id');
             $application_status_id = $request->input('application_status_id');
-            $module_id = 26;
             $zone_id = $request->input('zone_id');
-            $sub_module_id = 101;
+            $module_id = $request->input('module_id');
+            $sub_module_id = $request->input('sub_module_id');
+
 
             $user_id = $this->user_id;
             $app_data = array(
@@ -188,12 +189,9 @@ class DocumentManagementController extends Controller
                 "doc_title" => $request->input('doc_title'),
                 "owner_user_id" => $request->input('owner_user_id'),
                 "owner_group_id" => $request->input('owner_group_id'),
-                "has_parent_level" => $request->input('has_parent_level'),
-                "docparent_id" => $request->input('docparent_id'),
                 "doc_description" => $request->input('doc_description'),
                 "owner_type_id" => $request->input('owner_type_id'),
                 "doc_version" => $request->input('doc_version'),
-                "assessment_date" => $request->input('assessment_date'),
                 "application_status_id" => $request->input('application_status_id'),
                 "document_type_id" => $request->input('document_type_id'),
                 "navigator_folder_id" => $request->input('navigator_folder_id'),
@@ -201,6 +199,8 @@ class DocumentManagementController extends Controller
             );
 
             $applications_table = 'tra_documentmanager_application';
+
+
 
             if (validateIsNumeric($application_code)) {
                 //update
@@ -212,30 +212,36 @@ class DocumentManagementController extends Controller
 
                 if (recordExists($applications_table, $where_app)) {
 
-                    //$app_details = getTableData($applications_table, $where_app);
+                    $apps_tableData = getTableData($applications_table, $where_app);
+                  
                     $app_details = getPreviousRecords($applications_table, $where_app);
-
 
                     if ($app_details['success'] == false) {
                         return $app_details;
                     }
                     $app_details = $app_details['results'];
 
-
                     $res =  updateRecord($applications_table,  $where_app, $app_data, $user_id);
+
+                   // $previous_data = $app_details[0];
+
+                    unset($apps_tableData['id']);
+
+                    $res = insertRecord('tra_documentmanager_archive', $apps_tableData, $user_id);
+                    
                 }
 
-                $application_code = $app_details[0]['application_code']; //$app_details->application_code;
-                $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
+                // $application_code = $app_details[0]['application_code']; //$app_details->application_code;
+                // $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
 
 
 
-                $res['application_code'] = $application_code;
-                $res['ref_no'] = $ref_number;
-                $res['tracking_no'] = $ref_number;
-                if ($res['success']) {
-                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-                } 
+                // $res['application_code'] = $application_code;
+                // $res['ref_no'] = $ref_number;
+                // $res['tracking_no'] = $ref_number;
+                // if ($res['success']) {
+                //     initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+                // } 
             } else {
                 $zone_code = getSingleRecordColValue('par_zones', array('id' => $zone_id), 'zone_code');
                 $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');

@@ -45,6 +45,7 @@ Route::group(['prefix' => 'workflow','middleware' => ['auth:api', 'web']], funct
     Route::get('getSystemSubModules', [WorkflowController::class, 'getSystemSubModules']);
     Route::get('getProcessApplicableChecklistCategories', [WorkflowController::class, 'getProcessApplicableChecklistCategories']);
     Route::get('getProcessEditableFormFields', [WorkflowController::class, 'getProcessEditableFormFields']);
+    Route::get('getInitialLiveDocumentCreationWorkflowDetails', [WorkflowController::class, 'getInitialLiveDocumentCreationWorkflowDetails']);
     Route::get('getProcessEditableOtherParts', [WorkflowController::class, 'getProcessEditableOtherParts']);
     Route::get('getInitialDocumentCreationWorkflowDetails', [WorkflowController::class, 'getInitialDocumentCreationWorkflowDetails']);
     //Route::get('getProcessApplicableChecklistTypes', [WorkflowController::class, 'getProcessApplicableChecklistTypes']);

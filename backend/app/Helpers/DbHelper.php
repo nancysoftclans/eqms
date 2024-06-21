@@ -718,6 +718,8 @@ class DbHelper
         $qry = DB::connection($col)->table($table_name)
             ->where($where);
         $results = $qry->first();
+
+        $results = self::convertStdClassObjToArray($results);
         return $results;
     }
 
