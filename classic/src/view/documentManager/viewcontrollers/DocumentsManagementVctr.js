@@ -848,6 +848,8 @@ showEditConfigParamWinFrm: function (item) {
         this.fireEvent('onViewLiveDocumentDetails', application_type, submodule_id);
     },
 
+  
+
 
 //     onViewDocumentDetails: function (item) {
 //     Ext.getBody().mask("Please wait...");

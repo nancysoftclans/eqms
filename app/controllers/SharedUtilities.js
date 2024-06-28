@@ -226,6 +226,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     applicationdocuploadsgrid: {
       refresh: "refreshApplicationDocUploadsGrid",
     },
+    applicationdocreleasegrid: {
+      refresh: "refreshApplicationDocUploadsGrid",
+    },
     applicationdocpreviewnavigatorgrid: {
       refresh: "refreshApplicationDocUploadsGrid",
     },
@@ -3907,7 +3910,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       grid = Ext.widget("applicationdocuploadsgrid"),
       application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
-      grid = activeTab.down("docuploadsgrid"),
+      grid = activeTab.down("docreleasegrid"),
       // grid = activeTab.down('docuploadsgrid'),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),

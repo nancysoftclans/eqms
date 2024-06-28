@@ -38,6 +38,7 @@ Ext.define('Admin.controller.NewReportsCtr', {
                 // viewApplicationRecommendationLogs: 'viewApplicationRecommendationLogs',
                 // onReProductRegApplication: 'onReProductRegApplication',
                 // doSaveResearchFindings: 'doSaveResearchFindings'
+                   generateDocumentPermit:'generateDocumentPermit'
             }
         }
     },
@@ -89,6 +90,49 @@ Ext.define('Admin.controller.NewReportsCtr', {
                                 to_date: to_date
         };
     },
+
+    generateDocumentPermit:function(application_code,module_id,sub_module_id) {
+        Ext.getBody().mask();
+          Ext.Ajax.request({
+                          url: 'reports/generateDocumentPermit',
+                          method: 'GET',
+                          params: {
+                              application_code:application_code,
+                              module_id: module_id,
+                              sub_module_id:sub_module_id,
+                             
+                          },
+                          headers: {
+                              'Authorization': 'Bearer ' + access_token,
+                              'X-CSRF-Token': token
+                          },
+                          success: function (response) {
+                              Ext.getBody().unmask();
+                              var resp = Ext.JSON.decode(response.responseText),
+                                  success = resp.success;
+                              document_url = resp.document_url;
+                              if (success == true || success === true) {
+                                  
+                                  print_report(document_url);
+                                  
+                              } else {
+                                  toastr.error(resp.message, 'Failure Response');
+                              }
+                          },
+                          failure: function (response) {
+                              Ext.getBody().unmask();
+                              var resp = Ext.JSON.decode(response.responseText),
+                                  message = resp.message;
+                              toastr.error(message, 'Failure Response');
+                          },
+                          error: function (jqXHR, textStatus, errorThrown) {
+                              Ext.getBody().unmask();
+                              toastr.error('Error downloading data: ' + errorThrown, 'Error Response');
+                          }
+                  });
+                  
+              
+      },
     //     //                sub_module_id = frm.down('combo[name=sub_module_id]').getValue();
                     //                console.log(sub_module_id);
                     //                from_date = frm.down('datefield[name=from_date]').getValue(),

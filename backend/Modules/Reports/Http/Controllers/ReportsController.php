@@ -9625,4 +9625,187 @@ public function printAdministrativeSubmissionResponses(Request $req)
         }
         return \response()->json($res);
     }
+
+    public function generateDocumentPermit(Request $req){
+	try{
+				$application_code = $req->application_code;
+				$record = DB::table('tra_documentmanager_application as t1')
+										// ->leftJoin('tra_premises as t2', 't1.premise_id', 't2.id')
+										// ->leftJoin('wb_trader_account as t3', 't1.applicant_id', 't3.id')
+										// ->leftJoin('par_districts as t4', 't2.district_id', 't4.id')
+										// ->leftJoin('par_regions	 as t5', 't2.region_id', 't5.id')
+										// ->leftJoin('par_countries	 as t6', 't2.country_id', 't6.id')
+										// ->leftJoin('par_premises_types	 as t7', 't2.premise_type_id', 't7.id')
+										// ->select('t1.*','t2.*', 't8.*', 't3.name as applicant_name', 't4.name as district_name','t7.name as premise_type', 't7.permit_type_title', 't5.name as region_name', 't6.name as country_name', 't8.permit_signatory as permit_approval', 't7.*')
+										 ->join('tra_managerpermits_review as t2', 't1.application_code','t2.application_code' )
+										->where('t1.application_code',$application_code)
+										->first();
+
+				if($record){
+
+					$decision_id = $record->decision_id;
+					//$premise_type_id = $record->premise_type_id;
+
+							if($decision_id ==1){
+									//Pharmaceutical License WholeSale
+								//	Agro-Veterinary Shop
+								//Health Shop
+								//Hospital and Retail Pharmacy
+								//Dispensing Certificate
+								$org_info = $this->getOrganisationInfo();
+
+															$pdf = new PdfLettersProvider();
+
+dd($pdf);
+															$pdf->AddPage();
+																$template_url = base_path('/');
+																$pdf->setSourceFile($template_url."resources/templates/certificate_template.pdf");
+																// import page 1
+																$tplId = $pdf->importPage(1);
+																$pdf->useTemplate($tplId,0,0);
+																$pdf->setPageMark();
+
+																$logo = getcwd() . '/resources/images/zamra-logo.png';
+																$pdf->Image($logo, 86, 18, 40, 35);
+																$style = array(
+																	'border' => 0,
+																	'vpadding' => 'auto',
+																	'hpadding' => 'auto',
+																	'fgcolor' => array(0,0,0),
+																	'bgcolor' => false, //array(255,255,255)
+																	'module_width' => 1, // width of a single module in points
+																	'module_height' => 1 // height of a single module in points
+															);
+															$pdf->write2DBarcode(strtoupper($record->applicant_name).':'.$application_code.':'.$record->permit_no, 'QRCODE,H',170, 18, 20, 20, $style, 'N');
+																$pdf->SetFont('times','B',9);
+															$pdf->SetFont('times','B',9);
+															$pdf->Cell(0,1,'',0,1);
+
+															$pdf->Cell(0,4,'FORM Iv',0,1,'R');
+															$pdf->Cell(0,4,'(Regulation 6)',0,1,'R');
+															$pdf->SetFont('times','B',13);
+															$pdf->Cell(0,6,'',0,1);
+															$pdf->Cell(0,12,'',0,1);
+															$pdf->Cell(0,4,'The Medicines and Allied Substances Act, 2013',0,1,'C');
+
+															$pdf->SetFont('times','B',12);
+															$pdf->Cell(0,4,'(Act No. 3 of 2013)',0,1,'C');
+															//$pdf->Cell(0,30,'',0,1);
+															$pdf->Cell(0,5,'',0,1);
+
+															$regulation_title = "The Medicines and Allied Substances (Certificate of Registration) Regulations, 2017";
+
+															$pdf->Cell(0,4,$regulation_title,0,1,'C');
+
+															$pdf->Cell(0,5,'',0,1);
+
+															$pdf->SetFont('times','B',13);	$pdf->ln();
+															$pdf->Cell(0,5,'CERTIFICATE OF REGISTRATION',0,1,'C');
+															$pdf->SetFont('times','B',11);
+															$pdf->ln();
+															$pdf->Cell(0,8,' No: '.$record->premise_reg_no,0,1,'R');
+															$pdf->SetFont('times','',11);
+															$pdf->SetFont('times','B',11);
+
+															$pdf->setCellHeightRatio(2.4);
+															$pdf->SetFont('times','',11);
+															$template = "<p  align='justify'>This is to certify that (Name of ".$record->premise_type." ".$record->name ."  of (Physical Address) ".$record->physical_address.", ".$record->postal_address.", ".$record->region_name.", ".$record->country_name." is registered as a ".$record->premise_type;
+															$pdf->WriteHTML($template, true, false, true, true);
+
+															$pdf->SetFont('times','',11);
+															$pdf->Cell(0,8,'The terms and conditions of the certificate or registration are attached herewith',0,1);
+															$pdf->SetFont('times','',11);
+															$pdf->ln();
+															$pdf->ln();
+
+															$pdf->Cell(0,8,'This Certificate is issued on '.formatDate($record->approval_date),0,0,'C');
+
+
+																	$director_details = getPermitSignatoryDetails();
+																	$dg_signatory = $director_details->director_id;
+																	$director = $director_details->director;
+																	$is_acting_director = $director_details->is_acting_director;
+
+																	$permit_approval = $record->permit_approval;
+																	$approved_by = $record->approved_by;
+																	if($dg_signatory != $approved_by){
+																		$signatory = $approved_by;
+																	}
+																	else{
+																		$signatory = $dg_signatory;
+																	}
+																	$pdf->Ln();
+																	$pdf->Ln();
+															$signature = getUserSignatureDetails($signatory);
+															$signature = getcwd() . '/backend/resources/templates/signatures_uploads/'.$signature;
+															$startY = $pdf->GetY();
+																	$startX =$pdf->GetX();
+															$pdf->Image($signature,$startX+75,$startY-8,30,12);
+
+															$pdf->Cell(105,0,'',0,0);
+
+																	$pdf->Ln();
+																	$pdf->Cell(0,10,'...............................................................', 0,1,'C');
+
+																	$title = "Director-General";
+																	if($dg_signatory != $approved_by){
+																		$title = 'Acting '.$title;
+																	}else{
+																		if($is_acting_director ==1){
+																			$title = 'Acting '.$title;
+																		}
+
+																	}
+
+																	$pdf->Cell(0,10,$title, 0,0,'C');
+															$pdf->AddPage();
+
+															$pdf->SetFont('times','B',11);
+															$pdf->Cell(0,8,'TERMS AND CONDITIONS',0,1);
+
+															$pdf->SetFont('times','',11);
+															$pdf->MultiCell(11,11,'1.',0,'',0,0);
+
+															$pdf->MultiCell(0,11,'The certificate of registration shall be displayed conspicuously on the premises ',0,'',0,1);
+
+															$pdf->MultiCell(11,11,'2.',0,'',0,0);
+															$pdf->MultiCell(0,11,'The holder of the certificate of registration share, withing 14 dayes of the changes occurring notify the Authority of any changes in the ownership physical address, structure of the place of business, name and oction of the pharmacy, change of personnel responsible for the management or control of the pharmacy.',0,'',0,1);
+
+															$pdf->MultiCell(11,11,'3.',0,'',0,0);
+															$pdf->MultiCell(0,11,'The holder of the certificate of registration shall submit annual returns of no change returns by 31st March of the following finacial Year.',0,'',0,1);
+															$pdf->MultiCell(11,11,'4.',0,'',0,0);
+															$pdf->MultiCell(0,11,'The certificate of registration is not transferrable without written approval of the Authority.',0,'',0,1);
+
+															$pdf->MultiCell(11,11,'5.',0,'',0,0);
+															$pdf->MultiCell(0,11,'Where the certificate of registration is surrendered, the certificate of registration shall be considred cancelled.',0,'',0,1);
+															$pdf->MultiCell(11,11,'6.',0,'',0,0);
+															$pdf->MultiCell(0,11,'Where the certificate of registration is cancelled, the holder of the certificate shall surrender it to the Authority.',0,'',0,1);
+
+															$pdf->MultiCell(11,11,'7.',0,'',0,0);
+															$pdf->MultiCell(0,11,'Non-compliance with the terms and conditions of the certificate of registration shall result in the suspension or cancellation of the certificate',0,'',0,1);
+															$pdf->OutPut('Certificate of Registration.pdf');
+
+							}
+							else{
+
+							//	Letter of Rejection
+							}
+
+
+				}
+				else{
+
+					$res = array('success'=>false, 'message'=>'Premises Application not found, contact system admin');
+				}
+
+		}catch (\Exception $exception) {
+					$res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+		} catch (\Throwable $throwable) {
+					$res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+		}
+		return response()->json($res);
+
+
+}
 }

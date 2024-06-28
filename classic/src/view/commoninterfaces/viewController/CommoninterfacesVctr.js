@@ -3072,4 +3072,11 @@ func_setDocumentGridStore: function(me){
     autoGenerateChecklistBasedQueries:function(btn) {
         this.fireEvent('autoGenerateChecklistBasedQueries', btn);
     },
+      generateDocumentPermit: function (item) {
+        var record = item.getWidgetRecord(),
+            application_code = record.get('application_code');
+            module_id = record.get('module_id');
+            sub_module_id = record.get('sub_module_id');
+        this.fireEvent('generateDocumentPermit', application_code,module_id,sub_module_id);
+    },
 });
