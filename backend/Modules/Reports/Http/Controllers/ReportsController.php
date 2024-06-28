@@ -10,8 +10,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-use App\Modules\Reports\Providers\PdfProvider;
-use App\Modules\Reports\Providers\PdfLettersProvider;
+use Modules\Reports\Providers\PdfProvider;
+use Modules\Reports\Providers\PdfLettersProvider;
 use Modules\Reports\Traits\ReportsTrait;
 use \Mpdf\Mpdf as mPDF;
 class ReportsController extends Controller
@@ -22,13 +22,13 @@ class ReportsController extends Controller
     protected $sign_url;
     protected $sign_file;
 
-   protected $zone_id;
+    protected $zone_id;
 use ReportsTrait;
     public function __construct()
     {
         $this->base_url = url('/');
-        // $this->sign_file = getPermitSignatorySignature();
-        // $this->sign_url = $this->base_url . Config('constants.signs_path') . $this->sign_file;
+        $this->sign_file = getPermitSignatorySignature();
+        $this->sign_url = $this->base_url . Config('constants.signs_path') . $this->sign_file;
 		if(isset(\Auth::user()->id)){
 			$this->user_id = \Auth::user()->id;
 
@@ -9641,6 +9641,7 @@ public function printAdministrativeSubmissionResponses(Request $req)
 										->where('t1.application_code',$application_code)
 										->first();
 
+
 				if($record){
 
 					$decision_id = $record->decision_id;
@@ -9654,9 +9655,8 @@ public function printAdministrativeSubmissionResponses(Request $req)
 								//Dispensing Certificate
 								$org_info = $this->getOrganisationInfo();
 
-															$pdf = new PdfLettersProvider();
+															$pdf = new PdfProvider();
 
-dd($pdf);
 															$pdf->AddPage();
 																$template_url = base_path('/');
 																$pdf->setSourceFile($template_url."resources/templates/certificate_template.pdf");
@@ -9665,7 +9665,7 @@ dd($pdf);
 																$pdf->useTemplate($tplId,0,0);
 																$pdf->setPageMark();
 
-																$logo = getcwd() . '/resources/images/zamra-logo.png';
+																$logo = getcwd() . '/resources/images/botswana.jpg';
 																$pdf->Image($logo, 86, 18, 40, 35);
 																$style = array(
 																	'border' => 0,
@@ -9676,7 +9676,7 @@ dd($pdf);
 																	'module_width' => 1, // width of a single module in points
 																	'module_height' => 1 // height of a single module in points
 															);
-															$pdf->write2DBarcode(strtoupper($record->applicant_name).':'.$application_code.':'.$record->permit_no, 'QRCODE,H',170, 18, 20, 20, $style, 'N');
+															$pdf->write2DBarcode(strtoupper($record->doc_title).':'.$application_code.':'.$record->permit_no, 'QRCODE,H',170, 18, 20, 20, $style, 'N');
 																$pdf->SetFont('times','B',9);
 															$pdf->SetFont('times','B',9);
 															$pdf->Cell(0,1,'',0,1);
@@ -9703,13 +9703,13 @@ dd($pdf);
 															$pdf->Cell(0,5,'CERTIFICATE OF REGISTRATION',0,1,'C');
 															$pdf->SetFont('times','B',11);
 															$pdf->ln();
-															$pdf->Cell(0,8,' No: '.$record->premise_reg_no,0,1,'R');
+															$pdf->Cell(0,8,' No: '.$record->tracking_no,0,1,'R');
 															$pdf->SetFont('times','',11);
 															$pdf->SetFont('times','B',11);
 
 															$pdf->setCellHeightRatio(2.4);
 															$pdf->SetFont('times','',11);
-															$template = "<p  align='justify'>This is to certify that (Name of ".$record->premise_type." ".$record->name ."  of (Physical Address) ".$record->physical_address.", ".$record->postal_address.", ".$record->region_name.", ".$record->country_name." is registered as a ".$record->premise_type;
+															$template = "<p  align='justify'>This is to certify that (Name of ".$record->doc_title ."  of (Physical Address) ".$record->doc_title.", ".$record->doc_title.", ".$record->doc_title.", ".$record->doc_title." is registered as a ".$record->doc_title;
 															$pdf->WriteHTML($template, true, false, true, true);
 
 															$pdf->SetFont('times','',11);
@@ -9718,29 +9718,30 @@ dd($pdf);
 															$pdf->ln();
 															$pdf->ln();
 
-															$pdf->Cell(0,8,'This Certificate is issued on '.formatDate($record->approval_date),0,0,'C');
+															$pdf->Cell(0,8,'This Certificate is issued on '.formatDate($record->doc_title),0,0,'C');
+																	// $director_details = getPermitSignatoryDetails();
 
+																	// dd($director_details);
+																	// $dg_signatory = $director_details->director_id;
+																	// $director = $director_details->director;
+																	// $is_acting_director = $director_details->is_acting_director;
 
-																	$director_details = getPermitSignatoryDetails();
-																	$dg_signatory = $director_details->director_id;
-																	$director = $director_details->director;
-																	$is_acting_director = $director_details->is_acting_director;
+																	//$permit_approval = $record->permit_approval;
+																	//$approved_by = $record->approved_by;
+																	// if($dg_signatory != $approved_by){
+																	// 	$signatory = $approved_by;
+																	// }
+																	// else{
+																	// 	$signatory = $dg_signatory;
+																	// }
 
-																	$permit_approval = $record->permit_approval;
-																	$approved_by = $record->approved_by;
-																	if($dg_signatory != $approved_by){
-																		$signatory = $approved_by;
-																	}
-																	else{
-																		$signatory = $dg_signatory;
-																	}
 																	$pdf->Ln();
 																	$pdf->Ln();
-															$signature = getUserSignatureDetails($signatory);
-															$signature = getcwd() . '/backend/resources/templates/signatures_uploads/'.$signature;
+															//$signature = getUserSignatureDetails($signatory);
+															//$signature = getcwd() . '/backend/resources/templates/signatures_uploads/'.$signature;
 															$startY = $pdf->GetY();
 																	$startX =$pdf->GetX();
-															$pdf->Image($signature,$startX+75,$startY-8,30,12);
+															//$pdf->Image($signature,$startX+75,$startY-8,30,12);
 
 															$pdf->Cell(105,0,'',0,0);
 
@@ -9748,14 +9749,15 @@ dd($pdf);
 																	$pdf->Cell(0,10,'...............................................................', 0,1,'C');
 
 																	$title = "Director-General";
-																	if($dg_signatory != $approved_by){
-																		$title = 'Acting '.$title;
-																	}else{
-																		if($is_acting_director ==1){
-																			$title = 'Acting '.$title;
-																		}
 
-																	}
+																	// if($dg_signatory != $approved_by){
+																	// 	$title = 'Acting '.$title;
+																	// }else{
+																	// 	if($is_acting_director ==1){
+																	// 		$title = 'Acting '.$title;
+																	// 	}
+
+																	// }
 
 																	$pdf->Cell(0,10,$title, 0,0,'C');
 															$pdf->AddPage();
