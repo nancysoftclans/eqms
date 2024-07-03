@@ -86,7 +86,7 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::post('validateDocumentAppReceivingDetails', [DocumentManagementController::class, 'validateDocumentAppReceivingDetails']);
     Route::post('getDocumentArchive', [DocumentManagementController::class, 'getDocumentArchive']);
     Route::post('saveDocumentRecommendationComments', [DocumentManagementController::class, 'saveDocumentRecommendationComments']);
-    Route::post('saveDocumentApplicationRecommendationDetails', [DocumentManagementController::class, 'saveDocumentApplicationRecommendationDetails']); 
+    Route::post('saveDocumentApplicationApprovalDetails', [DocumentManagementController::class, 'saveDocumentApplicationApprovalDetails']); 
     Route::post('dmsUpdateAccountPassword', [DmsConfigurationsController::class, 'dmsUpdateAccountPassword']);
     Route::get('getArchivedDocdDetails', [DmsConfigurationsController::class, 'getArchivedDocdDetails']);
 

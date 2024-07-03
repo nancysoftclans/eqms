@@ -91,72 +91,8 @@ Ext.define('Admin.controller.NewReportsCtr', {
         };
     },
 
-    // generateDocumentPermit:function(application_code,module_id,sub_module_id) {
-    //     Ext.getBody().mask();
-    //       Ext.Ajax.request({
-    //                       url: 'reports/generateDocumentPermit',
-    //                       method: 'GET',
-    //                       params: {
-    //                           application_code:application_code,
-    //                           module_id: module_id,
-    //                           sub_module_id:sub_module_id,
-                             
-    //                       },
-    //                       headers: {
-    //                           'Authorization': 'Bearer ' + access_token,
-    //                           'X-CSRF-Token': token
-    //                       },
-    //                       success: function (response) {
-    //                           Ext.getBody().unmask();
-    //                           var resp = Ext.JSON.decode(response.responseText),
-    //                               success = resp.success;
-    //                           document_url = resp.document_url;
-    //                           var action_url = 'reports/generateDocumentPermit?application_code=' + application_code;
-
-    //                           console.log(application_code);
-    //                           if (success == true || success === true) {
-                                  
-    //                               print_report(action_url);
-                                  
-    //                           } else {
-    //                               toastr.error(resp.message, 'Failure Response');
-    //                           }
-    //                       },
-    //                       failure: function (response) {
-    //                           Ext.getBody().unmask();
-    //                           var resp = Ext.JSON.decode(response.responseText),
-    //                               message = resp.message;
-    //                           toastr.error(message, 'Failure Response');
-    //                       },
-    //                       error: function (jqXHR, textStatus, errorThrown) {
-    //                           Ext.getBody().unmask();
-    //                           toastr.error('Error downloading data: ' + errorThrown, 'Error Response');
-    //                       }
-    //               });
-                  
-              
-    //   },
-
         generateDocumentPermit: function (application_code) {
         var action_url = 'reports/generateDocumentPermit?application_code=' + application_code;
         print_report(action_url);
     },
-
-    //     //                sub_module_id = frm.down('combo[name=sub_module_id]').getValue();
-                    //                console.log(sub_module_id);
-                    //                from_date = frm.down('datefield[name=from_date]').getValue(),
-                    //                console.log(from_date);
-                    //                to_date = frm.down('textfield[name=to_date]').getValue(),
-                    //                premise_type = frm.down('combo[name=premise_type]').getValue();  
-                    //              //  module_id=panel.down('hiddenfield[name=module_id]').getValue();
-                              
-                    //           //frm = filter.getForm();
-                    //           if (frm.isValid()) {
-                    //          store.getProxy().extraParams = {
-
-                    //            // module_id: module_id,
-                    //             sub_module_id: sub_module_id,
-                    //             premise_type: premise_type,
-                    //             from_date: from_date,
-                    //             to_date: to_date
 });

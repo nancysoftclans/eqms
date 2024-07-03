@@ -26,8 +26,14 @@ class PdfProvider extends TcpdfFpdi
 		//Position at 1.5 cm from bottom
 		$this->SetY(-23);
 		//Arial italic 8
+
     $this->SetFont('times','',8);
-    $this->Cell(0,4,'Uganda Tel: +256 [0]417 788 100; Kampala, Uganda, Kampala, Uganda Website: www.nda.or.ug, Email: ndaug@nda.or.ug',0,1,'C');
+
+		$text1 = 'This document is property of the Botswana Medicines Regulatory Authority (BOMRA). It is strictly confidential and may on no account be reproduced, copied or';
+		$text2 = ' divulged to any third party without prior authorization by BOMRA Management.';
+
+		$this->Cell(0, 4, $text1, 0, 1, 'C'); // First line
+		$this->Cell(0, 4, $text2, 0, 1, 'C'); // Second line
     
     /*
 		 if ($this->page == 1) {

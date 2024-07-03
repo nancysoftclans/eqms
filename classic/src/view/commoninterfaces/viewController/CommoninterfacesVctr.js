@@ -1968,9 +1968,12 @@ func_setDocumentGridStore: function(me){
         else{
             toastr.error('Document Not Uploaded', 'Failure Response');
         }
-  },previewUploadedDocument: function (item) {
+  },
+
+  previewUploadedDocument: function (item) {
     var btn = item.up('button'),
         download = item.download,
+        grid = item.up('grid'),
         record = btn.getWidgetRecord(),
         node_ref = record.get('node_ref'),
         application_code = record.get('application_code'),
@@ -1978,16 +1981,21 @@ func_setDocumentGridStore: function(me){
         
         if(node_ref != ''){
 
-            this.functDownloadAppDocument(node_ref,download,application_code,uploadeddocuments_id, item);
+            this.functDownloadAppDocument(node_ref,download,application_code,uploadeddocuments_id, grid);
         }
         else{
             toastr.error('Document Not Uploaded', 'Failure Response');
         }
         
 
-},functDownloadAppDocument:function(node_ref,download,application_code=null,uploadeddocuments_id=null, item=null){
+},
+
+functDownloadAppDocument:function(node_ref,download,application_code=null,uploadeddocuments_id=null, grid=''){
         //get the document path 
-        item.setLoading(true);
+        if(grid != ''){
+
+            grid.mask('Document Preview..');
+        }
       
         Ext.Ajax.request({
             url: 'documentmanagement/getApplicationDocumentDownloadurl',
@@ -2002,53 +2010,124 @@ func_setDocumentGridStore: function(me){
                 'X-CSRF-Token': token
             },
             success: function (response) {
-                item.setLoading(false);
+                Ext.getBody().unmask();
+          
                 var resp = Ext.JSON.decode(response.responseText),
-                    success = resp.success;
+                success = resp.success;
                 document_url = resp.document_url;
+                filename = resp.filename;
                 if (success == true || success === true) {
-                    // if (download == 1 || download === 1) {
-                    //     download_report(document_url);
-                    // } else {
-                    //     print_report(document_url);
-                    // }
-                    window.open(document_url,'_blank', 'resizable=yes,scrollbars=yes,directories=no, titlebar=no, toolbar=no,menubar=no,location=no,directories=no, status=no');
+                    var a = document.createElement("a");
+                    a.href = document_url; 
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    grid.unmask();
                 } else {
+                    grid.unmask();
                     toastr.error(resp.message, 'Failure Response');
                 }
-                
-                // var resp = Ext.JSON.decode(response.responseText),
-                // success = resp.success;
-                // document_url = resp.document_url;
-                // filename = resp.filename;
-                // if (success == true || success === true) {
-                //     var a = document.createElement("a");
-                //     a.href = document_url; 
-                //     a.download = filename;
-                //     document.body.appendChild(a);
-
-                //     a.click();
-                //     a.remove();
-                //     Ext.getBody().unmask();
-                // } else {
-                //     Ext.getBody().unmask();
-                //     toastr.error(resp.message, 'Failure Response');
-                // }
+                   
+                    
             },
             failure: function (response) {
-                item.setLoading(false);
+                grid.unmask();
                 var resp = Ext.JSON.decode(response.responseText),
                     message = resp.message;
                 toastr.error(message, 'Failure Response');
             },
             error: function (jqXHR, textStatus, errorThrown) {
-                item.setLoading(false);
+                Ext.getBody().unmask();
                 toastr.error('Error downloading data: ' + errorThrown, 'Error Response');
             }
         });
 
 
 },
+
+//  previewUploadedDocument: function (item) {
+//     var btn = item.up('button'),
+//         download = item.download,
+//         record = btn.getWidgetRecord(),
+//         node_ref = record.get('node_ref'),
+//         application_code = record.get('application_code'),
+//         uploadeddocuments_id = record.get('uploadeddocuments_id');
+        
+//         if(node_ref != ''){
+
+//             this.functDownloadAppDocument(node_ref,download,application_code,uploadeddocuments_id, item);
+//         }
+//         else{
+//             toastr.error('Document Not Uploaded', 'Failure Response');
+//         }
+        
+
+// },
+// functDownloadAppDocument:function(node_ref,download,application_code=null,uploadeddocuments_id=null, item=null){
+//         //get the document path 
+//         item.setLoading(true);
+      
+//         Ext.Ajax.request({
+//             url: 'documentmanagement/getApplicationDocumentDownloadurl',
+//             method: 'GET',
+//             params: {
+//                 node_ref: node_ref,
+//                 application_code:application_code,
+//                 uploadeddocuments_id:uploadeddocuments_id
+//             },
+//             headers: {
+//                 'Authorization': 'Bearer ' + access_token,
+//                 'X-CSRF-Token': token
+//             },
+//             success: function (response) {
+//                 item.setLoading(false);
+//                 var resp = Ext.JSON.decode(response.responseText),
+//                     success = resp.success;
+//                 document_url = resp.document_url;
+//                 if (success == true || success === true) {
+//                     // if (download == 1 || download === 1) {
+//                     //     download_report(document_url);
+//                     // } else {
+//                     //     print_report(document_url);
+//                     // }
+//                     window.open(document_url,'_blank', 'resizable=yes,scrollbars=yes,directories=no, titlebar=no, toolbar=no,menubar=no,location=no,directories=no, status=no');
+//                 } else {
+//                     toastr.error(resp.message, 'Failure Response');
+//                 }
+                
+//                 // var resp = Ext.JSON.decode(response.responseText),
+//                 // success = resp.success;
+//                 // document_url = resp.document_url;
+//                 // filename = resp.filename;
+//                 // if (success == true || success === true) {
+//                 //     var a = document.createElement("a");
+//                 //     a.href = document_url; 
+//                 //     a.download = filename;
+//                 //     document.body.appendChild(a);
+
+//                 //     a.click();
+//                 //     a.remove();
+//                 //     Ext.getBody().unmask();
+//                 // } else {
+//                 //     Ext.getBody().unmask();
+//                 //     toastr.error(resp.message, 'Failure Response');
+//                 // }
+//             },
+//             failure: function (response) {
+//                 item.setLoading(false);
+//                 var resp = Ext.JSON.decode(response.responseText),
+//                     message = resp.message;
+//                 toastr.error(message, 'Failure Response');
+//             },
+//             error: function (jqXHR, textStatus, errorThrown) {
+//                 item.setLoading(false);
+//                 toastr.error('Error downloading data: ' + errorThrown, 'Error Response');
+//             }
+//         });
+
+
+// },
  downloadAllSelectedDocuments: function(btn) {
     var grid = btn.up('grid'),
         sm = grid.getSelectionModel(),

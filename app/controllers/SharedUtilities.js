@@ -3733,8 +3733,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
-    activeTab.down("button[name=recommendation]").setVisible(false);
-    activeTab.down("button[name=approval]").setVisible(true);
+      
     activeTab.down("textfield[name=recommendation_id]").setVisible(false);
     activeTab.down("textfield[name=approval_id]").setVisible(true);
     activeTab.down("button[name=add_upload]").setHidden(true);
@@ -5158,7 +5157,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     (frm = form.getForm()),
       (win = form.up("window")),
       (action_url =
-        "documentmanagement/saveDocumentApplicationRecommendationDetails");
+        "documentmanagement/saveDocumentApplicationApprovalDetails");
     if (frm.isValid()) {
       frm.submit({
         url: action_url,

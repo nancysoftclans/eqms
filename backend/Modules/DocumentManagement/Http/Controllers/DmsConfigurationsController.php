@@ -186,67 +186,6 @@ class DmsConfigurationsController extends Controller
         return \response()->json($res);
     }
  
-// public function getdocdefinationrequirementDetails(Request $req)
-// {
-//     $module_id = $req->module_id;
-//     $sub_module_id = $req->sub_module_id;
-//     $section_id = $req->section_id;
-//     $premise_type_id = $req->premise_type_id;
-//     $parent_id = $req->node;
-
-//     try {
-//         $results = DB::table('tra_documentmanager_application as t1')
-//             ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
-//             ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
-//             ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
-//             ->leftJoin('par_sections as t5', 't1.section_id', '=', 't5.id')
-//             ->leftJoin('wf_processes as t7', 't1.process_id', '=', 't7.id')
-//             ->leftJoin('par_form_categories as t8', 't1.document_type_id', '=', 't8.id')
-//             ->leftJoin('par_confirmations as t9', 't1.has_parent_level', '=', 't9.id')
-//             ->select(
-//                 't1.*',
-//                 DB::raw("CASE WHEN (SELECT COUNT(id) FROM tra_documentmanager_application q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
-//                 't1.name AS mtype',
-//                 't2.name AS document_type',
-//                 't3.name AS module_name',
-//                 't4.name AS sub_module',
-//                 't5.name AS section_name',
-//                 't7.name AS process_name',
-//                 't8.name AS document_type',
-//                 't9.name AS parent_level',
-
-//                 DB::raw("(SELECT GROUP_CONCAT(CONCAT(j.name, '.', j.extension) SEPARATOR ',') 
-//                             FROM tra_docupload_reqextensions t 
-//                             INNER JOIN par_document_extensionstypes j ON t.document_extensionstype_id = j.id 
-//                             WHERE t.documentupload_requirement_id = t1.id) AS allowed_extensions")
-//             );
-
-//         if (validateIsNumeric($parent_id)) {
-//             $results->where('t1.docparent_id', $parent_id);
-//         } else {
-//             $results->whereNull('t1.docparent_id');
-//         }
-//         if (validateIsNumeric($module_id)) {
-//             $results->where('t4.module_id', $module_id);
-//         }
-//         if (validateIsNumeric($sub_module_id)) {
-//             $results->where('t1.sub_module_id', $sub_module_id);
-//         }
-//         if (validateIsNumeric($section_id)) {
-//             $results->where('t1.section_id', $section_id);
-//         }
-//         if (validateIsNumeric($premise_type_id)) {
-//             $results->where('t1.premise_type_id', $premise_type_id);
-//         }
-
-//         $results = $results->get();
-//     } catch (\Exception $exception) {
-//         $results = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
-//     } catch (\Throwable $throwable) {
-//         $results = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
-//     }
-//     return $results;
-// }
 
 public function getdocdefinationrequirementDetails(Request $req)
 {
