@@ -38,6 +38,7 @@ Ext.define('Admin.controller.NewReportsCtr', {
                 // viewApplicationRecommendationLogs: 'viewApplicationRecommendationLogs',
                 // onReProductRegApplication: 'onReProductRegApplication',
                 // doSaveResearchFindings: 'doSaveResearchFindings'
+                   generateDocumentPermit:'generateDocumentPermit'
             }
         }
     },
@@ -89,21 +90,9 @@ Ext.define('Admin.controller.NewReportsCtr', {
                                 to_date: to_date
         };
     },
-    //     //                sub_module_id = frm.down('combo[name=sub_module_id]').getValue();
-                    //                console.log(sub_module_id);
-                    //                from_date = frm.down('datefield[name=from_date]').getValue(),
-                    //                console.log(from_date);
-                    //                to_date = frm.down('textfield[name=to_date]').getValue(),
-                    //                premise_type = frm.down('combo[name=premise_type]').getValue();  
-                    //              //  module_id=panel.down('hiddenfield[name=module_id]').getValue();
-                              
-                    //           //frm = filter.getForm();
-                    //           if (frm.isValid()) {
-                    //          store.getProxy().extraParams = {
 
-                    //            // module_id: module_id,
-                    //             sub_module_id: sub_module_id,
-                    //             premise_type: premise_type,
-                    //             from_date: from_date,
-                    //             to_date: to_date
+        generateDocumentPermit: function (application_code) {
+        var action_url = 'reports/generateDocumentPermit?application_code=' + application_code;
+        print_report(action_url);
+    },
 });

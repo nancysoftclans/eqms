@@ -39,38 +39,28 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             xtype: 'textfield',
             fieldLabel: 'Title',
             name: 'audit_label',
-            columnWidth: 1,
+            columnWidth: 0.33,
             labelAlign: 'top'
 
         },
         {
-            xtype: 'fieldcontainer',
-			readOnly:true,
-            layout: 'column',
-            name:'registration_container',
-            fieldLabel: 'Audit Type',
-            columnWidth: 1,
-            defaults: {
-                labelAlign: 'top'
-            },
-            items: [
-                {
-                    xtype: 'textfield',
-                    name: 'audit_type_name',
-                    columnWidth: 0.9
-                },
-                {
-                    xtype: 'button',
-                    iconCls: 'x-fa fa-link',
-                    columnWidth: 0.1,
-                    tooltip: 'Select Audit Type',
-                    handler: 'showAuditTypesRecords'
-                }
-            ]
+            xtype: 'textfield',
+            fieldLabel: 'Audit Types',
+            name: 'audit_type_name',
+            columnWidth: 0.23
         },
         {
+            xtype: 'button',
+            iconCls: 'x-fa fa-link',
+            columnWidth: 0.10,
+            tooltip: 'Select Audit Type',
+            handler: 'showAuditTypesRecords',
+            margin: '35 0 0 0',
+        },
+       
+        {
             xtype: 'datefield',
-            columnWidth: 1,
+            columnWidth: 0.33,
             labelAlign : 'top',
             format: 'Y-m-d',
             name: 'audit_start_date',
@@ -83,10 +73,17 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             margin: 2,
             format: 'Y-m-d',
             labelAlign : 'top',
+            columnWidth: 0.33,
             allowBlank: false,
             fieldLabel: 'End Date',
             maxValue: new Date(),
 
+        },
+        {
+            xtype: 'textfield',
+            fieldLabel: 'Status',
+            name: 'status',
+            columnWidth: 0.33
         },
         {
             xtype: 'htmleditor',

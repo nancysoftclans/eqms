@@ -200,6 +200,31 @@ function getInitialDocumentCreationWorkflowDetails(module_id, sub_module_id,is_d
     return results;
 }
 
+function getInitialLiveDocumentCreationWorkflowDetails(module_id, application_type, sub_module_id) {
+    var results = [];
+    Ext.Ajax.request({
+        method: 'GET',
+        async: false,
+        url: 'workflow/getInitialLiveDocumentCreationWorkflowDetails',
+        params: {
+            module_id: module_id,
+            application_type: application_type,
+            sub_module_id: sub_module_id,
+        },
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
+        success: function (response) {
+            var resp = Ext.JSON.decode(response.responseText),
+                success = resp.success;
+            if (success || success == true || success === true) {
+                results = resp.results;
+            }
+        }
+    });
+    return results;
+}
+
 function checkUserAccountActivities(mins) {
     var runner = new Ext.util.TaskRunner(),
         task,

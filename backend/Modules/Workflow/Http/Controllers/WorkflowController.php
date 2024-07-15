@@ -182,6 +182,58 @@ class WorkflowController extends Controller
         return response()->json($res);
     }
 
+    public function getInitialLiveDocumentCreationWorkflowDetails(Request $request)
+    {
+        $module_id = $request->input('module_id');
+        $sub_module_id = $request->input('sub_module_id');
+        $application_type = $request->input('application_type');
+
+        try {
+            //get workflow id
+            $where = array(
+                't1.module_id' => $module_id,
+                't1.sub_module_id' => $sub_module_id,
+                't1.renewal' => $application_type,
+            );
+
+            $qry = DB::table('wf_processes as t1')
+                ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
+                ->join('wf_workflow_stages as t3', function ($join) {
+                    $join->on('t2.id', '=', 't3.workflow_id')
+                        ->on('t3.stage_status', '=', DB::raw(1));
+                })
+                ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
+                ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId', 't3.stage_category_id');
+
+
+
+            $qry->where($where);
+
+            $results = $qry->first();
+            //initial status details
+            $statusDetails = getApplicationInitialStatus($module_id, $sub_module_id);
+
+            $results->initialAppStatus = $statusDetails->name;
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return response()->json($res);
+    }
+
     public function getIssueManagementWorkflowDetails(Request $request)
     {
         $module_id = $request->input('module_id');

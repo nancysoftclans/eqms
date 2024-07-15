@@ -10,8 +10,8 @@ use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-use App\Modules\Reports\Providers\PdfProvider;
-use App\Modules\Reports\Providers\PdfLettersProvider;
+use Modules\Reports\Providers\PdfProvider;
+use Modules\Reports\Providers\PdfLettersProvider;
 use Modules\Reports\Traits\ReportsTrait;
 use \Mpdf\Mpdf as mPDF;
 class ReportsController extends Controller
@@ -22,13 +22,13 @@ class ReportsController extends Controller
     protected $sign_url;
     protected $sign_file;
 
-   protected $zone_id;
+    protected $zone_id;
 use ReportsTrait;
     public function __construct()
     {
         $this->base_url = url('/');
-        // $this->sign_file = getPermitSignatorySignature();
-        // $this->sign_url = $this->base_url . Config('constants.signs_path') . $this->sign_file;
+        $this->sign_file = getPermitSignatorySignature();
+        $this->sign_url = $this->base_url . Config('constants.signs_path') . $this->sign_file;
 		if(isset(\Auth::user()->id)){
 			$this->user_id = \Auth::user()->id;
 
@@ -9625,4 +9625,243 @@ public function printAdministrativeSubmissionResponses(Request $req)
         }
         return \response()->json($res);
     }
+
+    public function generateDocumentPermit(Request $req){
+	try{
+		$application_code = $req->application_code;
+		$record = DB::table('tra_documentmanager_application as t1')
+								// ->leftJoin('tra_premises as t2', 't1.premise_id', 't2.id')
+								// ->leftJoin('wb_trader_account as t3', 't1.applicant_id', 't3.id')
+								// ->leftJoin('par_districts as t4', 't2.district_id', 't4.id')
+								// ->leftJoin('par_regions	 as t5', 't2.region_id', 't5.id')
+								// ->leftJoin('par_countries	 as t6', 't2.country_id', 't6.id')
+								// ->leftJoin('par_premises_types	 as t7', 't2.premise_type_id', 't7.id')
+								// ->select('t1.*','t2.*', 't8.*', 't3.name as applicant_name', 't4.name as district_name','t7.name as premise_type', 't7.permit_type_title', 't5.name as region_name', 't6.name as country_name', 't8.permit_signatory as permit_approval', 't7.*')
+								 ->join('tra_managerpermits_review as t2', 't1.application_code','t2.application_code' )
+								 ->join('users as t3', 't2.dg_signatory', 't3.id')
+								 ->select(DB::raw("t1.*,t2.*,decrypt(t3.first_name) as firstname,decrypt(t3.last_name) as lastname"))
+								->where('t1.application_code',$application_code);
+								//->first();
+			$record = $record->get();
+			$records = convertStdClassObjToArray($record);
+
+            $records = decryptArray($records);
+
+            foreach ($records as &$record) {
+            $record['fullname'] = $record['firstname'] . ' ' . $record['lastname'];
+             }
+
+
+			if($records){
+
+			$decision_id = $records[0]['decision_id'];
+		
+			if($decision_id ==1){
+
+			$document_number = $records[0]['tracking_no'];
+			$issue_number = $records[0]['tracking_no'];
+			$effective_date = $records[0]['created_on'];
+			$doc_title = $records[0]['doc_title'];
+			$approval_date = $records[0]['approval_date'];
+			$approved_by = $records[0]['fullname'];
+
+					//Pharmaceutical License WholeSale
+				//	Agro-Veterinary Shop
+				//Health Shop
+				//Hospital and Retail Pharmacy
+				//Dispensing Certificate
+				$org_info = $this->getOrganisationInfo();
+
+				$pdf = new PdfProvider();
+
+				$pdf->AddPage();
+					$template_url = base_path('/');
+
+					$pdf->setSourceFile($template_url."resources/templates/certificate_template.pdf");
+					// import page 1
+					$tplId = $pdf->importPage(1);
+					$pdf->useTemplate($tplId,0,0);
+					$pdf->setPageMark();
+
+					$logo = getcwd() . '/resources/images/logo.jpg';
+					$logo = str_replace('\\', '/', $logo);
+
+					//dd($logo);
+				//	$pdf->Image($logo, 86, 18, 40, 35);
+					$style = array(
+						'border' => 0,
+						'vpadding' => 'auto',
+						'hpadding' => 'auto',
+						'fgcolor' => array(0,0,0),
+						'bgcolor' => false, //array(255,255,255)
+						'module_width' => 1, // width of a single module in points
+						'module_height' => 1 // height of a single module in points
+				);
+				// $pdf->write2DBarcode(strtoupper($record->doc_title).':'.$application_code.':'.$record->permit_no, 'QRCODE,H',170, 18, 20, 20, $style, 'N');
+				// 	$pdf->SetFont('times','B',9);
+				// $pdf->SetFont('times','B',9);
+				// $pdf->Cell(0,1,'',0,1);
+
+				// $pdf->Cell(0,4,'FORM Iv',0,1,'R');
+				//$pdf->Cell(0,4,'(Regulation 6)',0,1,'R');
+				$pdf->Image($logo,85,30,43,19);
+				$pdf->SetFont('times','B',13);
+				$pdf->Cell(0,6,'',0,1);
+				$pdf->Cell(0,30,'',0,1);
+				$pdf->Cell(0,4,'Botswana Medicines Regulatory Authority',0,1,'C');
+
+				$pdf->SetFont('times','B',12);
+				//$pdf->Cell(0,4,'(Act No. 3 of 2013)',0,1,'C');
+				//$pdf->Cell(0,30,'',0,1);
+				$pdf->Cell(0,20,'',0,1);
+
+				//$regulation_title = "The Medicines and Allied Substances (Certificate of Registration) Regulations, 2017";
+
+				// Set y position to avoid overlapping with previous cell
+				$currentY = $pdf->GetY();
+				$pdf->SetY($currentY + 4);
+
+				// Calculate the width for each part of the line
+				$leftWidth = 60; // Adjust this value according to your needs
+				$centerWidth = 60; // Adjust this value according to your needs
+				$rightWidth = 60; // Adjust this value according to your needs
+
+				// Set the x position and print each cell
+				$pdf->SetX(10); // Adjust the starting x position if needed
+				$pdf->Cell($leftWidth, 4, 'Document No. '.$document_number, 0, 0, 'L');
+
+				$pdf->SetX(10 + $leftWidth); // Move x position to the center cell
+				$pdf->Cell($centerWidth, 4, 'Issue No. '.$issue_number, 0, 0, 'C');
+
+				$pdf->SetX(20 + $leftWidth + $centerWidth); // Move x position to the right cell
+				$pdf->Cell($rightWidth, 4, 'Effective Date: '.$effective_date, 0, 0, 'R');
+
+				//$pdf->Cell(0,4,$regulation_title,0,1,'C');
+
+				$pdf->Cell(0,15,'',0,1);
+
+				$pdf->SetFont('times','B',40);	$pdf->ln();
+				$pdf->Cell(0,5,$doc_title,0,1,'C');
+				$pdf->Cell(0,35,'',0,1);
+				$pdf->SetFont('times','B',13);	$pdf->ln();
+				// $pdf->SetFont('times','B',11);
+				// $pdf->ln();
+				// $pdf->Cell(0,8,' No: '.$record->tracking_no,0,1,'R');
+				// $pdf->SetFont('times','',11);
+				// $pdf->SetFont('times','B',11);
+
+				// $pdf->setCellHeightRatio(2.4);
+				// $pdf->SetFont('times','',11);
+				// $template = "<p  align='justify'>This is to certify that (Name of ".$record->doc_title ."  of (Physical Address) ".$record->doc_title.", ".$record->doc_title.", ".$record->doc_title.", ".$record->doc_title." is registered as a ".$record->doc_title;
+				// $pdf->WriteHTML($template, true, false, true, true);
+
+				// $pdf->SetFont('times','',11);
+				// $pdf->Cell(0,8,'The terms and conditions of the certificate or registration are attached herewith',0,1);
+				// $pdf->SetFont('times','',11);
+				// $pdf->ln();
+				// $pdf->ln();
+
+				//$pdf->Cell(0,8,'This Certificate is issued on '.formatDate($record->doc_title),0,0,'C');
+						// $director_details = getPermitSignatoryDetails();
+
+						// dd($director_details);
+						// $dg_signatory = $director_details->director_id;
+						// $director = $director_details->director;
+						// $is_acting_director = $director_details->is_acting_director;
+
+						//$permit_approval = $record->permit_approval;
+						//$approved_by = $record->approved_by;
+						// if($dg_signatory != $approved_by){
+						// 	$signatory = $approved_by;
+						// }
+						// else{
+						// 	$signatory = $dg_signatory;
+						// }
+
+
+				//$pdf->SetFont('Arial', 'B', 12);
+
+				// Set initial y position
+				$currentY = $pdf->GetY();
+				$pdf->SetY($currentY + 4);
+
+				// Set x positions for the sections
+				$x1 = 10;
+				$x2 = 110; // Adjust this value to position the second section as needed
+
+				// Print the labels
+				$pdf->SetX($x1);
+				$pdf->Cell(40, 4, 'Approved By:   '.$approved_by, 0, 0, 'L');
+
+				$pdf->SetX($x2);
+				$pdf->Cell(50, 4, 'Date of Approval:   '.$approval_date, 0, 0, 'L');
+
+				// Draw lines beside the labels
+				$lineY = $pdf->GetY() + 6; // Position the line a bit below the text
+				$lineLength = 50; // Length of the line
+
+				$pdf->Line($x1 + 30, $lineY, $x1 + 40 + $lineLength, $lineY);
+				$pdf->Line($x2 + 38, $lineY, $x2 + 40 + $lineLength, $lineY);
+
+				// Set y position below the lines
+				$pdf->SetY($lineY + 1);
+
+				// Print text below the lines
+				//$pdf->SetFont('Arial', '', 12);
+				//$pdf->SetTextColor(255, 0, 0);
+
+				// $pdf->SetX($x2 + 50); // Position text below the line
+				// $pdf->Cell($lineLength, 4, 'DD-MM-YYYY', 0, 2, 'L');
+
+						// $pdf->Ln();
+						// $pdf->Ln();
+				//$signature = getUserSignatureDetails($signatory);
+				//$signature = getcwd() . '/backend/resources/templates/signatures_uploads/'.$signature;
+				// $startY = $pdf->GetY();
+				// 		$startX =$pdf->GetX();
+				//$pdf->Image($signature,$startX+75,$startY-8,30,12);
+
+				// $pdf->Cell(105,0,'',0,0);
+
+				// 		$pdf->Ln();
+				// 		$pdf->Cell(0,10,'...............................................................', 0,1,'C');
+
+				// 		$title = "Director-General";
+
+						// if($dg_signatory != $approved_by){
+						// 	$title = 'Acting '.$title;
+						// }else{
+						// 	if($is_acting_director ==1){
+						// 		$title = 'Acting '.$title;
+						// 	}
+
+						// }
+
+						//$pdf->Cell(0,10,$title, 0,0,'C');
+				
+				$pdf->OutPut('Document Permit.pdf');
+
+				}
+							// else{
+
+							// //	Letter of Rejection
+							// }
+
+
+				}
+				else{
+
+					$res = array('success'=>false, 'message'=>'Document Application not found, contact system admin');
+				}
+
+		}catch (\Exception $exception) {
+					$res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+		} catch (\Throwable $throwable) {
+					$res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+		}
+		return response()->json($res);
+
+
+}
 }

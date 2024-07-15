@@ -197,17 +197,17 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentSubmissionApprovalPn
                     is_siginig:0
                 },
 
-                {
-                    text: 'Recommendations & Comments',
-                    ui: 'soft-blue', 
-                    iconCls: 'fa fa-clipboard-check',
-                    childXtype: 'applicationcommentspnl',
-                    winTitle: 'Process Comments',
-                    winWidth: '60%',
-                    name:'recommendation',
-                    comment_type_id: 3,
-                    stores: '[]'
-                },
+                // {
+                //     text: 'Recommendations & Comments',
+                //     ui: 'soft-blue', 
+                //     iconCls: 'fa fa-clipboard-check',
+                //     childXtype: 'applicationcommentspnl',
+                //     winTitle: 'Process Comments',
+                //     winWidth: '60%',
+                //     name:'recommendation',
+                //     comment_type_id: 3,
+                //     stores: '[]'
+                // },
                 // {
                 //     text: 'Preview Permit/Letter',
                 //     iconCls: 'fa fa-print',

@@ -235,6 +235,8 @@ class ConfigurationsController extends Controller
         } else {
             $table_data['dola'] = Carbon::now();
             $res = insertRecord($table_name, $table_data);
+
+     
             $id = $res['record_id'];
         }
 

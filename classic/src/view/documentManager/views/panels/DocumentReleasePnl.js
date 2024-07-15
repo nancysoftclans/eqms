@@ -116,7 +116,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentReleasePnl', {
             region: 'center',
             layout: 'fit',
             items: [{
-                xtype: 'docuploadsgrid',
+                xtype: 'docreleasegrid',
                 
             }]
         },

@@ -54,6 +54,7 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('navigatorMoveFolder', [DmsConfigurationsController::class, 'navigatorMoveFolder']);
     Route::get('getParameterstableSchema', [DmsConfigurationsController::class, 'getParameterstableSchema']);
     Route::get('getdocdefinationrequirementDetails', [DmsConfigurationsController::class, 'getdocdefinationrequirementDetails']);
+    Route::get('getlivedocumentDetails', [DmsConfigurationsController::class, 'getlivedocumentDetails']);
     Route::get('getdoctypesDetails', [DmsConfigurationsController::class, 'getdoctypesDetails']);
     Route::get('getNavigatorDetails', [DmsConfigurationsController::class, 'getNavigatorDetails']);
     Route::get('docdefinationrequirementfilterdetails', [DmsConfigurationsController::class, 'docdefinationrequirementfilterdetails']);
@@ -85,8 +86,9 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::post('validateDocumentAppReceivingDetails', [DocumentManagementController::class, 'validateDocumentAppReceivingDetails']);
     Route::post('getDocumentArchive', [DocumentManagementController::class, 'getDocumentArchive']);
     Route::post('saveDocumentRecommendationComments', [DocumentManagementController::class, 'saveDocumentRecommendationComments']);
-    Route::post('saveDocumentApplicationRecommendationDetails', [DocumentManagementController::class, 'saveDocumentApplicationRecommendationDetails']);
+    Route::post('saveDocumentApplicationApprovalDetails', [DocumentManagementController::class, 'saveDocumentApplicationApprovalDetails']); 
     Route::post('dmsUpdateAccountPassword', [DmsConfigurationsController::class, 'dmsUpdateAccountPassword']);
+    Route::get('getArchivedDocdDetails', [DmsConfigurationsController::class, 'getArchivedDocdDetails']);
 
     });
 

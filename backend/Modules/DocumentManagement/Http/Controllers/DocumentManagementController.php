@@ -29,6 +29,23 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Arr;
 
+
+//watermark
+use Exports\GridExport;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use Excel;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PDF;
+use \Mpdf\Mpdf as mPDF;
+use PhpOffice\PhpPresentation\Style\Alignment;
+use PhpOffice\PhpPresentation\Style\Color;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\Style\Font;
+use PhpOffice\PhpWord\Shared\Converter;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
+use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+
 class DocumentManagementController extends Controller
 {
     /**
@@ -173,9 +190,10 @@ class DocumentManagementController extends Controller
             $process_id = $request->input('process_id');
             $workflow_stage_id = $request->input('workflow_stage_id');
             $application_status_id = $request->input('application_status_id');
-            $module_id = 26;
             $zone_id = $request->input('zone_id');
-            $sub_module_id = 101;
+            $module_id = $request->input('module_id');
+            $sub_module_id = $request->input('sub_module_id');
+
 
             $user_id = $this->user_id;
             $app_data = array(
@@ -188,12 +206,9 @@ class DocumentManagementController extends Controller
                 "doc_title" => $request->input('doc_title'),
                 "owner_user_id" => $request->input('owner_user_id'),
                 "owner_group_id" => $request->input('owner_group_id'),
-                // "has_parent_level" => $request->input('has_parent_level'),
-                // "docparent_id" => $request->input('docparent_id'),
                 "doc_description" => $request->input('doc_description'),
                 "owner_type_id" => $request->input('owner_type_id'),
                 "doc_version" => $request->input('doc_version'),
-                // "assessment_date" => $request->input('assessment_date'),
                 "application_status_id" => $request->input('application_status_id'),
                 "document_type_id" => $request->input('document_type_id'),
                 "navigator_folder_id" => $request->input('navigator_folder_id'),
@@ -201,6 +216,8 @@ class DocumentManagementController extends Controller
             );
 
             $applications_table = 'tra_documentmanager_application';
+
+
 
             if (validateIsNumeric($application_code)) {
                 //update
@@ -212,30 +229,36 @@ class DocumentManagementController extends Controller
 
                 if (recordExists($applications_table, $where_app)) {
 
-                    //$app_details = getTableData($applications_table, $where_app);
+                    $apps_tableData = getTableData($applications_table, $where_app);
+                  
                     $app_details = getPreviousRecords($applications_table, $where_app);
-
 
                     if ($app_details['success'] == false) {
                         return $app_details;
                     }
                     $app_details = $app_details['results'];
 
-
                     $res =  updateRecord($applications_table,  $where_app, $app_data, $user_id);
+
+                   // $previous_data = $app_details[0];
+
+                    unset($apps_tableData['id']);
+
+                    $res = insertRecord('tra_documentmanager_archive', $apps_tableData, $user_id);
+                    
                 }
 
-                $application_code = $app_details[0]['application_code']; //$app_details->application_code;
-                $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
+                // $application_code = $app_details[0]['application_code']; //$app_details->application_code;
+                // $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
 
 
 
-                $res['application_code'] = $application_code;
-                $res['ref_no'] = $ref_number;
-                $res['tracking_no'] = $ref_number;
-                if ($res['success']) {
-                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-                } 
+                // $res['application_code'] = $application_code;
+                // $res['ref_no'] = $ref_number;
+                // $res['tracking_no'] = $ref_number;
+                // if ($res['success']) {
+                //     initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+                // } 
             } else {
                 $zone_code = getSingleRecordColValue('par_zones', array('id' => $zone_id), 'zone_code');
                 $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');
@@ -269,7 +292,7 @@ class DocumentManagementController extends Controller
 
                 $res = insertRecord($applications_table, $app_data, $user_id);
 
-                // dd($res);
+
                 $active_application_id = $res['record_id'];
 
                 //add to submissions table
@@ -465,7 +488,7 @@ class DocumentManagementController extends Controller
         return \response()->json($res);
     }
 
-    public function saveDocumentApplicationRecommendationDetails(Request $request)
+    public function saveDocumentApplicationApprovalDetails(Request $request)
     {
         try {
             $table_name = $request->input('table_name');
@@ -1973,6 +1996,28 @@ class DocumentManagementController extends Controller
                     'message' => 'Document Not Uploaded'
                 );
             } else {
+                if(validateIsNumeric($uploadeddocuments_id)){
+                    $record = DB::table('tra_application_uploadeddocuments')
+                                ->select('*')
+                                ->where('id',$uploadeddocuments_id)
+                                ->first();
+                }
+                else{
+                    $record = DB::table('tra_application_uploadeddocuments')
+                                ->select('*')
+                                ->where('node_ref',$node_ref)
+                                ->first();
+                    if(!$record){
+                        //tc_meeting_uploaddocuments
+                            $record = DB::table('tc_meeting_uploaddocuments')
+                                ->select('*')
+                                ->where('node_ref',$node_ref)
+                                ->first();
+                    }
+                }
+                
+                if($record){
+                    $initial_file_name = $record->initial_file_name;
                 //save the documetn access
                 $data['created_on'] = Carbon::now();
                 $data['created_by'] = $user_id;
@@ -1981,11 +2026,55 @@ class DocumentManagementController extends Controller
 
                 $document_versionid = $req->document_versionid;
                 $url = downloadDocumentUrl($node_ref, $document_versionid);
+        
 
-                $res = array(
-                    'success' => true,
-                    'document_url' => $url
-                );
+                // $res = array(
+                //     'success' => true,
+                //     'document_url' => $url
+                // );
+
+                   set_time_limit(0); 
+
+                    $public_dir=public_path().'/resources/uploads';
+                    $public_dir = str_replace('\\', '/', $public_dir);                
+                    
+                    $file = file_get_contents($url);
+                    $filetopath=$public_dir.'/'.$initial_file_name;
+                    file_put_contents($filetopath, $file);
+                    
+                    // $res = array(
+                    //     'success' => true,
+                    //     'document_url' => $url
+                    // );
+
+                    if ($file) {
+                        $attachment_path = $this->handleAttachment($file);
+                    }
+                    
+                    ini_set('memory_limit', '-1');
+                    if(file_exists($filetopath)){
+                       $file = file_get_contents($filetopath);
+                         //attachment
+
+                        unlink($filetopath); 
+                         $res = array(
+                            'success' => true,
+                            'message' => 'all is well',
+                            'filename' => $initial_file_name,
+                            'dms_url'=>$url,
+                            'document_url' => "data:application/octet-stream;base64,".base64_encode($file)
+                        );
+                        return json_encode($res);
+                    }
+                    
+                    /*
+                    $res = array(
+                            'success' => true,
+                            'message' => 'all is well',
+                            'filename' => $initial_file_name,
+                            'document_url' => $url
+                        );*/
+                }
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
@@ -2619,4 +2708,220 @@ class DocumentManagementController extends Controller
         }
         return response()->json($res);
     }
+
+    public function addExcelWatermark($attachment, $destination, $watermarkText, $savedName) {
+    try {
+        // Create a temporary file for the uploaded Excel
+        $tempPath = tempnam(sys_get_temp_dir(), 'excel_');
+        $attachment->move(dirname($tempPath), basename($tempPath));
+
+        // Load the Excel file using the Xlsx reader
+        $reader = IOFactory::createReader('Xlsx');
+        $spreadsheet = $reader->load($tempPath);
+
+        // Loop through all sheets and add the text watermark to each sheet
+        foreach ($spreadsheet->getAllSheets() as $sheet) {
+            // Add text watermark
+            $sheet->getHeaderFooter()->setOddHeader('&L&G&F' . $watermarkText);
+            $sheet->getHeaderFooter()->setEvenHeader('&L&G&F' . $watermarkText);
+        }
+
+        // Ensure the destination directory exists
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        // Form the full path for the output Excel file
+        $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
+
+        // Save the modified Excel file
+        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        $writer->save($outputPath);
+
+        // Remove the temporary file
+        unlink($tempPath);
+
+        return true; // Return true on success
+    } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+        // Handle any exceptions that occur during the process
+        echo 'Error: ' . $e->getMessage();
+        return false; // Return false on failure
+    }
+}
+
+
+
+public function addImageWatermark($sourceFile, $destination, $watermarkFile, $savedName) {
+    // Create an Imagick object for the source image
+    $image = new Imagick($sourceFile);
+
+    // Create an Imagick object for the watermark image
+    $watermark = new Imagick($watermarkFile);
+
+    // Get the dimensions of the source image and the watermark image
+    $imageWidth = $image->getImageWidth();
+    $imageHeight = $image->getImageHeight();
+    $watermarkWidth = $watermark->getImageWidth();
+    $watermarkHeight = $watermark->getImageHeight();
+
+    // Calculate the position to place the watermark (centered)
+    $x = ($imageWidth - $watermarkWidth) / 2;
+    $y = ($imageHeight - $watermarkHeight) / 2;
+
+    // Composite the watermark on the source image
+    $image->compositeImage($watermark, imagick::COMPOSITE_OVER, $x, $y);
+
+    // Ensure the destination directory exists
+    if (!is_dir($destination)) {
+        mkdir($destination, 0755, true);
+    }
+
+    // Form the full path for the output image file
+    $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
+
+    // Write the new image to the destination
+    $image->writeImage($outputPath);
+
+    // Clean up
+    $image->clear();
+    $image->destroy();
+    $watermark->clear();
+    $watermark->destroy();
+}
+
+
+public function addWordWatermark($sourceFile, $destination, $watermarkText, $savedName) {
+    // Load the Word document
+    $phpWord = IOFactory::load($sourceFile);
+
+    // Loop through all sections and add the watermark text to the header
+    foreach ($phpWord->getSections() as $section) {
+        $header = $section->addHeader();
+
+        // Add a text watermark
+        $watermark = $header->addWatermarkShape();
+        $watermark->addText($watermarkText, [
+            'font' => ['size' => 50, 'color' => 'C0C0C0', 'bold' => true],
+            'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+            'rotate' => 45
+        ]);
+
+        // Alternatively, you can use an image as a watermark
+        // $header->addImage('path/to/watermark/image.png', ['width' => 100, 'height' => 100, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'marginTop' => -80, 'wrappingStyle' => 'behind']);
+    }
+
+    // Ensure the destination directory exists
+    if (!is_dir($destination)) {
+        mkdir($destination, 0755, true);
+    }
+
+    // Form the full path for the output Word document
+    $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
+
+    // Save the modified Word document
+    $writer = IOFactory::createWriter($phpWord, 'Word2007');
+    $writer->save($outputPath);
+}
+
+
+public function addPptWatermark($sourceFile, $destination, $watermarkText, $savedName) {
+    // Load the PowerPoint file
+    $ppt = IOFactory::load($sourceFile);
+
+    foreach ($ppt->getAllSlides() as $slide) {
+        // Create a new rich text shape
+        $shape = $slide->createRichTextShape()
+            ->setHeight(100)
+            ->setWidth(600)
+            ->setOffsetX(170)
+            ->setOffsetY(180);
+
+        // Center the text
+        $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
+
+        // Add the watermark text
+        $textRun = $shape->createTextRun($watermarkText);
+        $textRun->getFont()->setBold(true)
+            ->setSize(60)
+            ->setColor(new Color(Color::COLOR_GRAY));
+    }
+
+    // Ensure the destination directory exists
+    if (!is_dir($destination)) {
+        mkdir($destination, 0755, true);
+    }
+
+    // Form the full path for the output PowerPoint file
+    $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
+
+    // Save the modified PowerPoint file
+    $writer = IOFactory::createWriter($ppt, 'PowerPoint2007');
+    $writer->save($outputPath);
+}
+
+public function addWatermark($attachment, $destination, $watermarkText, $savedName) {
+    $pdf = new \Mpdf\Mpdf();
+    // Save the uploaded file to a temporary location
+    $tempPath = tempnam(sys_get_temp_dir(), 'pdf_');
+    $attachment->move(dirname($tempPath), basename($tempPath));
+
+    // Set source file
+    $pageCount = $pdf->setSourceFile($tempPath);
+
+    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+        // Import a page
+        $tplId = $pdf->importPage($pageNo);
+        $pdf->AddPage();
+        $pdf->useTemplate($tplId);
+
+        // Set watermark font and color
+        $pdf->SetFont('Helvetica', 'B', 50);
+        $pdf->SetTextColor(255, 192, 203);
+
+        // Get page width and height
+        $size = $pdf->getTemplateSize($tplId);
+        $width = $size['width'];
+        $height = $size['height'];
+
+        // Add watermark text
+        $pdf->StartTransform();
+        $pdf->Rotate(45, $width / 2, $height / 2);
+        $pdf->Text($width / 4, $height / 2, $watermarkText);
+        $pdf->StopTransform();
+
+         // Reset the transparency to default
+        $pdf->SetAlpha(1);
+    }
+
+    // Ensure destination directory exists
+    if (!is_dir($destination)) {
+        mkdir($destination, 0755, true);
+    }
+
+    // Form the full path for the output PDF
+    $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
+
+    // Output the new PDF to the specified destination
+    $pdf->Output($outputPath, 'F');
+
+    // Clean up the temporary file
+    unlink($tempPath);
+}
+    
+    public function handleAttachment($file)
+{
+    if ($file) {
+        $file_name = $file->getClientOriginalName();
+        $extension = $file->getClientOriginalExtension();
+        $document_rootupload = Config('constants.dms.doc_rootupload');
+        $destination = getcwd() . $document_rootupload;
+        $savedName = str_random(3) . time() . '.' . $extension;
+        $watermarkText = 'CONFIDENTIAL';
+        $file->move($destination, $savedName);
+        $this->addWatermark($file, $destination, $watermarkText,$savedName);
+        //$this->addExcelWatermark($file, $destination, $watermarkText,$savedName);
+        return $destination . $savedName;
+    }
+    return null;
+}
 }

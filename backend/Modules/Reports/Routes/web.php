@@ -69,5 +69,6 @@ Route::group(['prefix' => 'reports','middleware' => ['auth:api', 'web']], functi
 Route::group(['prefix' => 'reports'], function() {
     // Route::get('printRequestForAdditionalInformation', [SummaryReportController::class, 'printRequestForAdditionalInformation']);
     Route::get('printAdministrativeSubmissionResponses', [ReportsController::class, 'printAdministrativeSubmissionResponses']);
+    Route::get('generateDocumentPermit', [ReportsController::class, 'generateDocumentPermit']);
     
     });

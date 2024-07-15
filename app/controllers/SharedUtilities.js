@@ -226,6 +226,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     applicationdocuploadsgrid: {
       refresh: "refreshApplicationDocUploadsGrid",
     },
+    applicationdocreleasegrid: {
+      refresh: "refreshApplicationDocUploadsGrid",
+    },
     applicationdocpreviewnavigatorgrid: {
       refresh: "refreshApplicationDocUploadsGrid",
     },
@@ -916,7 +919,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       itemdblclick: "onMeetingGroupSelectionListDblClick",
     },
     documentapplicationreceivingwizard: {
-      beforerender: "prepapreDocumentApplicationReceiving",
+      afterrender: "prepapreDocumentApplicationReceiving",
     },
     documentsubmissionpnl: {
       afterrender: "prepapreDocumentApplicationScreening",
@@ -1025,7 +1028,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           "showReceivingApplicationSubmissionWin",
         getDocumentReleaseRecommendationDetails:
           "getDocumentReleaseRecommendationDetails",    
-          viewNavigatorDocDetails: "onViewNavigatorDocDetails" 
+          viewNavigatorDocDetails: "onViewNavigatorDocDetails", 
+        onInitiateLiveDocumentApplication: "onInitiateLiveDocumentApplication",
+        viewLiveDocumentDetails: "onViewLiveDocumentDetails"
       },
     },
   },
@@ -3728,8 +3733,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
-    activeTab.down("button[name=recommendation]").setVisible(false);
-    activeTab.down("button[name=approval]").setVisible(true);
+      
     activeTab.down("textfield[name=recommendation_id]").setVisible(false);
     activeTab.down("textfield[name=approval_id]").setVisible(true);
     activeTab.down("button[name=add_upload]").setHidden(true);
@@ -3905,7 +3909,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       grid = Ext.widget("applicationdocuploadsgrid"),
       application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
-      grid = activeTab.down("docuploadsgrid"),
+      grid = activeTab.down("docreleasegrid"),
       // grid = activeTab.down('docuploadsgrid'),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
@@ -3971,18 +3975,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
       sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
-      // reference_no = activeTab.down('displayfield[name=reference_no]').getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
       stage_category_id = activeTab.down("hiddenfield[name=stage_category_id]").getValue();
-
-
-    if (stage_category_id == 1 || stage_category_id === 1) {
-      activeTab.down("button[name=recommendation]").setVisible(false);
-      activeTab.down("button[name=approval]").setVisible(false);
-      activeTab.down("textfield[name=recommendation_id]").setVisible(false);
-      activeTab.down("textfield[name=approval_id]").setVisible(false);
-      activeTab.down("button[name=add_upload]").setHidden(false);
-    }
 
     if (application_code) {
       Ext.Ajax.request({
@@ -4006,15 +4001,18 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             qmsdoclistfrm.loadRecord(model);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
             activeTab.down('hiddenfield[name=stage_category_id]').setValue(results.stage_category_id);
+            activeTab.down('hiddenfield[name=active_application_code]').setValue(application_code);
+            activeTab.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+            activeTab.down('hiddenfield[name=module_id]').setValue(module_id);
             activeTab.down("displayfield[name=tracking_no]").setValue(results.tracking_no);
 
-            if (results.stage_category_id == 1 || results.stage_category_id === 1) {
+          
                 activeTab.down("button[name=recommendation]").setVisible(false);
                 activeTab.down("button[name=approval]").setVisible(false);
                 activeTab.down("textfield[name=recommendation_id]").setVisible(false);
                 activeTab.down("textfield[name=approval_id]").setVisible(false);
                 activeTab.down("button[name=add_upload]").setHidden(false);
-            }
+          
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -5159,7 +5157,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     (frm = form.getForm()),
       (win = form.up("window")),
       (action_url =
-        "documentmanagement/saveDocumentApplicationRecommendationDetails");
+        "documentmanagement/saveDocumentApplicationApprovalDetails");
     if (frm.isValid()) {
       frm.submit({
         url: action_url,
@@ -12092,6 +12090,135 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       me.updateSubmissionsTable(record, "isRead");
     }, 300);
   },
+
+
+  onInitiateLiveDocumentApplication: function (application_type, sub_module_id) {
+    Ext.getBody().mask("Loading Please wait...");
+    var me = this,
+      mainTabPanel = me.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      dashboardWrapper = activeTab.down("#livedocumentapplicationwrapper"),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
+
+    workflow_details = getInitialLiveDocumentCreationWorkflowDetails(
+      module_id,
+      application_type,
+      sub_module_id,
+    );
+
+    if (!workflow_details) {
+      Ext.getBody().unmask();
+      toastr.warning(
+        "Problem encountered while fetching workflow details-->Possibly workflow not set!!",
+        "Warning Response"
+      );
+      return false;
+    }
+    dashboardWrapper.removeAll();
+    var workflowContainer = Ext.widget(workflow_details.viewtype);
+    workflowContainer.down("displayfield[name=process_name]").setValue(workflow_details.processName);
+    workflowContainer.down("displayfield[name=workflow_stage]").setValue(workflow_details.initialStageName);
+    workflowContainer.down("displayfield[name=application_status]").setValue(workflow_details.initialStageName);
+    workflowContainer.down("hiddenfield[name=process_id]").setValue(workflow_details.processId);
+    workflowContainer.down("hiddenfield[name=workflow_stage_id]").setValue(workflow_details.initialStageId);
+    workflowContainer.down("hiddenfield[name=module_id]").setValue(module_id);
+    workflowContainer.down("hiddenfield[name=sub_module_id]").setValue(sub_module_id);
+    workflowContainer.down("hiddenfield[name=application_status_id]").setValue(workflow_details.initialStageId);
+    workflowContainer.down("hiddenfield[name=stage_category_id]").setValue(workflow_details.stage_category_id);
+
+
+    dashboardWrapper.add(workflowContainer);
+
+    Ext.Function.defer(function () {
+      Ext.getBody().unmask();
+    }, 300);
+
+    //load the stores
+  },
+
+  onViewLiveDocumentDetails: function (record) {
+    Ext.getBody().mask("Please wait...");
+    var me = this,
+      mainTabPanel = me.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      process_id = record.get("process_id"),
+      workflow_stage_id = record.get("workflow_stage_id"),
+      workflow_stage = record.get("workflow_stage"),
+      ref_no = record.get("reference_no"),
+      tracking_no = record.get("tracking_no"),
+      isGeneral = record.get("is_general"),
+      view_id = record.get("view_id"),
+      html_id = record.get("destination_html_id"),
+      renewal = '',
+      module_id = 26,
+      sub_module_id = 101,
+      application_type = 1,
+      title_suffix = ref_no;
+
+
+    workflow_details = getInitialLiveDocumentCreationWorkflowDetails(
+      module_id,
+      application_type,
+      sub_module_id,
+    );
+
+    //console.log(stage_category_id);
+    if (!workflow_details || workflow_details.length < 1) {
+      Ext.getBody().unmask();
+      toastr.warning(
+        "Problem encountered while fetching workflow details-->Possibly workflow not set!!",
+        "Warning Response"
+      );
+      return false;
+    }
+    if (!ref_no || ref_no == "" || ref_no == null) {
+      title_suffix = tracking_no;
+    }
+
+    var tab = mainTabPanel.getComponent(view_id),
+      title = workflow_stage + "-" + title_suffix;
+    title = workflow_stage; //+ '-' + title_suffix;
+    if (isGeneral && (isGeneral == 1 || isGeneral === 1)) {
+      title = workflow_stage;
+      view_id = view_id + Math.floor(Math.random() * 100015);
+    }
+    if (!tab) {
+      //
+      var newTab = Ext.widget(workflow_details.viewtype, {
+        title: "Document Renewal",
+        id: view_id,
+        closable: true,
+      });
+
+      //updates the access control on the interface to be rendered.
+      //me.updateVisibilityAccess(newTab, workflow_stage_id);
+      me.updateVisibilityAccess(newTab, workflow_stage_id);
+      //prepare the interface and populates it accordingly
+      me.prepareApplicationBaseDetails(newTab, record);
+      mainTabPanel.add(newTab);
+      var sub_module_id = record.get("sub_module_id");
+      // if(sub_module_id == 8 && newTab.down('button[name=save_btn]')){
+      //     newTab.getViewModel().set('isReadOnly', true);
+      //     newTab.down('button[name=save_btn]').action_url = 'saveRenAltProductReceivingBaseDetails';
+      // }
+      // if(sub_module_id == 9 && newTab.down('button[name=save_btn]')){
+      //     newTab.getViewModel().set('isReadOnly', true);
+      //     newTab.down('button[name=save_btn]').action_url = 'saveRenAltProductReceivingBaseDetails';
+      // }
+      var lastTab = mainTabPanel.items.length - 1;
+      mainTabPanel.setActiveTab(lastTab);
+    } else {
+      me.prepareApplicationBaseDetails(tab, record);
+      mainTabPanel.setActiveTab(tab);
+    }
+
+    Ext.Function.defer(function () {
+      Ext.getBody().unmask();
+      me.updateSubmissionsTable(record, "isRead");
+    }, 300);
+  },
+
+
 
 
   
