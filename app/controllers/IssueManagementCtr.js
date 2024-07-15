@@ -172,7 +172,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(false);
-    activeTab.down("button[name=approval]").setVisible(false);
+    // activeTab.down("button[name=approval]").setVisible(false);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -353,7 +353,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(true);
-    activeTab.down("button[name=approval]").setVisible(false);
+    // activeTab.down("button[name=approval]").setVisible(false);
     // activeTab.down("textfield[name=recommendation_id]").setVisible(true);
     // activeTab.down("textfield[name=approval_id]").setVisible(false);
 

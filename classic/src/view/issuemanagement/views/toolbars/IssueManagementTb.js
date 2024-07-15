@@ -37,8 +37,8 @@ Ext.define("Admin.view.issuemanagement.views.toolbars.IssueManagementTb", {
             {
               text: "Customer Complaints And Appeals",
               iconCls: "x-fa fa-check",
-              handler: "showPmsApplicationWorkflow",
-              wrapper_xtype: "drugssurveillancedashwrapper",
+              // handler: "showPmsApplicationWorkflow",
+              // wrapper_xtype: "drugssurveillancedashwrapper",
               app_type: 38,
             },
           //   {
