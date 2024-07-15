@@ -188,12 +188,12 @@ class DocumentManagementController extends Controller
                 "doc_title" => $request->input('doc_title'),
                 "owner_user_id" => $request->input('owner_user_id'),
                 "owner_group_id" => $request->input('owner_group_id'),
-                "has_parent_level" => $request->input('has_parent_level'),
-                "docparent_id" => $request->input('docparent_id'),
+                // "has_parent_level" => $request->input('has_parent_level'),
+                // "docparent_id" => $request->input('docparent_id'),
                 "doc_description" => $request->input('doc_description'),
                 "owner_type_id" => $request->input('owner_type_id'),
                 "doc_version" => $request->input('doc_version'),
-                "assessment_date" => $request->input('assessment_date'),
+                // "assessment_date" => $request->input('assessment_date'),
                 "application_status_id" => $request->input('application_status_id'),
                 "document_type_id" => $request->input('document_type_id'),
                 "navigator_folder_id" => $request->input('navigator_folder_id'),
@@ -269,7 +269,7 @@ class DocumentManagementController extends Controller
 
                 $res = insertRecord($applications_table, $app_data, $user_id);
 
-
+                // dd($res);
                 $active_application_id = $res['record_id'];
 
                 //add to submissions table

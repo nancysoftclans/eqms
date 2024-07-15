@@ -53,7 +53,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
       anyMatch: true,
       fieldLabel: "Issue Type",
       margin: "0 20 20 0",
-      name: "issue_type_id",      
+      name: "issue_type_id",
       valueField: "id",
       displayField: "name",
       forceSelection: true,
@@ -80,7 +80,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
       fieldLabel: "Creation Date",
       margin: "0 20 20 0",
       name: "creation_date",
-      format:'d M Y',
+      format: "d M Y",
       readOnly: true,
     },
     {
@@ -131,7 +131,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
       fieldLabel: "Target Resolution Date",
       margin: "0 20 20 0",
       name: "target_resolution_date",
-      format:'d M Y'
+      format: "d M Y",
     },
     {
       xtype: "tagfield",

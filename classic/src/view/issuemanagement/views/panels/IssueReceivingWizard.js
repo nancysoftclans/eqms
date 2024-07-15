@@ -200,17 +200,17 @@ Ext.define(
             winWidth: "50%",
             handler: "showIssueManagementSubmissionWin",
           },
-          {
-            text: "Add Approval Decision",
-            iconCls: "fa fa-plus",
-            name: "approval",
-            handler: "getDocumentReleaseRecommendationDetails",
-            approval_frm: "documentreviewrecommfrm",
-            vwcontroller: "documentsManagementvctr",
-            stores: '["productApprovalDecisionsStr"]',
-            table_name: "tra_documentmanager_application",
-            is_siginig: 0,
-          },
+          // {
+          //   text: "Add Approval Decision",
+          //   iconCls: "fa fa-plus",
+          //   name: "approval",
+          //   handler: "getDocumentReleaseRecommendationDetails",
+          //   approval_frm: "documentreviewrecommfrm",
+          //   vwcontroller: "documentsManagementvctr",
+          //   stores: '["productApprovalDecisionsStr"]',
+          //   table_name: "tra_documentmanager_application",
+          //   is_siginig: 0,
+          // },
 
           {
             text: "Recommendations & Comments",

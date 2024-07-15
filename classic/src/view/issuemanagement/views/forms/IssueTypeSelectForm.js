@@ -1,4 +1,4 @@
-Ext.define("Admin.view.documentManager.views.forms.IssueTypeSelectForm", {
+Ext.define("Admin.view.issuemanagement.views.forms.IssueTypeSelectForm", {
   extend: "Ext.form.Panel",
   xtype: "issuetypeselectform",
   controller: "issuemanagementvctr",
