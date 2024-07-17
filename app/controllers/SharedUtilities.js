@@ -1402,18 +1402,12 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             expiry_date = "";
           }
           form.loadRecord(model);
-          form
-            .down("hiddenfield[name=application_id]")
-            .setValue(application_id);
-          form
-            .down("hiddenfield[name=application_code]")
-            .setValue(application_code);
+          form.down("hiddenfield[name=application_id]").setValue(application_id);
+          form.down("hiddenfield[name=application_code]").setValue(application_code);
           form.down("textfield[name=certificate_no]").setValue(permit_no);
           form.down("datefield[name=expiry_date]").setValue(expiry_date);
           form.down("hiddenfield[name=process_id]").setValue(process_id);
-          form
-            .down("hiddenfield[name=workflow_stage_id]")
-            .setValue(workflow_stage_id);
+          form.down("hiddenfield[name=workflow_stage_id]").setValue(workflow_stage_id);
           //hide fields
           if (is_siginig == 0) {
             form.down("textfield[name=certificate_no]").setHidden(true);
@@ -5154,6 +5148,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       decision_id = form.down("combo[name=decision_id]").getValue(),
       grid = activeTab.down("docuploadsgrid"),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue();
     (frm = form.getForm()),
       (win = form.up("window")),
       (action_url =
@@ -5166,7 +5161,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           "X-CSRF-Token": token,
         },
         params: {
-          //module_id: module_id
+          sub_module_id: sub_module_id
         },
         waitMsg: "Please wait...",
         success: function (fm, action) {

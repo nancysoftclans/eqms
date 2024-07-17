@@ -494,7 +494,10 @@ class DocumentManagementController extends Controller
             $table_name = $request->input('table_name');
             $application_id = $request->input('application_id');
             $application_code = $request->input('application_code');
-
+            $sub_module_id = $request->input('sub_module_id');
+           
+            $user_id = $this->user_id;
+dd($application_code);
 
             return DB::transaction(function () use ($application_code, $table_name, $request) {
                 $id = $request->input('recommendation_id');
@@ -504,12 +507,35 @@ class DocumentManagementController extends Controller
                 $approval_date = $request->input('approval_date');
                 $permit_signatory = $request->input('permit_signatory');
                 $dg_signatory = $request->input('dg_signatory');
+                $process_id = $request->input('process_id');
 
                 // Ensure $permit_signatory is properly set
                 $user_id = $this->user_id;
                 if (empty($permit_signatory)) {
                     $permit_signatory = $user_id;
                 }
+
+                    // $qry1 = DB::table('tra_proc_applicable_doctypes')
+                    //     ->select('doctype_id')
+                    //     ->where($where);
+                    // $docTypes = $qry1->get();
+                    // $docTypes = convertStdClassObjToArray($docTypes);
+                    // $docTypes = convertAssArrayToSimpleArray($docTypes, 'doctype_id');
+                
+                $serial_format = DB::table('par_document_types as t1');
+                    ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.document_type_id')
+                    ->select('t1.prefix')
+                    ->where('t2.application_code', $application_code)
+                    ->get();
+                     
+
+                $serial_format = convertStdClassObjToArray($serial_format); // Assuming this function converts stdClass objects to arrays
+                $serial_format = convertAssArrayToSimpleArray($serial_format, 'prefix'); // Assuming this function flattens the associative array to a simple array based on 'prefix'
+
+                    
+             dd($serial_format);
+
+                $doc_number = generateDocumentNumber($decision_id, $process_id, $user_id);
 
                 $params = [
                     'application_code' => $application_code,
@@ -536,6 +562,8 @@ class DocumentManagementController extends Controller
 
                     // Insert into manager permits review
                     $res = insertRecord('tra_managerpermits_review', $params, $user_id);
+
+
                 }
 
                 // Update manager permits review
@@ -2017,7 +2045,10 @@ class DocumentManagementController extends Controller
                 }
                 
                 if($record){
-                    $initial_file_name = $record->initial_file_name;
+
+                $document_number = getSingleRecordColValue('tra_permitsrelease_recommendation', $application_code, 'document_number');
+
+                $initial_file_name = $record->initial_file_name;
                 //save the documetn access
                 $data['created_on'] = Carbon::now();
                 $data['created_by'] = $user_id;
@@ -2036,32 +2067,40 @@ class DocumentManagementController extends Controller
                    set_time_limit(0); 
 
                     $public_dir=public_path().'/resources/uploads';
-                    $public_dir = str_replace('\\', '/', $public_dir);                
+                    $public_dir = str_replace('\\', '/', $public_dir);  
+
+                    if (!is_dir($public_dir)) {
+                        mkdir($public_dir, 0755, true);
+                     }              
                     
                     $file = file_get_contents($url);
                     $filetopath=$public_dir.'/'.$initial_file_name;
                     file_put_contents($filetopath, $file);
+
+                    //dd($destination);
                     
                     // $res = array(
                     //     'success' => true,
                     //     'document_url' => $url
                     // );
-
                     if ($file) {
-                        $attachment_path = $this->handleAttachment($file);
+                        $attachment_path = $this->addDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number);
+                        unlink($filetopath); 
+                       // dd($attachment_path);
+                    }else{
+                        $attachment_path = $filetopath;
                     }
                     
                     ini_set('memory_limit', '-1');
-                    if(file_exists($filetopath)){
-                       $file = file_get_contents($filetopath);
+                    if(file_exists($attachment_path)){
+                       $file = file_get_contents($attachment_path);
                          //attachment
-
-                        unlink($filetopath); 
+                        unlink($attachment_path); 
                          $res = array(
                             'success' => true,
                             'message' => 'all is well',
                             'filename' => $initial_file_name,
-                            'dms_url'=>$url,
+                            'dms_url'=>$attachment_path,
                             'document_url' => "data:application/octet-stream;base64,".base64_encode($file)
                         );
                         return json_encode($res);
@@ -2790,9 +2829,10 @@ public function addImageWatermark($sourceFile, $destination, $watermarkFile, $sa
 }
 
 
-public function addWordWatermark($sourceFile, $destination, $watermarkText, $savedName) {
+//public function addWordWatermark($sourceFile, $destination, $watermarkText, $savedName) {
+public function addWordWatermark($filetopath, $destination) {
     // Load the Word document
-    $phpWord = IOFactory::load($sourceFile);
+    $phpWord = IOFactory::load($filetopath);
 
     // Loop through all sections and add the watermark text to the header
     foreach ($phpWord->getSections() as $section) {
@@ -2859,14 +2899,48 @@ public function addPptWatermark($sourceFile, $destination, $watermarkText, $save
     $writer->save($outputPath);
 }
 
-public function addWatermark($attachment, $destination, $watermarkText, $savedName) {
+// public function addWatermark($filetopath, $initial_file_name, $public_dir) {
+//     $pdf = new \Mpdf\Mpdf();
+//     // Save the uploaded file to a temporary location
+//     // $tempPath = tempnam(sys_get_temp_dir(), 'pdf_');
+//     // $filetopath->move(dirname($tempPath), basename($tempPath));
+//     $watermarkText = 'CONFIDENTIAL';
+    
+//     // Set source file
+//     $pageCount = $pdf->setSourceFile($filetopath);
+
+//     for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+//         // Import a page
+//         $tplId = $pdf->importPage($pageNo);
+//         $pdf->AddPage();
+//         $pdf->useTemplate($tplId);
+
+//         // Set watermark font and color
+//         $pdf->SetFont('Helvetica', 'B', 50);
+//         $pdf->SetTextColor(255, 192, 203);
+
+//         // Get page width and height
+//         $size = $pdf->getTemplateSize($tplId);
+//         $width = $size['width'];
+//         $height = $size['height'];
+
+//         // Add watermark text
+//         $pdf->StartTransform();
+//         $pdf->Rotate(45, $width / 2, $height / 2);
+//         $pdf->Text($width / 4, $height / 2, $watermarkText);
+//         $pdf->StopTransform();
+
+//          // Reset the transparency to default
+//         $pdf->SetAlpha(1);
+//     }
+
+
+public function addDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number) {
     $pdf = new \Mpdf\Mpdf();
-    // Save the uploaded file to a temporary location
-    $tempPath = tempnam(sys_get_temp_dir(), 'pdf_');
-    $attachment->move(dirname($tempPath), basename($tempPath));
+    
 
     // Set source file
-    $pageCount = $pdf->setSourceFile($tempPath);
+    $pageCount = $pdf->setSourceFile($filetopath);
 
     for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
         // Import a page
@@ -2875,53 +2949,64 @@ public function addWatermark($attachment, $destination, $watermarkText, $savedNa
         $pdf->useTemplate($tplId);
 
         // Set watermark font and color
-        $pdf->SetFont('Helvetica', 'B', 50);
-        $pdf->SetTextColor(255, 192, 203);
+        $pdf->SetFont('Helvetica', 'B', 13);
+        $pdf->Cell(0,8,$document_number,0,1, 'R');
+        //$pdf->WriteHTML($watermarkText, true, false, true, true, 'R');
+        // $pdf->SetTextColor(255, 192, 203);
 
-        // Get page width and height
-        $size = $pdf->getTemplateSize($tplId);
-        $width = $size['width'];
-        $height = $size['height'];
+        // // Get page width and height
+        // $size = $pdf->getTemplateSize($tplId);
+        // $width = $size['width'];
+        // $height = $size['height'];
 
-        // Add watermark text
-        $pdf->StartTransform();
-        $pdf->Rotate(45, $width / 2, $height / 2);
-        $pdf->Text($width / 4, $height / 2, $watermarkText);
-        $pdf->StopTransform();
+        // // Add watermark text
+        // $pdf->StartTransform();
+        // $pdf->Rotate(45, $width / 2, $height / 2);
+        // $pdf->Text($width / 4, $height / 2, $watermarkText);
+        // $pdf->StopTransform();
 
-         // Reset the transparency to default
-        $pdf->SetAlpha(1);
+        // // Reset the transparency to default
+        // $pdf->SetAlpha(1);
     }
 
-    // Ensure destination directory exists
-    if (!is_dir($destination)) {
-        mkdir($destination, 0755, true);
-    }
+    // Save the watermarked PDF
+    $watermarkedFilePath = $public_dir . '/watermarked_' . $initial_file_name;
+    $pdf->Output($watermarkedFilePath, \Mpdf\Output\Destination::FILE);
 
-    // Form the full path for the output PDF
-    $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
-
-    // Output the new PDF to the specified destination
-    $pdf->Output($outputPath, 'F');
-
-    // Clean up the temporary file
-    unlink($tempPath);
+    return $watermarkedFilePath;
 }
+
+
+
+//     // Ensure destination directory exists
+//     if (!is_dir($public_dir)) {
+//         mkdir($public_dir, 0755, true);
+//     }
+
+//     // Form the full path for the output PDF
+//     $outputPath = rtrim($filetopath);
+
+   
+
+//     // Output the new PDF to the specified destination
+//     $pdf->Output($outputPath, 'F');
+
+//     // Clean up the temporary file
+//     unlink($filetopath);
+// }
     
-    public function handleAttachment($file)
-{
-    if ($file) {
-        $file_name = $file->getClientOriginalName();
-        $extension = $file->getClientOriginalExtension();
-        $document_rootupload = Config('constants.dms.doc_rootupload');
-        $destination = getcwd() . $document_rootupload;
-        $savedName = str_random(3) . time() . '.' . $extension;
-        $watermarkText = 'CONFIDENTIAL';
-        $file->move($destination, $savedName);
-        $this->addWatermark($file, $destination, $watermarkText,$savedName);
-        //$this->addExcelWatermark($file, $destination, $watermarkText,$savedName);
-        return $destination . $savedName;
-    }
-    return null;
-}
+//     public function handleAttachment($file)
+// {
+//     if ($file) {
+//         $document_rootupload = Config('constants.dms.doc_rootupload');
+//         $destination = getcwd() . $document_rootupload;
+//         $savedName = str_random(3) . time() . '.' . $extension;
+//         $watermarkText = 'CONFIDENTIAL';
+//         $file->move($destination, $savedName);
+//         $this->addWatermark($file, $destination, $watermarkText,$savedName);
+//      //   $this->addExcelWatermark($file, $destination, $watermarkText,$savedName);
+//         return $destination . $savedName;
+//     }
+//     return null;
+// }
 }

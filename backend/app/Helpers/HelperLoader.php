@@ -1508,3 +1508,17 @@ if (!function_exists('getInternalApplicant_id')) {
         return UtilityHelper::getInternalApplicant_id($identification_no);
     }
 }
+
+if (!function_exists('generateDocumentNumber')) {
+    function generateDocumentNumber($decision_id, $process_id, $user_id)
+    {
+        return UtilityHelper::generateDocumentNumber($decision_id, $process_id, $user_id);
+    }
+}
+
+if (!function_exists('generateDocNumber')) {
+    function generateDocNumber($codes_array, $decision_id)
+    {
+        return UtilityHelper::generateDocNumber($codes_array, $decision_id);
+    }
+}
