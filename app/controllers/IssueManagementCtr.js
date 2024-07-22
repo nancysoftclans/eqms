@@ -23,10 +23,10 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuereceivingwizard: {
         afterrender: "launchissuereceivingWizard",
       },
-      issuesubmissionwizard: {
+      issueinitialqualityreviewwizard: {
         afterrender: "prepapreIssueApplicationReview",
       },
-      "issuesubmissionwizard button[name=recommendation]": {
+      "issueinitialqualityreviewwizard button[name=recommendation]": {
         click: "AddGeneralComment",
       },
     },
