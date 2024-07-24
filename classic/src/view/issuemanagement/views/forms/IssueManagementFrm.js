@@ -156,7 +156,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
             proxy: {
               url: "configurations/getConfigParamFromTable",
               extraParams: {
-                table_name: "par_sections",
+                table_name: "par_departments",
               },
             },
           },

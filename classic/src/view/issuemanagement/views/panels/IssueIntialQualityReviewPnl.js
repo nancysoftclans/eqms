@@ -1,34 +1,55 @@
-Ext.define("Admin.view.issuemanagement.views.panels.IssueIntialQualityReviewPnl", {
-  extend: "Ext.tab.Panel",
-  xtype: "issuesubmissionpnl",
-  layout: {
-    type: "fit",
-  },
-  defaults: {
-    margin: 3,
-  },
-  viewModel: {
-    type: "issuemanagementvm",
-  },
-  items: [
-    {
-      xtype: "issuemanagementfrm",
-      autoScroll: true,
-      title: "ISSUE DETAILS",
+Ext.define(
+  "Admin.view.issuemanagement.views.panels.IssueIntialQualityReviewPnl",
+  {
+    extend: "Ext.tab.Panel",
+    xtype: "issuesubmissionpnl",
+    layout: {
+      type: "fit",
     },
-    {
-      xtype: "complainantdetailsfrm",
-      autoScroll: true,
-      title: "COMPLAINANT DETAILS",
+    defaults: {
+      margin: 3,
     },
-    {
-      xtype: "issuemanagementdocuploadsgrid",
-      title: "ASSOCIATED DOCUMENTS",
+
+    viewModel: {
+      type: "issuemanagementvm",
     },
-    {
-      xtype: "hiddenfield",
-      name: "_token",
-      value: token,
-    },
-  ],
-});
+    items: [
+      {
+        xtype: "issueinitialqualityreviewfrm",
+        autoScroll: true,
+        title: "Initial Review by Quality Office",
+      },
+      {
+        xtype: "issuemanagementfrm",
+        autoScroll: true,
+        title: "ISSUE DETAILS",
+        fieldDefaults: {
+          fieldStyle: {
+            color: "green",
+            "font-weight": "bold",
+          },
+        },
+      },
+      {
+        xtype: "complainantdetailsfrm",
+        autoScroll: true,
+        title: "COMPLAINANT DETAILS",
+        fieldDefaults: {
+          fieldStyle: {
+            color: "green",
+            "font-weight": "bold",
+          },
+        },
+      },
+      {
+        xtype: "issuemanagementdocuploadsgrid",
+        title: "ASSOCIATED DOCUMENTS",
+      },
+      {
+        xtype: "hiddenfield",
+        name: "_token",
+        value: token,
+      },
+    ],
+  }
+);

@@ -19,6 +19,10 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
   },
   tbar: [
     {
+      xtype: "panel",
+      html: "<h2>Double Click To View Issue Details</h2>",
+    },
+    {
       xtype: "exportbtn",
     },
     {

@@ -33,7 +33,14 @@ class IssueManagement extends Model
         'application_status_id',
         'reference_no',
         'tracking_no',
-        'process_id'
+        'process_id',
+        'complaint_direct_or_indirect',
+        'office_assigned_to',
+        'complaint_scheduling_delay',
+        'complaint_manner_of_advisor',
+        'complaint_turnaround',
+        'complaint_response_delay',
+        'complaint_other',
     ];
 
     public $timestamps = false;

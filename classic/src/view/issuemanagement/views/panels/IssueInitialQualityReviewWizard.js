@@ -150,7 +150,7 @@ Ext.define(
             iconCls: "fa fa-exclamation-triangle",
             enableToggle: true,
             pressed: true,
-            text: "Initial Review by Quality Office",
+            text: "ISSUE MANAGEMENT",
             max_step: 1,
             action: "quickNav",
             wizard: "issueinitialqualityreviewwizard",
@@ -171,6 +171,17 @@ Ext.define(
           },
           "->",
           {
+            text: "Save",
+            ui: "soft-blue",
+            iconCls: "fa fa-save",
+            name: "save",
+            formBind: true,
+            form_panel: "#issueinitialqualityreviewfrm",
+            action_url: "issuemanagement/saveIssueQualityReviewDetails",
+            wizard: "issuereceivingwizard",
+            handler: "saveIssueManagementInitialQualityReviewDetails",
+          },
+          {
             text: "Recommendations & Comments",
             ui: "soft-blue",
             iconCls: "fa fa-clipboard-check",
@@ -180,6 +191,7 @@ Ext.define(
             name: "recommendation",
             comment_type_id: 3,
             stores: "[]",
+            hidden: true
           },
           {
             text: "Submit Application",
