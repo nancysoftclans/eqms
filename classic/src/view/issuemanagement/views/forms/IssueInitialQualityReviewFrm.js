@@ -15,7 +15,7 @@ Ext.define(
     bodyPadding: 8,
     defaults: {
       columnWidth: 0.5,
-      // margin: 5,
+      margin: 5,
       labelAlign: "top",
     },
     frame: true,

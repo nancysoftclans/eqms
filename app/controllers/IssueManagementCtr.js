@@ -29,6 +29,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issueinitialqualityreviewwizard button[name=recommendation]": {
         click: "AddGeneralComment",
       },
+      issuerootcauseanalysiswizard: {
+        afterrender: "prepapreIssueApplicationReview",
+      },
     },
   },
 
