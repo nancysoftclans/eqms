@@ -1,8 +1,8 @@
 Ext.define(
-  "Admin.view.issuemanagement.views.panels.IssueSubmissionWizard",
+  "Admin.view.issuemanagement.views.panels.IssueRootCauseAnalysisWizard",
   {
     extend: "Ext.panel.Panel",
-    alias: "widget.issuesubmissionwizard",
+    alias: "widget.issuerootcauseanalysiswizard",
     padding: "2 0 2 0",
     requires: ["Ext.layout.container.*", "Ext.toolbar.Fill"],
     reference: "wizardpnl",
@@ -108,12 +108,16 @@ Ext.define(
             xtype: "hiddenfield",
             name: "application_status_id",
           },
+          {
+            xtype: "hiddenfield",
+            name: "application_code",
+          },
         ],
       },
     ],
     items: [
       {
-        xtype: "issuemanagementpnl",
+        xtype: "issuerootcauseanalysispnl",
         layout: "fit",
         defaults: {
           margin: 3,
@@ -126,33 +130,34 @@ Ext.define(
     ],
     initComponent: function () {
       var me = this;
-      // this.tbar = {
-      //   reference: "progress",
-      //   itemId: "progress_tbar",
-      //   defaultButtonUI: "wizard-blue",
-      //   cls: "wizardprogressbar",
-      //   style: {
-      //     color: "#90c258",
-      //   },
-      //   bodystyle: {
-      //     color: "#90c258",
-      //   },
-      //   layout: {
-      //     pack: "center",
-      //   },
-      //   items: [
-      //     {
-      //       step: 0,
-      //       iconCls: "fa fa-exclamation-triangle",
-      //       enableToggle: true,
-      //       pressed: true,
-      //       text: "ISSUE MANAGEMENT DETAILS",
-      //       max_step: 1,
-      //       action: "quickNav",
-      //       wizard: "issuereceivingwizard",
-      //     },
-      //   ],
-      // };
+      this.tbar = {
+        reference: "progress",
+        itemId: "progress_tbar",
+        defaultButtonUI: "wizard-blue",
+        cls: "wizardprogressbar",
+        style: {
+          color: "#90c258",
+        },
+        bodystyle: {
+          color: "#90c258",
+        },
+        layout: {
+          pack: "center",
+        },
+        items: [
+          {
+            step: 0,
+            iconCls: "fa fa-exclamation-triangle",
+            enableToggle: true,
+            pressed: true,
+            text: "ISSUE MANAGEMENT",
+            max_step: 1,
+            action: "quickNav",
+            wizard: "issuerootcauseanalysiswizard",
+            handler: "quickNavigation",
+          },
+        ],
+      };
       this.bbar = {
         reference: "navigation-toolbar",
         ui: "footer",
@@ -166,29 +171,15 @@ Ext.define(
           },
           "->",
           {
-            text: "Previous",
-            ui: "soft-blue",
-            iconCls: "fa fa-arrow-left",
-            name: "prev_btn",
-            max_step: 1,
-            bind: {
-              disabled: "{atBeginning}",
-            },
-            wizard: "issuereceivingwizard",
-            handler: "onPrevCardClick",
-            hidden: true,
-          },
-          {
-            text: "Save Details",
+            text: "Save",
             ui: "soft-blue",
             iconCls: "fa fa-save",
             name: "save",
             formBind: true,
-            form_panel: "#issuemanagementfrm",
-            action_url: "issuemanagement/saveNewReceivingBaseDetails",
-            wizard: "issuereceivingwizard",
-            handler: "saveIssueManagementApplicationReceivingBaseDetails",
-            hidden: true,
+            form_panel: "#issuerootcauseanalysisfrm",
+            action_url: "issuemanagement/saveIssueRCADetails",
+            wizard: "issuerootcauseanalysiswizard",
+            handler: "saveIssueRCAeviewDetails",
           },
           {
             text: "Recommendations & Comments",
@@ -200,6 +191,7 @@ Ext.define(
             name: "recommendation",
             comment_type_id: 3,
             stores: "[]",
+            hidden: true
           },
           {
             text: "Submit Application",
@@ -211,30 +203,6 @@ Ext.define(
             winWidth: "50%",
             handler: "showIssueManagementSubmissionWin",
           },
-          {
-            text: "Add Approval Decision",
-            iconCls: "fa fa-plus",
-            name: "approval",
-            handler: "getDocumentReleaseRecommendationDetails",
-            approval_frm: "documentreviewrecommfrm",
-            vwcontroller: "documentsManagementvctr",
-            stores: '["productApprovalDecisionsStr"]',
-            table_name: "tra_documentmanager_application",
-            is_siginig: 0,
-          },          
-          // {
-          //   text: "Next",
-          //   ui: "soft-blue",
-          //   reference: "nextbutton",
-          //   iconCls: "fa fa-arrow-right",
-          //   iconAlign: "right",
-          //   max_step: 1,
-          //   bind: {
-          //     disabled: "{atEnd}",
-          //   },
-          //   wizard: "issuereceivingwizard",
-          //   handler: "onNextCardClick",
-          // },
         ],
       };
       me.callParent(arguments);

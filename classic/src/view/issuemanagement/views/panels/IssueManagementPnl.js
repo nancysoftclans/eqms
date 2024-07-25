@@ -14,16 +14,16 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
     {
       xtype: "issuemanagementfrm",
       autoScroll: true,
-      title: "ISSUE DETAILS",
+      title: "Issue Details",
     },
     {
       xtype: "complainantdetailsfrm",
       autoScroll: true,
-      title: "COMPLAINANT DETAILS",
+      title: "Complainant Details",
     },
     {
       xtype: "issuemanagementdocuploadsgrid",
-      title: "ASSOCIATED DOCUMENTS",
+      title: "DOCUMENTS",
     },
     {
       xtype: "hiddenfield",

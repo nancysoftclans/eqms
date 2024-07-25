@@ -1,8 +1,8 @@
 Ext.define(
-  "Admin.view.issuemanagement.views.panels.IssueResolutionPnl",
+  "Admin.view.issuemanagement.views.panels.IssueIntialQualityReviewPnl",
   {
     extend: "Ext.tab.Panel",
-    xtype: "issueresolutionpnl",
+    xtype: "issuesubmissionpnl",
     layout: {
       type: "fit",
     },
@@ -15,31 +15,9 @@ Ext.define(
     },
     items: [
       {
-        xtype: "issueresolutionfrm",
-        autoScroll: true,
-        title: "Resolution",
-      },
-      {
-        xtype: "issuerootcauseanalysisfrm",
-        autoScroll: true,
-        title: "Root Cause Analysis",
-        fieldDefaults: {
-          fieldStyle: {
-            color: "green",
-            "font-weight": "bold",
-          },
-        },
-      },
-      {
         xtype: "issueinitialqualityreviewfrm",
         autoScroll: true,
         title: "Initial Review by Quality Office",
-        fieldDefaults: {
-          fieldStyle: {
-            color: "green",
-            "font-weight": "bold",
-          },
-        },
       },
       {
         xtype: "issuemanagementfrm",

@@ -23,16 +23,22 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuereceivingwizard: {
         afterrender: "launchissuereceivingWizard",
       },
-      issuesubmissionwizard: {
+      issueinitialqualityreviewwizard: {
         afterrender: "prepapreIssueApplicationReview",
       },
-      "issuesubmissionwizard button[name=recommendation]": {
+      "issueinitialqualityreviewwizard button[name=recommendation]": {
         click: "AddGeneralComment",
+      },
+      issuerootcauseanalysiswizard: {
+        afterrender: "prepapreIssueRCAReview",
+      },
+      issueresolutiongwizard: {
+        afterrender: "prepapreIssueResolutionReview",
       },
     },
   },
 
-  init: function () {},
+  init: function () { },
 
   listen: {
     controller: {
@@ -172,7 +178,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(false);
-    activeTab.down("button[name=approval]").setVisible(false);
+    // activeTab.down("button[name=approval]").setVisible(false);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -341,6 +347,12 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .getValue(),
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
       complainantdetailsfrm = activeTab.down("complainantdetailsfrm"),
+      issueinitialqualityreviewfrm = activeTab.down(
+        "issueinitialqualityreviewfrm"
+      ),
+      issuemanagementdocuploadsgrid = activeTab.down(
+        "issuemanagementdocuploadsgrid"
+      ),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue(),
@@ -352,10 +364,12 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .down("hiddenfield[name=workflow_stage_id]")
         .getValue();
 
-    activeTab.down("button[name=recommendation]").setVisible(true);
-    activeTab.down("button[name=approval]").setVisible(false);
-    activeTab.down("textfield[name=recommendation_id]").setVisible(true);
-    activeTab.down("textfield[name=approval_id]").setVisible(false);
+    // activeTab.down("button[name=recommendation]").setVisible(true);
+    // activeTab.down("button[name=approval]").setVisible(false);
+    // activeTab.down("textfield[name=recommendation_id]").setVisible(true);
+    // activeTab.down("textfield[name=approval_id]").setVisible(false);
+    issuemanagementdocuploadsgrid.down("button[name=add_upload]").setVisible(false);
+
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -377,6 +391,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           if (success == true || success === true) {
             issuemanagementfrm.loadRecord(model);
             complainantdetailsfrm.loadRecord(model);
+            issueinitialqualityreviewfrm.loadRecord(model);
             activeTab
               .down("displayfield[name=workflow_stage]")
               .setValue(results.workflow_stage);
@@ -387,7 +402,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               .down("datefield[name=creation_date]")
               .setValue(new Date(results.creation_date));
 
-            issuemanagementfrm.down("textfield[name=title]").setReadOnly(true);
             issuemanagementfrm
               .getForm()
               .getFields()
@@ -406,6 +420,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             issuemanagementfrm
               .down("tagfield[name=section_ids]")
               .setValue(section_ids_array);
+
+            issueinitialqualityreviewfrm
+              .down("radiogroup[name=complaint_direct_or_indirect]")
+              .setValue({
+                complaint_direct_or_indirect:
+                  results.complaint_direct_or_indirect,
+              });
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -413,8 +434,223 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         failure: function (response) {
           Ext.getBody().unmask();
           var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+    }
+  },
+
+  prepapreIssueRCAReview: function (pnl) {
+    Ext.getBody().mask("Please wait...");
+    var activeTab = pnl,
+      issuemanagementfrm = activeTab.down("issuemanagementfrm"),
+      complainantdetailsfrm = activeTab.down("complainantdetailsfrm"),
+      issueinitialqualityreviewfrm = activeTab.down(
+        "issueinitialqualityreviewfrm"
+      ),
+      issuerootcauseanalysisfrm = activeTab.down(
+        "issuerootcauseanalysisfrm"
+      ),
+      issuemanagementdocuploadsgrid = activeTab.down(
+        "issuemanagementdocuploadsgrid"
+      ),
+      active_application_id = activeTab
+        .down("hiddenfield[name=active_application_id]")
+        .getValue();
+    issuemanagementdocuploadsgrid.down("button[name=add_upload]").setVisible(false);
+
+
+    if (active_application_id) {
+      Ext.Ajax.request({
+        method: "GET",
+        url:
+          "issuemanagement/getIssueManagementDetailsById/" +
+          active_application_id,
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
             message = resp.message,
-            success = resp.success;
+            success = resp.success,
+            results = resp.results,
+            model = Ext.create("Ext.data.Model", results);
+
+          if (success == true || success === true) {
+            issuemanagementfrm.loadRecord(model);
+            complainantdetailsfrm.loadRecord(model);
+            issueinitialqualityreviewfrm.loadRecord(model);
+            issuerootcauseanalysisfrm.loadRecord(model);
+            activeTab
+              .down("displayfield[name=workflow_stage]")
+              .setValue(results.workflow_stage);
+            activeTab
+              .down("displayfield[name=tracking_no]")
+              .setValue(results.reference_no);
+            issuemanagementfrm
+              .down("datefield[name=creation_date]")
+              .setValue(new Date(results.creation_date));
+
+            issuemanagementfrm
+              .getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+            complainantdetailsfrm
+              .getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+
+            issueinitialqualityreviewfrm.getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+
+            // Parse the string using JSON.parse() (assuming valid JSON format)
+            const section_ids_array = JSON.parse(results.section_ids);
+            issuemanagementfrm
+              .down("tagfield[name=section_ids]")
+              .setValue(section_ids_array);
+
+            issueinitialqualityreviewfrm
+              .down("radiogroup[name=complaint_direct_or_indirect]")
+              .setValue({
+                complaint_direct_or_indirect:
+                  results.complaint_direct_or_indirect,
+              });
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+    }
+  },
+
+  prepapreIssueResolutionReview: function (pnl) {
+    Ext.getBody().mask("Please wait...");
+    var activeTab = pnl,
+      issuemanagementfrm = activeTab.down("issuemanagementfrm"),
+      complainantdetailsfrm = activeTab.down("complainantdetailsfrm"),
+      issueinitialqualityreviewfrm = activeTab.down(
+        "issueinitialqualityreviewfrm"
+      ),
+      issuerootcauseanalysisfrm = activeTab.down(
+        "issuerootcauseanalysisfrm"
+      ),
+      issueresolutionfrm = activeTab.down(
+        "issueresolutionfrm"
+      ),
+      issuemanagementdocuploadsgrid = activeTab.down(
+        "issuemanagementdocuploadsgrid"
+      ),
+      
+      active_application_id = activeTab
+        .down("hiddenfield[name=active_application_id]")
+        .getValue();
+    issuemanagementdocuploadsgrid.down("button[name=add_upload]").setVisible(false);
+
+
+    if (active_application_id) {
+      Ext.Ajax.request({
+        method: "GET",
+        url:
+          "issuemanagement/getIssueManagementDetailsById/" +
+          active_application_id,
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success,
+            results = resp.results,
+            model = Ext.create("Ext.data.Model", results);
+
+          if (success == true || success === true) {
+            issuemanagementfrm.loadRecord(model);
+            complainantdetailsfrm.loadRecord(model);
+            issueinitialqualityreviewfrm.loadRecord(model);
+            issuerootcauseanalysisfrm.loadRecord(model);
+            issueresolutionfrm.loadRecord(model);
+            activeTab
+              .down("displayfield[name=workflow_stage]")
+              .setValue(results.workflow_stage);
+            activeTab
+              .down("displayfield[name=tracking_no]")
+              .setValue(results.reference_no);
+            issuemanagementfrm
+              .down("datefield[name=creation_date]")
+              .setValue(new Date(results.creation_date));
+
+            issuemanagementfrm
+              .getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+            complainantdetailsfrm
+              .getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+
+            issueinitialqualityreviewfrm.getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+
+            issuerootcauseanalysisfrm.getForm()
+              .getFields()
+              .each(function (field) {
+                field.setReadOnly(true);
+              });
+            // Parse the string using JSON.parse() (assuming valid JSON format)
+            const section_ids_array = JSON.parse(results.section_ids);
+            issuemanagementfrm
+              .down("tagfield[name=section_ids]")
+              .setValue(section_ids_array);
+
+            issueinitialqualityreviewfrm
+              .down("radiogroup[name=complaint_direct_or_indirect]")
+              .setValue({
+                complaint_direct_or_indirect:
+                  results.complaint_direct_or_indirect,
+              });
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message;
           toastr.error(message, "Failure Response");
         },
         error: function (jqXHR, textStatus, errorThrown) {

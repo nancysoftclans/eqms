@@ -1,12 +1,12 @@
-Ext.define("Admin.view.issuemanagement.views.panels.IssueSubmissionPnl", {
+Ext.define("Admin.view.issuemanagement.views.panels.IssueResolutionPanel", {
   extend: "Ext.panel.Panel",
-  xtype: "issuesubmission",
+  xtype: "issueresolution",
   controller: "issuemanagementvctr",
   viewModel: "issuemanagementvm",
   layout: "fit",
   items: [
     {
-      xtype: "issuesubmissionwizard",
+      xtype: "issueresolutiongwizard",
     },
   ],
 });
