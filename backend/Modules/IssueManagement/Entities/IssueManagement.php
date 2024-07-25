@@ -41,6 +41,23 @@ class IssueManagement extends Model
         'complaint_turnaround',
         'complaint_response_delay',
         'complaint_other',
+        'problem_statement',
+        'rca_team',
+        'responsible_officer',
+        'complaint_placing_budgetary',
+        'complaint_placing_schedule',
+        'complaint_lacking_knowledge',
+        'complaint_practicing_autocratic',
+        'complaint_processes',
+        'complaint_ineffective_processes',
+        'complaint_inefficient_processes',
+        'complaint_ineffective_support',
+        'complaint_system_documentation',
+        'complaint_incomplete_system',
+        'complaint_ineffective_system',
+        'complaint_inefficient_system',
+        'complaint_analytical_methods',
+        'complaint_validated_methods',
     ];
 
     public $timestamps = false;

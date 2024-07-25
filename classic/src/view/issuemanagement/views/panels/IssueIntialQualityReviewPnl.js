@@ -43,7 +43,7 @@ Ext.define(
       },
       {
         xtype: "issuemanagementdocuploadsgrid",
-        title: "ASSOCIATED DOCUMENTS",
+        title: "DOCUMENTS",
       },
       {
         xtype: "hiddenfield",

@@ -23,6 +23,12 @@ Ext.define(
         xtype: "issueinitialqualityreviewfrm",
         autoScroll: true,
         title: "Initial Review by Quality Office",
+        fieldDefaults: {
+          fieldStyle: {
+            color: "green",
+            "font-weight": "bold",
+          },
+        },
       },
       {
         xtype: "issuemanagementfrm",
@@ -48,7 +54,7 @@ Ext.define(
       },
       {
         xtype: "issuemanagementdocuploadsgrid",
-        title: "ASSOCIATED DOCUMENTS",
+        title: "DOCUMENTS",
       },
       {
         xtype: "hiddenfield",

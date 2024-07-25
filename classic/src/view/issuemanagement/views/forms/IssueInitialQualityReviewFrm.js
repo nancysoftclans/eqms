@@ -40,6 +40,7 @@ Ext.define(
         margin: "0 20 20 0",
         allowBlank: false,
         name: "complaint_direct_or_indirect",
+        columns: 1,
         items: [
           { boxLabel: "Direct Complaint", name: "complaint_direct_or_indirect", inputValue: 1 },
           { boxLabel: "Indirect Complaint", name: "complaint_direct_or_indirect", inputValue: 2 },
@@ -74,7 +75,7 @@ Ext.define(
       {
         xtype: "checkboxgroup",
         fieldLabel: "Key issues of complaint",
-        columns: 1,
+        columns: 2,
         columnWidth: 1,
         allowBlank: false,
         items: [

@@ -94,6 +94,10 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
           name: "complaint_ineffective_processes",
         },
         {
+          boxLabel: "Inefficient processes/systems",
+          name: "complaint_inefficient_processes",
+        },
+        {
           boxLabel: "Ineffective support services",
           name: "complaint_ineffective_support",
         },
@@ -116,6 +120,10 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
         {
           boxLabel: "Ineffective system documentation",
           name: "complaint_ineffective_system",
+        },
+        {
+          boxLabel: "Inefficient system documentation",
+          name: "complaint_inefficient_system",
         }
       ],
     },

@@ -177,9 +177,9 @@ Ext.define(
             name: "save",
             formBind: true,
             form_panel: "#issuerootcauseanalysisfrm",
-            action_url: "issuemanagement/saveIssueRootCauseAnalysisDetails",
+            action_url: "issuemanagement/saveIssueRCADetails",
             wizard: "issuerootcauseanalysiswizard",
-            handler: "saveIssueManagementInitialQualityReviewDetails",
+            handler: "saveIssueRCAeviewDetails",
           },
           {
             text: "Recommendations & Comments",
