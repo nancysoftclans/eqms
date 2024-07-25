@@ -65,9 +65,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     "logdatabasesdocuploadgrid button[name=add_upload]": {
       click: "showApplicationDocUploadWin",
     },
-    "peerReviewMeetingPnl button[name=process_submission_btn]": {
-      click: "showManagerApplicationSubmissionWinGeneric",
-    },
     "documentapprovalfrm button[name=save_recommendation]": {
       click: "saveDocumentReviewRecommendationDetails",
     },
@@ -130,11 +127,11 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       click: "uploadApplicationFile",
       afterrender: "initializeResumableUpload",
     },
-    // "button[name=upload_excel_btn]": {
-    //   click: "uploadExcelFile",
-    //   // sendExcelToBD
-    //   afterrender: "initializeResumableExcelUpload",
-    // },
+    "button[name=upload_excel_btn]": {
+      click: "uploadExcelFile",
+      // sendExcelToBD
+      afterrender: "initializeResumableExcelUpload",
+    },
   },
   listen: {
     controller: {
