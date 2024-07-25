@@ -33,7 +33,7 @@ Ext.define(
       {
         xtype: "issuemanagementfrm",
         autoScroll: true,
-        title: "ISSUE DETAILS",
+        title: "Issue Details",
         fieldDefaults: {
           fieldStyle: {
             color: "green",
@@ -44,7 +44,7 @@ Ext.define(
       {
         xtype: "complainantdetailsfrm",
         autoScroll: true,
-        title: "COMPLAINANT DETAILS",
+        title: "Complainant Details",
         fieldDefaults: {
           fieldStyle: {
             color: "green",
@@ -54,7 +54,7 @@ Ext.define(
       },
       {
         xtype: "issuemanagementdocuploadsgrid",
-        title: "DOCUMENTS",
+        title: "Documents",
       },
       {
         xtype: "hiddenfield",

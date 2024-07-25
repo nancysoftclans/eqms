@@ -21,4 +21,5 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::get('getIssueProcessDetails', [IssueManagementController::class, 'getIssueProcessDetails']);
     Route::post('saveIssueQualityReviewDetails', [IssueManagementController::class, 'saveIssueQualityReviewDetails']);
     Route::post('saveIssueRCADetails', [IssueManagementController::class, 'saveIssueRCADetails']);
+    Route::post('saveIssueResolutionwDetails', [IssueManagementController::class, 'saveIssueResolutionwDetails']);
 });
