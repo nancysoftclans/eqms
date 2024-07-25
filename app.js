@@ -200,7 +200,7 @@ function getInitialDocumentCreationWorkflowDetails(module_id, sub_module_id,is_d
     return results;
 }
 
-function getInitialLiveDocumentCreationWorkflowDetails(module_id, application_type, sub_module_id) {
+function getInitialLiveDocumentCreationWorkflowDetails(module_id, sub_module_id) {
     var results = [];
     Ext.Ajax.request({
         method: 'GET',
@@ -208,7 +208,6 @@ function getInitialLiveDocumentCreationWorkflowDetails(module_id, application_ty
         url: 'workflow/getInitialLiveDocumentCreationWorkflowDetails',
         params: {
             module_id: module_id,
-            application_type: application_type,
             sub_module_id: sub_module_id,
         },
         headers: {

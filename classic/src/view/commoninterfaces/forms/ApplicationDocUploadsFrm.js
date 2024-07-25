@@ -205,20 +205,128 @@ Ext.define('Admin.view.commoninterfaces.forms.ApplicationDocUploadsFrm', {
         //     allowBlank: false,
         //     name: 'uploaded_doc'
         // },
-        {
-            xtype: 'textarea',
-            fieldLabel: 'Remarks',
-            name: 'description',
-            hidden: true,
-            allowBlank: true
-        },
-        {
-            xtype: 'component',
-            fieldLabel: 'File Name',
-            allowBlank: false,
-            name: 'name',
-            html: '<input type="text" id="fileName" style="width: 70%;padding: 10px;margin: 8px 0px;display: inline-block;box-sizing: border-box;background: #f1f1f1;outline: 0;border-width: 0 0 2px;border-color: #4664ab;"placeholder="select file" name="uname" readonly><a href="#" style="background-color: #35BAF6;box-shadow: 0 2px 0 darkblue;color: white;padding: 10px;position: relative;width: 30%;text-decoration: none;margin: 8px 0px;"id="browseButton">Select files</a>',
-        }
+
+
+     {
+    xtype: 'component',
+    fieldLabel: 'File Name',
+    allowBlank: false,
+    name: 'name',
+    html: `
+        <div style="
+            position: relative;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+        ">
+            <div style="
+                position: relative;
+                width: 100%;
+            ">
+                <input type="text" id="fileName" style="
+                    width: 100%;
+                    padding: 10px 10px 10px 120px; 
+                    margin: 8px 0;
+                    box-sizing: border-box;
+                    background: #f1f1f1;
+                    border: none;
+                    border-bottom: 2px solid #4664ab;
+                    display: block;
+                " placeholder="" name="uname" readonly>
+                <span style="
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    height: 100%; /* Match the height of the input field */
+                    width: 120px; /* Width should match the padding adjustment */
+                    background: #f1f1f1; /* Dark grey background */
+                    color: #333;
+                    padding: 10px;
+                    box-sizing: border-box;
+                    font-size: 12px;
+                    line-height: 1; /* Ensures the text is vertically centered */
+                    display: flex;
+                    align-items: center; /* Center text vertically */
+                    justify-content: center; /* Center text horizontally */
+                    text-align: center;
+                    border-top-left-radius: 5px; /* Optional: rounded corners */
+                    border-bottom-left-radius: 5px; /* Optional: rounded corners */
+                ">
+                    File Name
+                </span>
+            </div>
+            <a href="#" style="
+                background-color: #35BAF6;
+                box-shadow: 0 2px 0 darkblue;
+                color: white;
+                padding: 10px;
+                text-decoration: none;
+                margin: 8px 0;
+                display: block;
+                text-align: center;
+                width: 100%;
+                box-sizing: border-box;
+            " id="browseButton">Select file</a>
+        </div>
+    `,
+    style: {
+        display: 'block'
+    }
+}
+
+
+
+
+
+
+// {
+//     xtype: 'component',
+//     fieldLabel: 'File Name',
+//     allowBlank: false,
+//     name: 'name',
+//     html: `
+//         <div style="
+//             display: flex;
+//             flex-direction: column;
+//             width: 100%;
+//         ">
+//             <input type="text" id="fileName" style="
+//                 width: 100%;
+//                 padding: 10px;
+//                 margin: 8px 0;
+//                 box-sizing: border-box;
+//                 background: #f1f1f1;
+//                 border: none;
+//                 border-bottom: 2px solid #4664ab;
+//                 display: block;
+//             " placeholder="Select file" name="uname" readonly>
+//             <a href="#" style="
+//                 background-color: #35BAF6;
+//                 box-shadow: 0 2px 0 darkblue;
+//                 color: white;
+//                 padding: 10px;
+//                 text-decoration: none;
+//                 margin: 8px 0;
+//                 display: block;
+//                 text-align: center;
+//                 width: 100%; /* Full width */
+//                 box-sizing: border-box;
+//             " id="browseButton">Select files</a>
+//         </div>
+//     `,
+//     style: {
+//         display: 'block'
+//     }
+// }
+
+
+        // {
+        //     xtype: 'component',
+        //     fieldLabel: 'File Name',
+        //     allowBlank: false,
+        //     name: 'name',
+        //     html: '<input type="text" id="fileName" style="width: 70%;padding: 10px;margin: 8px 0px;display: inline-block;box-sizing: border-box;background: #f1f1f1;outline: 0;border-width: 0 0 2px;border-color: #4664ab;"placeholder="select file" name="uname" readonly><a href="#" style="background-color: #35BAF6;box-shadow: 0 2px 0 darkblue;color: white;padding: 10px;position: relative;width: 30%;text-decoration: none;margin: 8px 0px;"id="browseButton">Select files</a>',
+        // }
     ],
     buttons: [{
         xtype: 'button',

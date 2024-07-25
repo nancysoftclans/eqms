@@ -1146,26 +1146,27 @@ class DMSHelper
     }
 
 //get node versions
-    static function downloadDocumentUrl($node_ref, $version_id)
-    {
-        $auth_resp = authDms('');
-		if(!isset($auth_resp['ticket'])){
-		}
-        $ticket = $auth_resp['ticket'];
-    //get document name
-        $file_name = getSingleRecordColValue('tra_application_uploadeddocuments', ['node_ref'=>$node_ref], 'initial_file_name');
-     //   dms_url
-        $server_address = Config('constants.dms.dms_url');
-        if ($version_id != '') {
-            $url = $server_address . 'service/api/node/content/workspace/SpacesStore/' . $node_ref . '/version/' . $version_id . '/'.$file_name.'?a=false&alf_ticket=' . $ticket;
-
-        } else {
-            $url = $server_address . 'service/api/node/content/workspace/SpacesStore/' . $node_ref . '/'.$file_name .'?a=false&alf_ticket=' . $ticket;
-
-        }
-        return $url;
-
+   static function downloadDocumentUrl($node_ref, $version_id)
+{
+    $auth_resp = authDms('');
+    if (!isset($auth_resp['ticket'])) {
+        throw new \Exception('DMS authentication failed.');
     }
+    $ticket = $auth_resp['ticket'];
+
+    // Get document name
+    $file_name = getSingleRecordColValue('tra_application_uploadeddocuments', ['node_ref' => $node_ref], 'initial_file_name');
+    
+    // DMS URL
+    $server_address = Config('constants.dms.dms_url');
+    if ($version_id != '') {
+        $url = $server_address . 'service/api/node/content/workspace/SpacesStore/' . $node_ref . '/version/' . $version_id . '/' . urlencode($file_name) . '?a=false&alf_ticket=' . $ticket;
+    } else {
+        $url = $server_address . 'service/api/node/content/workspace/SpacesStore/' . $node_ref . '/' . urlencode($file_name) . '?a=false&alf_ticket=' . $ticket;
+    }
+    return $url;
+}
+
     static function downloadDocumentUrlOld($node_ref, $version_id)
     {
         $auth_resp = authDms('');
@@ -1443,19 +1444,16 @@ class DMSHelper
             'sub_module_id' => $sub_module_id,
             'created_by' => $user,
             'created_on' => Carbon::now());
-
-
+ 
         $resp = insertRecord('tra_application_documentsdefination', $dmsapp_data, $user, $con);
+
         return $resp;
-
-
     }
 
     static function initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id)
     {
         //check if node exists tra_application_documentsdefination
         $exists = recordExists('tra_application_documentsdefination', ['application_code'=>$application_code]);
-       
         if(!$exists){
             $dms_node_details = self::getApplicationSubModuleNodeDetails($module_id, $sub_module_id, $user_id);
             $nodeTracking = str_replace("/", "-", $ref_number);
@@ -1467,7 +1465,6 @@ class DMSHelper
             $dms_res = self::dmsCreateAppRootNodesChildren($parentNode_ref, $node_details);
             if ($dms_res['success']) {
                 $dms_node_id = $dms_res['node_details']->id;
-                
                 return self::saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, '', $ref_number, $dms_node_id, $user_id);
             }
         }else{

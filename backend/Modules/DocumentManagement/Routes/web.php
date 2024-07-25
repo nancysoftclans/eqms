@@ -28,6 +28,9 @@ Route::group(['prefix' => 'documentmanagement', 'middleware' => ['web']], functi
     Route::post('importExcelFile', [DocumentManagementController::class, 'importExcelFile']);
     Route::post('saveHeaderFooter', [DocumentManagementController::class, 'saveHeaderFooter']);
     Route::get('getHeaderFooterImages', [DocumentManagementController::class, 'getHeaderFooterImages']);
+    Route::get('downloadsopTemplate', [DocumentManagementController::class, 'downloadsopTemplate']);
+    Route::get('downloadFormFormat', [DocumentManagementController::class, 'downloadFormFormat']);
+    Route::get('downloadlogdatabasesTemplate', [DocumentManagementController::class, 'downloadlogdatabasesTemplate']);
 
 });
 
@@ -89,7 +92,9 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::post('saveDocumentApplicationApprovalDetails', [DocumentManagementController::class, 'saveDocumentApplicationApprovalDetails']); 
     Route::post('dmsUpdateAccountPassword', [DmsConfigurationsController::class, 'dmsUpdateAccountPassword']);
     Route::get('getArchivedDocdDetails', [DmsConfigurationsController::class, 'getArchivedDocdDetails']);
+   
 
     });
+
 
 

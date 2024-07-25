@@ -2801,7 +2801,7 @@ static function convertArrayToString($array){
         return  $applicant_id;
     }
 
-     static function generateDocumentNumber($decision_id, $process_id, $user_id)
+     static function generateDocumentNumber($decision_id, $process_id, $user_id, $doc_prefix)
     {
         $where = array(
             'process_id' => $process_id
@@ -2826,39 +2826,13 @@ static function convertArrayToString($array){
             $serial_num_tracker->where($where)->update($update_data);
 
         }
-        $serial_no = str_pad($current_serial_id, 5, 0, STR_PAD_LEFT);
+        $serial_no = str_pad($current_serial_id, 4, 0, STR_PAD_LEFT);
+
+        $doc_number = $doc_prefix . $serial_no;
+        
+        return $doc_number;
      
-        $codes_array['serial_no'] = $serial_no;
-        $ref_number = self::generateDocNumber($codes_array, $decision_id);
-        return $ref_number;
-    }
-
-     static function generateDocNumber($codes_array, $decision_id)
-    {
-        $serial_format = DB::table('par_document_types as t1')
-            ->leftJoin('tra_documentmanager_application as t2', 't1.document_type_id', 't2.id')
-            ->where('document_type_id', $document_type_id)
-            ->value('prefix');
-         dd($serial_format);
-
-        $arr = explode("|", $serial_format);
-       
-
-        $serial_variables = $serial_format = DB::table('par_refnumbers_variables')
-            ->select('identifier')
-            ->get();
-        //dd($serial_variables);
-        $serial_variables = convertStdClassObjToArray($serial_variables);
-        $serial_variables = convertAssArrayToSimpleArray($serial_variables, 'identifier');
-        $ref = '';
-        foreach ($arr as $code) {
-            if (in_array($code, $serial_variables)) {
-                isset($codes_array[$code]) ? $code = $codes_array[$code] : $code;
-            }
-            $ref = $ref . $code;
-            // dd($ref);
-        }
-        return $ref;
+        
     }
 
 

@@ -2023,16 +2023,13 @@ functDownloadAppDocument:function(node_ref,download,application_code=null,upload
                     document.body.appendChild(a);
                     a.click();
                     a.remove();
-                    grid.unmask();
                 } else {
-                    grid.unmask();
                     toastr.error(resp.message, 'Failure Response');
                 }
                    
                     
             },
             failure: function (response) {
-                grid.unmask();
                 var resp = Ext.JSON.decode(response.responseText),
                     message = resp.message;
                 toastr.error(message, 'Failure Response');
@@ -3158,4 +3155,23 @@ functDownloadAppDocument:function(node_ref,download,application_code=null,upload
             sub_module_id = record.get('sub_module_id');
         this.fireEvent('generateDocumentPermit', application_code,module_id,sub_module_id);
     },
+    downloadsopTemplate: function (btn) {
+        var module_id = btn.module_id;
+        this.fireEvent('downloadsopTemplate', module_id);
+    },
+
+    downloadFormFormat: function(btn) {
+        var module_id = btn.module_id;
+        this.fireEvent('downloadFormFormat', module_id);
+   
+    },
+
+    downloadlogdatabasesTemplate: function(btn) {
+        var module_id = btn.module_id;
+        this.fireEvent('downloadlogdatabasesTemplate', module_id);
+   
+    },
+
+
+
 });

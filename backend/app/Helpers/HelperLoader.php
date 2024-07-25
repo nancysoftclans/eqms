@@ -1510,15 +1510,9 @@ if (!function_exists('getInternalApplicant_id')) {
 }
 
 if (!function_exists('generateDocumentNumber')) {
-    function generateDocumentNumber($decision_id, $process_id, $user_id)
+    function generateDocumentNumber($decision_id, $process_id, $user_id, $doc_prefix)
     {
-        return UtilityHelper::generateDocumentNumber($decision_id, $process_id, $user_id);
+        return UtilityHelper::generateDocumentNumber($decision_id, $process_id, $user_id, $doc_prefix);
     }
 }
 
-if (!function_exists('generateDocNumber')) {
-    function generateDocNumber($codes_array, $decision_id)
-    {
-        return UtilityHelper::generateDocNumber($codes_array, $decision_id);
-    }
-}

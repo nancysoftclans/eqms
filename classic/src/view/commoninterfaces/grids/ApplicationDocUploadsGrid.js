@@ -70,11 +70,13 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
         xtype: 'textfield',
         name: 'recommendation_id',//authSignature
         columnWidth: 1,
+        hidden: true,
         allowBlank: false
     }, {
         xtype: 'textfield',
         name: 'approval_id',//authSignature
         columnWidth: 1,
+        hidden: true,
         allowBlank: false
     },{
         xtype: 'exportbtn',

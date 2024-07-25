@@ -492,12 +492,159 @@ showEditConfigParamWinFrm: function (item) {
             applicationCode= containerPnl.down('hiddenfield[name=active_application_code]').getValue(),
             application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
             workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
-            stage_category_id = containerPnl.down('hiddenfield[name=stage_category_id]').getValue(),
             qmsdoclistfrm = containerPnl.down('qmsdoclistfrm');
+         
+            qmsdoclistfrm = qmsdoclistfrm.getForm(); 
+  
+        if (qmsdoclistfrm.isValid()) {
+             // console.log(process_id, moduleId, submodule_id, applicationCode);
+            qmsdoclistfrm.submit({
+                url: 'documentmanagement/'+action_url,
+                waitMsg: 'Please wait...',
+                params: {
+                    module_id: moduleId,
+                    sub_module_id: submodule_id,
+                    application_code: applicationCode,
+                    process_id: process_id,
+                    workflow_stage_id: workflow_stage_id,
+                    active_application_id: active_application_id,
+                    application_status_id: application_status_id,
+                    '_token': token
+                },
+
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message,
+                        success = resp.success,
+                        active_application_id = resp.active_application_id,
+                        application_code = resp.application_code,
+                        sub_module_id = resp.sub_module_id,
+                        module_id = resp.module_id,
+                        product_id = resp.product_id,
+                        tracking_no = resp.tracking_no;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                            containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
+                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+                            containerPnl.down('hiddenfield[name=module_id]').setValue(module_id);
+                            containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                      
+
+                    } else {
+                        toastr.error(message, "Failure Response");
+                    }
+                },
+                failure: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message;
+                    toastr.error(message, "Failure Response");
+                }
+            });
+
+
+        } else {
+            toastr.warning('Please fill all the required fields!!', 'Warning Response');
+        }
+    }, 
+
+    saveDocumentRenewalBaseDetails: function (btn) {
+       var wizard = btn.wizardpnl,
+             wizardPnl = btn.up(wizard),
+             action_url = btn.action_url,
+             form_panel = btn.form_panel,
+             mainTabPnl = btn.up('#contentPanel'),
+             containerPnl = mainTabPnl.getActiveTab();
+
+        var process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
+            moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
+            submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
+            active_application_id = containerPnl.down('hiddenfield[name=active_application_id]').getValue(),
+            applicationCode= containerPnl.down('hiddenfield[name=active_application_code]').getValue(),
+            application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
+            workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            stage_category_id = containerPnl.down('hiddenfield[name=stage_category_id]').getValue();
+            qmsdoclistfrm = containerPnl.down('docrenewalfrm');
+         
+            qmsdoclistfrm = qmsdoclistfrm.getForm(); 
+  
+        if (qmsdoclistfrm.isValid()) {
+             // console.log(process_id, moduleId, submodule_id, applicationCode);
+            qmsdoclistfrm.submit({
+                url: 'documentmanagement/'+action_url,
+                waitMsg: 'Please wait...',
+                params: {
+                    module_id: moduleId,
+                    sub_module_id: submodule_id,
+                    application_code: applicationCode,
+                    process_id: process_id,
+                    workflow_stage_id: workflow_stage_id,
+                    stage_category_id: stage_category_id,
+                    active_application_id: active_application_id,
+                    application_status_id: application_status_id,
+                    '_token': token
+                },
+
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message,
+                        success = resp.success,
+                        active_application_id = resp.active_application_id,
+                        application_code = resp.application_code,
+                        sub_module_id = resp.sub_module_id,
+                        module_id = resp.module_id,
+                        product_id = resp.product_id,
+                        tracking_no = resp.tracking_no;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                            // containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
+                            // containerPnl.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+                            // containerPnl.down('hiddenfield[name=module_id]').setValue(module_id);
+                            containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                      
+
+                    } else {
+                        toastr.error(message, "Failure Response");
+                    }
+                },
+                failure: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message;
+                    toastr.error(message, "Failure Response");
+                }
+            });
+
+
+        } else {
+            toastr.warning('Please fill all the required fields!!', 'Warning Response');
+        }
+    }, 
+
+
+    saveSOPTemplateApplicationReceivingBaseDetails: function (btn) {
+       var wizard = btn.wizardpnl,
+             wizardPnl = btn.up(wizard),
+             action_url = btn.action_url,
+             form_panel = btn.form_panel,
+             mainTabPnl = btn.up('#contentPanel'),
+             containerPnl = mainTabPnl.getActiveTab();
+
+        var process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
+            moduleId = 26,
+            submodule_id = 104,
+            active_application_id = containerPnl.down('hiddenfield[name=active_application_id]').getValue(),
+            applicationCode= containerPnl.down('hiddenfield[name=active_application_code]').getValue(),
+            application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
+            workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            stage_category_id = containerPnl.down('hiddenfield[name=stage_category_id]').getValue();
+            qmsdoclistfrm = containerPnl.down('soptemplatedoclistfrm');
 
             qmsdoclistfrm = qmsdoclistfrm.getForm();
-
-            
   
         if (qmsdoclistfrm.isValid()) {
              // console.log(process_id, moduleId, submodule_id, applicationCode);
@@ -553,6 +700,156 @@ showEditConfigParamWinFrm: function (item) {
             toastr.warning('Please fill all the required fields!!', 'Warning Response');
         }
     }, 
+
+    saveFormFormatApplicationReceivingBaseDetails: function (btn) {
+       var wizard = btn.wizardpnl,
+             wizardPnl = btn.up(wizard),
+             action_url = btn.action_url,
+             form_panel = btn.form_panel,
+             mainTabPnl = btn.up('#contentPanel'),
+             containerPnl = mainTabPnl.getActiveTab();
+
+        var process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
+            moduleId = 26,
+            submodule_id = 106,
+            active_application_id = containerPnl.down('hiddenfield[name=active_application_id]').getValue(),
+            applicationCode= containerPnl.down('hiddenfield[name=active_application_code]').getValue(),
+            application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
+            workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            stage_category_id = containerPnl.down('hiddenfield[name=stage_category_id]').getValue();
+            qmsdoclistfrm = containerPnl.down('soptemplatedoclistfrm');
+
+            qmsdoclistfrm = qmsdoclistfrm.getForm();
+  
+        if (qmsdoclistfrm.isValid()) {
+             // console.log(process_id, moduleId, submodule_id, applicationCode);
+            qmsdoclistfrm.submit({
+                url: 'documentmanagement/'+action_url,
+                waitMsg: 'Please wait...',
+                params: {
+                    module_id: moduleId,
+                    sub_module_id: submodule_id,
+                    application_code: applicationCode,
+                    process_id: process_id,
+                    workflow_stage_id: workflow_stage_id,
+                    stage_category_id: stage_category_id,
+                    active_application_id: active_application_id,
+                    application_status_id: application_status_id,
+                    '_token': token
+                },
+
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message,
+                        success = resp.success,
+                        active_application_id = resp.active_application_id,
+                        application_code = resp.application_code,
+                        sub_module_id = resp.sub_module_id,
+                        module_id = resp.module_id,
+                        product_id = resp.product_id,
+                        tracking_no = resp.tracking_no;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                            containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
+                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+                            containerPnl.down('hiddenfield[name=module_id]').setValue(module_id);
+                            containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                      
+
+                    } else {
+                        toastr.error(message, "Failure Response");
+                    }
+                },
+                failure: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message;
+                    toastr.error(message, "Failure Response");
+                }
+            });
+
+
+        } else {
+            toastr.warning('Please fill all the required fields!!', 'Warning Response');
+        }
+    }, 
+
+    saveLogDBApplicationReceivingBaseDetails: function (btn) {
+       var wizard = btn.wizardpnl,
+             wizardPnl = btn.up(wizard),
+             action_url = btn.action_url,
+             form_panel = btn.form_panel,
+             mainTabPnl = btn.up('#contentPanel'),
+             containerPnl = mainTabPnl.getActiveTab();
+
+        var process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
+            moduleId = 26,
+            submodule_id = 107,
+            active_application_id = containerPnl.down('hiddenfield[name=active_application_id]').getValue(),
+            applicationCode= containerPnl.down('hiddenfield[name=active_application_code]').getValue(),
+            application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
+            workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            stage_category_id = containerPnl.down('hiddenfield[name=stage_category_id]').getValue();
+            qmsdoclistfrm = containerPnl.down('soptemplatedoclistfrm');
+
+            qmsdoclistfrm = qmsdoclistfrm.getForm();
+  
+        if (qmsdoclistfrm.isValid()) {
+             // console.log(process_id, moduleId, submodule_id, applicationCode);
+            qmsdoclistfrm.submit({
+                url: 'documentmanagement/'+action_url,
+                waitMsg: 'Please wait...',
+                params: {
+                    module_id: moduleId,
+                    sub_module_id: submodule_id,
+                    application_code: applicationCode,
+                    process_id: process_id,
+                    workflow_stage_id: workflow_stage_id,
+                    stage_category_id: stage_category_id,
+                    active_application_id: active_application_id,
+                    application_status_id: application_status_id,
+                    '_token': token
+                },
+
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message,
+                        success = resp.success,
+                        active_application_id = resp.active_application_id,
+                        application_code = resp.application_code,
+                        sub_module_id = resp.sub_module_id,
+                        module_id = resp.module_id,
+                        product_id = resp.product_id,
+                        tracking_no = resp.tracking_no;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                            containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
+                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+                            containerPnl.down('hiddenfield[name=module_id]').setValue(module_id);
+                            containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                      
+
+                    } else {
+                        toastr.error(message, "Failure Response");
+                    }
+                },
+                failure: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message;
+                    toastr.error(message, "Failure Response");
+                }
+            });
+
+
+        } else {
+            toastr.warning('Please fill all the required fields!!', 'Warning Response');
+        }
+    },
 
     
     // showAddConfigParamWinFrm: function (btn) {
@@ -846,10 +1143,7 @@ showEditConfigParamWinFrm: function (item) {
         var application_type = btn.renewal;
         var submodule_id = btn.app_type;
         this.fireEvent('onViewLiveDocumentDetails', application_type, submodule_id);
-    },
-
-  
-
+    }
 
 //     onViewDocumentDetails: function (item) {
 //     Ext.getBody().mask("Please wait...");

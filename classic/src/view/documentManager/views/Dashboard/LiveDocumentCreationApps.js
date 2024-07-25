@@ -12,7 +12,7 @@ Ext.define('Admin.view.documentManager.views.dashboards.LiveDocumentCreationApps
     {
             xtype: 'hiddenfield',
             name: 'sub_module_id',
-            value: 101
+            value: 105
         },
       {
             xtype: 'livedocumentsgrid',
