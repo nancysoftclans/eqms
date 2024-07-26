@@ -327,18 +327,27 @@ class IssueManagementController extends Controller
     public function submitIssueManagementApplication(Request $request)
     {
         try {
-            $application_code = $request->application_code;
-            $workflow_stage_id = $request->workflow_stage_id;
             $active_application_id = $request->active_application_id;
 
             $IssueManagement = IssueManagement::findOrFail($active_application_id);
-            $IssueStatus = IssueStatus::where('name', 'In Progress')->first();
 
-            if ($IssueManagement && $IssueStatus) {
+            $issue_status_id = 1;
+            if ($IssueManagement->complaint_fully_addressed == "1") {
+                $IssueStatus = IssueStatus::where('name', 'Closed')->first();
+                $issue_status_id = $IssueStatus->id ?: 7;
+                $date_closed = Carbon::now();
+            } else {
+                $IssueStatus = IssueStatus::where('name', 'In Progress')->first();
+                $issue_status_id = $IssueStatus->id ?: 2;
+                $date_closed = null;
+            }
+
+            if ($IssueManagement) {
                 $IssueManagement->fill([
-                    'issue_status_id' => $IssueStatus->id,
+                    'issue_status_id' => $issue_status_id,
                     'dola' => Carbon::now(),
                     'altered_by' => $this->user_id,
+                    'date_closed' => $date_closed
                 ]);
                 $IssueManagement->save();
 
@@ -356,7 +365,7 @@ class IssueManagementController extends Controller
         $application_code = $request->input('application_code');
         $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
-        
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -410,7 +419,7 @@ class IssueManagementController extends Controller
         $application_code = $request->input('application_code');
         $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
-        
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -474,7 +483,7 @@ class IssueManagementController extends Controller
         $application_code = $request->input('application_code');
         $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
-        
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -522,7 +531,7 @@ class IssueManagementController extends Controller
         $application_code = $request->input('application_code');
         $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
-        
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -541,13 +550,13 @@ class IssueManagementController extends Controller
                 $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
                     ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
                     ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
-                if ($IssueManagement) {
-                    $res = array(
-                        "success" => true,
-                        "message" => 'Data Saved Successfully!!',
-                        "results" => $IssueManagement
-                    );
-                }
+
+                $res = array(
+                    "success" => true,
+                    "message" => 'Data Saved Successfully!!',
+                    "results" => $IssueManagement
+                );
+
             }
         } catch (\Exception $exception) {
             DB::rollback();

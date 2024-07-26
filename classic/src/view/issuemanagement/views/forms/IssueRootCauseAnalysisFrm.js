@@ -58,7 +58,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
       xtype: "checkboxgroup",
       fieldLabel: "<strong>Management and People - Belief System</strong>",
       columns: 1,
-      allowBlank: false,
+      // allowBlank: false,
       items: [
         {
           boxLabel: "Placing budgetary considerations ahead of quality",
@@ -83,7 +83,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
       xtype: "checkboxgroup",
       fieldLabel: "<strong>Management Systems - Processes</strong>",
       columns: 1,
-      allowBlank: false,
+      // allowBlank: false,
       items: [
         {
           boxLabel: "Processes not defined",
@@ -107,7 +107,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
       xtype: "checkboxgroup",
       fieldLabel: "<strong>Management Systems - Documentation</strong>",
       columns: 1,
-      allowBlank: false,
+      // allowBlank: false,
       items: [
         {
           boxLabel: "System documentation not available",
@@ -131,7 +131,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
       xtype: "checkboxgroup",
       fieldLabel: "<strong>Analytical Methods</strong>",
       columns: 1,
-      allowBlank: false,
+      // allowBlank: false,
       items: [
         {
           boxLabel: "Method not fit for purpose",
