@@ -367,7 +367,7 @@ class IssueManagementController extends Controller
                     'altered_by' => $user_id,
                     'application_code' => $application_code,
                     'process_id' => $request->process_id,
-                    'complaint_direct_or_indirect' => $request->input('complaint_direct_or_indirect', 0),
+                    'complaint_direct_or_indirect' => $request->input('complaint_direct_or_indirect'),
                     'office_assigned_to' => $request->input('office_assigned_to', 0),
                     'complaint_scheduling_delay' => $request->has('complaint_scheduling_delay'),
                     'complaint_manner_of_advisor' => $request->has('complaint_manner_of_advisor'),
@@ -533,7 +533,7 @@ class IssueManagementController extends Controller
                     'altered_by' => $user_id,
                     'application_code' => $application_code,
                     'process_id' => $request->process_id,
-                    'issue_resolution' => $request->input('issue_resolution')
+                    'complaint_fully_addressed' => $request->input('complaint_fully_addressed')
                 ]);
                 $IssueManagement->save();
                 //End Update

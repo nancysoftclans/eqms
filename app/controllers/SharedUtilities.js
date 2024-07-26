@@ -346,7 +346,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     if (!tab) {
       //
       var newTab = Ext.widget(workflow_details.viewtype, {
-        title: "Document",
+        title: title,
         id: view_id,
         closable: true,
       });

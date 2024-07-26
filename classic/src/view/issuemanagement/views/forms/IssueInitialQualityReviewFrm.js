@@ -36,7 +36,7 @@ Ext.define(
       },
       {
         xtype: "radiogroup",
-        fieldLabel: "Direct or Indirect",
+        fieldLabel: "<strong>Direct or Indirect</strong>",
         margin: "0 20 20 0",
         allowBlank: false,
         name: "complaint_direct_or_indirect",
@@ -49,7 +49,7 @@ Ext.define(
       {
         xtype: "combo",
         anyMatch: true,
-        fieldLabel: "Office Assigned to",
+        fieldLabel: "<strong>Office Assigned to</strong>",
         margin: "0 20 20 0",
         name: "office_assigned_to",
         valueField: "id",
@@ -74,7 +74,7 @@ Ext.define(
       },
       {
         xtype: "checkboxgroup",
-        fieldLabel: "Key issues of complaint",
+        fieldLabel: "<strong>Key issues of complaint</strong>",
         columns: 2,
         columnWidth: 1,
         allowBlank: false,

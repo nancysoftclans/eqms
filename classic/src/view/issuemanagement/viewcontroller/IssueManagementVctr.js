@@ -537,5 +537,85 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         "Warning Response"
       );
     }
+  },
+  saveIssueQualityReviewDetails: function (btn) {
+    var wizard = btn.wizardpnl,
+      action_url = btn.action_url,
+      form_panel = btn.form_panel,
+      mainTabPnl = btn.up("#contentPanel"),
+      containerPnl = mainTabPnl.getActiveTab();
+    var process_id = containerPnl
+      .down("hiddenfield[name=process_id]")
+      .getValue(),
+      module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
+      sub_module_id = containerPnl
+        .down("hiddenfield[name=sub_module_id]")
+        .getValue(),
+      active_application_id = containerPnl
+        .down("hiddenfield[name=active_application_id]")
+        .getValue(),
+      application_code = containerPnl
+        .down("hiddenfield[name=active_application_code]")
+        .getValue(),
+      application_status_id = containerPnl
+        .down("hiddenfield[name=application_status_id]")
+        .getValue(),
+      workflow_stage_id = containerPnl
+        .down("hiddenfield[name=workflow_stage_id]")
+        .getValue()
+        issuequalityreviewfrm = containerPnl.down('issuequalityreviewfrm');
+
+    if (issuequalityreviewfrm.isValid()) {
+      var issueManagementData = issuequalityreviewfrm.getValues();
+
+      // Combine the data
+      var combinedData = {
+        process_id: process_id,
+        module_id: module_id,
+        sub_module_id: sub_module_id,
+        application_code: application_code,
+        active_application_id: active_application_id,
+        application_status_id: application_status_id,
+        workflow_stage_id: workflow_stage_id,
+      };
+
+      for (var key in issueManagementData) {
+        combinedData[key] = issueManagementData[key];
+      }
+
+      // Submit the data to the endpoint
+      Ext.Ajax.request({
+        url: action_url,
+        waitMsg: "Please wait...",
+        method: "POST",
+        params: combinedData,
+        success: function (response) {
+          var resp = Ext.decode(response.responseText),
+            results = resp.results;
+          if (resp.success) {
+            containerPnl
+              .down("displayfield[name=tracking_no]")
+              .setValue(results.reference_no);
+            containerPnl
+              .down("hiddenfield[name=active_application_id]")
+              .setValue(results.active_application_id);
+            containerPnl
+              .down("hiddenfield[name=active_application_code]")
+              .setValue(results.application_code);
+            toastr.success(resp.message, "Success Response");
+          } else {
+            toastr.error(resp.message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          toastr.error(response.message, "Failure Response");
+        },
+      });
+    } else {
+      toastr.error(
+        "Please fill all the required fields!!",
+        "Warning Response"
+      );
+    }
   }
 });

@@ -22,7 +22,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueTypeSelectForm", {
     {
       xtype: "combo",
       anyMatch: true,
-      fieldLabel: "Issue Type",
+      fieldLabel: "<strong>Issue Type</strong>",
       margin: "0 20 20 0",
       name: "issue_type_id",
       valueField: "id",

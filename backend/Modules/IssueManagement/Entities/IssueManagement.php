@@ -58,7 +58,8 @@ class IssueManagement extends Model
         'complaint_inefficient_system',
         'complaint_analytical_methods',
         'complaint_validated_methods',
-        'issue_resolution'
+        'issue_resolution',
+        'complaint_fully_addressed'
     ];
 
     public $timestamps = false;

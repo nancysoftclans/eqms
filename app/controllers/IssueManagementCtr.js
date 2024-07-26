@@ -41,7 +41,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     },
   },
 
-  init: function () {},
+  init: function () { },
 
   listen: {
     controller: {
@@ -675,6 +675,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       ),
       issuerootcauseanalysisfrm = activeTab.down("issuerootcauseanalysisfrm"),
       issueresolutionfrm = activeTab.down("issueresolutionfrm"),
+      issuequalityreviewfrm = activeTab.down("issuequalityreviewfrm"),
       issuemanagementdocuploadsgrid = activeTab.down(
         "issuemanagementdocuploadsgrid"
       ),
@@ -708,6 +709,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             issueinitialqualityreviewfrm.loadRecord(model);
             issuerootcauseanalysisfrm.loadRecord(model);
             issueresolutionfrm.loadRecord(model);
+            issuequalityreviewfrm.loadRecord(model);
             activeTab
               .down("displayfield[name=workflow_stage]")
               .setValue(results.workflow_stage);
@@ -744,7 +746,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               .each(function (field) {
                 field.setReadOnly(true);
               });
-              
+
             issueresolutionfrm
               .getForm()
               .getFields()
@@ -762,6 +764,12 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               .setValue({
                 complaint_direct_or_indirect:
                   results.complaint_direct_or_indirect,
+              });
+            issuequalityreviewfrm
+              .down("radiogroup[name=complaint_fully_addressed]")
+              .setValue({
+                complaint_fully_addressed:
+                  results.complaint_fully_addressed,
               });
           } else {
             toastr.error(message, "Failure Response");

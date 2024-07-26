@@ -51,7 +51,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
     {
       xtype: "combo",
       anyMatch: true,
-      fieldLabel: "Issue Type",
+      fieldLabel: "<strong>Issue Type</strong>",
       margin: "0 20 20 0",
       name: "issue_type_id",
       valueField: "id",
@@ -77,7 +77,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
     },
     {
       xtype: "datefield",
-      fieldLabel: "Creation Date",
+      fieldLabel: "<strong>Creation Date</strong>",
       margin: "0 20 20 0",
       name: "creation_date",
       format: "d M Y",
@@ -85,7 +85,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
     },
     {
       xtype: "textfield",
-      fieldLabel: "Title",
+      fieldLabel: "<strong>Title</strong>",
       margin: "0 20 20 0",
       name: "title",
       columnWidth: 1,
@@ -93,7 +93,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
     },
     {
       xtype: "textarea",
-      fieldLabel: "Description",
+      fieldLabel: "<strong>Description</strong>",
       margin: "0 20 20 0",
       name: "description",
       columnWidth: 1,
@@ -102,7 +102,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
     {
       xtype: "combo",
       anyMatch: true,
-      fieldLabel: "Status",
+      fieldLabel: "<strong>Status</strong>",
       margin: "0 20 20 0",
       name: "issue_status_id",
       valueField: "id",
@@ -128,14 +128,14 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueManagementFrm", {
     },
     {
       xtype: "datefield",
-      fieldLabel: "Target Resolution Date",
+      fieldLabel: "<strong>Target Resolution Date</strong>",
       margin: "0 20 20 0",
       name: "target_resolution_date",
       format: "d M Y",
     },
     {
       xtype: "tagfield",
-      fieldLabel: "Organisational Areas",
+      fieldLabel: "<strong>Organisational Areas</strong>",
       margin: "0 20 20 0",
       name: "section_ids",
       allowBlank: true,

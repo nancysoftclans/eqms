@@ -34,21 +34,21 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
     },
     {
       xtype: "textarea",
-      fieldLabel: "Problem Statement (Issue)",
+      fieldLabel: "<strong>Problem Statement (Issue)</strong>",
       margin: "0 20 20 0",
       name: "problem_statement",
       allowBlank: false,
     },
     {
       xtype: "textarea",
-      fieldLabel: "RCA Team",
+      fieldLabel: "<strong>RCA Team</strong>",
       margin: "0 20 20 0",
       name: "rca_team",
       allowBlank: false,
     },
     {
       xtype: "textfield",
-      fieldLabel: "Name of the Responsible Officer for the RCA",
+      fieldLabel: "<strong>Name of the Responsible Officer for the RCA</strong>",
       margin: "0 20 20 0",
       name: "responsible_officer",
       columnWidth: 1,
@@ -56,7 +56,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
     },
     {
       xtype: "checkboxgroup",
-      fieldLabel: "Management and People - Belief System",
+      fieldLabel: "<strong>Management and People - Belief System</strong>",
       columns: 1,
       allowBlank: false,
       items: [
@@ -81,7 +81,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
     },
     {
       xtype: "checkboxgroup",
-      fieldLabel: "Management Systems - Processes",
+      fieldLabel: "<strong>Management Systems - Processes</strong>",
       columns: 1,
       allowBlank: false,
       items: [
@@ -105,7 +105,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
     },
     {
       xtype: "checkboxgroup",
-      fieldLabel: "Management Systems - Documentation",
+      fieldLabel: "<strong>Management Systems - Documentation</strong>",
       columns: 1,
       allowBlank: false,
       items: [
@@ -129,7 +129,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueRootCauseAnalysisFrm", {
     },
     {
       xtype: "checkboxgroup",
-      fieldLabel: "Analytical Methods",
+      fieldLabel: "<strong>Analytical Methods</strong>",
       columns: 1,
       allowBlank: false,
       items: [
