@@ -29,6 +29,12 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     this.fireEvent("showIssueManagementSubmissionWin", btn);
   },
 
+  showIssueApplicationWorkflow: function (btn) {
+    var application_type = btn.app_type,
+        wrapper_xtype = btn.wrapper_xtype;
+    this.fireEvent('showApplicationWorkflow', application_type, wrapper_xtype);
+},
+
   doDeleteConfigWidgetParam: function (item) {
     //if (this.fireEvent('checkFullAccess')) {
     var me = this,
