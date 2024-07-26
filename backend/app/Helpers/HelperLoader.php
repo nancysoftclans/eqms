@@ -1508,3 +1508,11 @@ if (!function_exists('getInternalApplicant_id')) {
         return UtilityHelper::getInternalApplicant_id($identification_no);
     }
 }
+
+if (!function_exists('generateDocumentNumber')) {
+    function generateDocumentNumber($decision_id, $process_id, $user_id, $doc_prefix)
+    {
+        return UtilityHelper::generateDocumentNumber($decision_id, $process_id, $user_id, $doc_prefix);
+    }
+}
+

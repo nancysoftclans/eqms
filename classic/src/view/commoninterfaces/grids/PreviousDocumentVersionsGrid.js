@@ -1,7 +1,4 @@
-/**
- * User robinson odhiambo
- * on 10/4/2018.
- */
+
 Ext.define('Admin.view.commoninterfaces.grids.PreviousDocumentVersionsGrid', {
     extend: 'Ext.grid.Panel',
     controller: 'commoninterfacesVctr',

@@ -2801,4 +2801,39 @@ static function convertArrayToString($array){
         return  $applicant_id;
     }
 
+     static function generateDocumentNumber($decision_id, $process_id, $user_id, $doc_prefix)
+    {
+        $where = array(
+            'process_id' => $process_id
+        );
+        $serial_num_tracker = new SerialTracker();
+        $serial_track = $serial_num_tracker->where($where)->first();
+
+        if ($serial_track == '' || is_null($serial_track)) {
+            $current_serial_id = $decision_id;
+            $serial_num_tracker->process_id = $process_id;
+            $serial_num_tracker->created_by = $user_id;
+            $serial_num_tracker->last_serial_no = $current_serial_id;
+            $serial_num_tracker->save();
+        } else {
+            $last_serial_id = $serial_track->last_serial_no;
+            $current_serial_id = $last_serial_id + 1;
+
+            $update_data = array(
+                'last_serial_no' => $current_serial_id,
+                'altered_by' => $user_id
+            );
+            $serial_num_tracker->where($where)->update($update_data);
+
+        }
+        $serial_no = str_pad($current_serial_id, 4, 0, STR_PAD_LEFT);
+
+        $doc_number = $doc_prefix . $serial_no;
+        
+        return $doc_number;
+     
+        
+    }
+
+
 }

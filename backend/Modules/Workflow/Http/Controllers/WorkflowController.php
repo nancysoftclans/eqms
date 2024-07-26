@@ -186,14 +186,12 @@ class WorkflowController extends Controller
     {
         $module_id = $request->input('module_id');
         $sub_module_id = $request->input('sub_module_id');
-        $application_type = $request->input('application_type');
 
         try {
             //get workflow id
             $where = array(
                 't1.module_id' => $module_id,
                 't1.sub_module_id' => $sub_module_id,
-                't1.renewal' => $application_type,
             );
 
             $qry = DB::table('wf_processes as t1')
@@ -839,6 +837,7 @@ class WorkflowController extends Controller
                 't1.id' => $process_id,
                 't3.id' => $stage_id
             );
+
             $qry = DB::table('wf_processes as t1')
                 ->leftJoin('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
                 ->join('wf_workflow_stages as t3', 't3.workflow_id', '=', 't2.id')
@@ -1078,8 +1077,6 @@ class WorkflowController extends Controller
                         ->where('t3.stage_status', '<>', 3)
                         ->where($where);
                     //handle the query responses
-
-
                 }
             }
 

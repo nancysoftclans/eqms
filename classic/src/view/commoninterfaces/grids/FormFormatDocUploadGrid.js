@@ -1,7 +1,7 @@
-Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocReleaseGrid', {
+Ext.define('Admin.view.commoninterfaces.grids.FormFormatDocUploadGrid', {
     extend: 'Ext.tree.Panel',
     controller: 'commoninterfacesVctr',
-    xtype: 'applicationdocreleasegrid',
+    xtype: 'formformatdocuploadgrid',
     useArrows: true,
     rootVisible: false,
     multiSelect: false,
@@ -50,38 +50,45 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocReleaseGrid', {
         name: 'stage_category_id'
     },{
         xtype: 'button',
-        text: 'Upload',
+        text: 'Upload Form Format',
         name: 'add_upload',
-        iconCls: 'x-fa fa-plus',
-        ui: 'soft-blue',
-        winTitle: 'Document Upload',
+        iconCls: 'x-fa fa-upload',
+        ui: 'soft-blue',         
+        winTitle: 'Upload Form Format',
         childXtype: 'applicationDocUploadsFrm',
         newTab: 'applicationDocUploadsFrm',
         winWidth: '35%',
-        show_assessor: true,
+       
         stores: '["applicationDocumentsUploadsStr"]',
         storeID: 'applicationDocumentsUploadsStr',
         bind: {
             hidden: '{isReadOnly}'
         }
-    }, '->',
-
+    },{
+        text: 'Download Form Format',
+        iconCls: 'x-fa fa-download',
+        action: 'add',
+        ui: 'soft-blue',
+        name: 'download',
+        winTitle: 'Download Form Format',
+        winWidth: '80%',
+        handler: 'downloadFormFormat',
+        module_id : 26,
+        stores: '[]'
+    },
+    '->',
     {
         xtype: 'textfield',
         name: 'recommendation_id',//authSignature
         columnWidth: 1,
+        hidden: true,
         allowBlank: false
     }, {
         xtype: 'textfield',
         name: 'approval_id',//authSignature
         columnWidth: 1,
+        hidden: true,
         allowBlank: false
-    },{
-        xtype: 'exportbtn',
-        hidden: true
-    }, {
-        xtype: 'tbspacer',
-        width: 20
     }],
     autoScroll: true,
     listeners: {
@@ -106,7 +113,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocReleaseGrid', {
         displayMsg: 'Showing {0} - {1} of {2} total records',
         emptyMsg: 'No Records',
         beforeLoad: function () {
-            this.up('applicationdocreleasegrid').fireEvent('refresh', this);
+            this.up('formformatdocuploadgrid').fireEvent('refresh', this);
         }
     }],
     autoScroll: true,
@@ -115,26 +122,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocReleaseGrid', {
         //mode: 'SINGLE'
     },
 
-    columns: [
-    {
-        xtype: 'widgetcolumn',
-        width: 120,
-        hidden: true,
-        widget: {
-            width: 120,
-            textAlign: 'left',
-            xtype: 'button',
-            itemId: 'prints',
-            ui: 'soft-blue',
-            text: 'View Licence',
-            iconCls: 'x-fa fa-certificate',
-            handler: 'generateDocumentPermit',
-            bind: {
-                disabled: '{record.release_recommendation_id <= 0 || record.release_recommendation_id === null}'
-                //disabled: '{record.decision_id !== 1}'
-            }
-        }
-    },{
+    columns: [{
         xtype: 'treecolumn',
         dataIndex: 'file_name',
         text: 'File Name',

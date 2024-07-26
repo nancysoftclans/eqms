@@ -14,6 +14,7 @@ use Modules\Reports\Providers\PdfProvider;
 use Modules\Reports\Providers\PdfLettersProvider;
 use Modules\Reports\Traits\ReportsTrait;
 use \Mpdf\Mpdf as mPDF;
+use DateTime;
 class ReportsController extends Controller
 {
 
@@ -9630,16 +9631,9 @@ public function printAdministrativeSubmissionResponses(Request $req)
 	try{
 		$application_code = $req->application_code;
 		$record = DB::table('tra_documentmanager_application as t1')
-								// ->leftJoin('tra_premises as t2', 't1.premise_id', 't2.id')
-								// ->leftJoin('wb_trader_account as t3', 't1.applicant_id', 't3.id')
-								// ->leftJoin('par_districts as t4', 't2.district_id', 't4.id')
-								// ->leftJoin('par_regions	 as t5', 't2.region_id', 't5.id')
-								// ->leftJoin('par_countries	 as t6', 't2.country_id', 't6.id')
-								// ->leftJoin('par_premises_types	 as t7', 't2.premise_type_id', 't7.id')
-								// ->select('t1.*','t2.*', 't8.*', 't3.name as applicant_name', 't4.name as district_name','t7.name as premise_type', 't7.permit_type_title', 't5.name as region_name', 't6.name as country_name', 't8.permit_signatory as permit_approval', 't7.*')
-								 ->join('tra_managerpermits_review as t2', 't1.application_code','t2.application_code' )
+								 ->join('tra_permitsrelease_recommendation as t2', 't1.application_code','t2.application_code' )
 								 ->join('users as t3', 't2.dg_signatory', 't3.id')
-								 ->select(DB::raw("t1.*,t2.*,decrypt(t3.first_name) as firstname,decrypt(t3.last_name) as lastname"))
+								 ->select(DB::raw("t1.tracking_no, t1.doc_title, t1.created_on as effective_date,t2.*,decrypt(t3.first_name) as firstname,decrypt(t3.last_name) as lastname"))
 								->where('t1.application_code',$application_code);
 								//->first();
 			$record = $record->get();
@@ -9658,9 +9652,9 @@ public function printAdministrativeSubmissionResponses(Request $req)
 		
 			if($decision_id ==1){
 
-			$document_number = $records[0]['tracking_no'];
+			$document_number = $records[0]['document_number'];
 			$issue_number = $records[0]['tracking_no'];
-			$effective_date = $records[0]['created_on'];
+			$effective_date = $records[0]['effective_date'];
 			$doc_title = $records[0]['doc_title'];
 			$approval_date = $records[0]['approval_date'];
 			$approved_by = $records[0]['fullname'];
@@ -9733,10 +9727,11 @@ public function printAdministrativeSubmissionResponses(Request $req)
 				$pdf->SetX(10 + $leftWidth); // Move x position to the center cell
 				$pdf->Cell($centerWidth, 4, 'Issue No. '.$issue_number, 0, 0, 'C');
 
-				$pdf->SetX(20 + $leftWidth + $centerWidth); // Move x position to the right cell
-				$pdf->Cell($rightWidth, 4, 'Effective Date: '.$effective_date, 0, 0, 'R');
+				$pdf->SetX(10 + $leftWidth + $centerWidth); // Move x position to the right cell
 
-				//$pdf->Cell(0,4,$regulation_title,0,1,'C');
+				$effective_date = \DateTime::createFromFormat('Y-m-d H:i:s', $effective_date)->format('d/m/Y');
+
+				$pdf->Cell($rightWidth, 4, 'Effective Date: ' . $effective_date, 0, 0, 'R');
 
 				$pdf->Cell(0,15,'',0,1);
 
@@ -9794,6 +9789,7 @@ public function printAdministrativeSubmissionResponses(Request $req)
 				$pdf->Cell(40, 4, 'Approved By:   '.$approved_by, 0, 0, 'L');
 
 				$pdf->SetX($x2);
+				$approval_date = \DateTime::createFromFormat('Y-m-d H:i:s', $approval_date)->format('d/m/Y');
 				$pdf->Cell(50, 4, 'Date of Approval:   '.$approval_date, 0, 0, 'L');
 
 				// Draw lines beside the labels

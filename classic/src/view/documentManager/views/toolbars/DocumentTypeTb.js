@@ -25,8 +25,34 @@ Ext.define('Admin.view.documentManager.views.toolbars.DocumentTypeTb', {
         {
             text: 'Create Document',
             iconCls: 'x-fa fa-plus-square',
-            handler:'onInitiateDocumentApplication',
-            app_type: 101
+             menu:{
+                xtype: 'menu',
+                    items:[{
+                    text: 'Create Document',
+                    iconCls: 'x-fa fa-file',
+                    handler:'onInitiateDocumentApplication',
+                    app_type: 101
+                },
+                {
+                    text: 'SOP Template',
+                    iconCls: 'x-fa fa-file-alt',
+                    handler:'onInitiateDocumentApplication',
+                    app_type: 104
+                },
+                {
+                    text: 'Form Format',
+                    iconCls: 'x-fa fa-file-alt',
+                    handler:'onInitiateDocumentApplication',
+                    app_type: 106
+                },
+                {
+                    text: 'LOG Databases',
+                    iconCls: 'x-fa fa-database',
+                    handler:'onInitiateDocumentApplication',
+                    app_type: 107
+                }
+                ]
+            }
         },
        
     ]

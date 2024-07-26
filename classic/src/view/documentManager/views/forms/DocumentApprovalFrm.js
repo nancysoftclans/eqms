@@ -127,6 +127,8 @@ Ext.define('Admin.view.documentManager.views.forms.DocumentApprovalFrm', {
         maxValue: new Date(),
         columnWidth: 1,
         name: 'approval_date',
+        readOnly: true,
+        // disabled: true,
         submitFormat: 'Y-m-d',
         format: 'd/m/Y',
         altFormats: 'd,m,Y|d.m.Y|Y-m-d|d/m/Y/d-m-Y|d,m,Y 00:00:00|Y-m-d 00:00:00|d.m.Y 00:00:00|d/m/Y 00:00:00'
@@ -143,7 +145,9 @@ Ext.define('Admin.view.documentManager.views.forms.DocumentApprovalFrm', {
     {
         xtype: 'datefield',
         fieldLabel: 'Expiry Date',
-        allowBlank: true,readOnly: true,
+        allowBlank: true,
+        readOnly: true,
+        disabled: true,
         name: 'expiry_date',
         columnWidth: 1,
         submitFormat: 'Y-m-d',
