@@ -73,8 +73,20 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
             },
             isLoad: true
         },
+         beforeLoad: function () {
+              var grid = this.up("grid"),
+                pnl = grid.up("documentcreationapps"),
+                wrapper = pnl.up("documentapplicationwrapper"),
+                cnt = wrapper.up(),
+                store = this.store,
+                grid = this.up("grid");
+                store.getProxy().extraParams = {
+                table_name: "tra_documentmanager_application",
+              };
+            },
         itemdblclick: 'onViewDocumentApplication'
     },
+
    
     bbar: [
         {
@@ -99,7 +111,7 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
                 cnt = wrapper.up(),
                 store = this.store,
                 grid = this.up("grid");
-              store.getProxy().extraParams = {
+                store.getProxy().extraParams = {
                 table_name: "tra_documentmanager_application",
               };
             },
@@ -145,14 +157,14 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
         // Concatenate first_name and last_name
         var firstName = record.get("first_name");
         var lastName = record.get("last_name");
-        var fullName = firstName + " " + lastName;
         var groupOwner = record.get("group_owner");
+        var fullName = firstName + " " + lastName;
          
         if (fullName && groupOwner) {
             return fullName + ', ' + groupOwner;
         } else {
-             return fullName || groupOwner;
-            } 
+            return fullName || groupOwner;
+        } 
       },
     },
 
