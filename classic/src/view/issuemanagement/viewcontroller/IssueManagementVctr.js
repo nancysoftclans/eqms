@@ -31,20 +31,19 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
 
   showIssueApplicationWorkflow: function (btn) {
     var application_type = btn.app_type,
-        wrapper_xtype = btn.wrapper_xtype;
+      wrapper_xtype = btn.wrapper_xtype;
     this.fireEvent('showApplicationWorkflow', application_type, wrapper_xtype);
-},
+  },
 
   doDeleteConfigWidgetParam: function (item) {
-    //if (this.fireEvent('checkFullAccess')) {
     var me = this,
-      btn = item.up("button"),
+      btn = item.up('button'),
       record = btn.getWidgetRecord(),
-      id = record.get("submission_id"),
+      id = record.get('submission_id'),
       storeID = item.storeID,
       table_name = item.table_name,
       url = item.action_url;
-    this.fireEvent("deleteRecord", id, table_name, storeID, url);
+    this.fireEvent('deleteRecord', id, table_name, storeID, url);
   },
 
   showIssueTypeConfigParam: function (item) {
@@ -489,7 +488,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       workflow_stage_id = containerPnl
         .down("hiddenfield[name=workflow_stage_id]")
         .getValue()
-        issueresolutionfrm = containerPnl.down('issueresolutionfrm');
+    issueresolutionfrm = containerPnl.down('issueresolutionfrm');
 
     if (issueresolutionfrm.isValid()) {
       var issueManagementData = issueresolutionfrm.getValues();
@@ -569,7 +568,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       workflow_stage_id = containerPnl
         .down("hiddenfield[name=workflow_stage_id]")
         .getValue()
-        issuequalityreviewfrm = containerPnl.down('issuequalityreviewfrm');
+    issuequalityreviewfrm = containerPnl.down('issuequalityreviewfrm');
 
     if (issuequalityreviewfrm.isValid()) {
       var issueManagementData = issuequalityreviewfrm.getValues();

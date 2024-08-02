@@ -187,31 +187,43 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       flex: 1,
       tdCls: "wrap",
     },
-    // {
-    //   xtype: "widgetcolumn",
-    //   text: "Actions",
-    //   flex: 1,
-    //   widget: {
-    //     textAlign: "left",
-    //     xtype: "splitbutton",
-    //     iconCls: "x-fa fa-th-list",
-    //     ui: "gray",
-    //     menu: {
-    //       xtype: "menu",
-    //       items: [
-    //         {
-    //           text: "Delete",
-    //           iconCls: "x-fa fa-trash",
-    //           tooltip: "Delete Record",
-    //           table_name: "tra_submissions",
-    //           storeID: "",
-    //           action_url: "configurations/deleteConfigRecord",
-    //           action: "actual_delete",
-    //           // hidden: record.issue_status !== 'Draft'
-    //         },
-    //       ],
-    //     },
-    //   },
-    // },
+    {
+      xtype: "widgetcolumn",
+      text: "Actions",
+      flex: 1,
+      widget: {
+        textAlign: "left",
+        xtype: "splitbutton",
+        iconCls: "x-fa fa-th-list",
+        ui: "gray",
+        menu: {
+          xtype: "menu",
+          items: [
+            {
+              text: "Delete",
+              iconCls: "x-fa fa-trash",
+              tooltip: "Delete Record",
+              table_name: "tra_submissions",
+              storeID: "issuemanagementstr",
+              action_url: "configurations/deleteConfigRecord",
+              action: "actual_delete",
+              handler: 'doDeleteConfigWidgetParam',
+              bind: {
+                disabled: '{hideDeleteButton}'
+              },
+            },
+          ],
+        },
+      },
+      onWidgetAttach: function (col, widget, rec) {
+        var issue_status = rec.get("issue_status_id");
+        if (issue_status === 1) {
+          widget.down('menu menuitem[action=actual_delete]').setHidden(false);
+        }
+        else {
+          widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+        }
+      }
+    },
   ],
 });
