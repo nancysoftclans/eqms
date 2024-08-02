@@ -3309,6 +3309,10 @@ public function addExcelDocumentNumber($filetopath, $initial_file_name, $public_
             if (recordExists('tra_evaluation_recommendations', $where)) {
                 $res = deleteRecord('tra_evaluation_recommendations', $where);
             }
+
+            if (recordExists('tra_permitsrelease_recommendation', $where)) {
+                $res = deleteRecord('tra_permitsrelease_recommendation', $where);
+            }
               
             
         } catch (\Exception $exception) {

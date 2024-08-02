@@ -233,6 +233,7 @@ public function getdocdefinationrequirementDetails(Request $req)
     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
     ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
     ->leftJoin('par_navigator_folders as t7', 't1.navigator_folder_id', '=', 't7.id')
+    ->leftJoin('par_groups as t8', 't1.owner_group_id', '=', 't8.id')
     ->select(
         DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
         't1.doc_title AS mtype',
@@ -240,6 +241,7 @@ public function getdocdefinationrequirementDetails(Request $req)
         't6.name AS status',
         't5.name AS process_name',
         't7.name AS navigator_name',
+        't8.name AS group_owner',
         't1.*',
         // DB::raw("(SELECT t2.navigator_folder_name
         //   FROM tra_documentmanager_application t2

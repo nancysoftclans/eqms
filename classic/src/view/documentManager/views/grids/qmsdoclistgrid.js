@@ -60,7 +60,6 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
         stores: '[]'
     } ],
     autoScroll: true,
-    store: '[]',
     listeners: {
         beforerender: {
             fn: 'setGridTreeStore',
@@ -73,9 +72,6 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
                 },
             },
             isLoad: true
-        },
-        beforerender: function (grid) {
-            grid.store.load();
         },
         itemdblclick: 'onViewDocumentApplication'
     },
@@ -90,32 +86,22 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
             handler: 'backFromGroupAllDetails'
         },
         {
-        xtype: 'pagingtoolbar',
-        width: '100%',
-        displayInfo: true,
-        //store: '[]',
-        displayMsg: 'Showing {0} - {1} of {2} total records',
-        emptyMsg: 'No Records',
-        beforeLoad: function () {
+            xtype: 'pagingtoolbar',
+            // store: 'systemrolestreestr',
+            displayInfo: true,
+            displayMsg: 'Showing {0} - {1} of {2} total records',
+            emptyMsg: 'No Records',
 
-            this.up('qmsdoclistgrid').fireEvent('refresh', this);
-            // xtype: 'pagingtoolbar',
-            // store: '[]',
-            // displayInfo: true,
-            // displayMsg: 'Showing {0} - {1} of {2} total records',
-            // emptyMsg: 'No Records',
-
-            // beforeLoad: function () {
-            // this.up('qmsdoclistgrid').fireEvent('refresh', this);
-              // var grid = this.up("grid"),
-              //   pnl = grid.up("documentcreationapps"),
-              //   wrapper = pnl.up("documentapplicationwrapper"),
-              //   cnt = wrapper.up(),
-              //   store = this.store,
-              //   grid = this.up("grid");
-              // store.getProxy().extraParams = {
-              //   table_name: "tra_documentmanager_application",
-              // };
+            beforeLoad: function () {
+              var grid = this.up("grid"),
+                pnl = grid.up("documentcreationapps"),
+                wrapper = pnl.up("documentapplicationwrapper"),
+                cnt = wrapper.up(),
+                store = this.store,
+                grid = this.up("grid");
+              store.getProxy().extraParams = {
+                table_name: "tra_documentmanager_application",
+              };
             },
         },
         '->',
@@ -159,7 +145,14 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
         // Concatenate first_name and last_name
         var firstName = record.get("first_name");
         var lastName = record.get("last_name");
-        return firstName + " " + lastName;
+        var fullName = firstName + " " + lastName;
+        var groupOwner = record.get("group_owner");
+         
+        if (fullName && groupOwner) {
+            return fullName + ', ' + groupOwner;
+        } else {
+             return fullName || groupOwner;
+            } 
       },
     },
 
