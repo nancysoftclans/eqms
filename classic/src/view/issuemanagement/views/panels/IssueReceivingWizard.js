@@ -104,6 +104,10 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
         },
         {
           xtype: "hiddenfield",
+          name: "application_code",
+        },
+        {
+          xtype: "hiddenfield",
           name: "application_status_id",
         },
       ],
@@ -111,7 +115,7 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
   ],
   items: [
     {
-      xtype: "issuemanagementpnl",
+      xtype: "issuereceivingpnl",
       layout: "fit",
       defaults: {
         margin: 3,

@@ -1,6 +1,6 @@
 Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
   extend: "Ext.tab.Panel",
-  xtype: "issuemanagementpnl",
+  xtype: "issuereceivingpnl",
   layout: {
     type: "fit",
   },
@@ -23,7 +23,7 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
     },
     {
       xtype: "issuemanagementdocuploadsgrid",
-      title: "DOCUMENTS",
+      title: "Documents",
     },
     {
       xtype: "hiddenfield",
