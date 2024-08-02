@@ -202,8 +202,9 @@ class IssueManagementController extends Controller
 
     public function getIssueManagementDetails(Request $request)
     {
+        $issue_type_id = $request->input("issue_type_id");
         try {
-            $results = IssueManagement::from('tra_issue_management_applications as t1')
+            $qry = IssueManagement::from('tra_issue_management_applications as t1')
                 ->leftjoin('tra_submissions as t2', 't1.submission_id', 't2.id')
                 ->leftJoin('wf_workflow_stages as t3', 't1.workflow_stage_id', '=', 't3.id')
                 ->leftjoin('wf_processes as t4', 't2.process_id', '=', 't4.id')
@@ -220,8 +221,11 @@ class IssueManagementController extends Controller
                     't1.workflow_stage_id',
                     't1.created_on as creation_date',
                     DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
-                )
-                ->get();
+                );
+            if (validateIsNumeric($issue_type_id)) {
+                $qry->where('t1.issue_type_id', $issue_type_id);
+            }
+            $results = $qry->get();
 
             $results = convertStdClassObjToArray($results);
             $results = decryptArray($results);
@@ -327,18 +331,27 @@ class IssueManagementController extends Controller
     public function submitIssueManagementApplication(Request $request)
     {
         try {
-            $application_code = $request->application_code;
-            $workflow_stage_id = $request->workflow_stage_id;
             $active_application_id = $request->active_application_id;
 
             $IssueManagement = IssueManagement::findOrFail($active_application_id);
-            $IssueStatus = IssueStatus::where('name', 'In Progress')->first();
 
-            if ($IssueManagement && $IssueStatus) {
+            $issue_status_id = 1;
+            if ($IssueManagement->complaint_fully_addressed == "1") {
+                $IssueStatus = IssueStatus::where('name', 'Closed')->first();
+                $issue_status_id = $IssueStatus->id ?: 7;
+                $date_closed = Carbon::now();
+            } else {
+                $IssueStatus = IssueStatus::where('name', 'In Progress')->first();
+                $issue_status_id = $IssueStatus->id ?: 2;
+                $date_closed = null;
+            }
+
+            if ($IssueManagement) {
                 $IssueManagement->fill([
-                    'issue_status_id' => $IssueStatus->id,
+                    'issue_status_id' => $issue_status_id,
                     'dola' => Carbon::now(),
                     'altered_by' => $this->user_id,
+                    'date_closed' => $date_closed
                 ]);
                 $IssueManagement->save();
 
@@ -351,12 +364,12 @@ class IssueManagementController extends Controller
         }
         return \response()->json($res);
     }
-    public function saveIssueQualityReviewDetails(Request $request)
+    public function saveIssueInitialQualityReviewDetails(Request $request)
     {
         $application_code = $request->input('application_code');
         $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
-        
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -367,7 +380,7 @@ class IssueManagementController extends Controller
                     'altered_by' => $user_id,
                     'application_code' => $application_code,
                     'process_id' => $request->process_id,
-                    'complaint_direct_or_indirect' => $request->input('complaint_direct_or_indirect', 0),
+                    'complaint_direct_or_indirect' => $request->input('complaint_direct_or_indirect'),
                     'office_assigned_to' => $request->input('office_assigned_to', 0),
                     'complaint_scheduling_delay' => $request->has('complaint_scheduling_delay'),
                     'complaint_manner_of_advisor' => $request->has('complaint_manner_of_advisor'),
@@ -410,7 +423,7 @@ class IssueManagementController extends Controller
         $application_code = $request->input('application_code');
         $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
-        
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -474,7 +487,7 @@ class IssueManagementController extends Controller
         $application_code = $request->input('application_code');
         $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
-        
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -500,6 +513,54 @@ class IssueManagementController extends Controller
                         "results" => $IssueManagement
                     );
                 }
+            }
+        } catch (\Exception $exception) {
+            DB::rollback();
+            $res = array(
+                "success" => false,
+                "message" => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            DB::rollback();
+            $res = array(
+                "success" => false,
+                "message" => $throwable->getMessage()
+            );
+        }
+        return \response()->json($res);
+    }
+
+    public function saveIssueQualityReviewDetails(Request $request)
+    {
+        $application_code = $request->input('application_code');
+        $active_application_id = $request->input('active_application_id');
+        $user_id = $this->user_id;
+
+        try {
+            if (validateIsNumeric($active_application_id)) {
+                //Update
+                $IssueManagement = IssueManagement::findOrFail($active_application_id);
+                $IssueManagement->fill([
+                    'workflow_stage_id' => $request->workflow_stage_id,
+                    'dola' => Carbon::now(),
+                    'altered_by' => $user_id,
+                    'application_code' => $application_code,
+                    'process_id' => $request->process_id,
+                    'complaint_fully_addressed' => $request->input('complaint_fully_addressed')
+                ]);
+                $IssueManagement->save();
+                //End Update
+
+                $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
+                    ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
+                    ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
+
+                $res = array(
+                    "success" => true,
+                    "message" => 'Data Saved Successfully!!',
+                    "results" => $IssueManagement
+                );
+
             }
         } catch (\Exception $exception) {
             DB::rollback();

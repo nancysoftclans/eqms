@@ -9,13 +9,15 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
   width: "100%",
   viewConfig: {
     deferEmptyText: false,
+    preserveScrollOnReload: true,
+    enableTextSelection: true,
     emptyText: "Nothing to display",
-    getRowClass: function (record, rowIndex, rowParams, store) {
-      var is_enabled = record.get("is_enabled");
-      if (is_enabled == 0 || is_enabled === 0) {
-        return "invalid-row";
-      }
-    },
+    // getRowClass: function (record, rowIndex, rowParams, store) {
+    //   var is_enabled = record.get("is_enabled");
+    //   if (is_enabled == 0 || is_enabled === 0) {
+    //     return "invalid-row";
+    //   }
+    // },
   },
   tbar: [
     {
@@ -79,8 +81,6 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       fn: "setGridStore",
       config: {
         pageSize: 1000,
-        autoLoad: false,
-        defaultRootId: "root",
         enablePaging: true,
         storeId: "issuemanagementstr",
         grouper: {
@@ -114,35 +114,20 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
 
   bbar: [
     {
-      xtype: "button",
-      text: "Back",
-      hidden: true,
-      ui: "soft-blue",
-      iconCls: "x-fa fa-backward",
-      handler: "backFromGroupAllDetails",
-    },
-    {
       xtype: "pagingtoolbar",
-      // store: 'systemrolestreestr',
+      width: '100%',
       displayInfo: true,
       displayMsg: "Showing {0} - {1} of {2} total records",
       emptyMsg: "No Records",
       beforeLoad: function () {
-        var store = this.store,
-          grid = this.up("grid");
+        var store = this.getStore(),
+          grid = this.up("grid"),
+          issue_type_id = grid.down('combo[name=issue_type_id]').getValue();
         store.getProxy().extraParams = {
+          issue_type_id: issue_type_id,
           table_name: "tra_issue_management_applications",
         };
       },
-    },
-    "->",
-    {
-      xtype: "button",
-      text: "Sync Changes",
-      hidden: true,
-      ui: "soft-blue",
-      iconCls: "x-fa fa-save",
-      handler: "updateSystemNavigationAccessRoles",
     },
   ],
   columns: [
@@ -219,14 +204,26 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
               iconCls: "x-fa fa-trash",
               tooltip: "Delete Record",
               table_name: "tra_submissions",
-              storeID: "",
+              storeID: "issuemanagementstr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
-              // hidden: record.issue_status !== 'Draft'
+              handler: 'doDeleteConfigWidgetParam',
+              bind: {
+                disabled: '{hideDeleteButton}'
+              },
             },
           ],
         },
       },
+      onWidgetAttach: function (col, widget, rec) {
+        var issue_status = rec.get("issue_status_id");
+        if (issue_status === 1) {
+          widget.down('menu menuitem[action=actual_delete]').setHidden(false);
+        }
+        else {
+          widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+        }
+      }
     },
   ],
 });

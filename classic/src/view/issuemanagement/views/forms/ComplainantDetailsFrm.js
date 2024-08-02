@@ -20,33 +20,33 @@ Ext.define("Admin.view.issuemanagement.views.forms.ComplainantDetailsFrm", {
   items: [
     {
       xtype: "textfield",
-      fieldLabel: "Name of Complainant",
+      fieldLabel: "<strong>Name of Complainant</strong>",
       margin: "0 20 20 0",
       name: "complainant_name",
       allowBlank: false,
     },
     {
       xtype: "textfield",
-      fieldLabel: "Name of Organisation (if applicable)",
+      fieldLabel: "<strong>Name of Organisation (if applicable)</strong>",
       margin: "0 20 20 0",
       name: "organisation_name",
     },
     {
       xtype: "textfield",
-      fieldLabel: "Complainant Address",
+      fieldLabel: "<strong>Complainant Address</strong>",
       margin: "0 20 20 0",
       name: "complainant_address",
     },
     {
       xtype: "textfield",
-      fieldLabel: "Telephone",
+      fieldLabel: "<strong>Telephone</strong>",
       margin: "0 20 20 0",
       name: "complainant_telephone",
     },
     {
       xtype: "combo",
       anyMatch: true,
-      fieldLabel: "Complaint or Appeal",
+      fieldLabel: "<strong>Complaint or Appeal</strong>",
       margin: "0 20 20 0",
       name: "complaint_type_id",
       valueField: "id",
@@ -72,7 +72,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.ComplainantDetailsFrm", {
     {
       xtype: "combo",
       anyMatch: true,
-      fieldLabel: "Mode of Complaint",
+      fieldLabel: "<strong>Mode of Complaint</strong>",
       margin: "0 20 20 0",
       name: "complaint_mode_id",
       valueField: "id",

@@ -1,16 +1,34 @@
-Ext.define(
-  "Admin.view.issuemanagement.views.panels.IssueReceivingPnl",
-  {
-    extend: "Ext.panel.Panel",
-    xtype: "issuereceiving",
-    controller: "issuemanagementvctr",
-    viewModel: "issuemanagementvm",
-    layout: "fit",
-    
-    items: [
-      {
-        xtype: "issuereceivingwizard",
-      },
-    ],
-  }
-);
+Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
+  extend: "Ext.tab.Panel",
+  xtype: "issuereceivingpnl",
+  layout: {
+    type: "fit",
+  },
+  defaults: {
+    margin: 3,
+  },
+  viewModel: {
+    type: "issuemanagementvm",
+  },
+  items: [
+    {
+      xtype: "issuemanagementfrm",
+      autoScroll: true,
+      title: "Issue Details",
+    },
+    {
+      xtype: "complainantdetailsfrm",
+      autoScroll: true,
+      title: "Complainant Details",
+    },
+    {
+      xtype: "issuemanagementdocuploadsgrid",
+      title: "Documents",
+    },
+    {
+      xtype: "hiddenfield",
+      name: "_token",
+      value: token,
+    },
+  ],
+});

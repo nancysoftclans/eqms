@@ -1,8 +1,8 @@
 Ext.define(
-  "Admin.view.issuemanagement.views.panels.IssueInitialQualityReviewWizard",
+  "Admin.view.issuemanagement.views.panels.IssueManagementWizard",
   {
     extend: "Ext.panel.Panel",
-    alias: "widget.issueinitialqualityreviewwizard",
+    alias: "widget.issuemanagementwwizard",
     padding: "2 0 2 0",
     requires: ["Ext.layout.container.*", "Ext.toolbar.Fill"],
     reference: "wizardpnl",
@@ -117,7 +117,7 @@ Ext.define(
     ],
     items: [
       {
-        xtype: "issuesubmissionpnl",
+        xtype: "issuemanagementpnl",
         layout: "fit",
         defaults: {
           margin: 3,
@@ -153,7 +153,7 @@ Ext.define(
             text: "ISSUE MANAGEMENT",
             max_step: 1,
             action: "quickNav",
-            wizard: "issueinitialqualityreviewwizard",
+            wizard: "issuequalityreviewwizard",
             handler: "quickNavigation",
           },
         ],
@@ -170,39 +170,6 @@ Ext.define(
             hidden: true,
           },
           "->",
-          {
-            text: "Save",
-            ui: "soft-blue",
-            iconCls: "fa fa-save",
-            name: "save",
-            formBind: true,
-            form_panel: "#issueinitialqualityreviewfrm",
-            action_url: "issuemanagement/saveIssueInitialQualityReviewDetails",
-            wizard: "issueinitialqualityreviewwizard",
-            handler: "saveIssueManagementInitialQualityReviewDetails",
-          },
-          {
-            text: "Recommendations & Comments",
-            ui: "soft-blue",
-            iconCls: "fa fa-clipboard-check",
-            childXtype: "applicationcommentspnl",
-            winTitle: "Process Comments",
-            winWidth: "60%",
-            name: "recommendation",
-            comment_type_id: 3,
-            stores: "[]",
-            hidden: true
-          },
-          {
-            text: "Submit Application",
-            ui: "soft-blue",
-            iconCls: "fa fa-check",
-            name: "process_submission_btn",
-            storeID: "issuemanagementstr",
-            table_name: "tra_issue_management_applications",
-            winWidth: "50%",
-            handler: "showIssueManagementSubmissionWin",
-          },
         ],
       };
       me.callParent(arguments);

@@ -55,7 +55,7 @@ Ext.define('Admin.view.workflowmanagement.views.grids.WorkflowInterfacesGrid', {
                     sub_module = grid.down('combo[name=sub_module_id]'),
                     sub_module_str = sub_module.getStore();
                 sub_module_str.removeAll();
-                sub_module_str.load({params: {module_id: newVal}});
+                sub_module_str.load({ params: { module_id: newVal } });
                 grid.getStore().load();
             }
         }

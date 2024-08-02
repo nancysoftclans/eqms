@@ -34,14 +34,14 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueResolutionFrm", {
     },
     {
       xtype: "textarea",
-      fieldLabel: "Resolution",
+      fieldLabel: "<strong>Resolution</strong>",
       margin: "0 20 20 0",
       name: "issue_resolution",
       allowBlank: false,
     },
     {
       xtype: "displayfield",
-      fieldLabel: "Has the resolution been communicated to the customer?",
+      fieldLabel: "<strong>Has the resolution been communicated to the customer?</strong>",
       margin: "0 20 20 0",
       value: '<strong>Remember to attach all supporting documents, eg letters sent to the customer.</strong>'
     },

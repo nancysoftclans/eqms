@@ -1,8 +1,8 @@
 Ext.define(
-  "Admin.view.issuemanagement.views.panels.IssueInitialQualityReviewWizard",
+  "Admin.view.issuemanagement.views.panels.IssueQualityReviewWizard",
   {
     extend: "Ext.panel.Panel",
-    alias: "widget.issueinitialqualityreviewwizard",
+    alias: "widget.issuequalityreviewwizard",
     padding: "2 0 2 0",
     requires: ["Ext.layout.container.*", "Ext.toolbar.Fill"],
     reference: "wizardpnl",
@@ -117,7 +117,7 @@ Ext.define(
     ],
     items: [
       {
-        xtype: "issuesubmissionpnl",
+        xtype: "issuequalityreviewpnl",
         layout: "fit",
         defaults: {
           margin: 3,
@@ -153,7 +153,7 @@ Ext.define(
             text: "ISSUE MANAGEMENT",
             max_step: 1,
             action: "quickNav",
-            wizard: "issueinitialqualityreviewwizard",
+            wizard: "issuequalityreviewwizard",
             handler: "quickNavigation",
           },
         ],
@@ -176,10 +176,10 @@ Ext.define(
             iconCls: "fa fa-save",
             name: "save",
             formBind: true,
-            form_panel: "#issueinitialqualityreviewfrm",
-            action_url: "issuemanagement/saveIssueInitialQualityReviewDetails",
-            wizard: "issueinitialqualityreviewwizard",
-            handler: "saveIssueManagementInitialQualityReviewDetails",
+            form_panel: "#issuequalityreviewfrm",
+            action_url: "issuemanagement/saveIssueQualityReviewDetails",
+            wizard: "issuequalityreviewwizard",
+            handler: "saveIssueQualityReviewDetails",
           },
           {
             text: "Recommendations & Comments",
