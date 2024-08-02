@@ -29,13 +29,14 @@ Ext.define('Admin.view.documentManager.views.toolbars.DocumentTypeTb', {
                 xtype: 'menu',
                     items:[{
                     text: 'Create Document',
-                    iconCls: 'x-fa fa-file',
+                   // iconCls: 'x-fa fa-file',
+                    iconCls: 'x-fa fa-envelope',
                     handler:'onInitiateDocumentApplication',
                     app_type: 101
                 },
                 {
-                    text: 'SOP Template',
-                    iconCls: 'x-fa fa-file-alt',
+                    text: 'Template for Procedures, WI, Policies, Manuals, Appendix',
+                    iconCls: 'x-fa fa-file',
                     handler:'onInitiateDocumentApplication',
                     app_type: 104
                 },

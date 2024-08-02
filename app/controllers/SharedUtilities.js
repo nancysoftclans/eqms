@@ -74,6 +74,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     documentapplicationreceivingwizard: {
       afterrender: "prepapreDocumentApplicationReceiving",
     },
+    newqmsrecordwizard: {
+      afterrender: "prepapreNewQmsRecord",
+    },
     documentrenewalwizard: {
       afterrender: "prepapreDocumentApplicationRenewal",
     },
@@ -99,6 +102,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       afterrender: "prepapreSOPTemplateApplicationRelease",
     },
     "documenttypetb button[name=disposalpermitstbRegHomeBtn]": {
+      click: "documenttypeRegHome",
+    },
+    "qmsrecordtb button[name=disposalpermitstbRegHomeBtn]": {
       click: "documenttypeRegHome",
     },
     "applicationcommentsFrm button[name=save_comment]": {
@@ -142,7 +148,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         setCompStore: "setCompStore",
         deleteRecord: "deleteRecordByID",
         onInitiateDocumentApplication: "onInitiateDocumentApplication",
-        onInitiateNavigatorApplication: "onInitiateNavigatorApplication",
+        onInitiateQmsRecordApplication: "onInitiateQmsRecordApplication",
         showReceivingApplicationSubmissionWin:"showReceivingApplicationSubmissionWin",
         getDocumentReleaseRecommendationDetails: "getDocumentReleaseRecommendationDetails",    
         viewNavigatorDocDetails: "onViewNavigatorDocDetails", 
@@ -594,13 +600,13 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     //load the stores
   },
 
-  onInitiateNavigatorApplication: function (sub_module_id, btn) {
+  onInitiateQmsRecordApplication: function (sub_module_id, btn) {
     Ext.getBody().mask("Loading Please wait...");
     var me = this,
       is_dataammendment_request = btn.is_dataammendment_request,
       mainTabPanel = me.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      dashboardWrapper = activeTab.down("#navigatorapplicationwrapper"),
+      dashboardWrapper = activeTab.down("#qmsrecordapplicationwrapper"),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
 
     workflow_details = getInitialDocumentCreationWorkflowDetails(
@@ -1235,6 +1241,78 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     }
   },
 
+  prepapreNewQmsRecord: function (pnl) {
+    Ext.getBody().mask("Please wait...");
+    var me = this,
+      activeTab = pnl;
+      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+      qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
+      stage_category_id = activeTab.down("hiddenfield[name=stage_category_id]").getValue();
+
+    if (application_code) {
+      Ext.Ajax.request({
+        method: "GET",
+        url: "documentmanagement/prepapreNewQmsRecord",
+        params: {
+          application_code: application_code,
+        },
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success,
+            results = resp.results,
+            model = Ext.create("Ext.data.Model", results);
+
+          if (success == true || success === true) {
+            qmsdoclistfrm.loadRecord(model);
+            activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
+            activeTab.down('hiddenfield[name=stage_category_id]').setValue(results.stage_category_id);
+            activeTab.down('hiddenfield[name=active_application_code]').setValue(application_code);
+            activeTab.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+            activeTab.down('hiddenfield[name=module_id]').setValue(module_id);
+            activeTab.down("displayfield[name=tracking_no]").setValue(results.tracking_no);
+            activeTab.down("displayfield[name=document_number]").setValue(results.document_number);
+            activeTab.down('displayfield[name=created_on]').setValue(results.created_on);
+            qmsdoclistfrm.down("textfield[name=navigator_name]").setValue(results.navigator_name);
+
+          
+                activeTab.down("button[name=recommendation]").setVisible(false);
+                activeTab.down("button[name=approval]").setVisible(false);
+                activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+                activeTab.down("textfield[name=approval_id]").setVisible(false);
+                activeTab.down("button[name=add_upload]").setHidden(false);
+                activeTab.down("button[name=process_submission_btn]").setHidden(true);
+          
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+    }
+  },
+
   prepapreDocumentApplicationReceiving: function (pnl) {
     Ext.getBody().mask("Please wait...");
     var me = this,
@@ -1274,6 +1352,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             activeTab.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
             activeTab.down('hiddenfield[name=module_id]').setValue(module_id);
             activeTab.down("displayfield[name=tracking_no]").setValue(results.tracking_no);
+            activeTab.down("displayfield[name=document_number]").setValue(results.document_number);
+            activeTab.down('displayfield[name=created_on]').setValue(results.created_on);
             qmsdoclistfrm.down("textfield[name=navigator_name]").setValue(results.navigator_name);
 
           
@@ -1626,23 +1706,115 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     return true;
   },
 
-  saveDocumentReviewRecommendationDetails: function (btn) {
-    var me = this,
-      mainTabPanel = me.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      form = btn.up("form"),
-      decision_id = form.down("combo[name=decision_id]").getValue(),
-      module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
-      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue();
-      (frm = form.getForm()),
-      (win = form.up("window")),
-      (action_url = "documentmanagement/saveDocumentApplicationApprovalDetails");
 
-      if(activeTab.down("docuploadsgrid")){
-        var  grid = activeTab.down("docuploadsgrid");
-      }else{
-        var grid = activeTab.down("soptemplatedocuploadgrid");
+  // saveDocumentReviewRecommendationDetails: function (btn) {
+  //   var me = this,
+  //     mainTabPanel = me.getMainTabPanel(),
+  //     activeTab = mainTabPanel.getActiveTab(),
+  //     form = btn.up("form"),
+  //     decision_id = form.down("combo[name=decision_id]").getValue(),
+  //     module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
+  //     sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue();
+  //     (frm = form.getForm()),
+  //     (win = form.up("window")),
+  //     (action_url = "documentmanagement/saveDocumentApplicationApprovalDetails");
+
+  //     if(activeTab.down("docuploadsgrid")){
+  //       var  grid = activeTab.down("docuploadsgrid");
+  //     }else{
+  //       var grid = activeTab.down("soptemplatedocuploadgrid");
+  //     }
+  //   if (frm.isValid()) {
+  //     frm.submit({
+  //       url: action_url,
+  //       headers: {
+  //         Authorization: "Bearer " + access_token,
+  //         "X-CSRF-Token": token,
+  //       },
+  //       params: {
+  //         sub_module_id: sub_module_id
+  //       },
+  //       waitMsg: "Please wait...",
+  //       success: function (fm, action) {
+  //         var response = Ext.decode(action.response.responseText),
+  //           success = response.success,
+  //           message = response.message;
+  //           approval = response.results;
+  //         if (success == true || success === true) {
+  //           toastr.success(message, "Success Response");
+  //            grid.down("textfield[name=approval_id]").setValue(approval);
+  //           win.close();
+  //         } else {
+  //           toastr.error(message, "Failure Response");
+  //         }
+  //       },
+  //       failure: function (fm, action) {
+  //         var resp = action.result;
+  //         toastr.error(resp.message, "Failure Response");
+  //       },
+  //     });
+  //   }
+  // },
+
+  saveDocumentReviewRecommendationDetails: function (btn) {
+  var me = this,
+    mainTabPanel = me.getMainTabPanel(),
+    activeTab = mainTabPanel.getActiveTab(),
+    form = btn.up("form"),
+    decision_id = form.down("combo[name=decision_id]").getValue(),
+    module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+    sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+    application_code = activeTab.down("hiddenfield[name=application_code]").getValue(),
+    frm = form.getForm(),
+    win = form.up("window"),
+    action_url = "documentmanagement/saveDocumentApplicationApprovalDetails";
+
+  if (activeTab.down("docuploadsgrid")) {
+    var grid = activeTab.down("docuploadsgrid");
+  } else {
+    var grid = activeTab.down("soptemplatedocuploadgrid");
+  }
+
+  // Check if decision_id is 3
+  if (decision_id == 3) {
+    // Show confirmation popup
+    Ext.Msg.confirm('Confirmation', 'Rejecting this document will automatically ERASE its content from the system. Are you sure you want to delete this record?', function (btn) {
+      if (btn === 'yes') {
+        // Proceed to delete the record
+        Ext.Ajax.request({
+          url: 'documentmanagement/deleteDocumentRecord', 
+          method: 'POST',
+          params: {
+            sub_module_id: sub_module_id,
+            decision_id: decision_id,
+            application_code: application_code
+          },
+          headers: {
+            Authorization: "Bearer " + access_token,
+            "X-CSRF-Token": token,
+          },
+          success: function (response) {
+            var resp = Ext.decode(response.responseText),
+              success = resp.success,
+              message = resp.message;
+            if (success == true || success === true) {
+              grid.getStore().reload(); // Reload the grid store
+              win.close();
+              activeTab.close();
+              toastr.success(message, "Success Response");
+            } else {
+              toastr.error(message, "Failure Response");
+            }
+          },
+          failure: function (response) {
+            var resp = Ext.decode(response.responseText);
+            toastr.error(resp.message, "Failure Response");
+          }
+        });
       }
+    });
+  } else {
+    // Proceed with the form submission
     if (frm.isValid()) {
       frm.submit({
         url: action_url,
@@ -1657,11 +1829,11 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         success: function (fm, action) {
           var response = Ext.decode(action.response.responseText),
             success = response.success,
-            message = response.message;
+            message = response.message,
             approval = response.results;
           if (success == true || success === true) {
             toastr.success(message, "Success Response");
-             grid.down("textfield[name=approval_id]").setValue(approval);
+            grid.down("textfield[name=approval_id]").setValue(approval);
             win.close();
           } else {
             toastr.error(message, "Failure Response");
@@ -1673,7 +1845,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         },
       });
     }
-  },
+  }
+},
+
   saveApplicationApprovalDetails: function (btn) {
     var me = this,
       mainTabPanel = me.getMainTabPanel(),
@@ -2112,7 +2286,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       soptemplatedoclistfrm = activeTab.down("soptemplatedoclistfrm"),
       grid = activeTab.down("soptemplategrid"),
-      // grid = activeTab.down('docuploadsgrid'),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
       sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
@@ -2142,6 +2315,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
 
           if (success == true || success === true) {
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
+            activeTab.down("displayfield[name=tracking_no]").setValue(results.tracking_no);
+            activeTab.down("displayfield[name=document_number]").setValue(results.document_number);
+            activeTab.down('displayfield[name=created_on]').setValue(results.created_on);
             soptemplatedoclistfrm.loadRecord(model);
           } else {
             toastr.error(message, "Failure Response");
@@ -2718,14 +2894,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       });
     }
   },
-  deleteRecordByID: function (
-    id,
-    table_name,
-    storeID,
-    url,
-    method = null,
-    is_variation = ""
-  ) {
+  deleteRecordByID: function (id, table_name, storeID, url, method = null,is_variation = "") {
     var me = this,
       store = Ext.getStore(storeID);
     Ext.MessageBox.confirm(

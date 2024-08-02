@@ -1,7 +1,7 @@
-Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
+Ext.define('Admin.view.documentManager.views.grids.QmsRecordGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'qmsdoclistgrid',
-    itemId: 'qmsdoclistgrid',
+    xtype: 'qmsrecordgrid',
+    itemId: 'qmsrecordgrid',
     useArrows: true,
     rootVisible: false,
     multiSelect: false,
@@ -60,7 +60,6 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
         stores: '[]'
     } ],
     autoScroll: true,
-    store: '[]',
     listeners: {
         beforerender: {
             fn: 'setGridTreeStore',
@@ -68,14 +67,11 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-                        read: 'documentmanagement/getdocdefinationrequirementDetails'
+                        read: 'documentmanagement/getqmsrequirementDetails'
                     },
                 },
             },
             isLoad: true
-        },
-        beforerender: function (grid) {
-            grid.store.load();
         },
         itemdblclick: 'onViewDocumentApplication'
     },
@@ -90,32 +86,22 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
             handler: 'backFromGroupAllDetails'
         },
         {
-        xtype: 'pagingtoolbar',
-        width: '100%',
-        displayInfo: true,
-        //store: '[]',
-        displayMsg: 'Showing {0} - {1} of {2} total records',
-        emptyMsg: 'No Records',
-        beforeLoad: function () {
+            xtype: 'pagingtoolbar',
+            // store: 'systemrolestreestr',
+            displayInfo: true,
+            displayMsg: 'Showing {0} - {1} of {2} total records',
+            emptyMsg: 'No Records',
 
-            this.up('qmsdoclistgrid').fireEvent('refresh', this);
-            // xtype: 'pagingtoolbar',
-            // store: '[]',
-            // displayInfo: true,
-            // displayMsg: 'Showing {0} - {1} of {2} total records',
-            // emptyMsg: 'No Records',
-
-            // beforeLoad: function () {
-            // this.up('qmsdoclistgrid').fireEvent('refresh', this);
-              // var grid = this.up("grid"),
-              //   pnl = grid.up("documentcreationapps"),
-              //   wrapper = pnl.up("documentapplicationwrapper"),
-              //   cnt = wrapper.up(),
-              //   store = this.store,
-              //   grid = this.up("grid");
-              // store.getProxy().extraParams = {
-              //   table_name: "tra_documentmanager_application",
-              // };
+            beforeLoad: function () {
+              var grid = this.up("grid"),
+                pnl = grid.up("qmsrecordapps"),
+                wrapper = pnl.up("qmsrecordapplicationwrapper"),
+                cnt = wrapper.up(),
+                store = this.store,
+                grid = this.up("grid");
+              store.getProxy().extraParams = {
+                table_name: "tra_documentmanager_application",
+              };
             },
         },
         '->',
@@ -144,11 +130,6 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
         xtype: 'gridcolumn',
         dataIndex: 'doc_version',
         text: 'Version',
-        flex: 1
-    },{
-        xtype: 'gridcolumn',
-        dataIndex: 'status',
-        text: 'Status',
         flex: 1
     }, {
       xtype: "gridcolumn",

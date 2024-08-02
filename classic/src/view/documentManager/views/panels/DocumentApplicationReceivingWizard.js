@@ -30,7 +30,16 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                 margin: '-12 5 0 5',
                 labelStyle: "color:#595959;font-size:10px"
             },
-            items: ['->',  {
+            items: [{
+                xtype: 'displayfield',
+                name: 'created_on',
+                fieldLabel: 'Effective date:',
+                fieldStyle: {
+                    'color': 'green',
+                    'font-weight': 'bold',
+                    'font-size': '10px'
+                }
+            },'->',  {
                 xtype: 'displayfield',
                 name: 'process_name',
                 fieldLabel: 'Process',
@@ -42,10 +51,19 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
             }, {
                     xtype: 'tbseparator',
                     width: 5
+                },{
+                    xtype: 'displayfield',
+                    name: 'document_number',
+                    fieldLabel: 'Document No.',
+                    fieldStyle: {
+                        'color': 'green',
+                        'font-weight': 'bold',
+                        'font-size': '10px'
+                    }
                 }, {
                     xtype: 'displayfield',
                     name: 'workflow_stage',
-                     //hidden: true,
+                    hidden: true,
                     fieldLabel: 'Stage',
                     fieldStyle: {
                         'color': 'green',
@@ -72,7 +90,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                 },{
                     xtype: 'displayfield',
                     name: 'tracking_no',
-                    fieldLabel: 'Tracking No',
+                    fieldLabel: 'Issue No:',
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',

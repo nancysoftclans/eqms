@@ -66,6 +66,7 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('getRepositoryrootfolderDetails', [DmsConfigurationsController::class, 'getRepositoryrootfolderDetails']);
     Route::get('dmsAuthentication', [DmsConfigurationsController::class, 'dmsAuthentication']);
     Route::get('prepapreDocumentApplicationReceiving', [DocumentManagementController::class, 'prepapreDocumentApplicationReceiving']);
+    Route::get('prepapreNewQmsRecord', [DocumentManagementController::class, 'prepapreNewQmsRecord']);
     Route::get('prepapreDocumentApplicationScreening', [DocumentManagementController::class, 'prepapreDocumentApplicationScreening']);
     Route::get('getDMSSiteDefinationDetails', [DmsConfigurationsController::class, 'getDMSSiteDefinationDetails']);
     Route::get('getDMSSectionsDefinationDetails', [DmsConfigurationsController::class, 'getDMSSectionsDefinationDetails']);
@@ -90,8 +91,10 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::post('getDocumentArchive', [DocumentManagementController::class, 'getDocumentArchive']);
     Route::post('saveDocumentRecommendationComments', [DocumentManagementController::class, 'saveDocumentRecommendationComments']);
     Route::post('saveDocumentApplicationApprovalDetails', [DocumentManagementController::class, 'saveDocumentApplicationApprovalDetails']); 
+    Route::post('deleteDocumentRecord', [DocumentManagementController::class, 'deleteDocumentRecord']); 
     Route::post('dmsUpdateAccountPassword', [DmsConfigurationsController::class, 'dmsUpdateAccountPassword']);
     Route::get('getArchivedDocdDetails', [DmsConfigurationsController::class, 'getArchivedDocdDetails']);
+    Route::get('getqmsrequirementDetails', [DmsConfigurationsController::class, 'getqmsrequirementDetails']);
    
 
     });

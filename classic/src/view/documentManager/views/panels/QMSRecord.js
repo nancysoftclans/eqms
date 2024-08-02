@@ -1,7 +1,7 @@
-Ext.define('Admin.view.documentManager.views.panels.DocumentsCreationApplication', {
+Ext.define('Admin.view.documentManager.views.panels.QMSRecord', {
     extend: 'Ext.Container',
-    xtype: 'documentscreationapplication',
-    itemId: 'documentscreationapplication',
+    xtype: 'qmsrecord',
+    itemId: 'qmsrecord',
     controller: 'documentsManagementvctr',
     layout: 'border',
     items: [
@@ -12,14 +12,14 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentsCreationApplication
         },{
             xtype: 'hiddenfield',
             name: 'sub_module_id',
-            value: 101
+            value: 108
         },
         {
-            xtype: 'documentapplicationwrapper',
+            xtype: 'qmsrecordapplicationwrapper',
             region: 'center'
         },
         {
-            xtype: 'documenttypetb',
+            xtype: 'qmsrecordtb',
             region: 'south'
         }
     ]
