@@ -13,10 +13,11 @@ Ext.define('Admin.view.dashboard.SystemProcessDashboard', {
     listeners: {
         hide: 'onHideView',
     }, 
-    items: [ {
-            xtype: 'tabpanel',
-            region: 'center',
-            userCls: 'big-100 small-100',
+    items: [ 
+    {
+            // xtype: 'tabpanel',
+            // region: 'center',
+            // userCls: 'big-100 small-100',
             
             items: [
                 // {
