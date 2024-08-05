@@ -187,11 +187,11 @@ class DmsConfigurationsController extends Controller
     }
  
 
-public function getdocdefinationrequirementDetails(Request $req)
+    public function getqmsrequirementDetails(Request $req)
 {
  
     try {
-     $results = DB::table('tra_documentmanager_application as t1')
+     $results = DB::table('tra_documentrecords_application as t1')
     ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
     ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
@@ -205,6 +205,43 @@ public function getdocdefinationrequirementDetails(Request $req)
         't6.name AS status',
         't5.name AS process_name',
         't7.name AS navigator_name',
+        't1.*',
+        // DB::raw("(SELECT t2.navigator_folder_name
+        //   FROM tra_documentmanager_application t2
+        //   WHERE t1.navigator_folder_id = t2.id) as navigator_name")
+
+    )->get();
+
+        $results = convertStdClassObjToArray($results);
+        $res = decryptArray($results);
+    } catch (\Exception $exception) {
+        $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    } catch (\Throwable $throwable) {
+        $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    }
+    return $res;
+}
+
+public function getdocdefinationrequirementDetails(Request $req)
+{
+ 
+    try {
+     $results = DB::table('tra_documentmanager_application as t1')
+    ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+    ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
+    ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
+    ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
+    ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
+    ->leftJoin('par_navigator_folders as t7', 't1.navigator_folder_id', '=', 't7.id')
+    ->leftJoin('par_groups as t8', 't1.owner_group_id', '=', 't8.id')
+    ->select(
+        DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
+        't1.doc_title AS mtype',
+        't2.name AS document_type',
+        't6.name AS status',
+        't5.name AS process_name',
+        't7.name AS navigator_name',
+        't8.name AS group_owner',
         't1.*',
         // DB::raw("(SELECT t2.navigator_folder_name
         //   FROM tra_documentmanager_application t2
@@ -346,7 +383,7 @@ public function getArchivedDocdDetails(Request $req)
 
     }
 
-       public function getNavigatorDetails(Request $req){
+     public function getNavigatorDetails(Request $req){
         $module_id = $req->module_id;
         $sub_module_id = $req->sub_module_id;
         $section_id = $req->section_id;
@@ -361,7 +398,8 @@ public function getArchivedDocdDetails(Request $req)
                     ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
                     ->select(
                         //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
-                        DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
+                        DB::raw("CASE WHEN (SELECT COUNT(id)
+ FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
                          //DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),attachments
                        't1.name AS navigator_name',
                         't1.id',
@@ -414,7 +452,8 @@ public function getArchivedDocdDetails(Request $req)
                     ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
                     ->select(
                         //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
-                        DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
+                        DB::raw("CASE WHEN (SELECT COUNT(id)
+ FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
                          //DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),
                        't1.name AS navigator_name',
                         't1.id',
@@ -434,13 +473,14 @@ public function getArchivedDocdDetails(Request $req)
         }
  
     } catch (\Exception $exception) {
-        $data = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        $data = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', _CLASS_), \Auth::user()->id);
     } catch (\Throwable $throwable) {
-        $data = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        $data = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', _CLASS_), \Auth::user()->id);
     }
     return $data;
 
     }
+
 
      public function navigatorMoveFolder(Request $request)
     {

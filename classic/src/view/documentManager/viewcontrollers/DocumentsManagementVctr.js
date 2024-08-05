@@ -153,9 +153,9 @@ Ext.define('Admin.view.documentManager.viewcontrollers.DocumentsManagementVctr',
         this.fireEvent('onInitiateDocumentApplication', application_type, btn);
     },
 
-    onInitiateNavigatorApplication: function (btn) {
+    onInitiateQmsRecordApplication: function (btn) {
         var application_type = btn.app_type;
-        this.fireEvent('onInitiateNavigatorApplication', application_type, btn);
+        this.fireEvent('onInitiateQmsRecordApplication', application_type, btn);
     },
     doCreateConfigParam: function (btn) {
         var me = this,
@@ -482,6 +482,7 @@ showEditConfigParamWinFrm: function (item) {
              wizardPnl = btn.up(wizard),
              action_url = btn.action_url,
              form_panel = btn.form_panel,
+             table_name = btn.table_name,
              mainTabPnl = btn.up('#contentPanel'),
              containerPnl = mainTabPnl.getActiveTab();
 
@@ -521,16 +522,18 @@ showEditConfigParamWinFrm: function (item) {
                         success = resp.success,
                         active_application_id = resp.active_application_id,
                         application_code = resp.application_code,
-                        sub_module_id = resp.sub_module_id,
-                        module_id = resp.module_id,
                         product_id = resp.product_id,
-                        tracking_no = resp.tracking_no;
+                        tracking_no = resp.tracking_no,
+                        document_number = resp.document_number,
+                        created_on = resp.created_on;
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                             containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
-                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
-                            containerPnl.down('hiddenfield[name=module_id]').setValue(module_id);
+                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(submodule_id);
+                            containerPnl.down('hiddenfield[name=module_id]').setValue(moduleId);
                             containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                            containerPnl.down('displayfield[name=document_number]').setValue(document_number);
+                            containerPnl.down('displayfield[name=created_on]').setValue(created_on);
                       
 
                     } else {
@@ -571,7 +574,6 @@ showEditConfigParamWinFrm: function (item) {
             qmsdoclistfrm = qmsdoclistfrm.getForm(); 
   
         if (qmsdoclistfrm.isValid()) {
-             // console.log(process_id, moduleId, submodule_id, applicationCode);
             qmsdoclistfrm.submit({
                 url: 'documentmanagement/'+action_url,
                 waitMsg: 'Please wait...',
@@ -672,16 +674,18 @@ showEditConfigParamWinFrm: function (item) {
                         success = resp.success,
                         active_application_id = resp.active_application_id,
                         application_code = resp.application_code,
-                        sub_module_id = resp.sub_module_id,
-                        module_id = resp.module_id,
                         product_id = resp.product_id,
-                        tracking_no = resp.tracking_no;
+                        tracking_no = resp.tracking_no,
+                        document_number = resp.document_number,
+                        created_on = resp.created_on;
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                             containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
-                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
-                            containerPnl.down('hiddenfield[name=module_id]').setValue(module_id);
+                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(submodule_id);
+                            containerPnl.down('hiddenfield[name=module_id]').setValue(moduleId);
                             containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                            containerPnl.down('displayfield[name=document_number]').setValue(document_number);
+                            containerPnl.down('displayfield[name=created_on]').setValue(created_on);
                       
 
                     } else {
@@ -747,16 +751,18 @@ showEditConfigParamWinFrm: function (item) {
                         success = resp.success,
                         active_application_id = resp.active_application_id,
                         application_code = resp.application_code,
-                        sub_module_id = resp.sub_module_id,
-                        module_id = resp.module_id,
                         product_id = resp.product_id,
-                        tracking_no = resp.tracking_no;
+                        tracking_no = resp.tracking_no,
+                        document_number = resp.document_number,
+                        created_on = resp.created_on;
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                             containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
-                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
-                            containerPnl.down('hiddenfield[name=module_id]').setValue(module_id);
+                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(submodule_id);
+                            containerPnl.down('hiddenfield[name=module_id]').setValue(moduleId);
                             containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                            containerPnl.down('displayfield[name=document_number]').setValue(document_number);
+                            containerPnl.down('displayfield[name=created_on]').setValue(created_on);
                       
 
                     } else {
@@ -822,16 +828,18 @@ showEditConfigParamWinFrm: function (item) {
                         success = resp.success,
                         active_application_id = resp.active_application_id,
                         application_code = resp.application_code,
-                        sub_module_id = resp.sub_module_id,
-                        module_id = resp.module_id,
                         product_id = resp.product_id,
-                        tracking_no = resp.tracking_no;
+                        tracking_no = resp.tracking_no,
+                        document_number = resp.document_number,
+                        created_on = resp.created_on;
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                             containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
-                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
-                            containerPnl.down('hiddenfield[name=module_id]').setValue(module_id);
+                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(submodule_id);
+                            containerPnl.down('hiddenfield[name=module_id]').setValue(moduleId);
                             containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                            containerPnl.down('displayfield[name=document_number]').setValue(document_number);
+                            containerPnl.down('displayfield[name=created_on]').setValue(created_on);
                       
 
                     } else {

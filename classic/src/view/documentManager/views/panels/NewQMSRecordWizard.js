@@ -1,9 +1,9 @@
 /**
  * Created by softclans
  */
-Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
+Ext.define('Admin.view.documentManager.views.panels.NewQMSRecordWizard', {
     extend: 'Ext.panel.Panel',
-    alias: 'widget.formformatreceivingpnl',
+    alias: 'widget.newqmsrecordwizard',
     padding: '2 0 2 0',
     requires: [
         'Ext.layout.container.*',
@@ -51,7 +51,7 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
             }, {
                     xtype: 'tbseparator',
                     width: 5
-                }, {
+                },{
                     xtype: 'displayfield',
                     name: 'document_number',
                     fieldLabel: 'Document No.',
@@ -60,7 +60,7 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                         'font-weight': 'bold',
                         'font-size': '10px'
                     }
-                },{
+                }, {
                     xtype: 'displayfield',
                     name: 'workflow_stage',
                     hidden: true,
@@ -70,6 +70,10 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                         'font-weight': 'bold',
                         'font-size': '10px'
                     }
+                }, {
+                    xtype: 'tbseparator',
+                    hidden: true,
+                    width: 5
                 }, {
                 xtype: 'displayfield',
                 name: 'application_status',
@@ -131,7 +135,7 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
 
     ],
     items: [{
-            xtype: 'soptemplatedocumentdetailspnl',
+            xtype: 'documentdetailspnl',
             dockedItems: [
                 {
                     xtype: 'toolbar',
@@ -141,8 +145,8 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                 }
             ],
         }, {
-            xtype: 'formformatgrid',
-            title: 'Form Format Upload'
+            xtype: 'docuploadsgrid',
+            title: 'Document Upload'
         },
         {
             xtype: 'hiddenfield',
@@ -172,18 +176,18 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                     iconCls: 'fa fa-university',
                     enableToggle: true,
                     pressed: true,
-                    text: 'Form Format Application Details',
+                    text: 'Document Creation Application Details',
                     max_step:1,
-                    action: 'quickNav', wizard: 'formformatreceivingpnl',
+                    action: 'quickNav', wizard: 'newqmsrecordwizard',
                     handler: 'quickNavigation'
                 }, {
                     step: 1,
                     iconCls: 'fa fa-product-hunt',
                     enableToggle: true,
                     max_step:1,
-                    text: 'Form Format Upload',
+                    text: 'Document Upload',
                     action: 'quickNav', 
-                    wizard: 'formformatreceivingpnl',
+                    wizard: 'newqmsrecordwizard',
                     handler: 'quickNavigation'
                 }
             ]
@@ -205,30 +209,32 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                     ui: 'soft-blue',
                     iconCls: 'fa fa-arrow-left',
                     max_step:1,
+                    name: 'prev',
                     bind: {
                         disabled: '{atBeginning}'
                     },
-                    wizard:'formformatreceivingpnl',
+                    wizard:'newqmsrecordwizard',
                     handler: 'onPrevCardClick'
                 },{
-                    text: 'Save Form Details',
+                    text: 'Save Details',
                     ui: 'soft-blue',
                     iconCls: 'fa fa-save',
-                    table_name: 'tra_documentmanager_application',
+                    table_name: 'tra_documentrecords_application',
                     name: 'save', 
                    // formBind: true,
-                    form_panel:'#soptemplatedoclistfrm',
+                    form_panel:'#qmsdoclistfrm',
                     action_url:'saveDocDefinationrequirement',
-                    wizard: 'formformatreceivingpnl',
-                    handler: 'saveFormFormatApplicationReceivingBaseDetails'
+                    wizard: 'newqmsrecordwizard',
+                    handler: 'saveDocumentApplicationReceivingBaseDetails'
                 },
                 {
                     text: 'Submit Application',
                     ui: 'soft-blue',
                     iconCls: 'fa fa-check',
                     name: 'process_submission_btn',
+                     hidden: true,
                     storeID: 'drugproductregistrationstr',
-                    table_name: 'tra_documentmanager_application',
+                    table_name: 'tra_documentrecords_application',
                     winWidth: '50%',
                     handler: 'showReceivingApplicationSubmissionWin'
                 },
@@ -241,7 +247,7 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                     approval_frm: 'documentreviewrecommfrm',
                     vwcontroller: 'documentsManagementvctr',
                     stores: '["productApprovalDecisionsStr"]',
-                    table_name: 'tra_documentmanager_application',
+                    table_name: 'tra_documentrecords_application',
                     is_siginig:0
                 },
 
@@ -260,13 +266,14 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                 {
                     text: 'Next',
                     ui: 'soft-blue',
+                    name: 'next',
                     reference: 'nextbutton',
                     iconCls: 'fa fa-arrow-right',
                     iconAlign: 'right',
                     max_step:1,
                     bind: {
                         disabled: '{atEnd}'
-                    },wizard:'formformatreceivingpnl',
+                    },wizard:'newqmsrecordwizard',
                     handler: 'onNextCardClick'
                 }
             ]

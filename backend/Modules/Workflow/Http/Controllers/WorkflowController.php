@@ -135,7 +135,6 @@ class WorkflowController extends Controller
                 't1.sub_module_id' => $sub_module_id
             );
 
-
             if (validateIsNumeric($is_dataammendment_request)) {
 
                 $where['t1.is_dataammendment_request'] = $is_dataammendment_request;
@@ -153,11 +152,12 @@ class WorkflowController extends Controller
                 ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
                 ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId', 't3.stage_category_id');
 
-
+        
 
             $qry->where($where);
 
             $results = $qry->first();
+
             //initial status details
             $statusDetails = getApplicationInitialStatus($module_id, $sub_module_id);
 

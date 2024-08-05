@@ -2801,7 +2801,7 @@ static function convertArrayToString($array){
         return  $applicant_id;
     }
 
-     static function generateDocumentNumber($decision_id, $process_id, $user_id, $doc_prefix)
+     static function generateDocumentNumber($sub_module_id, $process_id, $user_id, $doc_prefix)
     {
         $where = array(
             'process_id' => $process_id
@@ -2810,7 +2810,7 @@ static function convertArrayToString($array){
         $serial_track = $serial_num_tracker->where($where)->first();
 
         if ($serial_track == '' || is_null($serial_track)) {
-            $current_serial_id = $decision_id;
+            $current_serial_id = $sub_module_id;
             $serial_num_tracker->process_id = $process_id;
             $serial_num_tracker->created_by = $user_id;
             $serial_num_tracker->last_serial_no = $current_serial_id;
