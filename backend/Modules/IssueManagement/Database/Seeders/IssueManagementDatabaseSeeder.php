@@ -16,6 +16,7 @@ class IssueManagementDatabaseSeeder extends Seeder
         $this->call([
             ComplaintModesSeederTableSeeder::class,
             ComplaintTypesSeederTableSeeder::class,
+            IssueStateSeederTableSeeder::class,
             IssueStatusSeederTableSeeder::class,
             IssueTypesSeederTableSeeder::class
         ]);

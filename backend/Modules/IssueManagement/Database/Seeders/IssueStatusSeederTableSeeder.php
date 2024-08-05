@@ -14,48 +14,52 @@ class IssueStatusSeederTableSeeder extends Seeder
      */
     public function run()
     {
-        $seeder=array(
+        $seeder = array(
             array(
-                'name'=>'Draft',
-                'description'=>'Draft'
+                'title' => 'Raised',
+                'issue_state_id' => 1,
             ),
             array(
-                'name'=>'In Progress',
-                'description'=>'In Progress'
+                'title' => 'In Progress',
+                'issue_state_id' => 1
             ),
             array(
-                'name'=>'Paused',
-                'description'=>'Paused'
+                'title' => 'Paused',
+                'issue_state_id' => 1
             ),
             array(
-                'name'=>'On Hold',
-                'description'=>'On Hold'
+                'title' => 'Pause',
+                'issue_state_id' => 5
             ),
             array(
-                'name'=>'Under investigation',
-                'description'=>'Under investigation'
+                'title' => 'On Hold',
+                'issue_state_id' => 1
             ),
             array(
-                'name'=>'Cancelled',
-                'description'=>'Cancelled'
+                'title' => 'Under investigation',
+                'issue_state_id' => 3
             ),
             array(
-                'name'=>'Closed',
-                'description'=>'Closed'
+                'title' => 'Cancelled',
+                'issue_state_id' => 4
             ),
             array(
-                'name'=>'Withdrawn',
-                'description'=>'Withdrawn'
+                'title' => 'Closed',
+                'issue_state_id' => 2
             ),
             array(
-                'name'=>'Rejected',
-                'description'=>'Rejected'
+                'title' => 'Withdrawn',
+                'issue_state_id' => 4
+            ),
+            array(
+                'title' => 'Rejected',
+                'issue_state_id' => 4
             ),
         );
-        // update or insert depending on the name
-        foreach($seeder as $seed){
+        // update or insert depending on the title
+        foreach ($seeder as $seed) {
             DB::table('par_issue_statuses')->updateOrInsert(
-                ['name'=>$seed['name']],
+                ['title' => $seed['title']],
                 $seed
             );
         }
