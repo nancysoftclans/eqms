@@ -12,36 +12,36 @@ Ext.define('Admin.view.dashboard.SystemProcessDashboard', {
     layout: 'border',
     listeners: {
         hide: 'onHideView',
-    }, 
-    items: [ {
-            xtype: 'tabpanel',
-            region: 'center',
-            userCls: 'big-100 small-100',
-            
-            items: [
-                {
-                    title: 'My Workspace',
-                    xtype: 'intraygrid',
-                    // height: Ext.Element.getViewportHeight() - 161
-                },
-                // {
-                //     title: 'Out-Tray',
-                //     xtype: 'outtraygrid',
-                //     // height: Ext.Element.getViewportHeight() - 161
-                // },
-                // {
-                //     xtype:'panel',
-                //     layout:'border',
-                //     title: 'Online Application Receiving Dashboard',
-                //     items:[{
-                //         xtype: 'portalSubmissionReceivingPnl',
-                //         region:'center'
-                        
-                //     }
+    },
+    items: [{
+        xtype: 'tabpanel',
+        region: 'center',
+        userCls: 'big-100 small-100',
+
+        items: [
+            {
+                title: 'In-Tray',
+                xtype: 'intraygrid',
+                // height: Ext.Element.getViewportHeight() - 161
+            },
+            {
+                title: 'Out-Tray',
+                xtype: 'outtraygrid',
+                // height: Ext.Element.getViewportHeight() - 161
+            },
+            {
+                xtype: 'panel',
+                layout: 'border',
+                title: 'Online Application Receiving Dashboard',
+                items: [{
+                    xtype: 'portalSubmissionReceivingPnl',
+                    region: 'center'
+
+                }
                     // {
                     //     xtype: 'onlineapplicationdashboardgrid',
                     //     region:'center'
-                        
+
                     // }
                     // ,{
                     //     xtype: 'onlineappssubmissioncountergrid',
@@ -53,26 +53,35 @@ Ext.define('Admin.view.dashboard.SystemProcessDashboard', {
                     //     autoScroll: true
 
                     // }
-                  //  ]
-                //}, 
-                // {
-                //     xtype:'panel',
-                //     layout:'border',
-                //     title: 'Application Queries Dashboard',
-                //     items:[{
-                //         xtype: 'dashboardQueriesPnl',
-                //         region:'center'
-                        
-                //     }
-                    ]
+                ]
+            }, {
+                xtype: 'panel',
+                layout: 'border',
+                title: 'Application Queries Dashboard',
+                items: [{
+                    xtype: 'dashboardQueriesPnl',
+                    region: 'center'
+
                 }
-                // ,{
-                //     xtype:'controllleddocumentsaccessdashboard',
-                //     title:'Shared Documents (Controlled Documents Dashboard)',
-                //     layout:'fit'
-                // }
-            ]
-        //}
-		
-    //]
+                ]
+            },
+            {
+                xtype: 'panel',
+                layout: 'border',
+                title: 'My Workspace',
+                items: [{
+                    xtype: 'myworkspacedashboardgrid',
+                    region: 'center',
+
+                }]
+            }
+            // ,{
+            //     xtype:'controllleddocumentsaccessdashboard',
+            //     title:'Shared Documents (Controlled Documents Dashboard)',
+            //     layout:'fit'
+            // }
+        ]
+    }
+
+    ]
 });
