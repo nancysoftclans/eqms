@@ -238,6 +238,7 @@ public function getdocdefinationrequirementDetails(Request $req)
         DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
         't1.doc_title AS mtype',
         't2.name AS document_type',
+        't4.name AS workflow_stage',
         't6.name AS status',
         't5.name AS process_name',
         't7.name AS navigator_name',

@@ -328,6 +328,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       title_suffix = ref_no;
 
     workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
+    console.log(workflow_details);
 
     //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
@@ -2418,8 +2419,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             success = response.success,
             message = response.message;
             reccomendation = response.results;
-
-            console.log(reccomendation);
           if (success == true || success === true) {
             toastr.success(message, "Success Response");
             grid.down("textfield[name=recommendation_id]").setValue(reccomendation);

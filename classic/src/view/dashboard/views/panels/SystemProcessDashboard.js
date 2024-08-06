@@ -13,18 +13,17 @@ Ext.define('Admin.view.dashboard.SystemProcessDashboard', {
     listeners: {
         hide: 'onHideView',
     }, 
-    items: [ 
-    {
-            // xtype: 'tabpanel',
-            // region: 'center',
-            // userCls: 'big-100 small-100',
+    items: [ {
+            xtype: 'tabpanel',
+            region: 'center',
+            userCls: 'big-100 small-100',
             
             items: [
-                // {
-                //     title: 'In-Tray',
-                //     xtype: 'intraygrid',
-                //     // height: Ext.Element.getViewportHeight() - 161
-                // },
+                {
+                    title: 'My Workspace',
+                    xtype: 'intraygrid',
+                    // height: Ext.Element.getViewportHeight() - 161
+                },
                 // {
                 //     title: 'Out-Tray',
                 //     xtype: 'outtraygrid',
@@ -39,23 +38,24 @@ Ext.define('Admin.view.dashboard.SystemProcessDashboard', {
                 //         region:'center'
                         
                 //     }
-                //     // {
-                //     //     xtype: 'onlineapplicationdashboardgrid',
-                //     //     region:'center'
+                    // {
+                    //     xtype: 'onlineapplicationdashboardgrid',
+                    //     region:'center'
                         
-                //     // }
-                //     // ,{
-                //     //     xtype: 'onlineappssubmissioncountergrid',
-                //     //     title:'Online Application Submissions Counter(Summary Data)',
-                //     //     region: 'south',
-                //     //     collapsible: true,
-                //     //     collapsed: true,
-                //     //     height: 320,
-                //     //     autoScroll: true
+                    // }
+                    // ,{
+                    //     xtype: 'onlineappssubmissioncountergrid',
+                    //     title:'Online Application Submissions Counter(Summary Data)',
+                    //     region: 'south',
+                    //     collapsible: true,
+                    //     collapsed: true,
+                    //     height: 320,
+                    //     autoScroll: true
 
-                //     // }
-                //     ]
-                // }, {
+                    // }
+                  //  ]
+                //}, 
+                // {
                 //     xtype:'panel',
                 //     layout:'border',
                 //     title: 'Application Queries Dashboard',
@@ -64,15 +64,15 @@ Ext.define('Admin.view.dashboard.SystemProcessDashboard', {
                 //         region:'center'
                         
                 //     }
-                //     ]
-                // }
+                    ]
+                }
                 // ,{
                 //     xtype:'controllleddocumentsaccessdashboard',
                 //     title:'Shared Documents (Controlled Documents Dashboard)',
                 //     layout:'fit'
                 // }
             ]
-        }
+        //}
 		
-    ]
+    //]
 });

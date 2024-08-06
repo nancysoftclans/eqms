@@ -277,6 +277,16 @@ Ext.define('Admin.controller.WorkflowManagementCtr', {
             win = form.up('window'),
             frm = form.getForm();
             non_mainpanel_close = 0;
+
+            if(mainTabPanel.down("#documentapplicationwrapper")){
+            var documentCreationWrapper = mainTabPanel.down("#documentapplicationwrapper"), 
+                documentCreationGridStore = documentCreationWrapper.down("grid");
+            }
+
+            if(mainTabPanel.down("#livedocumentapplicationwrapper")){
+            var livedocumentapplicationwrapper = mainTabPanel.down("#livedocumentapplicationwrapper"),
+                liveCreationGridStore = livedocumentapplicationwrapper.down("grid");
+            }
             
             if(form.down('hiddenfield[name=non_mainpanel_close]')){
                 non_mainpanel_close = form.down('hiddenfield[name=non_mainpanel_close]').getValue();
@@ -296,6 +306,13 @@ Ext.define('Admin.controller.WorkflowManagementCtr', {
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                         //store.load();
+                        if(documentCreationGridStore){
+                            documentCreationGridStore.getStore().reload();
+                        }
+                        if(liveCreationGridStore){
+                            liveCreationGridStore.getStore().reload();  
+                        }
+                        
                         if(store){
                             store.load();
                         }
