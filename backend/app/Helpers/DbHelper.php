@@ -1247,6 +1247,21 @@ class DbHelper
             return $res;
         }
     }
+    static function getLastChecklistApplicationDetails($application_code) {
+        $qry = DB::table('tra_checklistitems_responses')
+            ->where('application_code', $application_code)
+            ->orderBy('id', 'DESC');
+
+        $results = $qry->first();
+
+        if(!empty($results)){
+            $res = array('success'=>true, 'results'=> $results);
+            return $res;
+        }else{
+            $res = array('success'=>false, 'results'=> $results);
+            return $res;
+        }
+    }
     static function onSaveOfflinePrePayments($application_code,$req,$user){
         $records = array('application_code'=>$application_code,
             'previous_application_no'=>$req->previous_application_no,

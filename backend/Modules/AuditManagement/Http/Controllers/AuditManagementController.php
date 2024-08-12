@@ -233,7 +233,7 @@ class AuditManagementController extends Controller
          
         try{
            
-            $audit_types_data = DB::table('par_qms_audit_types as t1')->get();
+            $audit_types_data = DB::table('par_audit_findings as t1')->get();
             
             $res = array(
                 'success' => true,
@@ -273,7 +273,6 @@ class AuditManagementController extends Controller
                 "module_id" => $module_id,
                 "application_status_id" => $request->input('application_status_id'),
                 "audit_title" => $request->input('audit_title'),
-                "audit_type_name" => $request->input('audit_type_name'),
                 "audit_type_id" => $request->input('audit_type_id'),
                 "audit_summary" => $request->input('audit_summary'),
                 "is_full_day" => $request->input('is_full_day'),
@@ -422,22 +421,64 @@ class AuditManagementController extends Controller
      
         try {
          $results = DB::table('tra_auditsmanager_application as t1')
-        ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
+        ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
+        ->leftJoin('par_qms_audit_types as t3', 't1.audit_type_id', '=', 't3.id')
        
         ->select(
         
             't1.*',
+            't2.name as workflow_stage',
+            't3.name as audit_type_name'
 
         )->get();
 
             $results = convertStdClassObjToArray($results);
             $res = decryptArray($results);
+
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return $res;
+    }
+
+    public function prepapreAuditApplicationReceiving(Request $req)
+    {
+        $application_id = $req->input('application_id');
+        $application_code = $req->input('application_code');
+        $table_name = $req->input('table_name');
+        try {
+            $main_qry = DB::table('tra_auditsmanager_application as t1')
+            ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
+            ->leftJoin('par_qms_audit_types as t3', 't1.audit_type_id', '=', 't3.id')
+            ->leftJoin('par_system_statuses as t4', 't1.application_status_id', '=', 't4.id')
+            ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
+            ->select(
+            
+                't1.*',
+                't2.name as workflow_stage',
+                't3.name as audit_type_name',
+                't4.name as application_status',
+                't5.name as process_name',
+
+            )
+            ->where('t1.application_code', $application_code);
+
+            $results = $main_qry->first();
+
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well'
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return \response()->json($res);
     }
    
 }

@@ -49,15 +49,12 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     xtype: 'displayfield',
                     name: 'workflow_stage',
                     fieldLabel: 'Workflow Stage',
+                    hidden: true,
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',
                         'font-size': '10px'
                     }
-                },
-                {
-                    xtype: 'tbseparator',
-                    width: 5
                 },
                 {
                     xtype: 'displayfield',

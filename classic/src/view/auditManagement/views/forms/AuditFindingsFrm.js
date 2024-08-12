@@ -26,7 +26,7 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
         xtype: 'hiddenfield',
         margin: '0 20 20 0',
         name: 'table_name',
-       value: 'par_qms_audit_types',
+       value: 'par_audit_findings',
         allowBlank: true
     }, {
         xtype: 'hiddenfield',
@@ -101,32 +101,6 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
         name: 'results',
         columnWidth: 1,
         allowBlank: false
-    },{
-        xtype: 'combo', 
-        fieldLabel: 'Owner User',
-        name: 'owner_user_id',
-        valueField: 'id',
-        margin: '0 20 20 0',
-        displayField: `fullname`,
-        forceSelection: true,
-        allowBlank: true,
-        hidden: true,
-        queryMode: 'local',
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                        url: 'usermanagement/documentOwner',
-                        extraParams: {
-                            //table_name: 'par_user_roles'
-                        }
-                    }
-                },
-                isLoad: true
-            }
-        }
     },
     ]},
     {

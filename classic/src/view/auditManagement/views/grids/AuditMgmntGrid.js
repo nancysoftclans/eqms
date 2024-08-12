@@ -72,7 +72,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
                 table_name: "tra_auditsmanager_application",
               };
             },
-        itemdblclick: 'onViewDocumentApplication'
+        itemdblclick: 'onViewAuditApplication'
     },
 
    
@@ -122,7 +122,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
         },
         {
             xtype: 'gridcolumn',
-            dataIndex:'title',
+            dataIndex:'audit_title',
             text: 'Title',
             flex: 1,
         },
@@ -134,13 +134,13 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
         },
         {
             xtype: 'gridcolumn',
-            dataIndex: 'start_date',
+            dataIndex: 'audit_start_date',
             text: 'Start Date', 
             flex: 1,
         },
         {
             xtype: 'gridcolumn',
-            dataIndex: 'end_date',
+            dataIndex: 'audit_end_date',
             text: 'End Date', 
             flex: 1,
         }

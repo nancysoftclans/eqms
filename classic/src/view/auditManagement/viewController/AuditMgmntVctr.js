@@ -122,9 +122,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                         active_application_id = resp.active_application_id,
                         application_code = resp.application_code,
                         product_id = resp.product_id,
-                        tracking_no = resp.tracking_no,
-                        document_number = resp.document_number,
-                        created_on = resp.created_on;
+                        tracking_no = resp.tracking_no;
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                             containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
@@ -352,6 +350,15 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             }
         }
         activeItem.focus();
+    },
+
+    onViewAuditApplication: function (grid, record) {
+
+        this.fireEvent('viewAuditApplication', record);
+
+    },
+    setCompStore: function (obj, options) {
+        this.fireEvent('setCompStore', obj, options);
     },
    
 })

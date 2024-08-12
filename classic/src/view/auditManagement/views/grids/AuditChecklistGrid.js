@@ -34,7 +34,8 @@
         enableGroupingMenu: false
     }],
     tbar: [{
-        xtype: 'exportbtn'
+        xtype: 'exportbtn',
+        hidden: true
     }, {
         xtype: 'tbspacer',
         width: 50
@@ -48,6 +49,7 @@
         valueField: 'id',
         displayField: 'name',
         forceSelection: true,
+        hidden: true,
         name: 'applicable_checklist',
         queryMode: 'local',
         width: 500,
@@ -221,12 +223,14 @@
         }
     }],
 
-    bbar: [{
-        text: 'Checklist Revision(s)',
-        ui: 'soft-blue',
-        iconCls: 'fa fa-history',
-        name: 'show_screeninghistory_btn'
-    },{
+    bbar: [
+    // {
+    //     text: 'Checklist Revision(s)',
+    //     ui: 'soft-blue',
+    //     iconCls: 'fa fa-history',
+    //     name: 'show_screeninghistory_btn'
+    // },
+    {
         xtype: 'pagingtoolbar',
         width: '50%',
         displayInfo: true,

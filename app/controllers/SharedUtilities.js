@@ -630,28 +630,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     }
     dashboardWrapper.removeAll();
     var workflowContainer = Ext.widget(workflow_details.viewtype);
-    workflowContainer
-      .down("displayfield[name=process_name]")
-      .setValue(workflow_details.processName);
-    workflowContainer
-      .down("displayfield[name=workflow_stage]")
-      .setValue(workflow_details.initialStageName);
-    workflowContainer
-      .down("displayfield[name=application_status]")
-      .setValue(workflow_details.initialStageName);
-    workflowContainer
-      .down("hiddenfield[name=process_id]")
-      .setValue(workflow_details.processId);
-    workflowContainer
-      .down("hiddenfield[name=workflow_stage_id]")
-      .setValue(workflow_details.initialStageId);
+    workflowContainer.down("displayfield[name=process_name]").setValue(workflow_details.processName);
+    workflowContainer.down("displayfield[name=workflow_stage]").setValue(workflow_details.initialStageName);
+    workflowContainer.down("displayfield[name=application_status]").setValue(workflow_details.initialStageName);
+    workflowContainer.down("hiddenfield[name=process_id]").setValue(workflow_details.processId);
+    workflowContainer.down("hiddenfield[name=workflow_stage_id]").setValue(workflow_details.initialStageId);
     workflowContainer.down("hiddenfield[name=module_id]").setValue(module_id);
-    workflowContainer
-      .down("hiddenfield[name=sub_module_id]")
-      .setValue(sub_module_id);
-    workflowContainer
-      .down("hiddenfield[name=application_status_id]")
-      .setValue(workflow_details.initialStageId);
+    workflowContainer.down("hiddenfield[name=sub_module_id]").setValue(sub_module_id);
+    workflowContainer.down("hiddenfield[name=application_status_id]").setValue(workflow_details.initialStageId);
     dashboardWrapper.add(workflowContainer);
 
     Ext.Function.defer(function () {
