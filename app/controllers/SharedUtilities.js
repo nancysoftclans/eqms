@@ -138,6 +138,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       // sendExcelToBD
       afterrender: "initializeResumableExcelUpload",
     },
+    auditchecklistgrid: {
+      refresh: "refreshAuditChecklistItemsGrid",
+    },
   },
   listen: {
     controller: {
@@ -2950,6 +2953,35 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         }
       }
     );
+  },
+
+   refreshAuditChecklistItemsGrid: function (me) {
+    var store = me.getStore(),
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      application_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      workflow_stage = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
+    checklist_type = 0;
+    if (me.is_auditor_checklist == 1) {
+      store.getProxy().extraParams = {
+        application_id: application_id,
+        application_code: application_code,
+        checklist_type: checklist_type,
+        process_id: process_id,
+        workflow_stage: workflow_stage,
+        is_auditor: 1,
+      };
+    } else {
+      store.getProxy().extraParams = {
+        application_id: application_id,
+        application_code: application_code,
+        checklist_type: checklist_type,
+        process_id: process_id,
+        workflow_stage: workflow_stage,
+      };
+    }
   },
 
   

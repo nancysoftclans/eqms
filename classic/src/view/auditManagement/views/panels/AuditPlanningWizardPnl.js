@@ -7,6 +7,9 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
         'Ext.layout.container.*',
         'Ext.toolbar.Fill'
     ],
+    viewModel: {
+        type: 'auditplanvm'
+    },
     reference: 'wizardpnl',
     layout: 'card',
     itemId: 'wizardpnl',
@@ -21,11 +24,11 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
             xtype: 'toolbar',
             dock: 'top',
             ui: 'footer',
-            height: 80,
+            height: 55,
             defaults: {
                 labelAlign: 'top',
                 margin: '-12 5 0 5',
-                labelStyle: "color:#595959;font-size:13px"
+                labelStyle: "color:#595959;font-size:10px"
             },
             items: [
                 '->', {
@@ -35,12 +38,12 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',
-                        'font-size': '12px'
+                        'font-size': '10px'
                     }
                 },
                 {
                     xtype: 'tbseparator',
-                    width: 20
+                    width: 5
                 },
                 {
                     xtype: 'displayfield',
@@ -49,27 +52,37 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',
-                        'font-size': '12px'
+                        'font-size': '10px'
                     }
                 },
                 {
                     xtype: 'tbseparator',
-                    width: 20
+                    width: 5
                 },
                 {
                     xtype: 'displayfield',
                     name: 'application_status',
-                    fieldLabel: 'App Status',
+                    fieldLabel: 'Status',
                     fieldStyle: {
                         'color': 'green',
                         'font-weight': 'bold',
-                        'font-size': '12px'
+                        'font-size': '10px'
+                    }
+                },
+                 {
+                    xtype: 'tbseparator',
+                    width: 5
+                },
+                {
+                    xtype: 'displayfield',
+                    name: 'tracking_no',
+                    fieldLabel: 'Reference',
+                    fieldStyle: {
+                        'color': 'green',
+                        'font-weight': 'bold',
+                        'font-size': '10px'
                     }
                 }, 
-                {
-                    xtype: 'tbseparator',
-                    width: 20
-                },
                 {
                     xtype: 'hiddenfield',
                     name: 'process_id'
@@ -113,14 +126,15 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                 }
             ],
         }, {
-            xtype: 'docuploadsgrid',
+           // xtype: 'checklistresponsescmngrid',
+            xtype: 'auditchecklistgrid',
             title: 'Questionnaire'
         },{
-            xtype: 'docuploadsgrid',
+            xtype: 'auditfindingsgrid',
             title: 'Findings'
         },{
             xtype: 'docuploadsgrid',
-            title: 'Associated items'
+            title: 'Associated document'
         },
         {
             xtype: 'hiddenfield',
@@ -190,17 +204,17 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
             reference: 'navigation-toolbar',
             ui: 'footer',
             items: ['->',
-                 {
-                    text: 'Previous',
-                    ui: 'soft-blue',
-                    iconCls: 'fa fa-arrow-left',
-                    max_step:3,
-                    bind: {
-                        disabled: '{atBeginning}'
-                    },
-                    wizard:'auditPlanningWizardPnl',
-                    handler: 'onPrevCardClick'
-                },
+                //  {
+                //     text: 'Previous',
+                //     ui: 'soft-blue',
+                //     iconCls: 'fa fa-arrow-left',
+                //     max_step:3,
+                //     bind: {
+                //         disabled: '{atBeginning}'
+                //     },
+                //     wizard:'auditPlanningWizardPnl',
+                //     handler: 'onPrevCardClick'
+                // },
                 {
                     text: 'Save Audit Details',
                     ui: 'soft-blue',
@@ -209,6 +223,8 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     bind: {
                         disabled: '{isReadOnly}'
                     },
+                    wizard: 'auditPlanningWizardPnl',
+                    form_panel:'#auditPlanMainDetailsFrm',
                     action_url: 'saveNewAuditPlanDetails',
                     handler: 'saveNewAuditPlanDetails',
 
@@ -221,18 +237,18 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     winWidth: '50%',
                     handler: 'showReceivingApplicationSubmissionWin',
                 },
-                 {
-                    text: 'Next',
-                    ui: 'soft-blue',
-                    reference: 'nextbutton',
-                    iconCls: 'fa fa-arrow-right',
-                    iconAlign: 'right',
-                    max_step:3,
-                    bind: {
-                        disabled: '{atEnd}'
-                    },wizard:'auditPlanningWizardPnl',
-                    handler: 'onNextCardClick'
-                }
+                //  {
+                //     text: 'Next',
+                //     ui: 'soft-blue',
+                //     reference: 'nextbutton',
+                //     iconCls: 'fa fa-arrow-right',
+                //     iconAlign: 'right',
+                //     max_step:3,
+                //     bind: {
+                //         disabled: '{atEnd}'
+                //     },wizard:'auditPlanningWizardPnl',
+                //     handler: 'onNextCardClick'
+                // }
             ]
         };
         me.callParent(arguments);

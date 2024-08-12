@@ -196,11 +196,11 @@ class UtilityHelper
             'module_id' => $module_id,
             'sub_module_id' => $sub_module_id
         );
+
         $results = DB::table('par_application_statuses as t1')
             ->join('par_system_statuses as t2', 't1.status_id', '=', 't2.id')
             ->select('t1.status_id', 't2.name')
             ->where($where)
-            ->where('t1.status', 1)
             ->first();
 
         if (!is_null($results)) {

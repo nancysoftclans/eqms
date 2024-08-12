@@ -1,7 +1,7 @@
-Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
+Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'audittypesgrid',
-    itemId: 'audittypesgrid',
+    xtype: 'auditfindingsgrid',
+    itemId: 'auditfindingsgrid',
     controller: 'auditMgmntVctr',
     useArrows: true,
     rootVisible: false,
@@ -34,12 +34,12 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
         }
     },
     tbar: [{
-      text: 'Create Audit Type',
+      text: 'Add Findings',
                 iconCls: 'x-fa fa-plus',
                 action: 'add',
                 ui: 'soft-blue',
-                childXtype: 'newAuditTypeDetailsFrm',
-                winTitle: 'Create Audit Type',
+                childXtype: 'auditfindingsfrm',
+                winTitle: 'Add Finding',
                 winWidth: '80%',
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
@@ -55,7 +55,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
                 storeId: 'audittypesstr',
                 proxy: {
                     api: {
-                        read: 'auditManagement/getAuditTypes'
+                        read: 'auditManagement/getAuditFindings'
                     },
                 },
             },
@@ -96,28 +96,36 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
         }],
     columns: [{
         xtype: 'gridcolumn',
-        dataIndex: 'code',
-        text: 'Code',
+        dataIndex: 'audit_id',
+        text: 'ID',
         flex: 1,
         sortable: true
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'audit_type_name',
+        dataIndex: 'finding_title',
         text: 'Title',
+        flex: 1,
+        sortable: true
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'finding_type',
+        text: 'Type',
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'is_enabled',
-        text: 'Active',
-        flex: 1,
-        renderer: function (value, metaData) {
-             if (value) {
-                metaData.tdStyle = 'color:green;';
-                return '<i class="fas fa-check"></i>';
-               }
-             metaData.tdStyle = 'color:green;';
-             return '<i class="fas fa-times"></i>';
-        }
+        dataIndex: 'finding_owner',
+        text: 'Owner',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'finding_status',
+        text: 'Status',
+        flex: 1
+    },{
+        xtype: 'gridcolumn',
+        dataIndex: 'created_on',
+        text: 'Date Raised',
+        flex: 1
     },{
         text: 'Options',
         xtype: 'widgetcolumn',
@@ -136,7 +144,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
                     iconCls: 'x-fa fa-edit',
                     tooltip: 'Edit Record',
                     action: 'edit',
-                    childXtype: 'newAuditTypeDetailsFrm',
+                    childXtype: 'auditfindingsfrm',
                     winTitle: 'Edit Audit Type',
                     winWidth: '80%',
                     handler: 'showEditAuditTypeConfigParamWinFrm',bind: {

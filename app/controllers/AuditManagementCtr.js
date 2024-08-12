@@ -1,4 +1,4 @@
-Ext.define('Admin.controller.QualityManagementCtr',{
+Ext.define('Admin.controller.AuditManagementCtr',{
     extend: 'Ext.app.Controller',
     stores: [],
     config: {
@@ -10,6 +10,14 @@ Ext.define('Admin.controller.QualityManagementCtr',{
             selector: '#contentPanel'
         }],
         
+    },
+    control: {
+        "auditPlanMainDetailsFrm button[action=search_audit_type]": {
+        click: "showAuditTypes",
+     },
+        audittypesgrid: {
+        itemdblclick: "onAuditTypesGridClick",
+    },
     },
 
     /**
@@ -59,4 +67,62 @@ Ext.define('Admin.controller.QualityManagementCtr',{
             }, 300);
             // workflowContainer.getViewModel().set({readOnly:false});
     },
+
+    showAuditTypes: function (btn) {
+    var me = this,
+      childXtype = btn.childXtype,
+      winTitle = btn.winTitle,
+      winWidth = btn.winWidth,
+      mainTabPanel = me.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      activeTab = mainTabPanel.getActiveTab();
+
+    if (activeTab.down("hiddenfield[name=section_id]")) {
+      section_id = activeTab.down("hiddenfield[name=section_id]").getValue();
+    }
+    if (activeTab.down("hiddenfield[name=active_application_code]")) {
+      section_id = activeTab
+        .down("hiddenfield[name=active_application_code]")
+        .getValue();
+    }
+    gmp_type_id = 0;
+    var childObject = Ext.widget(childXtype);
+    childObject.setHeight(450);
+
+    if (childObject.down("hiddenfield[name=application_code]")) {
+      childObject
+        .down("hiddenfield[name=application_code]")
+        .setValue(application_code);
+    }
+    funcShowCustomizableWindow(
+      winTitle,
+      winWidth,
+      childObject,
+      "customizablewindow"
+    );
+  },
+
+  onAuditTypesGridClick: function (view, record, item, index, e, eOpts) {
+    var me = this,
+      grid = view.grid,
+      folder_id = record.get("id"),
+      win = grid.up("window"),
+      mainTabPanel = me.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      mask = new Ext.LoadMask({
+        msg: "Please wait...",
+        target: win,
+      });
+    mask.show();
+    var auditPlanMainDetailsFrm = activeTab.down("auditPlanMainDetailsFrm");
+
+       auditPlanMainDetailsFrm.loadRecord(record);
+   
+
+
+    Ext.Function.defer(function () {
+      mask.hide();
+      win.close();
+    }, 200);
+  },
 });

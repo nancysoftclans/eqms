@@ -15,7 +15,7 @@ Ext.define('Admin.view.auditManagement.views.toolbars.AuditMgmntTb.js', {
         {
             text: 'Home',
             iconCls: 'x-fa fa-home',
-            sec_dashboard:'documentapplicationwrapper',
+            sec_dashboard:'auditManagementDashWrapperPnl',
             name: 'disposalpermitstbRegHomeBtn'
         },
         {

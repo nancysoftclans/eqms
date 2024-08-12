@@ -1,6 +1,6 @@
-   Ext.define('Admin.view.productregistration.views.grids.DetailedChecklistGrid', {
+   Ext.define('Admin.view.auditManagement.views.grids.AuditChecklistGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'detailedChecklistGrid',
+    xtype: 'auditchecklistgrid',
     cls: 'dashboard-todo-list',
     autoScroll: true,
     autoHeight: true,
@@ -237,7 +237,7 @@
                 grid.fireEvent('refresh', grid);
         }
     },'->',{
-        text: 'Save Inspection Details',
+        text: 'Save Checklist Details',
         ui: 'soft-blue',
         bind: {
             hidden: '{isReadOnly}'

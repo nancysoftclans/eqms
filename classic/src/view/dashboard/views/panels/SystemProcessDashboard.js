@@ -20,55 +20,57 @@ Ext.define('Admin.view.dashboard.SystemProcessDashboard', {
 
         items: [
             {
-                title: 'In-Tray',
+                title: 'My Workspace',
                 xtype: 'intraygrid',
                 // height: Ext.Element.getViewportHeight() - 161
             },
-            {
-                title: 'Out-Tray',
-                xtype: 'outtraygrid',
-                // height: Ext.Element.getViewportHeight() - 161
-            },
+            // {
+            //     title: 'Out-Tray',
+            //     xtype: 'outtraygrid',
+            //     // height: Ext.Element.getViewportHeight() - 161
+            // },
+            // {
+            //     xtype: 'panel',
+            //     layout: 'border',
+            //     title: 'Online Application Receiving Dashboard',
+            //     items: [
+            //     // {
+            //     //     xtype: 'portalSubmissionReceivingPnl',
+            //     //     region: 'center'
+
+            //     // }
+            //         // {
+            //         //     xtype: 'onlineapplicationdashboardgrid',
+            //         //     region:'center'
+
+            //         // }
+            //         // ,{
+            //         //     xtype: 'onlineappssubmissioncountergrid',
+            //         //     title:'Online Application Submissions Counter(Summary Data)',
+            //         //     region: 'south',
+            //         //     collapsible: true,
+            //         //     collapsed: true,
+            //         //     height: 320,
+            //         //     autoScroll: true
+
+            //         // }
+            //     ]
+            // }, 
+            // {
+            //     xtype: 'panel',
+            //     layout: 'border',
+            //     title: 'Application Queries Dashboard',
+            //     items: [{
+            //         xtype: 'dashboardQueriesPnl',
+            //         region: 'center'
+
+            //     }
+            //     ]
+            // },
             {
                 xtype: 'panel',
                 layout: 'border',
-                title: 'Online Application Receiving Dashboard',
-                items: [{
-                    xtype: 'portalSubmissionReceivingPnl',
-                    region: 'center'
-
-                }
-                    // {
-                    //     xtype: 'onlineapplicationdashboardgrid',
-                    //     region:'center'
-
-                    // }
-                    // ,{
-                    //     xtype: 'onlineappssubmissioncountergrid',
-                    //     title:'Online Application Submissions Counter(Summary Data)',
-                    //     region: 'south',
-                    //     collapsible: true,
-                    //     collapsed: true,
-                    //     height: 320,
-                    //     autoScroll: true
-
-                    // }
-                ]
-            }, {
-                xtype: 'panel',
-                layout: 'border',
-                title: 'Application Queries Dashboard',
-                items: [{
-                    xtype: 'dashboardQueriesPnl',
-                    region: 'center'
-
-                }
-                ]
-            },
-            {
-                xtype: 'panel',
-                layout: 'border',
-                title: 'My Workspace',
+                title: 'Dashboard',
                 items: [{
                     xtype: 'myworkspacedashboardgrid',
                     region: 'center',

@@ -207,7 +207,7 @@ Ext.define('Admin.view.auditManagement.views.forms.NewAuditTypeDetailsFrm',{
     ]},
     {
     xtype:'fieldset',
-    columnWidth: 0.33,
+    columnWidth: 1,
     title: "Restrict permissions",
     collapsible: true,
     defaults: {
