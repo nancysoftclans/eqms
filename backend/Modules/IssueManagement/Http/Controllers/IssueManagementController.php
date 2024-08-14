@@ -216,10 +216,11 @@ class IssueManagementController extends Controller
                     't3.name as workflow_stage',
                     't4.name as process_name',
                     't1.created_on as raised_date',
-                    't5.name as issue_status',
+                    't5.title as issue_status',
                     't1.id as active_application_id',
                     't1.workflow_stage_id',
                     't1.created_on as creation_date',
+                    't1.id as issue_id',
                     DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
                 );
             if (validateIsNumeric($issue_type_id)) {

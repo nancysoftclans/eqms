@@ -357,6 +357,12 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
         this.fireEvent('viewAuditApplication', record);
 
     },
+
+    onSelectAssociatedIssueApplication: function (grid, record) {
+
+        this.fireEvent('onAssociatedIssueGridClick', record, grid);
+
+    },
     setCompStore: function (obj, options) {
         this.fireEvent('setCompStore', obj, options);
     },

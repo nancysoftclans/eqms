@@ -61,12 +61,12 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Finding type',
         margin: '0 20 20 0',
-        name: 'finding_type',
-        valueField: 'id',
+        name: 'finding_type_id',
         displayField: 'name',
         forceSelection: true,
         allowBlank: true,
         queryMode: 'local',
+        valueField: 'id',
         listeners: {
             beforerender: {
                 fn: 'setCompStore',
@@ -110,12 +110,12 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
     collapsible: true,
     defaults: {
         labelAlign: 'top',
-        allowBlank: false,
+        allowBlank: true,
         labelAlign: 'top',
         margin: 5,
         xtype: 'textfield',
-        allowBlank: false,
         columnWidth: 0.33,
+        readOnly: true
     },
     layout: 'column',
      items:[
@@ -123,42 +123,36 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
         {
             xtype: 'textfield',
             fieldLabel: 'ISSUE TYPE',
-            name: 'issue_type',
+            name: 'title',
             columnWidth: 0.23,
-            readOnly: true
         },
         {
             xtype: 'textfield',
-            name: 'issue_type_id',
+            name: 'issue_id',
             columnWidth: 0.9,
-            allowBlank: false,
             hidden: true,
-            fieldLabel: 'ISSUE ID',
-            readOnly: true
         },
         {
             xtype: 'button',
             iconCls: 'x-fa fa-link',
             columnWidth: 0.10,
-            tooltip: 'Select Issue Type',
+            tooltip: 'Select Issue',
            // handler: 'showAuditTypesRecords',
-            winTitle: 'Select Audit Type',
+            winTitle: 'Select Issue',
             winWidth: '90%',
             margin: '35 0 0 0',
             action: 'search_issue_type',
-            childXtype: 'audittypesgrid',
+            childXtype: 'associatedissuegrid',
         },
         {
             xtype: 'textfield',
             fieldLabel: 'CREATION DATE',
-            name: 'created_on',
-            readOnly: true
+            name: 'raised_date'
         },
         {
             xtype: 'textfield',
             fieldLabel: 'STATUS',
-            name: 'status',
-            readOnly: true
+            name: 'issue_status'
         },
      ]
  },],
@@ -172,11 +166,11 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
                     text: 'Save Details',
                     iconCls: 'x-fa fa-save',
                     action: 'save',
-                    table_name: 'par_qms_audit_types',
+                    table_name: 'par_audit_findings',
                     storeID: 'audittypesstr',
                     formBind: true,
                     ui: 'soft-blue',
-                    action_url: 'auditManagement/saveAuditType',
+                    action_url: 'auditManagement/saveAuditFinding',
                     handler: 'doCreateConfigParamWin'
                 }
             ]

@@ -81,7 +81,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
                 var store = this.store,
                    grid = this.up('grid');
                     store.getProxy().extraParams = {
-                        table_name:'par_qms_audit_types'
+                        table_name:'par_audit_findings'
                     };
             
             },
@@ -96,7 +96,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
         }],
     columns: [{
         xtype: 'gridcolumn',
-        dataIndex: 'audit_id',
+        dataIndex: 'finding_id',
         text: 'ID',
         flex: 1,
         sortable: true
@@ -123,7 +123,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'created_on',
+        dataIndex: 'raised_on',
         text: 'Date Raised',
         flex: 1
     },{

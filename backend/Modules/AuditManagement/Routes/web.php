@@ -21,6 +21,7 @@ Route::group(['prefix' => 'auditManagement', 'middleware' => ['auth:api', 'web']
     Route::get('getAuditTypesMetadata',[AuditManagementController::class, 'getAuditTypeMetaData']);
     Route::post('saveAuditTypeMetaData', [AuditManagementController::class, 'saveAuditTypeMetaData']);
     Route::post('saveNewAuditPlanDetails', [AuditManagementController::class, 'saveNewAuditPlanDetails']);
+    Route::post('saveAuditFinding', [AuditManagementController::class, 'saveAuditFinding']);
     Route::get('getAuditTypes',[AuditManagementController::class,'getAuditTypes']);
     Route::get('getAuditManagementDetails',[AuditManagementController::class,'getAuditManagementDetails']);
     Route::get('getAuditFindings', [AuditManagementController::class, 'getAuditFindings']);
@@ -33,7 +34,5 @@ Route::group(['prefix' => 'auditManagement', 'middleware' => ['auth:api', 'web']
    
 });
 
-Route::group(['prefix' => 'auditManagement','middleware' => ['auth:api', 'web']], function() {
 
-});
 

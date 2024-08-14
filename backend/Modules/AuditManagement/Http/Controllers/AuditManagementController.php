@@ -233,7 +233,10 @@ class AuditManagementController extends Controller
          
         try{
            
-            $audit_types_data = DB::table('par_audit_findings as t1')->get();
+            $audit_types_data = DB::table('par_audit_findings as t1')
+                                ->leftJoin('par_finding_types as t2', 't1.finding_type_id', '=', 't2.id')
+                                ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type')
+                                ->get();
             
             $res = array(
                 'success' => true,
@@ -309,11 +312,7 @@ class AuditManagementController extends Controller
                 }
                    $res['application_code'] = $app_details[0]['application_code'];
                    $res['tracking_no'] = $app_details[0]['tracking_no'];
-                   $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
-
-                if ($res['success']) {
-                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-                } 
+                   $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no; 
             } else {
                 $zone_code = getSingleRecordColValue('par_zones', array('id' => $zone_id), 'zone_code');
                 $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');
@@ -390,9 +389,7 @@ class AuditManagementController extends Controller
 
 
                 if ($res['success']) {
-                initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-
-        
+                 initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                 
 
                 } else {
@@ -479,6 +476,96 @@ class AuditManagementController extends Controller
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
         return \response()->json($res);
+    }
+
+    public function saveAuditFinding(Request $req) {
+          try {
+             DB::beginTransaction();
+            $user_id = \Auth::user()->id;
+            $post_data = $req->post();
+            $table_name = $post_data['table_name'];
+            $id = $post_data['id'];
+
+            //unset unnecessary values
+            unset($post_data['_token']);
+            unset($post_data['table_name']);
+            unset($post_data['model']);
+            unset($post_data['id']);
+            unset($post_data['unset_data']);
+
+            $table_data = $post_data;
+            //dd($table_data);
+            //add extra params
+            $table_data['created_on'] = Carbon::now();
+            $table_data['created_by'] = $user_id;
+
+
+            $where = array(
+                'id' => $id
+            );
+            //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
+
+            if (isset($id) && $id != "") {
+                if (recordExists($table_name, $where)) {
+
+                    unset($table_data['created_on']);
+                    unset($table_data['created_by']);
+                    $table_data['dola'] = Carbon::now();
+                    $table_data['altered_by'] = $user_id;
+                    $res = updateRecord($table_name, $where, $table_data);
+                    
+                    if($res['success'] == false) {
+
+                    DB::rollBack();
+                    $res = array(   
+                        'success' => false,
+                        'message' => 'Details Not Updated',
+                        'error' => $res['message']
+                    );
+                }
+                else {
+                    DB::commit();
+                    $res = array(
+                        'success' => true,
+                        'message' => 'Details SuccessFully Updated',
+                        'record_id' => $res['record_id']
+                    );
+                }
+                }
+            } else {
+                $table_data['dola'] = Carbon::now();
+                $res = insertRecord($table_name, $table_data);
+
+                if($res['success'] == false) {
+
+                    DB::rollBack();
+                    $res = array(   
+                        'success' => false,
+                        'message' => 'Details Not Updated',
+                        'error' => $res['message']
+                    );
+                }
+                else {
+                    DB::commit();
+                    $res = array(
+                        'success' => true,
+                        'message' => 'Details SuccessFully Updated',
+                        'record_id' => $res['record_id']
+                    );
+                }
+
+            }
+            //save the documetn extension types
+         
+
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        return response()->json($res);
+
     }
    
 }

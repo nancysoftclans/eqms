@@ -24,6 +24,9 @@ Ext.define('Admin.controller.AuditManagementCtr',{
         audittypesgrid: {
             itemdblclick: "onAuditTypesGridClick",
         },
+        // associatedissuegrid: {
+        //     itemdblclick: "onAssociatedIssueGridClick",
+        // },
         'auditchecklistgrid button[name=savegrid_screening_btn]': {
             click: 'saveApplicationChecklistDetails'
         },
@@ -40,7 +43,8 @@ Ext.define('Admin.controller.AuditManagementCtr',{
             '*': {
                 onInitiateNewAuditPlan:'onInitiateNewAuditPlan',
                 viewAuditApplication: 'viewAuditApplication',
-                setCompStore: "setCompStore",
+                setCompStore: 'setCompStore',
+                onAssociatedIssueGridClick: 'viewAssociatedIssueGrid'
             }
         }
     },
@@ -156,12 +160,32 @@ Ext.define('Admin.controller.AuditManagementCtr',{
         target: win,
       });
     mask.show();
+    console.log(record);
     var auditPlanMainDetailsFrm = activeTab.down("auditPlanMainDetailsFrm");
 
        auditPlanMainDetailsFrm.loadRecord(record);
    
 
 
+    Ext.Function.defer(function () {
+      mask.hide();
+      win.close();
+    }, 200);
+  },
+
+  viewAssociatedIssueGrid: function (record, grid) {
+    var me = this,
+      win = grid.up("window"),
+      mask = new Ext.LoadMask({
+        msg: "Please wait...",
+        target: win,
+      });
+    mask.show();
+    console.log(record);
+    var auditfindingsfrm = Ext.widget("auditfindingsfrm");
+
+       auditfindingsfrm.loadRecord(record);
+   
     Ext.Function.defer(function () {
       mask.hide();
       win.close();
