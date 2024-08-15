@@ -230,12 +230,13 @@ class AuditManagementController extends Controller
     }
 
      public function getAuditFindings(Request $req) {
-         
+         $application_code = $req->input('application_code');
         try{
            
             $audit_types_data = DB::table('par_audit_findings as t1')
                                 ->leftJoin('par_finding_types as t2', 't1.finding_type_id', '=', 't2.id')
                                 ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type')
+                                ->where('t1.application_code', $application_code)
                                 ->get();
             
             $res = array(
@@ -498,6 +499,7 @@ class AuditManagementController extends Controller
             //add extra params
             $table_data['created_on'] = Carbon::now();
             $table_data['created_by'] = $user_id;
+           // $table_data['application_code'] = $application_code;
 
 
             $where = array(

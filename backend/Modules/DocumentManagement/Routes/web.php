@@ -88,6 +88,7 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::get('onLoadOnlineProductImagesUploads', [DocumentManagementController::class, 'onLoadOnlineProductImagesUploads']);
     Route::get('onLoadUnstructureApplicationDocumentsUploads', [DocumentManagementController::class, 'onLoadUnstructureApplicationDocumentsUploads']);
     Route::post('validateDocumentAppReceivingDetails', [DocumentManagementController::class, 'validateDocumentAppReceivingDetails']);
+    Route::post('validateAuditAppReceivingDetails', [DocumentManagementController::class, 'validateAuditAppReceivingDetails']);
     Route::post('getDocumentArchive', [DocumentManagementController::class, 'getDocumentArchive']);
     Route::post('saveDocumentRecommendationComments', [DocumentManagementController::class, 'saveDocumentRecommendationComments']);
     Route::post('saveDocumentApplicationApprovalDetails', [DocumentManagementController::class, 'saveDocumentApplicationApprovalDetails']); 

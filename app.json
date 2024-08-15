@@ -25,6 +25,11 @@
         "app",
         "${toolkit.name}/src"
     ],
+    
+    "requires": [
+    "calendar"
+    ],
+
 
     /**
      * Comma-separated string with the paths of directories or files to search.

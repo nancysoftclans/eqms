@@ -233,8 +233,6 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             storeID = btn.storeID,
             store = Ext.getStore(storeID),
             frm = form.getForm();
-
-            console.log(url);
         if (frm.isValid()) {
             frm.submit({
                 url: url,
@@ -365,6 +363,54 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
     },
     setCompStore: function (obj, options) {
         this.fireEvent('setCompStore', obj, options);
+    },
+
+    saveAuditFindingParam: function (btn) {
+        var me = this,
+            url = btn.action_url,
+            table = btn.table_name,
+            form = btn.up('form'),
+            win = form.up('window'),
+            storeID = btn.storeID,
+            store = Ext.getStore(storeID),
+            frm = form.getForm(), 
+            activePanel = Ext.ComponentQuery.query("#wizardpnl")[0];
+            applicationCode= activePanel.down('hiddenfield[name=active_application_code]').getValue();
+            //console.log(applicationCode);
+        if (frm.isValid()) {
+            frm.submit({
+                url: url,
+                params: {model: table, application_code: applicationCode},
+                waitMsg: 'Please wait...',
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (form, action) {
+                    var response = Ext.decode(action.response.responseText),
+                        success = response.success,
+                        message = response.message;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                        store.removeAll();
+                        store.load();
+                        win.close();
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (form, action) {
+                    var resp = action.result;
+
+                    console.log(resp);
+                    toastr.error(resp.message, 'Failure Response');
+                }
+            });
+        }
+    },
+
+    showRAuditApplicationSubmissionWin: function (btn) {
+
+        this.fireEvent('showRAuditApplicationSubmissionWin', btn);
     },
    
 })

@@ -2794,7 +2794,9 @@ class WorkflowController extends Controller
             $this->processNormalApplicationSubmission($request);
         } else if ($module_id == 28) { //Issue Management Applications
             $this->processNormalApplicationSubmission($request);
-        } else {
+        } else if ($module_id == 29) { //Audit Applications
+            $this->processNormalApplicationSubmission($request);
+        }else {
             echo "module not set";
         }
     }

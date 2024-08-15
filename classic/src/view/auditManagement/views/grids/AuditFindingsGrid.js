@@ -44,9 +44,12 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
     },{
-      xtype: "tbspacer",
-      width: 100,
-    }],
+        xtype: "tbspacer",
+        width: 100,
+    },{
+        xtype: 'hiddenfield',
+        name: 'application_code'
+    },],
     autoScroll: true,
     listeners: {
         beforerender: {
@@ -77,14 +80,17 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
             displayInfo: true,
             displayMsg: 'Showing {0} - {1} of {2} total records',
             emptyMsg: 'No Records',
-            beforeLoad: function() {
-                var store = this.store,
-                   grid = this.up('grid');
-                    store.getProxy().extraParams = {
-                        table_name:'par_audit_findings'
-                    };
+            // beforeLoad: function() {
+            //     var store = this.store,
+            //        grid = this.up('grid');
+            //         store.getProxy().extraParams = {
+            //             table_name:'par_audit_findings'
+            //         };
             
-            },
+            // },
+            beforeLoad: function () {
+            this.up('auditfindingsgrid').fireEvent('refresh', this);
+        }
         },
         '->',
         {

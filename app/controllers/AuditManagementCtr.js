@@ -18,8 +18,14 @@ Ext.define('Admin.controller.AuditManagementCtr',{
         "auditfindingsfrm button[action=search_issue_type]": {
             click: "showAuditFinding",
         },
+        'auditchecklistgrid button[name=savegrid_screening_btn]': {
+            click: 'saveApplicationChecklistDetails'
+        },
         auditPlanningWizardPnl: {
             afterrender: "prepapreAuditApplicationReceiving",
+        },
+        auditschedulepnl: {
+            afterrender: "prepapreAuditApplicationSchedule",
         },
         audittypesgrid: {
             itemdblclick: "onAuditTypesGridClick",
@@ -27,8 +33,8 @@ Ext.define('Admin.controller.AuditManagementCtr',{
         // associatedissuegrid: {
         //     itemdblclick: "onAssociatedIssueGridClick",
         // },
-        'auditchecklistgrid button[name=savegrid_screening_btn]': {
-            click: 'saveApplicationChecklistDetails'
+        auditfindingsgrid: {
+          refresh: "refreshAuditFindingGrid",
         },
     },
 
@@ -44,7 +50,8 @@ Ext.define('Admin.controller.AuditManagementCtr',{
                 onInitiateNewAuditPlan:'onInitiateNewAuditPlan',
                 viewAuditApplication: 'viewAuditApplication',
                 setCompStore: 'setCompStore',
-                onAssociatedIssueGridClick: 'viewAssociatedIssueGrid'
+                onAssociatedIssueGridClick: 'viewAssociatedIssueGrid',
+                showRAuditApplicationSubmissionWin: 'showRAuditApplicationSubmissionWin'
             }
         }
     },
@@ -119,35 +126,36 @@ Ext.define('Admin.controller.AuditManagementCtr',{
 
   showAuditFinding: function (btn) {
     var me = this,
-      childXtype = btn.childXtype,
-      winTitle = btn.winTitle,
-      winWidth = btn.winWidth,
-      mainTabPanel = me.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      activeTab = mainTabPanel.getActiveTab();
+        childXtype = btn.childXtype,
+        winTitle = btn.winTitle,
+        winWidth = btn.winWidth,
+        mainTabPanel = me.getMainTabPanel(),
+        activeTab = mainTabPanel.getActiveTab();
 
     if (activeTab.down("hiddenfield[name=section_id]")) {
-      section_id = activeTab.down("hiddenfield[name=section_id]").getValue();
+        section_id = activeTab.down("hiddenfield[name=section_id]").getValue();
     }
     if (activeTab.down("hiddenfield[name=active_application_code]")) {
-      section_id = activeTab.down("hiddenfield[name=active_application_code]").getValue();
+        section_id = activeTab.down("hiddenfield[name=active_application_code]").getValue();
     }
 
     var childObject = Ext.widget(childXtype);
     childObject.setHeight(450);
 
     if (childObject.down("hiddenfield[name=application_code]")) {
-      childObject
-        .down("hiddenfield[name=application_code]")
-        .setValue(application_code);
+        childObject
+            .down("hiddenfield[name=application_code]")
+            .setValue(application_code);
     }
+
     funcShowCustomizableWindow(
-      winTitle,
-      winWidth,
-      childObject,
-      "customizablewindow"
+        winTitle,
+        winWidth,
+        childObject,
+        "customizablewindow"
     );
-  },
+},
+
   onAuditTypesGridClick: function (view, record, item, index, e, eOpts) {
     var me = this,
       grid = view.grid,
@@ -176,15 +184,15 @@ Ext.define('Admin.controller.AuditManagementCtr',{
   viewAssociatedIssueGrid: function (record, grid) {
     var me = this,
       win = grid.up("window"),
+      title = record.get("title"),
       mask = new Ext.LoadMask({
         msg: "Please wait...",
         target: win,
       });
     mask.show();
-    console.log(record);
+    console.log(title);
     var auditfindingsfrm = Ext.widget("auditfindingsfrm");
-
-       auditfindingsfrm.loadRecord(record);
+        auditfindingsfrm.down("textfield[name=title]").setValue(title);
    
     Ext.Function.defer(function () {
       mask.hide();
@@ -561,5 +569,178 @@ Ext.define('Admin.controller.AuditManagementCtr',{
             }
         });
     },
+
+    refreshAuditFindingGrid: function (me) {
+    var store = me.store,
+      grid = me.up("treepanel"),
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue();
+
+    store.getProxy().extraParams = {
+      application_code: application_code
+    };
+  },
+
+  showRAuditApplicationSubmissionWin: function (btn) {
+    Ext.getBody().mask("Please wait...");
+    var mainTabPanel = this.getMainTabPanel(),
+      storeID = btn.storeID,
+      table_name = btn.table_name,
+      winWidth = btn.winWidth,
+      activeTab = mainTabPanel.getActiveTab(),
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      applicantFrm = activeTab.down("auditPlanMainDetailsFrm"),
+      Audit_id = applicantFrm.down("textfield[name=audit_type_id]").getValue(),
+      //section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
+      // premise_id = activeTab.down('hiddenfield[name=premise_id]').getValue(),
+      // storeID = getApplicationStore(module_id, section_id),
+      valid = this.validateNewReceivingSubmission(),
+      validateHasDocuments = validateHasUploadedDocumentsDetils(application_code);
+
+    if (!validateHasDocuments) {
+      toastr.error(  
+        "Response: Please Upload the required documents to proceed."
+      );
+      Ext.getBody().unmask();
+      return;
+    }
+    if (valid) {
+      Ext.Ajax.request({
+        method: "POST",
+        url: "documentmanagement/validateAuditAppReceivingDetails",
+        params: {
+          application_code: application_code,
+          workflow_stage_id: workflow_stage_id,
+          _token: token,
+        },
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          if (success == true || success === true) {
+            extraParams = [
+              {
+                field_type: "hiddenfield",
+                field_name: "has_queries",
+                // value: hasQueries
+              },
+            ];
+            showWorkflowSubmissionWin(Audit_id, application_code, table_name,"workflowsubmissionsreceivingfrm",
+              winWidth,
+              storeID,
+              extraParams,
+              ""
+            );
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+      toastr.warning(
+        "Please Enter All the required Product Details!!",
+        "Warning Response"
+      );
+      return;
+    }
+  },
+
+   validateNewReceivingSubmission: function (btn) {
+    var mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab();
+
+      var applicantFrm = activeTab.down("auditPlanMainDetailsFrm"),
+       Audit_id = applicantFrm.down("textfield[name=audit_type_id]").getValue();
+   
+    if (!Audit_id) {
+      toastr.warning("Please Save Application Details!!", "Warning Response");
+      return false;
+    }
+    if (!applicantFrm.isValid()) {
+      // toastr.warning('Please Enter All the required Permits Details!!', 'Warning Response');
+      // return false;
+    }
+
+    return true;
+  },
+  prepapreAuditApplicationSchedule: function (pnl) {
+    Ext.getBody().mask("Please wait...");
+    var me = this,
+      activeTab = pnl;
+      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+      auditPlanMainDetailsFrm = activeTab.down("auditPlanMainDetailsFrm"),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+      workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
+
+    if (application_code) {
+      Ext.Ajax.request({
+        method: "GET",
+        url: "auditManagement/prepapreAuditApplicationReceiving",
+        params: {
+          application_code: application_code,
+        },
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success,
+            results = resp.results,
+            model = Ext.create("Ext.data.Model", results);
+
+          if (success == true || success === true) {
+            activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
+            activeTab.down("displayfield[name=tracking_no]").setValue(results.tracking_no);
+            activeTab.down("displayfield[name=application_status]").setValue(results.application_status);
+            activeTab.down("displayfield[name=process_name]").setValue(results.process_name);
+          
+           
+          
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (response) {
+          Ext.getBody().unmask();
+          var resp = Ext.JSON.decode(response.responseText),
+            message = resp.message,
+            success = resp.success;
+          toastr.error(message, "Failure Response");
+        },
+        error: function (jqXHR, textStatus, errorThrown) {
+          Ext.getBody().unmask();
+          toastr.error("Error: " + errorThrown, "Error Response");
+        },
+      });
+    } else {
+      Ext.getBody().unmask();
+    }
+  },
     
 });

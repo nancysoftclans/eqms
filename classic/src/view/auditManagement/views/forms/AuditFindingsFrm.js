@@ -171,9 +171,10 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
                     formBind: true,
                     ui: 'soft-blue',
                     action_url: 'auditManagement/saveAuditFinding',
-                    handler: 'doCreateConfigParamWin'
+                    handler: 'saveAuditFindingParam'
                 }
             ]
         }
     ]
 })
+
