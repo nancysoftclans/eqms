@@ -1,7 +1,7 @@
-Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
+Ext.define("Admin.view.issuemanagement.views.grids.IssueTypeGrid", {
   extend: "Ext.grid.Panel",
-  xtype: "issuestatusgroupsgrid",
-  itemId: "issuestatusgroupsgrid",
+  xtype: "issuetypegrid",
+  itemId: "issuetypegrid",
   controller: "issuemanagementvctr",
 
   features: [
@@ -27,8 +27,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
       iconCls: "x-fa fa-plus",
       action: "add",
       ui: "soft-blue",
-      childXtype: "issuestatusgroupsform",
-      winTitle: "Create Issue Status Group",
+      childXtype: "issuetypepanel",
+      winTitle: "Create Issue Type",
       winWidth: "80%",
       handler: "showAddConfigParamWinFrm",
       stores: "[]",
@@ -39,10 +39,10 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
     beforerender: {
       fn: "setGridTreeStore",
       config: {
-        storeId: "issuestatusgroupsstr",
+        storeId: "issuetypestr",
         proxy: {
           api: {
-            read: "issuemanagement/issue_status_groups",
+            read: "issuemanagement/issue_types",
           },
         },
       },
@@ -83,7 +83,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "is_enabled",
+      dataIndex: "is_active",
       text: "Active",
       flex: 1,
       renderer: function (value, metaData) {
@@ -119,8 +119,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
               iconCls: "x-fa fa-edit",
               tooltip: "Edit Record",
               action: "edit",
-              childXtype: "issuestatusgroupsform",
-              winTitle: "Edit Issue Status Group",
+              childXtype: "issuetypeform",
+              winTitle: "Edit Issue Type",
               winWidth: "80%",
               handler: "showEditConfigParamWinFrm",
               bind: {
@@ -131,7 +131,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
             {
               text: "Disable",
               iconCls: "x-fa fa-repeat",
-              table_name: "par_issue_status_groups",
+              table_name: "par_issue_types",
               storeID: "formCategoryStr",
               hidden: true,
               action_url: "configurations/softDeleteConfigRecord",
@@ -145,7 +145,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
               text: "Delete",
               iconCls: "x-fa fa-trash",
               tooltip: "Delete Record",
-              table_name: "par_issue_status_groups",
+              table_name: "par_issue_types",
               storeID: "formCategoryStr",
               hidden: true,
               action_url: "configurations/deleteConfigRecord",
@@ -162,7 +162,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
               text: "Enable",
               iconCls: "x-fa fa-undo",
               tooltip: "Enable Record",
-              table_name: "par_issue_status_groups",
+              table_name: "par_issue_types",
               hidden: true,
               storeID: "formCategoryStr",
               action_url: "configurations/undoConfigSoftDeletes",
