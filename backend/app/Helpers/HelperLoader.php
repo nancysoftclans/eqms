@@ -1436,6 +1436,12 @@ if (!function_exists('sys_error_handler')) {
         return DbHelper::getLastApplicationSubmissionDetails($application_code);
     }
 }
+if (!function_exists('getLastChecklistApplicationDetails')) {
+    function getLastChecklistApplicationDetails($application_code)
+    {
+        return DbHelper::getLastChecklistApplicationDetails($application_code);
+    }
+}
 if (!function_exists('getTableName')) {
     function getTableName($module_id, $is_portal = 0)
     {

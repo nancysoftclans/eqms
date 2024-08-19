@@ -76,9 +76,75 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
         // console.log(btn);
     },
 
-    saveNewAuditPlanDetails:function(btn) {
-        // console.log(btn);
-    },
+    saveNewAuditPlanDetails:function(btn){
+       var wizard = btn.wizardpnl,
+             wizardPnl = btn.up(wizard),
+             action_url = btn.action_url,
+             form_panel = btn.form_panel,
+             table_name = btn.table_name,
+             mainTabPnl = btn.up('#contentPanel'),
+             containerPnl = mainTabPnl.getActiveTab();
+
+        var process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
+            moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
+            submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
+            active_application_id = containerPnl.down('hiddenfield[name=active_application_id]').getValue(),
+            applicationCode= containerPnl.down('hiddenfield[name=active_application_code]').getValue(),
+            application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
+            workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
+            auditPlanMainDetailsFrm = containerPnl.down('auditPlanMainDetailsFrm');
+         
+            auditPlanMainDetailsFrm = auditPlanMainDetailsFrm.getForm(); 
+  
+        if (auditPlanMainDetailsFrm.isValid()) {
+             // console.log(process_id, moduleId, submodule_id, applicationCode);
+            auditPlanMainDetailsFrm.submit({
+                url: 'auditManagement/'+action_url,
+                waitMsg: 'Please wait...',
+                params: {
+                    module_id: moduleId,
+                    sub_module_id: submodule_id,
+                    application_code: applicationCode,
+                    process_id: process_id,
+                    workflow_stage_id: workflow_stage_id,
+                    active_application_id: active_application_id,
+                    application_status_id: application_status_id,
+                    '_token': token
+                },
+
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message,
+                        success = resp.success,
+                        active_application_id = resp.active_application_id,
+                        application_code = resp.application_code,
+                        product_id = resp.product_id,
+                        tracking_no = resp.tracking_no;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                            containerPnl.down('hiddenfield[name=active_application_code]').setValue(application_code);
+                            containerPnl.down('hiddenfield[name=sub_module_id]').setValue(submodule_id);
+                            containerPnl.down('hiddenfield[name=module_id]').setValue(moduleId);
+                            containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                    } else {
+                        toastr.error(message, "Failure Response");
+                    }
+                },
+                failure: function (frm, action) {
+                    var resp = action.result,
+                        message = resp.message;
+                    toastr.error(message, "Failure Response");
+                }
+            });
+
+
+        } else {
+            toastr.warning('Please fill all the required fields!!', 'Warning Response');
+        }
+    }, 
 
     showEditAuditType: function(btn) {
        var button = btn.up('button'),
@@ -167,8 +233,6 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             storeID = btn.storeID,
             store = Ext.getStore(storeID),
             frm = form.getForm();
-
-            console.log(url);
         if (frm.isValid()) {
             frm.submit({
                 url: url,
@@ -221,6 +285,132 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
              return false;
          }*/
     },
+    quickNavigation: function (btn) {
+         var step = btn.step,
+            wizard = btn.wizard,
+            max_step = btn.max_step,
+            wizardPnl = btn.up(wizard);
+            
+            motherPnl = wizardPnl;
+            panel = motherPnl.up('panel'),
+            application_id = motherPnl.down('hiddenfield[name=sub_module_id]').getValue(),
+            progress = wizardPnl.down('#progress_tbar'),
+            progressItems = progress.items.items;
+
+        if (step == 1) {
+            var thisItem = progressItems[step];
+            if (!application_id) {
+                thisItem.setPressed(false);
+                toastr.warning('Please save document details first!!', 'Warning Response');
+                return false;
+            }
+        }
+        if (step == 0) {
+            motherPnl.down('button[name=save_btn]').setVisible(true);
+            // panel.getViewModel().set('atBeginning', false);
+            // panel.getViewModel().set('atEnd', true);
+            wizardPnl.down('button[name=process_submission_btn]').setVisible(false);
+        } else if (step == max_step) {
+            
+            motherPnl.down('button[name=save_btn]').setVisible(false);
+            //panel.getViewModel().set('atBeginning', true);
+            wizardPnl.down('button[name=process_submission_btn]').setVisible(true);
+        } else {
+            // panel.getViewModel().set('atBeginning', false);
+            // panel.getViewModel().set('atEnd', false);
+            if(wizardPnl.down('button[name=save_btn]')){
+
+                wizardPnl.down('button[name=save_btn]').setVisible(false);
+            }
+          
+                wizardPnl.down('button[name=process_submission_btn]').setVisible(false);
+        }
 
 
+        wizardPnl.getLayout().setActiveItem(step);
+        var layout = wizardPnl.getLayout(),
+            item = null,
+            i = 0,
+            activeItem = layout.getActiveItem();
+
+        for (i = 0; i < progressItems.length; i++) {
+            item = progressItems[i];
+
+            if (step === item.step) {
+                item.setPressed(true);
+            }
+            else {
+                item.setPressed(false);
+            }
+
+            if (Ext.isIE8) {
+                item.btnIconEl.syncRepaint();
+            }
+        }
+        activeItem.focus();
+    },
+
+    onViewAuditApplication: function (grid, record) {
+
+        this.fireEvent('viewAuditApplication', record);
+
+    },
+
+    onSelectAssociatedIssueApplication: function (grid, record) {
+
+        this.fireEvent('onAssociatedIssueGridClick', record, grid);
+
+    },
+    setCompStore: function (obj, options) {
+        this.fireEvent('setCompStore', obj, options);
+    },
+
+    saveAuditFindingParam: function (btn) {
+        var me = this,
+            url = btn.action_url,
+            table = btn.table_name,
+            form = btn.up('form'),
+            win = form.up('window'),
+            storeID = btn.storeID,
+            store = Ext.getStore(storeID),
+            frm = form.getForm(), 
+            activePanel = Ext.ComponentQuery.query("#wizardpnl")[0];
+            applicationCode= activePanel.down('hiddenfield[name=active_application_code]').getValue();
+            //console.log(applicationCode);
+        if (frm.isValid()) {
+            frm.submit({
+                url: url,
+                params: {model: table, application_code: applicationCode},
+                waitMsg: 'Please wait...',
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (form, action) {
+                    var response = Ext.decode(action.response.responseText),
+                        success = response.success,
+                        message = response.message;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                        store.removeAll();
+                        store.load();
+                        win.close();
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (form, action) {
+                    var resp = action.result;
+
+                    console.log(resp);
+                    toastr.error(resp.message, 'Failure Response');
+                }
+            });
+        }
+    },
+
+    showRAuditApplicationSubmissionWin: function (btn) {
+
+        this.fireEvent('showRAuditApplicationSubmissionWin', btn);
+    },
+   
 })

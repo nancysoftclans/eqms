@@ -38,6 +38,71 @@ class commonController extends Controller
         }
     }
 
+    public function saveApplicationChecklistDetails(Request $request)
+    {
+        $application_code = $request->input('application_code');
+        $screening_details = $request->input('screening_details');
+        $screening_details = json_decode($screening_details);
+        $table_name = 'tra_checklistitems_responses';
+        $user_id = $this->user_id;
+        $submission_details = getLastChecklistApplicationDetails($application_code);
+        
+        try {
+            $insert_params = array();
+            foreach ($screening_details as $screening_detail) {
+        
+                
+            if ($submission_details['success'] == true) {
+                   $application_id = $submission_details['results']->id;   
+            
+
+                if (validateIsNumeric($application_id)) {
+                    $where = array(
+                        'id' => $application_id
+                    );
+            
+                    $prev_data = getPreviousRecords($table_name, $where);
+                    $prev_data = $prev_data['results'][0];
+                    
+                   updateRecord($table_name, $where,  $prev_data, $user_id);
+                   
+                } 
+            }else {
+                    $insert_params[] = array(
+                        'application_code' => $application_code,
+                        'checklist_item_id' => $screening_detail->checklist_item_id,
+                        'pass_status' => $screening_detail->pass_status,
+                        'comment' => $screening_detail->comment,
+                        'observation' => $screening_detail->observation,
+                        'risk_type' => $screening_detail->risk_type,
+                        'risk_type_remarks' => $screening_detail->risk_type_remarks,
+                        'created_on' => Carbon::now(),
+                        'created_by' => $user_id
+                    );
+                }
+            }
+            if (count($insert_params) > 0) {
+                 DB::table($table_name)
+                    ->insert($insert_params);
+            }
+            $res = array(
+                'success' => true,
+                'message' => 'Screening details saved successfully!!'
+            );
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return \response()->json($res);
+    }
+
     public function getApplicationChecklistQueries(Request $request)
     {
         $item_resp_id = $request->input('item_resp_id');
@@ -4657,203 +4722,203 @@ class commonController extends Controller
         }
         return \response()->json($res);
     }
-    public function saveApplicationChecklistDetails(Request $request)
-    {
-        $application_id = $request->input('application_id');
-        $application_code = $request->input('application_code');
-        $screening_details = $request->input('screening_details');
-        $module_id = $request->input('module_id');
-        $sub_module_id = $request->input('sub_module_id');
-        $screening_details = json_decode($screening_details);
-        $table_name = 'tra_checklistitems_responses';
-        $user_id = $this->user_id;
-        $submission_details = getLastApplicationSubmissionDetails($application_code);
-        $submission_id = 0;
-        $workflow_stage_id = 0;
-        if($submission_details['success']){
-            $submission_details = $submission_details['results'];
-            $submission_id = $submission_details->id;
-            $workflow_stage_id = $submission_details->current_stage;
-        }
+    // public function saveApplicationChecklistDetails(Request $request)
+    // {
+    //     $application_id = $request->input('application_id');
+    //     $application_code = $request->input('application_code');
+    //     $screening_details = $request->input('screening_details');
+    //     $module_id = $request->input('module_id');
+    //     $sub_module_id = $request->input('sub_module_id');
+    //     $screening_details = json_decode($screening_details);
+    //     $table_name = 'tra_checklistitems_responses';
+    //     $user_id = $this->user_id;
+    //     $submission_details = getLastApplicationSubmissionDetails($application_code);
+    //     $submission_id = 0;
+    //     $workflow_stage_id = 0;
+    //     if($submission_details['success']){
+    //         $submission_details = $submission_details['results'];
+    //         $submission_id = $submission_details->id;
+    //         $workflow_stage_id = $submission_details->current_stage;
+    //     }
 
-        try {
-            $insert_params = array();
-            DB::beginTransaction();
-            foreach ($screening_details as $screening_detail) {
-                $auditor_comment = '';
-                $auditorpass_status = '';
-                $audit = '';
-                $auditorpass_status = '';
-                $audit_created_by = '';
-                $audit_altered_by = '';
-                $audit_altered_on = '';
-                $audit_created_on = '';
-                if (property_exists($screening_detail, 'auditor_comment')) {
-                    $auditor_comment = $screening_detail->auditor_comment;
+    //     try {
+    //         $insert_params = array();
+    //         DB::beginTransaction();
+    //         foreach ($screening_details as $screening_detail) {
+    //             $auditor_comment = '';
+    //             $auditorpass_status = '';
+    //             $audit = '';
+    //             $auditorpass_status = '';
+    //             $audit_created_by = '';
+    //             $audit_altered_by = '';
+    //             $audit_altered_on = '';
+    //             $audit_created_on = '';
+    //             if (property_exists($screening_detail, 'auditor_comment')) {
+    //                 $auditor_comment = $screening_detail->auditor_comment;
 
-                    $audit_created_on = Carbon::now();
+    //                 $audit_created_on = Carbon::now();
 
-                    $audit_altered_by = $user_id;
-                    $audit_altered_on = Carbon::now();
-                }
-                 if (property_exists($screening_detail, 'auditorpass_status')) {
+    //                 $audit_altered_by = $user_id;
+    //                 $audit_altered_on = Carbon::now();
+    //             }
+    //              if (property_exists($screening_detail, 'auditorpass_status')) {
 
-                    $auditorpass_status = $screening_detail->auditorpass_status;
-                    $audit_altered_by = $user_id;
-                    $audit_altered_on = Carbon::now();
-                 }
-                $item_resp_id = $screening_detail->item_resp_id;
-                if (isset($item_resp_id) && $item_resp_id != '') {
-                    $where = array(
-                        'id' => $item_resp_id
-                    );
-                    $pass_status = $screening_detail->pass_status;
-                    if (DB::table('tra_checklistitems_queries')
-                            ->where('item_resp_id', $item_resp_id)
-                            ->where('status', '<>', 4)
-                            ->count() > 0) {
-                       // $pass_status = ;
-                    }
+    //                 $auditorpass_status = $screening_detail->auditorpass_status;
+    //                 $audit_altered_by = $user_id;
+    //                 $audit_altered_on = Carbon::now();
+    //              }
+    //             $item_resp_id = $screening_detail->item_resp_id;
+    //             if (isset($item_resp_id) && $item_resp_id != '') {
+    //                 $where = array(
+    //                     'id' => $item_resp_id
+    //                 );
+    //                 $pass_status = $screening_detail->pass_status;
+    //                 if (DB::table('tra_checklistitems_queries')
+    //                         ->where('item_resp_id', $item_resp_id)
+    //                         ->where('status', '<>', 4)
+    //                         ->count() > 0) {
+    //                    // $pass_status = ;
+    //                 }
 
-                    $update_params = array(
-                        'pass_status' => $pass_status,
-                        'comment' => $screening_detail->comment,
-                        'observation' => $screening_detail->observation,
-                        'auditorpass_status'=>$auditorpass_status,
-                        'auditor_comment' => $auditor_comment,
-                        'audit_altered_on' => $audit_altered_on,
-                        'audit_altered_by' => $audit_altered_by,
-                        'dola' => Carbon::now(),
-                        'altered_by' => $user_id
-                    );
-                    if(isset($screening_detail->risk_type)){
-                       $update_params['risk_type'] = $screening_detail->risk_type;
-                       $update_params['risk_type_remarks'] = $screening_detail->risk_type_remarks;
-                    }
-                    // $prev_data = getPreviousRecords($table_name, $where);
-                    updateRecord($table_name, $where, $update_params, $user_id);
-                    if($auditorpass_status != ''){
+    //                 $update_params = array(
+    //                     'pass_status' => $pass_status,
+    //                     'comment' => $screening_detail->comment,
+    //                     'observation' => $screening_detail->observation,
+    //                     'auditorpass_status'=>$auditorpass_status,
+    //                     'auditor_comment' => $auditor_comment,
+    //                     'audit_altered_on' => $audit_altered_on,
+    //                     'audit_altered_by' => $audit_altered_by,
+    //                     'dola' => Carbon::now(),
+    //                     'altered_by' => $user_id
+    //                 );
+    //                 if(isset($screening_detail->risk_type)){
+    //                    $update_params['risk_type'] = $screening_detail->risk_type;
+    //                    $update_params['risk_type_remarks'] = $screening_detail->risk_type_remarks;
+    //                 }
+    //                 // $prev_data = getPreviousRecords($table_name, $where);
+    //                 updateRecord($table_name, $where, $update_params, $user_id);
+    //                 if($auditorpass_status != ''){
 
-                    }
-                } else {
-                    if(!isset($screening_detail->risk_type)){
-                        $insert_params[] = array(
-                            'application_id' => $application_id,
-                            'application_code' => $application_code,
-                            'checklist_item_id' => $screening_detail->checklist_item_id,
-                            'risk_type' => null,
-                            'risk_type_remarks' => null,
-                            'pass_status' => $screening_detail->pass_status,
-                            'comment' => $screening_detail->comment,
-                            'auditorpass_status'=>$auditorpass_status,
-                            'auditor_comment' => $auditor_comment,
-                            'observation' => $screening_detail->observation,
-                            'created_on' => Carbon::now(),
-                            'created_by' => $user_id,
-                            'submission_id' => $submission_id
-                        );
-                    }else{
-                        $insert_params[] = array(
-                            'application_id' => $application_id,
-                            'application_code' => $application_code,
-                            'risk_type' => $screening_detail->risk_type,
-                            'risk_type_remarks' => $screening_detail->risk_type_remarks,
-                            'checklist_item_id' => $screening_detail->checklist_item_id,
-                            'pass_status' => $screening_detail->pass_status,
-                            'comment' => $screening_detail->comment,
-                            'auditorpass_status'=>$auditorpass_status,
-                            'auditor_comment' => $auditor_comment,
-                            'observation' => $screening_detail->observation,
-                            'created_on' => Carbon::now(),
-                            'created_by' => $user_id,
-                            'submission_id' => $submission_id
-                            );
-                        }
+    //                 }
+    //             } else {
+    //                 if(!isset($screening_detail->risk_type)){
+    //                     $insert_params[] = array(
+    //                         'application_id' => $application_id,
+    //                         'application_code' => $application_code,
+    //                         'checklist_item_id' => $screening_detail->checklist_item_id,
+    //                         'risk_type' => null,
+    //                         'risk_type_remarks' => null,
+    //                         'pass_status' => $screening_detail->pass_status,
+    //                         'comment' => $screening_detail->comment,
+    //                         'auditorpass_status'=>$auditorpass_status,
+    //                         'auditor_comment' => $auditor_comment,
+    //                         'observation' => $screening_detail->observation,
+    //                         'created_on' => Carbon::now(),
+    //                         'created_by' => $user_id,
+    //                         'submission_id' => $submission_id
+    //                     );
+    //                 }else{
+    //                     $insert_params[] = array(
+    //                         'application_id' => $application_id,
+    //                         'application_code' => $application_code,
+    //                         'risk_type' => $screening_detail->risk_type,
+    //                         'risk_type_remarks' => $screening_detail->risk_type_remarks,
+    //                         'checklist_item_id' => $screening_detail->checklist_item_id,
+    //                         'pass_status' => $screening_detail->pass_status,
+    //                         'comment' => $screening_detail->comment,
+    //                         'auditorpass_status'=>$auditorpass_status,
+    //                         'auditor_comment' => $auditor_comment,
+    //                         'observation' => $screening_detail->observation,
+    //                         'created_on' => Carbon::now(),
+    //                         'created_by' => $user_id,
+    //                         'submission_id' => $submission_id
+    //                         );
+    //                     }
                     
-                }
-            }
-            if (count($insert_params) > 0) {
-                //DB::table($table_name)
-                  //  ->insert($insert_params);
-                $res = insertMultipleRecords($table_name, $insert_params);
-                if(!isset($res['success']) || $res['success'] == false){
-                    DB::rollback();
-                    return $res;
-                }
-                //log entry
-                $log_data = array(
-                    'submission_id' => $submission_id,
-                    'workflow_stage_id' => $workflow_stage_id,
-                    'application_code' => $application_code,
-                    'user_id' => $user_id
-                );
-                $res = insertRecord('tra_applicationchecklist_logs', $log_data, $user_id);
-                if(!isset($res['success']) || $res['success'] == false){
-                     DB::rollback();
-                    return $res;
-                }
-            }
-            if($module_id == 2 && $sub_module_id == 50){
-                $where = ['t1.application_id' => $application_id, 't1.application_code' => $application_code];
-                $minor = DB::table('tra_checklistitems_responses as t1')
-                        ->join('par_checklist_items as t2', 't1.checklist_item_id', 't2.id')
-                        ->join('par_checklist_types as t3', 't2.checklist_type_id', 't3.id')
-                        ->where($where)
-                        ->where('risk_type', 1)
-                        ->where('pass_status', 2)
-                        ->count();
-                $major = DB::table('tra_checklistitems_responses as t1')
-                        ->join('par_checklist_items as t2', 't1.checklist_item_id', 't2.id')
-                        ->join('par_checklist_types as t3', 't2.checklist_type_id', 't3.id')
-                        ->where($where)
-                        ->where('risk_type', 2)
-                        ->where('pass_status', 2)
-                        ->count();
-                $critical = DB::table('tra_checklistitems_responses as t1')
-                        ->join('par_checklist_items as t2', 't1.checklist_item_id', 't2.id')
-                        ->join('par_checklist_types as t3', 't2.checklist_type_id', 't3.id')
-                        ->where($where)
-                        ->where('risk_type', 3)
-                        ->where('pass_status', 2)
-                        ->count();
+    //             }
+    //         }
+    //         if (count($insert_params) > 0) {
+    //             //DB::table($table_name)
+    //               //  ->insert($insert_params);
+    //             $res = insertMultipleRecords($table_name, $insert_params);
+    //             if(!isset($res['success']) || $res['success'] == false){
+    //                 DB::rollback();
+    //                 return $res;
+    //             }
+    //             //log entry
+    //             $log_data = array(
+    //                 'submission_id' => $submission_id,
+    //                 'workflow_stage_id' => $workflow_stage_id,
+    //                 'application_code' => $application_code,
+    //                 'user_id' => $user_id
+    //             );
+    //             $res = insertRecord('tra_applicationchecklist_logs', $log_data, $user_id);
+    //             if(!isset($res['success']) || $res['success'] == false){
+    //                  DB::rollback();
+    //                 return $res;
+    //             }
+    //         }
+    //         if($module_id == 2 && $sub_module_id == 50){
+    //             $where = ['t1.application_id' => $application_id, 't1.application_code' => $application_code];
+    //             $minor = DB::table('tra_checklistitems_responses as t1')
+    //                     ->join('par_checklist_items as t2', 't1.checklist_item_id', 't2.id')
+    //                     ->join('par_checklist_types as t3', 't2.checklist_type_id', 't3.id')
+    //                     ->where($where)
+    //                     ->where('risk_type', 1)
+    //                     ->where('pass_status', 2)
+    //                     ->count();
+    //             $major = DB::table('tra_checklistitems_responses as t1')
+    //                     ->join('par_checklist_items as t2', 't1.checklist_item_id', 't2.id')
+    //                     ->join('par_checklist_types as t3', 't2.checklist_type_id', 't3.id')
+    //                     ->where($where)
+    //                     ->where('risk_type', 2)
+    //                     ->where('pass_status', 2)
+    //                     ->count();
+    //             $critical = DB::table('tra_checklistitems_responses as t1')
+    //                     ->join('par_checklist_items as t2', 't1.checklist_item_id', 't2.id')
+    //                     ->join('par_checklist_types as t3', 't2.checklist_type_id', 't3.id')
+    //                     ->where($where)
+    //                     ->where('risk_type', 3)
+    //                     ->where('pass_status', 2)
+    //                     ->count();
                 
-                $risk_compliance = array(
-                    'minor_compliances' => $minor,
-                    'major_compliances' => $major,
-                    'critical_compliances' => $critical,
-                );
-                $res = updateRecord('tra_premiseinspection_applications', ['id' => $application_id], $risk_compliance);
-                if(!isset($res['record_id'])){
-                    return $res;
-                }
-                updateFacilityRiskScore();
-                //complete pending inspections from the licensing module
-                $premise_id = getSingleRecordColValue('tra_premiseinspection_applications', ['id' => $application_id], 'premise_id');
-                $premise_submission_list = DB::table("tra_premises_applications as t1")
-                        ->join('tra_submissions as t2', 't1.application_code', 't2.application_code')
-                        ->join('wf_workflow_stages as t3', 't2.current_stage', 't3.id')
-                        ->where(['t3.stage_category_id'=> 17,'is_done' => 0, 't1.premise_id' => $premise_id])
-                        ->select('t2.id as submission_id')
-                        ->get();
-                $submission_ids = convertStdClassObjToArray($premise_submission_list);
-                if(count($submission_ids) > 0){
-                    DB::table('tra_submissions')->where($submission_ids)->update(['is_done'=>1, 'remarks'=> 'Cleared by inspections conducted on the facility via routine inspections']);
-                }
-            }
-            DB::commit();
-            $res = array(
-                'success' => true,
-                'message' => 'Screening details saved successfully!!'
-            );
-        } catch (\Exception $exception) {
-             DB::rollback();
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
-        } catch (\Throwable $throwable) {
-             DB::rollback();
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
-        }
-        return \response()->json($res);
-    }
+    //             $risk_compliance = array(
+    //                 'minor_compliances' => $minor,
+    //                 'major_compliances' => $major,
+    //                 'critical_compliances' => $critical,
+    //             );
+    //             $res = updateRecord('tra_premiseinspection_applications', ['id' => $application_id], $risk_compliance);
+    //             if(!isset($res['record_id'])){
+    //                 return $res;
+    //             }
+    //             updateFacilityRiskScore();
+    //             //complete pending inspections from the licensing module
+    //             $premise_id = getSingleRecordColValue('tra_premiseinspection_applications', ['id' => $application_id], 'premise_id');
+    //             $premise_submission_list = DB::table("tra_premises_applications as t1")
+    //                     ->join('tra_submissions as t2', 't1.application_code', 't2.application_code')
+    //                     ->join('wf_workflow_stages as t3', 't2.current_stage', 't3.id')
+    //                     ->where(['t3.stage_category_id'=> 17,'is_done' => 0, 't1.premise_id' => $premise_id])
+    //                     ->select('t2.id as submission_id')
+    //                     ->get();
+    //             $submission_ids = convertStdClassObjToArray($premise_submission_list);
+    //             if(count($submission_ids) > 0){
+    //                 DB::table('tra_submissions')->where($submission_ids)->update(['is_done'=>1, 'remarks'=> 'Cleared by inspections conducted on the facility via routine inspections']);
+    //             }
+    //         }
+    //         DB::commit();
+    //         $res = array(
+    //             'success' => true,
+    //             'message' => 'Screening details saved successfully!!'
+    //         );
+    //     } catch (\Exception $exception) {
+    //          DB::rollback();
+    //         $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+    //     } catch (\Throwable $throwable) {
+    //          DB::rollback();
+    //         $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+    //     }
+    //     return \response()->json($res);
+    // }
     public function submitInspectionDetails(Request $request){
         $module_id = $request->input('module_id');
         try{

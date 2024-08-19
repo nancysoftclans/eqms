@@ -67,6 +67,8 @@ Route::group(['prefix' => 'common','middleware' => ['auth:api', 'web']], functio
 	Route::post('emmptyTraTable', [commonController::class, 'emmptyTraTable']);
 	Route::post('syncTcMeetingGroupParticipants', [commonController::class, 'syncTcMeetingGroupParticipants']);
 	Route::get('autoGenerateChecklistBasedQueries', [commonController::class, 'autoGenerateChecklistBasedQueries']);
+	Route::post('saveApplicationChecklistDetails', [commonController::class, 'saveApplicationChecklistDetails']);
+	
 	
 
 });

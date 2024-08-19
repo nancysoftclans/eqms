@@ -138,6 +138,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       // sendExcelToBD
       afterrender: "initializeResumableExcelUpload",
     },
+    auditchecklistgrid: {
+      refresh: "refreshAuditChecklistItemsGrid",
+    },
   },
   listen: {
     controller: {
@@ -328,6 +331,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       title_suffix = ref_no;
 
     workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
+    console.log(workflow_details);
 
     //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
@@ -626,28 +630,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     }
     dashboardWrapper.removeAll();
     var workflowContainer = Ext.widget(workflow_details.viewtype);
-    workflowContainer
-      .down("displayfield[name=process_name]")
-      .setValue(workflow_details.processName);
-    workflowContainer
-      .down("displayfield[name=workflow_stage]")
-      .setValue(workflow_details.initialStageName);
-    workflowContainer
-      .down("displayfield[name=application_status]")
-      .setValue(workflow_details.initialStageName);
-    workflowContainer
-      .down("hiddenfield[name=process_id]")
-      .setValue(workflow_details.processId);
-    workflowContainer
-      .down("hiddenfield[name=workflow_stage_id]")
-      .setValue(workflow_details.initialStageId);
+    workflowContainer.down("displayfield[name=process_name]").setValue(workflow_details.processName);
+    workflowContainer.down("displayfield[name=workflow_stage]").setValue(workflow_details.initialStageName);
+    workflowContainer.down("displayfield[name=application_status]").setValue(workflow_details.initialStageName);
+    workflowContainer.down("hiddenfield[name=process_id]").setValue(workflow_details.processId);
+    workflowContainer.down("hiddenfield[name=workflow_stage_id]").setValue(workflow_details.initialStageId);
     workflowContainer.down("hiddenfield[name=module_id]").setValue(module_id);
-    workflowContainer
-      .down("hiddenfield[name=sub_module_id]")
-      .setValue(sub_module_id);
-    workflowContainer
-      .down("hiddenfield[name=application_status_id]")
-      .setValue(workflow_details.initialStageId);
+    workflowContainer.down("hiddenfield[name=sub_module_id]").setValue(sub_module_id);
+    workflowContainer.down("hiddenfield[name=application_status_id]").setValue(workflow_details.initialStageId);
     dashboardWrapper.add(workflowContainer);
 
     Ext.Function.defer(function () {
@@ -2418,8 +2408,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             success = response.success,
             message = response.message;
             reccomendation = response.results;
-
-            console.log(reccomendation);
           if (success == true || success === true) {
             toastr.success(message, "Success Response");
             grid.down("textfield[name=recommendation_id]").setValue(reccomendation);
@@ -2951,6 +2939,35 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         }
       }
     );
+  },
+
+   refreshAuditChecklistItemsGrid: function (me) {
+    var store = me.getStore(),
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      application_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      workflow_stage = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
+    checklist_type = 0;
+    if (me.is_auditor_checklist == 1) {
+      store.getProxy().extraParams = {
+        application_id: application_id,
+        application_code: application_code,
+        checklist_type: checklist_type,
+        process_id: process_id,
+        workflow_stage: workflow_stage,
+        is_auditor: 1,
+      };
+    } else {
+      store.getProxy().extraParams = {
+        application_id: application_id,
+        application_code: application_code,
+        checklist_type: checklist_type,
+        process_id: process_id,
+        workflow_stage: workflow_stage,
+      };
+    }
   },
 
   

@@ -17,4 +17,8 @@ Route::middleware('auth:api')->get('/auditmanagement', function (Request $reques
     return $request->user();
 });
 
+Route::group(['prefix' => 'auditmanagement','middleware' => ['auth:api']], function() {
+    // Route::post('uploadMultipleFiles', [DocumentManagementController::class, 'uploadMultipleFiles']);
+});
+
 

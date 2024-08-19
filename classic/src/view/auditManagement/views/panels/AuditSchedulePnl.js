@@ -1,7 +1,8 @@
-Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
+Ext.define('Admin.view.auditManagement.panels.AuditSchedulePnl', {
     extend: 'Ext.panel.Panel',
-    alias: 'widget.auditPlanningWizardPnl',
-    //itemId: 'auditPlanningWizardPnl',
+    xtype: 'auditschedulepnl',
+    alias: 'widget.auditschedulepnl',
+    //itemId: 'auditschedulepnl',
     padding: '2 0 2 0',
 
     requires: [
@@ -109,12 +110,16 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     xtype: 'hiddenfield',
                     name: 'status_type_id'
                 },
+                {
+                    xtype: 'hiddenfield',
+                    name: 'application_code'
+                },
             ]
         }
         
     ],
       items: [{
-            xtype: 'auditsmaindetailspnl',
+            xtype: 'calendarpnl',
             dockedItems: [
                 {
                     xtype: 'toolbar',
@@ -123,17 +128,18 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     margin: 3,
                 }
             ],
-        }, {
-           // xtype: 'checklistresponsescmngrid',
-            xtype: 'auditchecklistgrid',
-            title: 'Questionnaire'
-        },{
-            xtype: 'auditfindingsgrid',
-            title: 'Findings'
-        },{
-            xtype: 'docuploadsgrid',
-            title: 'Associated document'
         },
+        //  {
+        //    // xtype: 'checklistresponsescmngrid',
+        //     xtype: 'auditchecklistgrid',
+        //     title: 'Questionnaire'
+        // },{
+        //     xtype: 'auditfindingsgrid',
+        //     title: 'Findings'
+        // },{
+        //     xtype: 'docuploadsgrid',
+        //     title: 'Associated document'
+        // },
         {
             xtype: 'hiddenfield',
             name: 'active_application_id'
@@ -161,41 +167,42 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                 
                 {
                     step: 0,
-                    iconCls: 'fa fa-university',
+                    iconCls: 'fa fa-calendar',
                     enableToggle: true,
                     pressed: true,
-                    text: 'Audit Details',
-                    max_step:3,
-                    action: 'quickNav', wizard: 'auditPlanningWizardPnl',
+                    text: 'Audit Schedule',
+                    max_step:0,
+                    action: 'quickNav', wizard: 'auditschedulepnl',
                     handler: 'quickNavigation'
-                }, {
-                    step: 1,
-                    iconCls: 'fa fa-clipboard',
-                    enableToggle: true,
-                    max_step:3,
-                    text: 'Questionnaire',
-                    action: 'quickNav', 
-                    wizard: 'auditPlanningWizardPnl',
-                    handler: 'quickNavigation'
-                },{
-                    step: 2,
-                    iconCls: 'fa fa-search',
-                    enableToggle: true,
-                    max_step:3,
-                    text: 'Findings',
-                    action: 'quickNav', 
-                    wizard: 'auditPlanningWizardPnl',
-                    handler: 'quickNavigation'
-                },{
-                    step: 3,
-                    iconCls: 'fa fa-link',
-                    enableToggle: true,
-                    max_step:3,
-                    text: 'Associated items',
-                    action: 'quickNav', 
-                    wizard: 'auditPlanningWizardPnl',
-                    handler: 'quickNavigation'
-                }
+                }, 
+                // {
+                //     step: 1,
+                //     iconCls: 'fa fa-clipboard',
+                //     enableToggle: true,
+                //     max_step:3,
+                //     text: 'Questionnaire',
+                //     action: 'quickNav', 
+                //     wizard: 'auditschedulepnl',
+                //     handler: 'quickNavigation'
+                // },{
+                //     step: 2,
+                //     iconCls: 'fa fa-search',
+                //     enableToggle: true,
+                //     max_step:3,
+                //     text: 'Findings',
+                //     action: 'quickNav', 
+                //     wizard: 'auditschedulepnl',
+                //     handler: 'quickNavigation'
+                // },{
+                //     step: 3,
+                //     iconCls: 'fa fa-link',
+                //     enableToggle: true,
+                //     max_step:3,
+                //     text: 'Associated items',
+                //     action: 'quickNav', 
+                //     wizard: 'auditschedulepnl',
+                //     handler: 'quickNavigation'
+                // }
             ]
         };
         this.bbar = {
@@ -210,18 +217,18 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                 //     bind: {
                 //         disabled: '{atBeginning}'
                 //     },
-                //     wizard:'auditPlanningWizardPnl',
+                //     wizard:'auditschedulepnl',
                 //     handler: 'onPrevCardClick'
                 // },
                 {
-                    text: 'Save Audit Details',
+                    text: 'Save Shedule Details',
                     ui: 'soft-blue',
                     iconCls: 'fa fa-save',
                     name: 'save_btn',
                     bind: {
                         disabled: '{isReadOnly}'
                     },
-                    wizard: 'auditPlanningWizardPnl',
+                    wizard: 'auditschedulepnl',
                     form_panel:'#auditPlanMainDetailsFrm',
                     action_url: 'saveNewAuditPlanDetails',
                     handler: 'saveNewAuditPlanDetails',
@@ -233,6 +240,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                     iconCls: 'fa fa-check',
                     name: 'process_submission_btn',
                     winWidth: '50%',
+                    hidden: true,
                     handler: 'showRAuditApplicationSubmissionWin',
                 },
                 //  {
@@ -244,7 +252,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
                 //     max_step:3,
                 //     bind: {
                 //         disabled: '{atEnd}'
-                //     },wizard:'auditPlanningWizardPnl',
+                //     },wizard:'auditschedulepnl',
                 //     handler: 'onNextCardClick'
                 // }
             ]

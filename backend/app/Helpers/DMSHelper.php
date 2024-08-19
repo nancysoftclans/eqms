@@ -1444,9 +1444,11 @@ class DMSHelper
             'sub_module_id' => $sub_module_id,
             'created_by' => $user,
             'created_on' => Carbon::now());
+
+
  
         $resp = insertRecord('tra_application_documentsdefination', $dmsapp_data, $user, $con);
-
+    
         return $resp;
     }
 
