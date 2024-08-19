@@ -25,10 +25,6 @@
         "app",
         "${toolkit.name}/src"
     ],
-    
-    "requires": [
-    "calendar"
-    ],
 
 
     /**
