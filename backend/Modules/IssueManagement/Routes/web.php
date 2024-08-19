@@ -23,4 +23,5 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::post('saveIssueRCADetails', [IssueManagementController::class, 'saveIssueRCADetails']);
     Route::post('saveIssueResolutionwDetails', [IssueManagementController::class, 'saveIssueResolutionwDetails']);
     Route::post('saveIssueQualityReviewDetails', [IssueManagementController::class, 'saveIssueQualityReviewDetails']);
+    Route::resource('issue_status_groups', 'IssueStatusGroupsController');
 });

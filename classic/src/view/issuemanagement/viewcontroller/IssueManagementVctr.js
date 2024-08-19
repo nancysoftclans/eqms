@@ -2,7 +2,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
   extend: "Ext.app.ViewController",
   alias: "controller.issuemanagementvctr",
 
-  init: function () { },
+  init: function () {},
 
   setWorkflowCombosStore: function (obj, options) {
     this.fireEvent("setWorkflowCombosStore", obj, options);
@@ -13,6 +13,9 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
 
   setGridStore: function (obj, options) {
     this.fireEvent("setGridStore", obj, options);
+  },
+  setGridTreeStore: function (obj, options) {
+    this.fireEvent("setGridTreeStore", obj, options);
   },
 
   reloadParentGridOnChange: function (combo) {
@@ -32,18 +35,56 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
   showIssueApplicationWorkflow: function (btn) {
     var application_type = btn.app_type,
       wrapper_xtype = btn.wrapper_xtype;
-    this.fireEvent('showApplicationWorkflow', application_type, wrapper_xtype);
+    this.fireEvent("showApplicationWorkflow", application_type, wrapper_xtype);
+  },
+
+  doCreateConfigParamWin: function (btn) {
+    var me = this,
+      url = btn.action_url,
+      table = btn.table_name,
+      form = btn.up("form"),
+      win = form.up("window"),
+      storeID = btn.storeID,
+      store = Ext.getStore(storeID),
+      frm = form.getForm();
+    if (frm.isValid()) {
+      frm.submit({
+        url: url,
+        params: { model: table },
+        waitMsg: "Please wait...",
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (form, action) {
+          var response = Ext.decode(action.response.responseText),
+            success = response.success,
+            message = response.message;
+          if (success == true || success === true) {
+            toastr.success(message, "Success Response");
+            store.removeAll();
+            store.load();
+            win.close();
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (form, action) {
+          var resp = action.result;
+          toastr.error(resp.message, "Failure Response");
+        },
+      });
+    }
   },
 
   doDeleteConfigWidgetParam: function (item) {
     var me = this,
-      btn = item.up('button'),
+      btn = item.up("button"),
       record = btn.getWidgetRecord(),
-      id = record.get('submission_id'),
+      id = record.get("submission_id"),
       storeID = item.storeID,
       table_name = item.table_name,
       url = item.action_url;
-    this.fireEvent('deleteRecord', id, table_name, storeID, url);
+    this.fireEvent("deleteRecord", id, table_name, storeID, url);
   },
 
   showIssueTypeConfigParam: function (item) {
@@ -59,6 +100,73 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       me.fireEvent("refreshStores", storeArray);
     }
     funcShowCustomizableWindow(winTitle, winWidth, form, "customizablewindow");
+  },
+
+  showAddConfigParamWinFrm: function (btn) {
+    var me = this,
+      childXtype = btn.childXtype,
+      winTitle = btn.winTitle,
+      winWidth = btn.winWidth,
+      child = Ext.widget(childXtype);
+
+    if (btn.has_params) {
+      var param_value = btn
+        .up("grid")
+        .down("hiddenfield[name=" + btn.param_name + "]")
+        .getValue();
+      child
+        .down("hiddenfield[name=" + btn.param_name + "]")
+        .setValue(param_value);
+    }
+    child.setHeight(600);
+    funcShowCustomizableWindow(winTitle, winWidth, child, "customizablewindow");
+  },
+
+  showEditConfigParamWinFrm: function (item) {
+    var me = this,
+      btn = item.up("button"),
+      record = btn.getWidgetRecord(),
+      childXtype = item.childXtype,
+      winTitle = item.winTitle,
+      winWidth = item.winWidth,
+      form = Ext.widget(childXtype),
+      storeArray = eval(item.stores),
+      arrayLength = storeArray.length;
+    if (arrayLength > 0) {
+      me.fireEvent("refreshStores", storeArray);
+    }
+    form.loadRecord(record);
+
+    form.on("afterrender", function () {
+      try {
+        const property_ids = record.get("property_ids");
+        if (property_ids) {
+          const property_ids_array = JSON.parse(property_ids);
+          form.down("tagfield[name=property_ids]").setValue(property_ids_array);
+        }
+      } catch (e) {
+        console.error("Error parsing property_ids:", e);
+      }
+    });
+    form.setHeight(650);
+    funcShowCustomizableWindow(winTitle, winWidth, form, "customizablewindow");
+  },
+  onAddClick: function () {
+    var view = this.getView(),
+      rec =
+        new Admin.view.issuemanagement.viewmodel.IssueStatusGroupsLifecycleVm({
+          common: "",
+          light: "Mostly Shady",
+          price: 0,
+          availDate: Ext.Date.clearTime(new Date()),
+          indoor: false,
+        });
+
+    view.store.insert(0, rec);
+    view.findPlugin("cellediting").startEdit(rec, 0);
+  },
+  onRemoveClick: function (view, recIndex, cellIndex, item, e, record) {
+    record.drop();
   },
 
   showNewIssueApplication: function (btn) {
@@ -219,8 +327,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       mainTabPnl = btn.up("#contentPanel"),
       containerPnl = mainTabPnl.getActiveTab();
     var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
+        .down("hiddenfield[name=process_id]")
+        .getValue(),
       module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
       sub_module_id = containerPnl
         .down("hiddenfield[name=sub_module_id]")
@@ -309,8 +417,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       mainTabPnl = btn.up("#contentPanel"),
       containerPnl = mainTabPnl.getActiveTab();
     var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
+        .down("hiddenfield[name=process_id]")
+        .getValue(),
       module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
       sub_module_id = containerPnl
         .down("hiddenfield[name=sub_module_id]")
@@ -327,7 +435,9 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       workflow_stage_id = containerPnl
         .down("hiddenfield[name=workflow_stage_id]")
         .getValue(),
-      issueinitialqualityreviewfrm = containerPnl.down("issueinitialqualityreviewfrm");
+      issueinitialqualityreviewfrm = containerPnl.down(
+        "issueinitialqualityreviewfrm"
+      );
 
     if (issueinitialqualityreviewfrm.isValid()) {
       var issueManagementData = issueinitialqualityreviewfrm.getValues();
@@ -376,10 +486,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         },
       });
     } else {
-      toastr.error(
-        "Please fill all the required fields!!",
-        "Warning Response"
-      );
+      toastr.error("Please fill all the required fields!!", "Warning Response");
     }
   },
 
@@ -390,8 +497,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       mainTabPnl = btn.up("#contentPanel"),
       containerPnl = mainTabPnl.getActiveTab();
     var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
+        .down("hiddenfield[name=process_id]")
+        .getValue(),
       module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
       sub_module_id = containerPnl
         .down("hiddenfield[name=sub_module_id]")
@@ -407,8 +514,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         .getValue(),
       workflow_stage_id = containerPnl
         .down("hiddenfield[name=workflow_stage_id]")
-        .getValue()
-    issuerootcauseanalysisfrm = containerPnl.down('issuerootcauseanalysisfrm');
+        .getValue();
+    issuerootcauseanalysisfrm = containerPnl.down("issuerootcauseanalysisfrm");
 
     if (issuerootcauseanalysisfrm.isValid()) {
       var issueManagementData = issuerootcauseanalysisfrm.getValues();
@@ -457,10 +564,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         },
       });
     } else {
-      toastr.error(
-        "Please fill all the required fields!!",
-        "Warning Response"
-      );
+      toastr.error("Please fill all the required fields!!", "Warning Response");
     }
   },
   saveIssueResolutionwDetails: function (btn) {
@@ -470,8 +574,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       mainTabPnl = btn.up("#contentPanel"),
       containerPnl = mainTabPnl.getActiveTab();
     var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
+        .down("hiddenfield[name=process_id]")
+        .getValue(),
       module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
       sub_module_id = containerPnl
         .down("hiddenfield[name=sub_module_id]")
@@ -487,8 +591,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         .getValue(),
       workflow_stage_id = containerPnl
         .down("hiddenfield[name=workflow_stage_id]")
-        .getValue()
-    issueresolutionfrm = containerPnl.down('issueresolutionfrm');
+        .getValue();
+    issueresolutionfrm = containerPnl.down("issueresolutionfrm");
 
     if (issueresolutionfrm.isValid()) {
       var issueManagementData = issueresolutionfrm.getValues();
@@ -537,10 +641,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         },
       });
     } else {
-      toastr.error(
-        "Please fill all the required fields!!",
-        "Warning Response"
-      );
+      toastr.error("Please fill all the required fields!!", "Warning Response");
     }
   },
   saveIssueQualityReviewDetails: function (btn) {
@@ -550,8 +651,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       mainTabPnl = btn.up("#contentPanel"),
       containerPnl = mainTabPnl.getActiveTab();
     var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
+        .down("hiddenfield[name=process_id]")
+        .getValue(),
       module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
       sub_module_id = containerPnl
         .down("hiddenfield[name=sub_module_id]")
@@ -567,8 +668,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         .getValue(),
       workflow_stage_id = containerPnl
         .down("hiddenfield[name=workflow_stage_id]")
-        .getValue()
-    issuequalityreviewfrm = containerPnl.down('issuequalityreviewfrm');
+        .getValue();
+    issuequalityreviewfrm = containerPnl.down("issuequalityreviewfrm");
 
     if (issuequalityreviewfrm.isValid()) {
       var issueManagementData = issuequalityreviewfrm.getValues();
@@ -617,10 +718,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         },
       });
     } else {
-      toastr.error(
-        "Please fill all the required fields!!",
-        "Warning Response"
-      );
+      toastr.error("Please fill all the required fields!!", "Warning Response");
     }
-  }
+  },
 });

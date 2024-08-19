@@ -17,6 +17,7 @@ class CreateTableIssueStatusGroups extends Migration
             $table->id();
             $table->string('title');
             $table->integer('is_enabled')->default(1);
+            $table->string('issue_status_ids')->nullable();
             $table->integer('created_by')->default(0);
             $table->integer('altered_by')->default(0);
             $table->timestamp('created_on')->useCurrent();

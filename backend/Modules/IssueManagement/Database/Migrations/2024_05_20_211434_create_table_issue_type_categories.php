@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTableParIssueTypes extends Migration
+class CreateTableIssueTypeCategories extends Migration
 {
     /**
      * Run the migrations.
@@ -13,10 +13,9 @@ class CreateTableParIssueTypes extends Migration
      */
     public function up()
     {
-        Schema::create('par_issue_types', function (Blueprint $table) {
+        Schema::create('par_issue_type_categories', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
+            $table->string('title');
             $table->integer('is_enabled')->default(1);
             $table->integer('created_by')->default(0);
             $table->integer('altered_by')->default(0);
@@ -32,6 +31,6 @@ class CreateTableParIssueTypes extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('par_issue_types');
+        Schema::dropIfExists('par_issue_type_categories');
     }
 }
