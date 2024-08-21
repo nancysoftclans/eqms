@@ -139,22 +139,22 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
     var issuemanagementfrm = workflowContainer.down("issuemanagementfrm");
 
-    issuemanagementfrm
-      .down("combo[name=issue_type_id]")
-      .setValue(issue_type_id);
-    issuemanagementfrm.down("combo[name=issue_status_id]").setValue(1);
-    issuemanagementfrm
-      .down("datefield[name=creation_date]")
-      .setValue(new Date());
+    // issuemanagementfrm
+    //   .down("combo[name=issue_type_id]")
+    //   .setValue(issue_type_id);
+    // issuemanagementfrm.down("combo[name=issue_status_id]").setValue(1);
+    // issuemanagementfrm
+    //   .down("datefield[name=creation_date]")
+    //   .setValue(new Date());
 
-    // Calculate the date 10 days from now
-    var targetDate = new Date();
-    targetDate.setDate(targetDate.getDate() + 10);
+    // // Calculate the date 10 days from now
+    // var targetDate = new Date();
+    // targetDate.setDate(targetDate.getDate() + 10);
 
-    // Set the target resolution date field to 10 days from now
-    issuemanagementfrm
-      .down("datefield[name=target_resolution_date]")
-      .setValue(targetDate);
+    // // Set the target resolution date field to 10 days from now
+    // issuemanagementfrm
+    //   .down("datefield[name=target_resolution_date]")
+    //   .setValue(targetDate);
 
     dashboardWrapper.add(workflowContainer);
 

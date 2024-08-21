@@ -90,7 +90,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueTypeGrid", {
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "is_active",
+      dataIndex: "is_enabled",
       text: "Active",
       flex: 1,
       renderer: function (value, metaData) {
