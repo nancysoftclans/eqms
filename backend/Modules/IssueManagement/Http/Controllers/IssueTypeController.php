@@ -7,14 +7,14 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Modules\IssueManagement\Entities\IssueStatusGroups;
+use Modules\IssueManagement\Entities\IssueType;
 
-class IssueStatusGroupsController extends Controller
+class IssueTypeController extends Controller
 {
     public function index()
     {
-        $IssueStatusGroups = IssueStatusGroups::all();
-        return $IssueStatusGroups;
+        $IssueType = IssueType::from('par_issue_types as it')->join('par_form_categories as fc', 'it.form_id', 'fc.id')->select('it.*', 'fc.name as form')->get();
+        return $IssueType;
     }
 
     public function store(Request $request)
@@ -36,20 +36,20 @@ class IssueStatusGroupsController extends Controller
                     );
                     return response()->json($res);
                 }
-                $IssueStatusGroups = IssueStatusGroups::find($id);
+                $IssueType = IssueType::find($id);
                 $data = $request->all();
                 $data['altered_by'] = Auth::user()->id;
-                $IssueStatusGroups = $IssueStatusGroups->update($data);
+                $IssueType = $IssueType->update($data);
 
                 $res = array(
                     "success" => true,
                     "message" => 'Data Saved Successfully!!',
-                    "results" => $IssueStatusGroups
+                    "results" => $IssueType
                 );
             } else {
                 //Create
                 $rules = array(
-                    'title' => 'required|unique:par_issue_status_groups,title',
+                    'title' => 'required|unique:par_issue_types,title',
                 );
 
                 $validator = Validator::make($request->all(), $rules);
@@ -61,16 +61,16 @@ class IssueStatusGroupsController extends Controller
                     );
                     return response()->json($res);
                 }
-                $IssueStatusGroups = new IssueStatusGroups;
+                $IssueType = new IssueType;
                 $data = $request->all();
                 $data['created_by'] = Auth::user()->id;
                 $data['altered_by'] = Auth::user()->id;
-                $IssueStatusGroups = $IssueStatusGroups->create($data);
+                $IssueType = $IssueType->create($data);
 
                 $res = array(
                     "success" => true,
                     "message" => 'Data Saved Successfully!!',
-                    "results" => $IssueStatusGroups
+                    "results" => $IssueType
                 );
             }
         } catch (\Exception $exception) {
@@ -91,8 +91,8 @@ class IssueStatusGroupsController extends Controller
 
     public function show($id)
     {
-        $IssueStatusGroups = IssueStatusGroups::find($id);
-        return $IssueStatusGroups;
+        $IssueType = IssueType::find($id);
+        return $IssueType;
     }
 
     public function update(Request $request, $id)
@@ -110,15 +110,15 @@ class IssueStatusGroupsController extends Controller
             );
         } else {
             try {
-                $IssueStatusGroups = IssueStatusGroups::find($id);
+                $IssueType = IssueType::find($id);
                 $data = $request->all();
                 $data['altered_by'] = Auth::user()->id;
-                $IssueStatusGroups = $IssueStatusGroups->update($data);
+                $IssueType = $IssueType->update($data);
 
                 $res = array(
                     "success" => true,
                     "message" => 'Data Saved Successfully!!',
-                    "results" => $IssueStatusGroups
+                    "results" => $IssueType
                 );
             } catch (\Exception $exception) {
                 DB::rollback();
@@ -140,14 +140,14 @@ class IssueStatusGroupsController extends Controller
     public function destroy($id)
     {
         try {
-            $IssueStatusGroups = IssueStatusGroups::find($id);
+            $IssueType = IssueType::find($id);
 
-            $IssueStatusGroups = $IssueStatusGroups->delete();
+            $IssueType = $IssueType->delete();
 
             $res = array(
                 "success" => true,
                 "message" => 'Record deleted Successfully!!',
-                "results" => $IssueStatusGroups
+                "results" => $IssueType
             );
         } catch (\Exception $exception) {
             DB::rollback();

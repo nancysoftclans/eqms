@@ -11,12 +11,12 @@ Ext.define(
     },
     items: [
       {
-        xtype: "issuemanagementfrm",
+        xtype: "issuetypeform",
         autoScroll: true,
         title: "Issue Type Details",
       },
       {
-        xtype: "complainantdetailsfrm",
+        xtype: "",
         autoScroll: true,
         title: "Associated Items",
       },

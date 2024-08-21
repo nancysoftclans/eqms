@@ -38,15 +38,14 @@ Ext.define(
           "->",
           {
             text: "Save Details",
-            ui: "soft-blue",
-            iconCls: "fa fa-save",
-            name: "save",
+            iconCls: "x-fa fa-save",
+            action: "save",
+            storeID: "issuestatusgroupsstr",
             formBind: true,
-            form_panel: "#issueinitialqualityreviewfrm",
-            action_url: "issuemanagement/saveIssueInitialQualityReviewDetails",
-            wizard: "issueinitialqualityreviewwizard",
-            handler: "saveIssueManagementInitialQualityReviewDetails",
-          }
+            ui: "soft-blue",
+            action_url: "issuemanagement/issue_status_groups",
+            handler: "doCreateConfigParamWin",
+          },
         ],
       };
       me.callParent(arguments);

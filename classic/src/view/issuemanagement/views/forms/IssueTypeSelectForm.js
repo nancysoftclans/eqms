@@ -26,7 +26,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueTypeSelectForm", {
       margin: "0 20 20 0",
       name: "issue_type_id",
       valueField: "id",
-      displayField: "name",
+      displayField: "title",
       forceSelection: true,
       allowBlank: false,
       queryMode: "local",

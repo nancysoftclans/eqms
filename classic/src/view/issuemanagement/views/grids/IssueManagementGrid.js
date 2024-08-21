@@ -38,7 +38,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       labelWidth: 80,
       width: 320,
       valueField: "id",
-      displayField: "name",
+      displayField: "title",
       forceSelection: true,
       name: "issue_type_id",
       queryMode: "local",
