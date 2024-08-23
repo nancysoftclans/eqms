@@ -345,11 +345,11 @@ class IssueManagementController extends Controller
 
             $issue_status_id = 1;
             if ($IssueManagement->complaint_fully_addressed == "1") {
-                $IssueStatus = IssueStatus::where('name', 'Closed')->first();
+                $IssueStatus = IssueStatus::where('title', 'Closed')->first();
                 $issue_status_id = $IssueStatus->id ?: 7;
                 $date_closed = Carbon::now();
             } else {
-                $IssueStatus = IssueStatus::where('name', 'In Progress')->first();
+                $IssueStatus = IssueStatus::where('title', 'In Progress')->first();
                 $issue_status_id = $IssueStatus->id ?: 2;
                 $date_closed = null;
             }

@@ -15,33 +15,6 @@ Ext.define(
     },
     items: [
       {
-        xtype: "issueresolutionfrm",
-        autoScroll: true,
-        title: "Resolution",
-      },
-      {
-        xtype: "issuerootcauseanalysisfrm",
-        autoScroll: true,
-        title: "Root Cause Analysis",
-        fieldDefaults: {
-          fieldStyle: {
-            color: "green",
-            "font-weight": "bold",
-          },
-        },
-      },
-      {
-        xtype: "issueinitialqualityreviewfrm",
-        autoScroll: true,
-        title: "Initial Review by Quality Office",
-        fieldDefaults: {
-          fieldStyle: {
-            color: "green",
-            "font-weight": "bold",
-          },
-        },
-      },
-      {
         xtype: "issuemanagementfrm",
         autoScroll: true,
         title: "Issue Details",
@@ -53,19 +26,8 @@ Ext.define(
         },
       },
       {
-        xtype: "complainantdetailsfrm",
-        autoScroll: true,
-        title: "Complainant Details",
-        fieldDefaults: {
-          fieldStyle: {
-            color: "green",
-            "font-weight": "bold",
-          },
-        },
-      },
-      {
         xtype: "issuemanagementdocuploadsgrid",
-        title: "Documents",
+        title: "Associated Items",
       },
       {
         xtype: "hiddenfield",
