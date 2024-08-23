@@ -205,16 +205,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             activeTab
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
-            // issuemanagementfrm
-            //   .down("datefield[name=creation_date]")
-            //   .setValue(new Date(results.creation_date));
-            // issuemanagementfrm.loadRecord(model);
-
-            // // Parse the string using JSON.parse() (assuming valid JSON format)
-            // const section_ids_array = JSON.parse(results.section_ids);
-            // issuemanagementfrm
-            //   .down("tagfield[name=section_ids]")
-            //   .setValue(section_ids_array);
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -343,12 +333,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               .each(function (field) {
                 field.setReadOnly(true);
               });
-
-            // Parse the string using JSON.parse() (assuming valid JSON format)
-            const section_ids_array = JSON.parse(results.section_ids);
-            // issuemanagementfrm
-            //   .down("tagfield[name=section_ids]")
-            //   .setValue(section_ids_array);
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -416,12 +400,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 field.setReadOnly(true);
               });
 
-            // Parse the string using JSON.parse() (assuming valid JSON format)
-            const section_ids_array = JSON.parse(results.section_ids);
-            // issuemanagementfrm
-            //   .down("tagfield[name=section_ids]")
-            //   .setValue(section_ids_array);
-
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -479,7 +457,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               .setValue(results.workflow_stage);
             activeTab
               .down("displayfield[name=tracking_no]")
-              .setValue(results.reference_no);            
+              .setValue(results.reference_no);
 
             issuemanagementfrm
               .getForm()
@@ -487,12 +465,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               .each(function (field) {
                 field.setReadOnly(true);
               });
-
-            // Parse the string using JSON.parse() (assuming valid JSON format)
-            const section_ids_array = JSON.parse(results.section_ids);
-            // issuemanagementfrm
-            //   .down("tagfield[name=section_ids]")
-            //   .setValue(section_ids_array);
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -2323,6 +2295,10 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
                 if (success == true || success === true) {
                   me.loadRecord(model);
+                  // Parse the string using JSON.parse() (assuming valid JSON format)
+                  var section_ids_array = JSON.parse(results.section_ids);
+                  section_ids_array = section_ids_array.join();
+                  me.down("tagfield[name=section_ids]").setValue(section_ids_array);
                 } else {
                   toastr.error(message, "Failure Response");
                 }

@@ -73,7 +73,7 @@ Ext.define('Admin.view.configurations.views.forms.FormFieldDesignerFrm', {
                     tpl_block = form.down('textarea[name=tpl_block]'),
                     formfield = form.down('textfield[name=formfield]');
 
-                if(newVal == 6 || newVal == 7 || newVal == 9){
+                if(newVal == 6 || newVal == 7 || newVal == 9|| newVal == 10){
                     table.setVisible(true);
                     displayfield.setVisible(true);
                     valuefield.setVisible(true); 
