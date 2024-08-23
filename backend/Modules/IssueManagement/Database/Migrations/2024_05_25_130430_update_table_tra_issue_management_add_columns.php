@@ -17,11 +17,11 @@ class UpdateTableTraIssueManagementAddColumns extends Migration
             $table->dropColumn('section_id');
             $table->string('section_ids')->nullable();
             $table->string('complainant_name');
-            $table->string('organisation_name')->nullable();
+            $table->string('complainant_organisation')->nullable();
             $table->text('complainant_address')->nullable();
             $table->string('complainant_telephone')->nullable();
-            $table->unsignedBigInteger('complaint_type_id')->nullable();
-            $table->unsignedBigInteger('complaint_mode_id')->nullable();
+            $table->unsignedBigInteger('complaint_type')->nullable();
+            $table->unsignedBigInteger('complaint_mode')->nullable();
         });
     }
 

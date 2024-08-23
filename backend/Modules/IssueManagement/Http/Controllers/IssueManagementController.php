@@ -52,26 +52,32 @@ class IssueManagementController extends Controller
         $user_id = $this->user_id;
         $view_id = generateApplicationViewID();
         $zone_id = $request->input('zone_id');
-        $dateString = $request->target_resolution_date;
-        $date = Carbon::createFromFormat('d M Y', $dateString);
-
+        
+        $targetDateString = $request->target_resolution_date;
+        $creationDateString = $request->creation_date;
+        
+        $targetDateString = Carbon::parse($targetDateString);
+        $creationDateString = Carbon::parse($creationDateString);
+        
+        
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
                 $IssueManagement = IssueManagement::findOrFail($active_application_id);
                 $IssueManagement->fill([
                     'title' => $request->title,
-                    'issue_type_id' => $request->issue_type_id,
+                    'issue_type_id' => $request->issue_type,
                     'description' => $request->description,
-                    'target_resolution_date' => $date->format('Y-m-d'),
+                    'creation_date' => $creationDateString->format('Y-m-d'),
+                    'target_resolution_date' => $targetDateString->format('Y-m-d'),
                     'section_ids' => $request->section_ids,
-                    'issue_status_id' => $request->issue_status_id,
+                    'issue_status_id' => $request->issue_status,
                     'complainant_name' => $request->complainant_name,
                     'complainant_address' => $request->complainant_address,
-                    'organisation_name' => $request->organisation_name,
+                    'complainant_organisation' => $request->complainant_organisation,
                     'complainant_telephone' => $request->complainant_telephone,
-                    'complaint_mode_id' => $request->complaint_mode_id,
-                    'complaint_type_id' => $request->complaint_type_id,
+                    'complaint_mode' => $request->complaint_mode,
+                    'complaint_type' => $request->complaint_type,
                     'workflow_stage_id' => $request->workflow_stage_id,
                     'dola' => Carbon::now(),
                     'altered_by' => $user_id,
@@ -143,18 +149,19 @@ class IssueManagementController extends Controller
                 $data = $request->all();
                 $issue_data = array(
                     'submission_id' => $res['record_id'],
-                    'issue_type_id' => $data['issue_type_id'],
+                    'issue_type_id' => $data['issue_type'],
                     'title' => $data['title'],
                     'description' => $data['description'],
-                    'target_resolution_date' => $date->format('Y-m-d'),
+                    'creation_date' => $creationDateString->format('Y-m-d'),
+                    'target_resolution_date' => $targetDateString->format('Y-m-d'),
                     'section_ids' => $data['section_ids'],
-                    'issue_status_id' => $data['issue_status_id'],
+                    'issue_status_id' => $data['issue_status'],
                     'complainant_address' => $data['complainant_address'],
                     'complainant_name' => $data['complainant_name'],
-                    'organisation_name' => $data['organisation_name'],
+                    'complainant_organisation' => $data['complainant_organisation'],
                     'complainant_telephone' => $data['complainant_telephone'],
-                    'complaint_mode_id' => $data['complaint_mode_id'],
-                    'complaint_type_id' => $data['complaint_type_id'],
+                    'complaint_mode' => $data['complaint_mode'],
+                    'complaint_type' => $data['complaint_type'],
                     'created_on' => Carbon::now(),
                     'dola' => Carbon::now(),
                     'created_by' => $user_id,
@@ -219,7 +226,6 @@ class IssueManagementController extends Controller
                     't5.title as issue_status',
                     't1.id as active_application_id',
                     't1.workflow_stage_id',
-                    't1.created_on as creation_date',
                     't1.id as issue_id',
                     DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
                 );
@@ -266,10 +272,9 @@ class IssueManagementController extends Controller
                     't3.name as workflow_stage',
                     't4.name as process_name',
                     't1.created_on as raised_date',
-                    't5.name as issue_status',
+                    't5.title as issue_status',
                     't1.id as active_application_id',
                     't2.current_stage as workflow_stage_id',
-                    't1.created_on as creation_date',
                     DB::raw("CONCAT_WS(' ',decrypt(t6.first_name),decrypt(t6.last_name)) as owner")
                 )
                 ->where('t1.id', $active_application_id)

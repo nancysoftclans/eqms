@@ -345,14 +345,12 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       workflow_stage_id = containerPnl
         .down("hiddenfield[name=workflow_stage_id]")
         .getValue(),
-      issuemanagementfrm = containerPnl.down("issuemanagementfrm"),
-      complainantdetailsfrm = containerPnl.down("complainantdetailsfrm");
+      issuemanagementfrm = containerPnl.down("issuemanagementfrm");
 
-    // Validate both forms
-    if (issuemanagementfrm.isValid() && complainantdetailsfrm.isValid()) {
-      // Gather data from each form
+    // Validate form
+    if (issuemanagementfrm.isValid()) {
+      // Gather data
       var issueManagementData = issuemanagementfrm.getValues();
-      var complainantDetailsData = complainantdetailsfrm.getValues();
 
       // Combine the data
       var combinedData = {
@@ -367,10 +365,6 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
 
       for (var key in issueManagementData) {
         combinedData[key] = issueManagementData[key];
-      }
-
-      for (var key in complainantDetailsData) {
-        combinedData[key] = complainantDetailsData[key];
       }
 
       // Submit the data to the endpoint

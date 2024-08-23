@@ -177,7 +177,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .down("hiddenfield[name=application_status_id]")
         .getValue(),
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      complainantdetailsfrm = activeTab.down("complainantdetailsfrm"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue(),
@@ -211,22 +210,22 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
           if (success == true || success === true) {
             issuemanagementfrm.loadRecord(model);
-            complainantdetailsfrm.loadRecord(model);
             activeTab
               .down("displayfield[name=workflow_stage]")
               .setValue(results.workflow_stage);
             activeTab
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
-            issuemanagementfrm
-              .down("datefield[name=creation_date]")
-              .setValue(new Date(results.creation_date));
+            // issuemanagementfrm
+            //   .down("datefield[name=creation_date]")
+            //   .setValue(new Date(results.creation_date));
+            // issuemanagementfrm.loadRecord(model);
 
-            // Parse the string using JSON.parse() (assuming valid JSON format)
-            const section_ids_array = JSON.parse(results.section_ids);
-            issuemanagementfrm
-              .down("tagfield[name=section_ids]")
-              .setValue(section_ids_array);
+            // // Parse the string using JSON.parse() (assuming valid JSON format)
+            // const section_ids_array = JSON.parse(results.section_ids);
+            // issuemanagementfrm
+            //   .down("tagfield[name=section_ids]")
+            //   .setValue(section_ids_array);
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -952,6 +951,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           sub_module_id = wizard.down('hiddenfield[name=sub_module_id]').getValue(),
           section_id = wizard.down('hiddenfield[name=section_id]').getValue(),
           issue_type_id = wizard.down('hiddenfield[name=issue_type_id]').getValue();
+        active_application_id = wizard.down('hiddenfield[name=active_application_id]').getValue();
         if (wizard.down('hiddenfield[name=prodclass_category_id]')) {
           prodclass_category_id = wizard.down('hiddenfield[name=prodclass_category_id]').getValue();
         }
@@ -2732,16 +2732,19 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             me.down('combo[name=issue_type]').setValue(issue_type_id);
             me.down("combo[name=issue_status]").setValue(1);
           }
-          if (me.down('datefield[name=creation_date]')) {
-            me.down('datefield[name=creation_date]').setValue(new Date());
+          if (active_application_id) {
+
+          } else {
+            if (me.down('datefield[name=creation_date]')) {
+              me.down('datefield[name=creation_date]').setValue(new Date());
+            }
+            if (me.down('datefield[name=target_resolution_date]')) {
+              var targetDate = new Date();
+              var target_period = me.down('numberfield[name=target_period]').getValue();
+              targetDate.setDate(targetDate.getDate() + target_period);
+              me.down('datefield[name=target_resolution_date]').setValue(targetDate);
+            }
           }
-          if (me.down('datefield[name=target_resolution_date]')) {
-            var targetDate = new Date();
-            var target_period = me.down('numberfield[name=target_period]').getValue();
-            targetDate.setDate(targetDate.getDate() + target_period);
-            me.down('datefield[name=target_resolution_date]').setValue(targetDate);
-          }
-          
           //CHRIS
 
         } else {
