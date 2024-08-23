@@ -179,8 +179,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
     activeTab.down("button[name=recommendation]").setVisible(false);
     // activeTab.down("button[name=approval]").setVisible(false);
-
-    if (!active_application_id == isNaN) {
+    active_application_id = parseInt(active_application_id);
+    if (!isNaN(active_application_id)) {
       Ext.Ajax.request({
         method: "GET",
         url:
@@ -260,59 +260,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       valid = this.validateNewReceivingSubmission();
 
     if (valid) {
-      Ext.Ajax.request({
-        method: "POST",
-        url: "issuemanagement/submitIssueManagementApplication",
-        params: {
-          application_code: application_code,
-          workflow_stage_id: workflow_stage_id,
-          active_application_id: active_application_id,
-          _token: token,
-        },
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-        success: function (response) {
-          Ext.getBody().unmask();
-          var resp = Ext.JSON.decode(response.responseText),
-            message = resp.message,
-            success = resp.success;
-          if (success == true || success === true) {
-            extraParams = [
-              {
-                field_type: "hiddenfield",
-                field_name: "has_queries",
-                // value: hasQueries
-              },
-            ];
-            showWorkflowSubmissionWin(
-              active_application_id,
-              application_code,
-              table_name,
-              "workflowsubmissionsreceivingfrm",
-              winWidth,
-              storeID,
-              extraParams,
-              "",
-              "",
-              workflow_stage_id
-            );
-          } else {
-            toastr.error(message, "Failure Response");
-          }
-        },
-        failure: function (response) {
-          Ext.getBody().unmask();
-          var resp = Ext.JSON.decode(response.responseText),
-            message = resp.message,
-            success = resp.success;
-          toastr.error(message, "Failure Response");
-        },
-        error: function (jqXHR, textStatus, errorThrown) {
-          Ext.getBody().unmask();
-          toastr.error("Error: " + errorThrown, "Error Response");
-        },
-      });
+      showWorkflowSubmissionWin(
+        active_application_id,
+        application_code,
+        table_name,
+        "workflowsubmissionsreceivingfrm",
+        winWidth,
+        storeID,
+        "",
+        "",
+        "",
+        workflow_stage_id
+      );
     } else {
       Ext.getBody().unmask();
       toastr.warning(
@@ -520,10 +479,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               .setValue(results.workflow_stage);
             activeTab
               .down("displayfield[name=tracking_no]")
-              .setValue(results.reference_no);
-            issuemanagementfrm
-              .down("datefield[name=creation_date]")
-              .setValue(new Date(results.creation_date));
+              .setValue(results.reference_no);            
 
             issuemanagementfrm
               .getForm()
@@ -2347,7 +2303,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             me.down('combo[name=section_id]').setValue(section_id);
           }
           //CHRIS
-          if (!active_application_id == isNaN) {
+          active_application_id = parseInt(active_application_id);
+          if (!isNaN(active_application_id)) {
             Ext.Ajax.request({
               method: "GET",
               url:

@@ -312,7 +312,33 @@ Ext.define('Admin.view.workflowmanagement.views.forms.WorkflowStagesFrm', {
             //     store.load({params: {filter: filterStr}});
             // }
         }
-    }, {
+    }, 
+    {
+        xtype: 'combo', anyMatch: true,
+        name: 'issue_status_id',
+        valueField: 'id',
+        displayField: 'title',
+        allowBlank: true,
+        columnWidth: 0.33,//0.4,
+        queryMode: 'local',
+        fieldLabel: 'Issue Status(For Issue Management)',
+        listeners: {
+            beforerender: {
+                fn: 'setWorkflowCombosStore',
+                config: {
+                    pageSize: 100,
+                    proxy: {
+                        url: 'configurations/getConfigParamFromTable',
+                        extraParams: {
+                            table_name: 'par_issue_statuses'
+                        }
+                    }
+                },
+                isLoad: true
+            }
+        }
+    },
+    {
         xtype: 'textarea',
         fieldLabel: 'Description',
         name: 'description',

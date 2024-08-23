@@ -342,7 +342,6 @@ class IssueManagementController extends Controller
             $active_application_id = $request->active_application_id;
 
             $IssueManagement = IssueManagement::findOrFail($active_application_id);
-
             $issue_status_id = 1;
             if ($IssueManagement->complaint_fully_addressed == "1") {
                 $IssueStatus = IssueStatus::where('title', 'Closed')->first();

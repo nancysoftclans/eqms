@@ -21,8 +21,10 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\FacadesAuth;
 use Illuminate\Support\Facades\Auth;
 use Modules\Enforcement\Traits\EnforcementTrait;
+use Modules\IssueManagement\Entities\IssueStatus;
 use Modules\Surveillance\Traits\SurveillanceTrait;
 use Modules\ClinicalTrial\Traits\ClinicalTrialTrait;
+use Modules\IssueManagement\Entities\IssueManagement;
 use Modules\GmpApplications\Traits\GmpApplicationsTrait;
 use Modules\PromotionMaterials\Traits\PromotionMaterialsTrait;
 use Modules\PremiseRegistration\Traits\PremiseRegistrationTrait;
@@ -152,7 +154,7 @@ class WorkflowController extends Controller
                 ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
                 ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId', 't3.stage_category_id');
 
-        
+
 
             $qry->where($where);
 
@@ -769,7 +771,7 @@ class WorkflowController extends Controller
                 ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
                 ->join('wf_workflow_stages as t3', function ($join) {
                     $join->on('t2.id', '=', 't3.workflow_id');
-                        //->on('t3.stage_status', '=', DB::raw(1));
+                    //->on('t3.stage_status', '=', DB::raw(1));
                 })
                 ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
                 ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId');
@@ -1734,7 +1736,7 @@ class WorkflowController extends Controller
         $submission_id = 0;
         //check for previously added checklist
 
-       
+
         if (validateIsNumeric($query_id)) {
             $query_data = DB::table('tra_application_query_reftracker')->where('id', $query_id)->first();
             $checklist_category_id = $query_data->checklist_category_id;
@@ -1789,7 +1791,7 @@ class WorkflowController extends Controller
                 ->where('id', $process_id)
                 ->first();
 
-                
+
             $where2 = convertStdClassObjToArray($where2);
 
             $module_id = $where2['module_id'];
@@ -1867,7 +1869,7 @@ class WorkflowController extends Controller
                             // code...
                             $checklist_categories = [19];
                             break;
-                            //vet
+                        //vet
                         case 10: //pharm / small mole
                             // code...
                             $checklist_categories = [21];
@@ -1934,7 +1936,7 @@ class WorkflowController extends Controller
             $checklist_types = convertStdClassObjToArray($checklist_types);
             $checklist_types = convertAssArrayToSimpleArray($checklist_types, 'id');
 
-           // dd($checklist_types);
+            // dd($checklist_types);
 
             $qry = DB::table('par_checklist_items as t1')
                 ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
@@ -2793,10 +2795,34 @@ class WorkflowController extends Controller
         } else if ($module_id == 26) {
             $this->processNormalApplicationSubmission($request);
         } else if ($module_id == 28) { //Issue Management Applications
-            $this->processNormalApplicationSubmission($request);
+            $data = $this->processNormalApplicationSubmission($request);
+            
+            $submission_data = $data['results'];
+            $application_code = $submission_data['application_code'];
+            $current_stage =$submission_data['current_stage'];
+            $issue_status = IssueStatus::from('par_issue_statuses as is')->join('wf_workflow_stages as ws', 'is.id', 'ws.issue_status_id')
+            ->where('ws.id', $current_stage)->first();
+            $date_closed = null;
+            if ($issue_status->title == 'Closed') {
+                $date_closed = Carbon::now();
+            }else{
+                $date_closed = null;
+            }
+            $IssueManagement = IssueManagement::where('application_code', $application_code)->first();
+            
+            if ($IssueManagement) {
+                $IssueManagement->fill([
+                    'issue_status_id' => $issue_status->issue_status_id,
+                    'dola' => Carbon::now(),
+                    'altered_by' => $this->user_id,
+                    'date_closed' => $date_closed
+                ]);
+                $IssueManagement->save();
+            }
+
         } else if ($module_id == 29) { //Audit Applications
             $this->processNormalApplicationSubmission($request);
-        }else {
+        } else {
             echo "module not set";
         }
     }
@@ -3061,7 +3087,8 @@ class WorkflowController extends Controller
                 }
             }
 
-            $this->updateApplicationSubmission($request, $application_details, $application_status_id);
+            $res = $this->updateApplicationSubmission($request, $application_details, $application_status_id);
+            
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
             echo json_encode($res);
@@ -3071,6 +3098,7 @@ class WorkflowController extends Controller
             echo json_encode($res);
             exit();
         }
+        return $res;
     }
 
     public function processNormalManagersApplicationSubmission(Request $request, $keep_status = false, $action_type = 0)
@@ -5089,7 +5117,8 @@ class WorkflowController extends Controller
             DB::commit();
             $res = array(
                 'success' => true,
-                'message' => 'Application Submitted Successfully!!'
+                'message' => 'Application Submitted Successfully!!',
+                'results' => $submission_params
             );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
@@ -5097,7 +5126,7 @@ class WorkflowController extends Controller
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
         echo json_encode($res);
-        return true;
+        return $res;
     }
 
     public function updateInTrayReading(Request $request)
