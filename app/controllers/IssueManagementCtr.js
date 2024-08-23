@@ -20,6 +20,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issuereceivingwizard button[name=prev_btn]": {
         click: "onPrevCardClick",
       },
+      'issuemanagementfrm': {
+        beforerender: 'prepareInterfaceBasedonConfig'
+      },
       issuereceivingwizard: {
         afterrender: "launchissuereceivingWizard",
       },
@@ -41,12 +44,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuemanagementwwizard: {
         afterrender: "prepapreIssueManagementPreview",
       },
-      'issuemanagementfrm': {
-        beforerender: 'prepareInterfaceBasedonConfig'
-      },
-      // 'issuemanagementfrm': {
-      //   afterrender: 'iniateFormFields'
-      // },
+
     },
   },
 
@@ -245,14 +243,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     } else {
       Ext.getBody().unmask();
     }
-  },
-
-  iniateFormFields: function (pnl) {
-    Ext.getBody().mask("Please wait...");
-    var me = this,
-      activeTab = pnl,
-      issuemanagementfrm = activeTab.down("issuemanagementfrm");
-    console.log(issuemanagementfrm);
   },
 
   showIssueManagementSubmissionWin: function (btn) {
@@ -950,8 +940,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         var module_id = wizard.down('hiddenfield[name=module_id]').getValue(),
           sub_module_id = wizard.down('hiddenfield[name=sub_module_id]').getValue(),
           section_id = wizard.down('hiddenfield[name=section_id]').getValue(),
-          issue_type_id = wizard.down('hiddenfield[name=issue_type_id]').getValue();
-        active_application_id = wizard.down('hiddenfield[name=active_application_id]').getValue();
+          issue_type_id = wizard.down('hiddenfield[name=issue_type_id]').getValue(),
+          active_application_id = wizard.down('hiddenfield[name=active_application_id]').getValue();
         if (wizard.down('hiddenfield[name=prodclass_category_id]')) {
           prodclass_category_id = wizard.down('hiddenfield[name=prodclass_category_id]').getValue();
         }
@@ -2728,13 +2718,46 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             me.down('combo[name=section_id]').setValue(section_id);
           }
           //CHRIS
-          if (me.down('combo[name=issue_type]') && me.down("combo[name=issue_status]")) {
-            me.down('combo[name=issue_type]').setValue(issue_type_id);
-            me.down("combo[name=issue_status]").setValue(1);
-          }
-          if (active_application_id) {
+          if (active_application_id !== null) {
+            Ext.Ajax.request({
+              method: "GET",
+              url:
+                "issuemanagement/getIssueManagementDetailsById/" +
+                active_application_id,
+              headers: {
+                Authorization: "Bearer " + access_token,
+              },
+              success: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText),
+                  message = resp.message,
+                  success = resp.success,
+                  results = resp.results,
+                  model = Ext.create("Ext.data.Model", results);
 
+                if (success == true || success === true) {
+                  me.loadRecord(model);
+                } else {
+                  toastr.error(message, "Failure Response");
+                }
+              },
+              failure: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText),
+                  message = resp.message,
+                  success = resp.success;
+                toastr.error(message, "Failure Response");
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+                Ext.getBody().unmask();
+                toastr.error("Error: " + errorThrown, "Error Response");
+              },
+            });
           } else {
+            if (me.down('combo[name=issue_type]') && me.down("combo[name=issue_status]")) {
+              me.down('combo[name=issue_type]').setValue(issue_type_id);
+              me.down("combo[name=issue_status]").setValue(1);
+            }
             if (me.down('datefield[name=creation_date]')) {
               me.down('datefield[name=creation_date]').setValue(new Date());
             }

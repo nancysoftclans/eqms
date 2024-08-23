@@ -22,6 +22,7 @@ class IssueManagement extends Model
         'complainant_name',
         'complainant_organisation',
         'complainant_telephone',
+        'complainant_email',
         'complaint_mode',
         'complaint_type',
         'created_by',

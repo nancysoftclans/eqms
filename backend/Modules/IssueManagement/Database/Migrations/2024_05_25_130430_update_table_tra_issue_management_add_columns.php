@@ -20,6 +20,7 @@ class UpdateTableTraIssueManagementAddColumns extends Migration
             $table->string('complainant_organisation')->nullable();
             $table->text('complainant_address')->nullable();
             $table->string('complainant_telephone')->nullable();
+            $table->string('complainant_email')->nullable();
             $table->unsignedBigInteger('complaint_type')->nullable();
             $table->unsignedBigInteger('complaint_mode')->nullable();
         });
