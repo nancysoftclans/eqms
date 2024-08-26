@@ -26,7 +26,7 @@ Ext.define(
         },
       },
       {
-        xtype: "issuemanagementdocuploadsgrid",
+        xtype: "associateditemspnl",
         title: "Associated Items",
       },
       {

@@ -17,7 +17,7 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
       title: "Issue Details",
     },
     {
-      xtype: "issuemanagementdocuploadsgrid",
+      xtype: "associateditemspnl",
       title: "Associated Items",
     },
     {

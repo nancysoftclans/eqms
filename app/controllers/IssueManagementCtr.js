@@ -343,9 +343,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    issuemanagementdocuploadsgrid
-      .down("button[name=add_upload]")
-      .setVisible(false);
+    // issuemanagementdocuploadsgrid
+    //   .down("button[name=add_upload]")
+    //   .setVisible(false);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -422,9 +422,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    issuemanagementdocuploadsgrid
-      .down("button[name=add_upload]")
-      .setVisible(false);
+    // issuemanagementdocuploadsgrid
+    //   .down("button[name=add_upload]")
+    //   .setVisible(false);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -581,7 +581,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       if (wizard.down('hiddenfield[name=module_id]').getValue()) {
         var module_id = wizard.down('hiddenfield[name=module_id]').getValue(),
           sub_module_id = wizard.down('hiddenfield[name=sub_module_id]').getValue(),
-          section_id = wizard.down('hiddenfield[name=section_id]').getValue(),
+          // section_id = wizard.down('hiddenfield[name=section_id]').getValue(),
           issue_type_id = wizard.down('hiddenfield[name=issue_type_id]').getValue(),
           active_application_id = wizard.down('hiddenfield[name=active_application_id]').getValue();
         if (wizard.down('hiddenfield[name=prodclass_category_id]')) {
