@@ -166,7 +166,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     },
   },
   setGridStore: function (me, options) {
-    // console.log(me);
     var config = options.config,
       isLoad = options.isLoad,
       toolbar = me.down("pagingtoolbar"),
@@ -191,7 +190,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   },
  
   setGridTreeStore: function (me, options) {
-    // console.log(me);
     var config = options.config,
       isLoad = options.isLoad,
       toolbar = me.down("pagingtoolbar"),
@@ -332,7 +330,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       title_suffix = ref_no;
 
     workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
-    //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
       Ext.getBody().unmask();
       toastr.warning(
@@ -1540,7 +1537,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       testChunks: false,
       throttleProgressCallbacks: 1,
     });
-    // console.log(browseFile);
     resumable.assignBrowse(document.getElementById("browseButton"));
 
     resumable.on("fileAdded", function (file) {
@@ -2087,8 +2083,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
 
 
     workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
-
-    //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
       Ext.getBody().unmask();
       toastr.warning(
@@ -2209,10 +2203,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       module_id,
       sub_module_id,
     );
-
-    console.log(workflow_details);
-
-    //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
       Ext.getBody().unmask();
       toastr.warning(
@@ -2539,7 +2529,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       testChunks: false,
       throttleProgressCallbacks: 1,
     });
-    // console.log(browseFile);
+    
     resumable.assignBrowse(document.getElementById("browseButton"));
 
     resumable.on("fileAdded", function (file) {

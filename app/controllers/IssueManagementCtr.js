@@ -212,6 +212,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                     results.complaint_direct_or_indirect,
                 });
             }
+            if (issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')) {
+              issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')
+                .setValue({
+                  complaint_fully_addressed:
+                    results.complaint_fully_addressed,
+                });
+            }
 
             if (issuemanagementfrm.down('combo[name=issue_status_id]')) {
               const issue_type_id = issuemanagementfrm.down('combo[name=issue_type_id]').getValue();
@@ -372,12 +379,19 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                     results.complaint_direct_or_indirect,
                 });
             }
-            issuemanagementfrm
-              .getForm()
-              .getFields()
-              .each(function (field) {
-                field.setReadOnly(true);
-              });
+            if (issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')) {
+              issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')
+                .setValue({
+                  complaint_fully_addressed:
+                    results.complaint_fully_addressed,
+                });
+            }
+            // issuemanagementfrm
+            //   .getForm()
+            //   .getFields()
+            //   .each(function (field) {
+            //     field.setReadOnly(true);
+            //   });
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -437,13 +451,26 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             activeTab
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
-
-            issuemanagementfrm
-              .getForm()
-              .getFields()
-              .each(function (field) {
-                field.setReadOnly(true);
-              });
+              if (issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')) {
+                issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')
+                  .setValue({
+                    complaint_direct_or_indirect:
+                      results.complaint_direct_or_indirect,
+                  });
+              }
+              if (issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')) {
+                issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')
+                  .setValue({
+                    complaint_fully_addressed:
+                      results.complaint_fully_addressed,
+                  });
+              }
+            // issuemanagementfrm
+            //   .getForm()
+            //   .getFields()
+            //   .each(function (field) {
+            //     field.setReadOnly(true);
+            //   });
 
           } else {
             toastr.error(message, "Failure Response");
@@ -503,7 +530,20 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             activeTab
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
-
+              if (issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')) {
+                issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')
+                  .setValue({
+                    complaint_direct_or_indirect:
+                      results.complaint_direct_or_indirect,
+                  });
+              }
+              if (issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')) {
+                issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')
+                  .setValue({
+                    complaint_fully_addressed:
+                      results.complaint_fully_addressed,
+                  });
+              }
             issuemanagementfrm
               .getForm()
               .getFields()
@@ -2269,22 +2309,58 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }));
 
               if (is_readOnly == 1) {
-                var field = Ext.create('Ext.form.RadioGroup', {
+                var field = Ext.create('Ext.form.' + xtype, {
                   name: field_name,
                   fieldLabel: label,
                   hidden: is_hidden,
                   columnWidth: column_width,
                   allowBlank: is_mandatory,
                   readOnly: true,
+                  columns: 1,
                   items: items
                 });
               } else {
-                var field = Ext.create('Ext.form.RadioGroup', {
+                var field = Ext.create('Ext.form.' + xtype, {
                   name: field_name,
                   fieldLabel: label,
                   hidden: is_hidden,
                   columnWidth: column_width,
+                  columns: 1,
                   allowBlank: is_mandatory,
+                  bind: {
+                    readOnly: '{isReadOnly}'
+                  },
+                  items: items
+                });
+              }
+            }
+            else if (result[i].form_field_type_id == 13) {
+              var items = result[i].default_value;
+              items = JSON.parse(items);
+
+              // Map the array of strings to an array of objects
+              var items = items.map((label, index) => ({
+                boxLabel: label.boxLabel,
+                name: label.name,
+              }));
+
+              if (is_readOnly == 1) {
+                var field = Ext.create('Ext.form.CheckboxGroup', {
+                  fieldLabel: label,
+                  hidden: is_hidden,
+                  columnWidth: column_width,
+                  allowBlank: is_mandatory,
+                  readOnly: true,
+                  columns: 1,
+                  items: items
+                });
+              } else {
+                var field = Ext.create('Ext.form.CheckboxGroup', {
+                  fieldLabel: label,
+                  hidden: is_hidden,
+                  columnWidth: column_width,
+                  allowBlank: is_mandatory,
+                  columns: 1,
                   bind: {
                     readOnly: '{isReadOnly}'
                   },
@@ -2377,7 +2453,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   // Parse the string using JSON.parse() (assuming valid JSON format)
                   var section_ids_array = JSON.parse(results.section_ids);
                   section_ids_array = section_ids_array.join();
-                  me.down("tagfield[name=section_ids]").setValue(section_ids_array);
+                  if (me.down("tagfield[name=section_ids]")) {
+                    me.down("tagfield[name=section_ids]").setValue(section_ids_array);
+                  }
                 } else {
                   toastr.error(message, "Failure Response");
                 }

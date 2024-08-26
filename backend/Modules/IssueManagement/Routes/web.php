@@ -19,10 +19,6 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::get('getIssueManagementDetails', [IssueManagementController::class, 'getIssueManagementDetails']);
     Route::get('getIssueManagementDetailsById/{active_application_id}', [IssueManagementController::class, 'getIssueManagementDetailsById']);
     Route::get('getIssueProcessDetails', [IssueManagementController::class, 'getIssueProcessDetails']);
-    Route::post('saveIssueInitialQualityReviewDetails', [IssueManagementController::class, 'saveIssueInitialQualityReviewDetails']);
-    Route::post('saveIssueRCADetails', [IssueManagementController::class, 'saveIssueRCADetails']);
-    Route::post('saveIssueResolutionwDetails', [IssueManagementController::class, 'saveIssueResolutionwDetails']);
-    Route::post('saveIssueQualityReviewDetails', [IssueManagementController::class, 'saveIssueQualityReviewDetails']);
     Route::resource('issue_status_groups', 'IssueStatusGroupsController');
     Route::resource('issue_types', 'IssueTypeController');
 });

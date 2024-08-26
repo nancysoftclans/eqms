@@ -81,6 +81,30 @@ class IssueManagementController extends Controller
                     'complaint_type' => $request->complaint_type,
                     'complaint_direct_or_indirect' => $request->complaint_direct_or_indirect,
                     'office_assigned_to' => $request->office_assigned_to,
+                    'complaint_scheduling_delay' => $request->has('complaint_scheduling_delay'),
+                    'complaint_manner_of_advisor' => $request->has('complaint_manner_of_advisor'),
+                    'complaint_turnaround' => $request->has('complaint_turnaround'),
+                    'complaint_response_delay' => $request->has('complaint_response_delay'),
+                    'complaint_other' => $request->has('complaint_other'),
+                    'problem_statement' => $request->input('problem_statement'),
+                    'rca_team' => $request->input('rca_team'),
+                    'responsible_officer' => $request->input('responsible_officer'),
+                    'complaint_placing_budgetary' => $request->has('complaint_placing_budgetary'),
+                    'complaint_placing_schedule' => $request->has('complaint_placing_schedule'),
+                    'complaint_lacking_knowledge' => $request->has('complaint_lacking_knowledge'),
+                    'complaint_practicing_autocratic' => $request->has('complaint_practicing_autocratic'),
+                    'complaint_processes' => $request->has('complaint_processes'),
+                    'complaint_ineffective_processes' => $request->has('complaint_ineffective_processes'),
+                    'complaint_inefficient_processes' => $request->has('complaint_inefficient_processes'),
+                    'complaint_ineffective_support' => $request->has('complaint_ineffective_support'),
+                    'complaint_system_documentation' => $request->has('complaint_system_documentation'),
+                    'complaint_incomplete_system' => $request->has('complaint_incomplete_system'),
+                    'complaint_ineffective_system' => $request->has('complaint_ineffective_system'),
+                    'complaint_inefficient_system' => $request->has('complaint_inefficient_system'),
+                    'complaint_analytical_methods' => $request->has('complaint_analytical_methods'),
+                    'complaint_validated_methods' => $request->has('complaint_validated_methods'),                    
+                    'complaint_fully_addressed' => $request->input('complaint_fully_addressed'),
+                    'issue_resolution' => $request->input('issue_resolution'),
                     'workflow_stage_id' => $request->workflow_stage_id,
                     'dola' => Carbon::now(),
                     'altered_by' => $user_id,
@@ -168,6 +192,30 @@ class IssueManagementController extends Controller
                     'complaint_type' => $data['complaint_type'],
                     'complaint_direct_or_indirect' => $request->complaint_direct_or_indirect,
                     'office_assigned_to' => $request->office_assigned_to,
+                    'complaint_scheduling_delay' => $request->has('complaint_scheduling_delay'),
+                    'complaint_manner_of_advisor' => $request->has('complaint_manner_of_advisor'),
+                    'complaint_turnaround' => $request->has('complaint_turnaround'),
+                    'complaint_response_delay' => $request->has('complaint_response_delay'),
+                    'complaint_other' => $request->has('complaint_other'),
+                    'problem_statement' => $request->input('problem_statement'),
+                    'rca_team' => $request->input('rca_team'),
+                    'responsible_officer' => $request->input('responsible_officer'),
+                    'complaint_placing_budgetary' => $request->has('complaint_placing_budgetary'),
+                    'complaint_placing_schedule' => $request->has('complaint_placing_schedule'),
+                    'complaint_lacking_knowledge' => $request->has('complaint_lacking_knowledge'),
+                    'complaint_practicing_autocratic' => $request->has('complaint_practicing_autocratic'),
+                    'complaint_processes' => $request->has('complaint_processes'),
+                    'complaint_ineffective_processes' => $request->has('complaint_ineffective_processes'),
+                    'complaint_inefficient_processes' => $request->has('complaint_inefficient_processes'),
+                    'complaint_ineffective_support' => $request->has('complaint_ineffective_support'),
+                    'complaint_system_documentation' => $request->has('complaint_system_documentation'),
+                    'complaint_incomplete_system' => $request->has('complaint_incomplete_system'),
+                    'complaint_ineffective_system' => $request->has('complaint_ineffective_system'),
+                    'complaint_inefficient_system' => $request->has('complaint_inefficient_system'),
+                    'complaint_analytical_methods' => $request->has('complaint_analytical_methods'),
+                    'complaint_validated_methods' => $request->has('complaint_validated_methods'),
+                    'issue_resolution' => $request->input('issue_resolution'),                    
+                    'complaint_fully_addressed' => $request->input('complaint_fully_addressed'),
                     'created_on' => Carbon::now(),
                     'dola' => Carbon::now(),
                     'created_by' => $user_id,
@@ -372,219 +420,6 @@ class IssueManagementController extends Controller
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
-        }
-        return \response()->json($res);
-    }
-    public function saveIssueInitialQualityReviewDetails(Request $request)
-    {
-        $application_code = $request->input('application_code');
-        $active_application_id = $request->input('active_application_id');
-        $user_id = $this->user_id;
-
-        try {
-            if (validateIsNumeric($active_application_id)) {
-                //Update
-                $IssueManagement = IssueManagement::findOrFail($active_application_id);
-                $IssueManagement->fill([
-                    'workflow_stage_id' => $request->workflow_stage_id,
-                    'dola' => Carbon::now(),
-                    'altered_by' => $user_id,
-                    'application_code' => $application_code,
-                    'process_id' => $request->process_id,
-                    'complaint_direct_or_indirect' => $request->input('complaint_direct_or_indirect'),
-                    'office_assigned_to' => $request->input('office_assigned_to', 0),
-                    'complaint_scheduling_delay' => $request->has('complaint_scheduling_delay'),
-                    'complaint_manner_of_advisor' => $request->has('complaint_manner_of_advisor'),
-                    'complaint_turnaround' => $request->has('complaint_turnaround'),
-                    'complaint_response_delay' => $request->has('complaint_response_delay'),
-                    'complaint_other' => $request->has('complaint_other'),
-                ]);
-                $IssueManagement->save();
-                //End Update
-
-                $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
-                    ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
-                    ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
-                if ($IssueManagement) {
-                    $res = array(
-                        "success" => true,
-                        "message" => 'Data Saved Successfully!!',
-                        "results" => $IssueManagement
-                    );
-                }
-            }
-        } catch (\Exception $exception) {
-            DB::rollback();
-            $res = array(
-                "success" => false,
-                "message" => $exception->getMessage()
-            );
-        } catch (\Throwable $throwable) {
-            DB::rollback();
-            $res = array(
-                "success" => false,
-                "message" => $throwable->getMessage()
-            );
-        }
-        return \response()->json($res);
-    }
-
-    public function saveIssueRCADetails(Request $request)
-    {
-        $application_code = $request->input('application_code');
-        $active_application_id = $request->input('active_application_id');
-        $user_id = $this->user_id;
-
-        try {
-            if (validateIsNumeric($active_application_id)) {
-                //Update
-                $IssueManagement = IssueManagement::findOrFail($active_application_id);
-                $IssueManagement->fill([
-                    'workflow_stage_id' => $request->workflow_stage_id,
-                    'dola' => Carbon::now(),
-                    'altered_by' => $user_id,
-                    'application_code' => $application_code,
-                    'process_id' => $request->process_id,
-                    'problem_statement' => $request->input('problem_statement'),
-                    'rca_team' => $request->input('rca_team'),
-                    'responsible_officer' => $request->input('responsible_officer'),
-                    'complaint_placing_budgetary' => $request->has('complaint_placing_budgetary'),
-                    'complaint_placing_schedule' => $request->has('complaint_placing_schedule'),
-                    'complaint_lacking_knowledge' => $request->has('complaint_lacking_knowledge'),
-                    'complaint_practicing_autocratic' => $request->has('complaint_practicing_autocratic'),
-                    'complaint_processes' => $request->has('complaint_processes'),
-                    'complaint_ineffective_processes' => $request->has('complaint_ineffective_processes'),
-                    'complaint_inefficient_processes' => $request->has('complaint_inefficient_processes'),
-                    'complaint_ineffective_support' => $request->has('complaint_ineffective_support'),
-                    'complaint_system_documentation' => $request->has('complaint_system_documentation'),
-                    'complaint_incomplete_system' => $request->has('complaint_incomplete_system'),
-                    'complaint_ineffective_system' => $request->has('complaint_ineffective_system'),
-                    'complaint_inefficient_system' => $request->has('complaint_inefficient_system'),
-                    'complaint_analytical_methods' => $request->has('complaint_analytical_methods'),
-                    'complaint_validated_methods' => $request->has('complaint_validated_methods'),
-                ]);
-                $IssueManagement->save();
-                //End Update
-
-                $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
-                    ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
-                    ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
-                if ($IssueManagement) {
-                    $res = array(
-                        "success" => true,
-                        "message" => 'Data Saved Successfully!!',
-                        "results" => $IssueManagement
-                    );
-                }
-            }
-        } catch (\Exception $exception) {
-            DB::rollback();
-            $res = array(
-                "success" => false,
-                "message" => $exception->getMessage()
-            );
-        } catch (\Throwable $throwable) {
-            DB::rollback();
-            $res = array(
-                "success" => false,
-                "message" => $throwable->getMessage()
-            );
-        }
-        return \response()->json($res);
-    }
-
-    public function saveIssueResolutionwDetails(Request $request)
-    {
-        $application_code = $request->input('application_code');
-        $active_application_id = $request->input('active_application_id');
-        $user_id = $this->user_id;
-
-        try {
-            if (validateIsNumeric($active_application_id)) {
-                //Update
-                $IssueManagement = IssueManagement::findOrFail($active_application_id);
-                $IssueManagement->fill([
-                    'workflow_stage_id' => $request->workflow_stage_id,
-                    'dola' => Carbon::now(),
-                    'altered_by' => $user_id,
-                    'application_code' => $application_code,
-                    'process_id' => $request->process_id,
-                    'issue_resolution' => $request->input('issue_resolution')
-                ]);
-                $IssueManagement->save();
-                //End Update
-
-                $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
-                    ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
-                    ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
-                if ($IssueManagement) {
-                    $res = array(
-                        "success" => true,
-                        "message" => 'Data Saved Successfully!!',
-                        "results" => $IssueManagement
-                    );
-                }
-            }
-        } catch (\Exception $exception) {
-            DB::rollback();
-            $res = array(
-                "success" => false,
-                "message" => $exception->getMessage()
-            );
-        } catch (\Throwable $throwable) {
-            DB::rollback();
-            $res = array(
-                "success" => false,
-                "message" => $throwable->getMessage()
-            );
-        }
-        return \response()->json($res);
-    }
-
-    public function saveIssueQualityReviewDetails(Request $request)
-    {
-        $application_code = $request->input('application_code');
-        $active_application_id = $request->input('active_application_id');
-        $user_id = $this->user_id;
-
-        try {
-            if (validateIsNumeric($active_application_id)) {
-                //Update
-                $IssueManagement = IssueManagement::findOrFail($active_application_id);
-                $IssueManagement->fill([
-                    'workflow_stage_id' => $request->workflow_stage_id,
-                    'dola' => Carbon::now(),
-                    'altered_by' => $user_id,
-                    'application_code' => $application_code,
-                    'process_id' => $request->process_id,
-                    'complaint_fully_addressed' => $request->input('complaint_fully_addressed')
-                ]);
-                $IssueManagement->save();
-                //End Update
-
-                $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
-                    ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
-                    ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
-
-                $res = array(
-                    "success" => true,
-                    "message" => 'Data Saved Successfully!!',
-                    "results" => $IssueManagement
-                );
-
-            }
-        } catch (\Exception $exception) {
-            DB::rollback();
-            $res = array(
-                "success" => false,
-                "message" => $exception->getMessage()
-            );
-        } catch (\Throwable $throwable) {
-            DB::rollback();
-            $res = array(
-                "success" => false,
-                "message" => $throwable->getMessage()
-            );
         }
         return \response()->json($res);
     }
