@@ -451,20 +451,20 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             activeTab
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
-              if (issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')) {
-                issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')
-                  .setValue({
-                    complaint_direct_or_indirect:
-                      results.complaint_direct_or_indirect,
-                  });
-              }
-              if (issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')) {
-                issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')
-                  .setValue({
-                    complaint_fully_addressed:
-                      results.complaint_fully_addressed,
-                  });
-              }
+            if (issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')) {
+              issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')
+                .setValue({
+                  complaint_direct_or_indirect:
+                    results.complaint_direct_or_indirect,
+                });
+            }
+            if (issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')) {
+              issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')
+                .setValue({
+                  complaint_fully_addressed:
+                    results.complaint_fully_addressed,
+                });
+            }
             // issuemanagementfrm
             //   .getForm()
             //   .getFields()
@@ -530,20 +530,20 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             activeTab
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
-              if (issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')) {
-                issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')
-                  .setValue({
-                    complaint_direct_or_indirect:
-                      results.complaint_direct_or_indirect,
-                  });
-              }
-              if (issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')) {
-                issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')
-                  .setValue({
-                    complaint_fully_addressed:
-                      results.complaint_fully_addressed,
-                  });
-              }
+            if (issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')) {
+              issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')
+                .setValue({
+                  complaint_direct_or_indirect:
+                    results.complaint_direct_or_indirect,
+                });
+            }
+            if (issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')) {
+              issuemanagementfrm.down('radiogroup[name=complaint_fully_addressed]')
+                .setValue({
+                  complaint_fully_addressed:
+                    results.complaint_fully_addressed,
+                });
+            }
             issuemanagementfrm
               .getForm()
               .getFields()
@@ -2398,11 +2398,16 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           }
           // console.log(live_group_tracker);
           //insert fieldsets
-          for (const key in live_group_tracker) {
+          const sortedKeys = Object.keys(live_group_tracker).sort((a, b) => b - a);
+          sortedKeys.forEach(key => {
             const grouper = live_group_tracker[key];
             me.add(1, grouper);
+          });
+          // for (const key in live_group_tracker) {
+          //   const grouper = live_group_tracker[key];
+          //   me.add(1, grouper);
 
-          }
+          // }
           var found = false;
           if (me.up().up().getViewModel()) {
             var vmodel = me.up().up().getViewModel();
