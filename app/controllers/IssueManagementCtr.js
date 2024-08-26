@@ -177,8 +177,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .down("hiddenfield[name=workflow_stage_id]")
         .getValue();
 
+
     activeTab.down("button[name=recommendation]").setVisible(false);
-    // activeTab.down("button[name=approval]").setVisible(false);
     active_application_id = parseInt(active_application_id);
     if (!isNaN(active_application_id)) {
       Ext.Ajax.request({
@@ -205,6 +205,45 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             activeTab
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
+            if (issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')) {
+              issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')
+                .setValue({
+                  complaint_direct_or_indirect:
+                    results.complaint_direct_or_indirect,
+                });
+            }
+
+            if (issuemanagementfrm.down('combo[name=issue_status_id]')) {
+              const issue_type_id = issuemanagementfrm.down('combo[name=issue_type_id]').getValue();
+              Ext.Ajax.request({
+                method: "GET",
+                url:
+                  "issuemanagement/issue_types/" + issue_type_id,
+                headers: {
+                  Authorization: "Bearer " + access_token,
+                },
+                success: function (response) {
+                  var resp = Ext.JSON.decode(response.responseText),
+                    results = resp,
+                    issue_status_ids = JSON.parse(results.issue_status_ids);
+                  if (issue_status_ids && Array.isArray(issue_status_ids)) {
+                    // Get the issue_status_id combo
+                    var issueStatusCombo = issuemanagementfrm.down('combo[name=issue_status_id]');
+                    var store = issueStatusCombo.getStore();
+
+                    // Filter the store by issue_status_ids
+                    store.clearFilter();
+                    store.filterBy(function (record) {
+                      return issue_status_ids.includes(record.get('id'));
+                    });
+                  }
+                },
+                failure: function (response) {
+                },
+                error: function (jqXHR, textStatus, errorThrown) {
+                },
+              });
+            }
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -326,7 +365,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             activeTab
               .down("displayfield[name=tracking_no]")
               .setValue(results.reference_no);
-
+            if (issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')) {
+              issuemanagementfrm.down('radiogroup[name=complaint_direct_or_indirect]')
+                .setValue({
+                  complaint_direct_or_indirect:
+                    results.complaint_direct_or_indirect,
+                });
+            }
             issuemanagementfrm
               .getForm()
               .getFields()
@@ -2210,6 +2255,40 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   bind: {
                     readOnly: '{isReadOnly}'
                   }
+                });
+              }
+            }
+            else if (result[i].form_field_type_id == 12) {
+              var items = result[i].default_value;
+              items = items.split(',');
+              // Map the array of strings to an array of objects
+              var items = items.map((label, index) => ({
+                boxLabel: label,
+                name: field_name,
+                inputValue: index + 1
+              }));
+
+              if (is_readOnly == 1) {
+                var field = Ext.create('Ext.form.RadioGroup', {
+                  name: field_name,
+                  fieldLabel: label,
+                  hidden: is_hidden,
+                  columnWidth: column_width,
+                  allowBlank: is_mandatory,
+                  readOnly: true,
+                  items: items
+                });
+              } else {
+                var field = Ext.create('Ext.form.RadioGroup', {
+                  name: field_name,
+                  fieldLabel: label,
+                  hidden: is_hidden,
+                  columnWidth: column_width,
+                  allowBlank: is_mandatory,
+                  bind: {
+                    readOnly: '{isReadOnly}'
+                  },
+                  items: items
                 });
               }
             }

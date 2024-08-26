@@ -90,6 +90,20 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueTypeGrid", {
     },
     {
       xtype: "gridcolumn",
+      dataIndex: "status_group",
+      text: "Status Group",
+      flex: 1,
+      sortable: true,
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "issue_type_category",
+      text: "Issue Type Category",
+      flex: 1,
+      sortable: true,
+    },
+    {
+      xtype: "gridcolumn",
       dataIndex: "is_enabled",
       text: "Active",
       flex: 1,
@@ -102,12 +116,12 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueTypeGrid", {
         return '<i class="fas fa-times"></i>';
       },
     },
-    {
-      xtype: "gridcolumn",
-      dataIndex: "dola",
-      text: "Date Modified",
-      flex: 1,
-    },
+    // {
+    //   xtype: "gridcolumn",
+    //   dataIndex: "dola",
+    //   text: "Date Modified",
+    //   flex: 1,
+    // },
     {
       text: "Options",
       xtype: "widgetcolumn",

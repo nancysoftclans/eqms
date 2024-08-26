@@ -2,6 +2,7 @@
 
 namespace Modules\IssueManagement\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -13,7 +14,12 @@ class IssueTypeController extends Controller
 {
     public function index()
     {
-        $IssueType = IssueType::from('par_issue_types as it')->join('par_form_categories as fc', 'it.form_id', 'fc.id')->select('it.*', 'fc.name as form')->get();
+        $IssueType = IssueType::from('par_issue_types as it')
+            ->join('par_form_categories as fc', 'it.form_id', 'fc.id')
+            ->leftJoin('par_issue_status_groups as isg', 'it.status_group_id', 'isg.id')
+            ->leftJoin('par_issue_type_categories as itc', 'it.issue_type_category_id', 'itc.id')
+            ->select('it.*', 'fc.name as form', 'isg.issue_status_ids', 'isg.title as status_group', 'itc.title as issue_type_category')
+            ->get();
         return $IssueType;
     }
 
@@ -39,6 +45,7 @@ class IssueTypeController extends Controller
                 $IssueType = IssueType::find($id);
                 $data = $request->all();
                 $data['altered_by'] = Auth::user()->id;
+                $data['dola'] = Carbon::now();
                 $IssueType = $IssueType->update($data);
 
                 $res = array(
@@ -91,7 +98,13 @@ class IssueTypeController extends Controller
 
     public function show($id)
     {
-        $IssueType = IssueType::find($id);
+        $IssueType = IssueType::from('par_issue_types as it')
+            ->join('par_form_categories as fc', 'it.form_id', 'fc.id')
+            ->leftJoin('par_issue_status_groups as isg', 'it.status_group_id', 'isg.id')
+            ->leftJoin('par_issue_type_categories as itc', 'it.issue_type_category_id', 'itc.id')
+            ->select('it.*', 'fc.name as form', 'isg.issue_status_ids', 'isg.title as status_group', 'itc.title as issue_type_category')
+            ->where('it.id', $id)
+            ->first();
         return $IssueType;
     }
 

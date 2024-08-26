@@ -15,6 +15,8 @@ class IssueType extends Model
         'title',
         'description',
         'form_id',
+        'status_group_id',
+        'issue_type_category_id',
         'is_enabled',
         'created_by',
         'altered_by'

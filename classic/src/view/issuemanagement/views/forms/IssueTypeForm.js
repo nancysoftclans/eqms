@@ -97,13 +97,67 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueTypeForm", {
           },
         },
         {
+          xtype: "combo",
+          anyMatch: true,
+          fieldLabel: "Status Group",
+          margin: "0 20 20 0",
+          name: "status_group_id",
+          columnWidth: 0.33,
+          valueField: "id",
+          displayField: "title",
+          forceSelection: true,
+          allowBlank: false,
+          queryMode: "local",
+          listeners: {
+            afterrender: {
+              fn: "setCompStore",
+              config: {
+                pageSize: 10000,
+                proxy: {
+                  extraParams: {
+                    table_name: "par_issue_status_groups",
+                  },
+                },
+              },
+              isLoad: true,
+            },
+          },
+        },
+        {
+          xtype: "combo",
+          anyMatch: true,
+          fieldLabel: "Issue Type Category",
+          margin: "0 20 20 0",
+          name: "issue_type_category_id",
+          columnWidth: 0.33,
+          valueField: "id",
+          displayField: "title",
+          forceSelection: true,
+          allowBlank: true,
+          queryMode: "local",
+          listeners: {
+            afterrender: {
+              fn: "setCompStore",
+              config: {
+                pageSize: 10000,
+                proxy: {
+                  extraParams: {
+                    table_name: "par_issue_type_categories",
+                  },
+                },
+              },
+              isLoad: true,
+            },
+          },
+        },
+        {
           xtype: "checkbox",
           inputValue: 1,
           uncheckedValue: 0,
           fieldLabel: "Active",
           margin: "0 20 20 0",
           name: "is_active",
-          columnWidth: 1,
+          columnWidth: 0.33,
           allowBlank: true,
         },
       ],
