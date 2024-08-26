@@ -2461,6 +2461,20 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   if (me.down("tagfield[name=section_ids]")) {
                     me.down("tagfield[name=section_ids]").setValue(section_ids_array);
                   }
+                  if (me.down('radiogroup[name=complaint_direct_or_indirect]')) {
+                    me.down('radiogroup[name=complaint_direct_or_indirect]')
+                      .setValue({
+                        complaint_direct_or_indirect:
+                          results.complaint_direct_or_indirect,
+                      });
+                  }
+                  if (me.down('radiogroup[name=complaint_fully_addressed]')) {
+                    me.down('radiogroup[name=complaint_fully_addressed]')
+                      .setValue({
+                        complaint_fully_addressed:
+                          results.complaint_fully_addressed,
+                      });
+                  }
                 } else {
                   toastr.error(message, "Failure Response");
                 }

@@ -14,7 +14,7 @@ class UpdateTableTraIssueManagementAddReviewColumns extends Migration
     public function up()
     {
         Schema::table('tra_issue_management_applications', function (Blueprint $table) {
-            $table->string('complaint_direct_or_indirect')->nullable();
+            $table->integer('complaint_direct_or_indirect')->nullable();
             $table->integer('office_assigned_to')->nullable()->default(0);           
             $table->boolean('complaint_scheduling_delay')->default(false);
             $table->boolean('complaint_manner_of_advisor')->default(false);
