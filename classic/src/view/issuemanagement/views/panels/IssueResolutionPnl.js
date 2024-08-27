@@ -26,8 +26,22 @@ Ext.define(
         },
       },
       {
-        xtype: "associateditemspnl",
         title: "Associated Items",
+        xtype: 'tabpanel',
+        items: [
+          {
+            xtype: "issuemanagementdocuploadsgrid",
+            title: "Associated Documents",
+          },
+          {
+            xtype: "",
+            title: "Associated Issues",
+          },
+          {
+            xtype: "",
+            title: " Associated Audits",
+          }
+        ],
       },
       {
         xtype: "hiddenfield",

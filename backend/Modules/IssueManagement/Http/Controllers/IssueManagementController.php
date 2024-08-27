@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Modules\IssueManagement\Entities\IssueStatus;
 use Modules\IssueManagement\Entities\IssueManagement;
+use Modules\IssueManagement\Entities\IssueManagementDocument;
 
 class IssueManagementController extends Controller
 {
@@ -52,14 +53,14 @@ class IssueManagementController extends Controller
         $user_id = $this->user_id;
         $view_id = generateApplicationViewID();
         $zone_id = $request->input('zone_id');
-        
+
         $targetDateString = $request->target_resolution_date;
         $creationDateString = $request->creation_date;
-        
+
         $targetDateString = Carbon::parse($targetDateString);
         $creationDateString = Carbon::parse($creationDateString);
-        
-        
+
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -102,7 +103,7 @@ class IssueManagementController extends Controller
                     'complaint_ineffective_system' => $request->has('complaint_ineffective_system'),
                     'complaint_inefficient_system' => $request->has('complaint_inefficient_system'),
                     'complaint_analytical_methods' => $request->has('complaint_analytical_methods'),
-                    'complaint_validated_methods' => $request->has('complaint_validated_methods'),                    
+                    'complaint_validated_methods' => $request->has('complaint_validated_methods'),
                     'complaint_fully_addressed' => $request->input('complaint_fully_addressed'),
                     'issue_resolution' => $request->input('issue_resolution'),
                     'workflow_stage_id' => $request->workflow_stage_id,
@@ -214,7 +215,7 @@ class IssueManagementController extends Controller
                     'complaint_inefficient_system' => $request->has('complaint_inefficient_system'),
                     'complaint_analytical_methods' => $request->has('complaint_analytical_methods'),
                     'complaint_validated_methods' => $request->has('complaint_validated_methods'),
-                    'issue_resolution' => $request->input('issue_resolution'),                    
+                    'issue_resolution' => $request->input('issue_resolution'),
                     'complaint_fully_addressed' => $request->input('complaint_fully_addressed'),
                     'created_on' => Carbon::now(),
                     'dola' => Carbon::now(),
@@ -415,6 +416,62 @@ class IssueManagementController extends Controller
                 $IssueManagement->save();
 
                 $res = array('success' => true, 'message' => 'validated');
+            }
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getIssueManagementDocuments(Request $request)
+    {
+        try {
+            $results = IssueManagementDocument::where('issue_id', $request->issue_id)->get();
+
+            // $res = array(
+            //     'success' => true,
+            //     'results' => $results,
+            //     'message' => 'All is well!!'
+            // );
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                "success" => false,
+                "message" => $throwable->getMessage()
+            );
+        }
+
+        return \response()->json($results);
+    }
+    public function saveIssueManagementDocuments(Request $request)
+    {
+        try {
+            $active_application_id = $request->active_application_id;
+            if (is_numeric($active_application_id)) {
+                $document_data = json_decode($request->document_ids, true);
+                foreach ($document_data as $document) {
+                    $data = array(
+                        'issue_id' => $active_application_id,
+                        'document_id' => $document,
+                        'dola' => Carbon::now(),
+                        'altered_by' => $this->user_id,
+                    );
+                    $IssueManagementDocument = new IssueManagementDocument();
+                    $IssueManagementDocument->create($data);
+                }
+                $IssueManagementDocument = IssueManagementDocument::all();
+
+                $res = array(
+                    'success' => true,
+                    'message' => 'Saved Successfully!!',
+                    'results' => $IssueManagementDocument
+                );
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
