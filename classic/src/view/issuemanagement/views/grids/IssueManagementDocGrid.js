@@ -1,8 +1,8 @@
-Ext.define("Admin.view.issuemanagement.views.grids.IssueDocUploadsGrid", {
+Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
   extend: "Ext.grid.Panel",
   controller: "issuemanagementvctr",
-  xtype: "issuemanagementdocuploadsgrid",
-  itemId: "issuemanagementdocuploadsgrid",
+  xtype: "issuemanagementdocgrid",
+  itemId: "issuemanagementdocgrid",
   features: [
     {
       ftype: "searching",
@@ -71,13 +71,13 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueDocUploadsGrid", {
       displayMsg: "Showing {0} - {1} of {2} total records",
       emptyMsg: "No Records",
       beforeLoad: function () {
-        this.up("issuemanagementdocuploadsgrid").fireEvent("refresh", this);
+        this.up("issuemanagementdocgrid").fireEvent("refresh", this);
       },
     },
   ],
   columns: [
     {
-      xtype: "treecolumn",
+      xtype: "gridcolumn",
       dataIndex: "title",
       text: "Title",
       sortable: true,
@@ -130,54 +130,19 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueDocUploadsGrid", {
               download: 0,
             },
             {
-              text: "ZIP and Download",
-              iconCls: "x-fa fa-download",
-              handler: "downloadDirectoryasZip",
-              tooltip: "download as zip",
-              action: "download",
-              download: 0,
-            },
-            {
-              text: "Update Document",
-              iconCls: "x-fa fa-upload",
-              winTitle: "Update Document",
-              childXtype: "applicationDocUploadsFrm",
-              winWidth: "35%",
-              handler: "updateApplicationDocUploadWin",
-              stores: "[]",
-              action: "update",
-              name: "update",
-              bind: {
-                hidden: "{isReadOnly}", // false
-              },
-            },
-            {
               text: "Delete",
               iconCls: "x-fa fa-trash",
-              name: "delete",
               tooltip: "Delete Record",
-              table_name: "tra_application_uploadeddocuments",
-              storeID: "applicationDocumentsUploads",
-              action_url: "productregistration/deleteProductiseRegRecord",
+              table_name: "tra_issue_management_documents",
+              storeID: "issuemanagementdocumentstr",
+              action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
-              handler: "onDeleteApplicationDocument",
-
               bind: {
-                hidden: "{isReadOnly}", // false
+                disabled: "{hideDeleteButton}",
               },
-            },
-            {
-              text: "Preview Previous Version",
-              iconCls: "x-fa fa-eye",
-              hidden: true,
-              storeId: "previousDocumentsUploads",
-              childXtype: "previousDocumentVersionsGrid",
-              winTitle: "Document Previous Versions",
-              winWidth: "70%",
-              action: "prev_versions",
-              handler: "previewPreviousUploadedDocument",
+              handler: "doDeleteConfigWidgetParam",
               bind: {
-                hidden: "{isReadOnly}", // false
+                disabled: "{hideDeleteButton}",
               },
             },
           ],

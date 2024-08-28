@@ -35,13 +35,19 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuemanagementwwizard: {
         afterrender: "prepapreIssueManagementPreview",
       },
-      "issuemanagementdocuploadsgrid button[name=select_document]": {
+      "issuemanagementdocgrid button[name=select_document]": {
         click: "showApplicationDocUploadWin",
       },
       "issueselectdocumentfrm button[name=save_issuedocument_btn]": {
         click: "saveIssueManagementDocuments",
       },
-      issuemanagementdocuploadsgrid: {
+      issuemanagementdocgrid: {
+        refresh: "refreshGrid",
+      },
+      issuemanagementissuegrid: {
+        refresh: "refreshGrid",
+      },
+      issuemanagementauditgrid: {
         refresh: "refreshGrid",
       },
     },
@@ -174,8 +180,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .down("hiddenfield[name=application_status_id]")
         .getValue(),
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocuploadsgrid = activeTab.down(
-        "issuemanagementdocuploadsgrid"
+      issuemanagementdocgrid = activeTab.down(
+        "issuemanagementdocgrid"
       ),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
@@ -189,7 +195,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(false);
-    // issuemanagementdocuploadsgrid.down("button[name=select_document]").setVisible(true);
+    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
     active_application_id = parseInt(active_application_id);
     if (!isNaN(active_application_id)) {
       Ext.Ajax.request({
@@ -358,13 +364,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocuploadsgrid = activeTab.down(
-        "issuemanagementdocuploadsgrid"
+      issuemanagementdocgrid = activeTab.down(
+        "issuemanagementdocgrid"
       ),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    // issuemanagementdocuploadsgrid.down("button[name=select_document]").setVisible(true);
+    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -444,13 +450,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocuploadsgrid = activeTab.down(
-        "issuemanagementdocuploadsgrid"
+      issuemanagementdocgrid = activeTab.down(
+        "issuemanagementdocgrid"
       ),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    // issuemanagementdocuploadsgrid.down("button[name=select_document]").setVisible(true);
+    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -529,13 +535,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocuploadsgrid = activeTab.down(
-        "issuemanagementdocuploadsgrid"
+      issuemanagementdocgrid = activeTab.down(
+        "issuemanagementdocgrid"
       ),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    issuemanagementdocuploadsgrid
+    issuemanagementdocgrid
       .down("button[name=add_upload]")
       .setVisible(false);
 

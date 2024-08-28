@@ -21,11 +21,11 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
       xtype: 'tabpanel',
       items: [
         {
-          xtype: "issuemanagementdocuploadsgrid",
+          xtype: "issuemanagementdocgrid",
           title: "Associated Documents",
         },
         {
-          xtype: "",
+          xtype: "issuemanagementissuegrid",
           title: "Associated Issues",
         },
         {

@@ -28,15 +28,15 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
       xtype: 'tabpanel',
       items: [
         {
-          xtype: "issuemanagementdocuploadsgrid",
+          xtype: "issuemanagementdocgrid",
           title: "Associated Documents",
         },
         {
-          xtype: "",
+          xtype: "issuemanagementissuegrid",
           title: "Associated Issues",
         },
         {
-          xtype: "",
+          xtype: "issuemanagementauditgrid",
           title: " Associated Audits",
         }
       ],

@@ -13,11 +13,18 @@ use Illuminate\Support\Facades\Validator;
 use Modules\IssueManagement\Entities\IssueStatus;
 use Modules\IssueManagement\Entities\IssueManagement;
 use Modules\IssueManagement\Entities\IssueManagementDocument;
-
+use SoapClient;
+use SoapFault;
 class IssueManagementController extends Controller
 {
 
     protected $user_id;
+    protected $username = "NDA";
+    protected $password = "NDAPWD";
+    protected $publicKeyPath = "D:/URA/public_key.pem";
+    protected $privateKeyPath = "D:/URA/private_key.pem";
+    protected $privateKeyPassword = "";
+    protected $wsdl = "https://testpayments.ura.go.ug/MDAService/PaymentServices.svc?wsdl";   
 
     public function __construct(Request $req)
     {
@@ -38,6 +45,69 @@ class IssueManagementController extends Controller
                 return $next($request);
             });
         }
+
+    }
+
+
+    public function test()
+    {
+        $encryptedCredentials = $this->encryptCredentials($this->username, $this->password, $this->publicKeyPath);
+        $signedCredentials = $this->signCredentials($encryptedCredentials, $this->privateKeyPath, $this->privateKeyPassword);
+
+        try {
+            // Initialize the SOAP client
+            $client = new SoapClient($this->wsdl);
+            
+            // Prepare the parameters for the method call
+            $params = array(
+                'TIN' => "",
+                'signedCredentials' => $signedCredentials,
+                'encryptedCredentials' => $encryptedCredentials,                
+                'userName' => $this->username  
+            );
+
+            // Call the method
+            $response = $client->__soapCall('GetClientRegistration', array($params));
+
+            // Return the response
+            return response()->json($response);
+
+        } catch (SoapFault $fault) {
+            // Handle SOAP errors
+            return response()->json(['error' => $fault->getMessage()], 500);
+        }
+    }
+
+    function encryptCredentials($username, $password, $publicKeyPath)
+    {
+
+        // Concatenate username and password
+        $credentials = $username . $password;
+
+        // Load URA's public key
+        $publicKey = file_get_contents($publicKeyPath);
+
+        // Encrypt the credentials using the public key
+        openssl_public_encrypt($credentials, $encryptedCredentials, $publicKey, OPENSSL_PKCS1_PADDING);
+
+        // Return base64 encoded encrypted credentials
+        return base64_encode($encryptedCredentials);
+    }
+
+    function signCredentials($encryptedCredentials, $privateKeyPath, $privateKeyPassword)
+    {
+        // Load your private key
+        $privateKey = file_get_contents($privateKeyPath);
+        $privateKeyResource = openssl_pkey_get_private($privateKey, $privateKeyPassword);
+
+        // Sign the encrypted credentials
+        openssl_sign($encryptedCredentials, $signature, $privateKeyResource, OPENSSL_ALGO_SHA1);
+
+        // Free the private key from memory
+        openssl_free_key($privateKeyResource);
+
+        // Return base64 encoded signature
+        return base64_encode($signature);
     }
 
 
@@ -428,13 +498,12 @@ class IssueManagementController extends Controller
     public function getIssueManagementDocuments(Request $request)
     {
         try {
-            $results = IssueManagementDocument::where('issue_id', $request->issue_id)->get();
-
-            // $res = array(
-            //     'success' => true,
-            //     'results' => $results,
-            //     'message' => 'All is well!!'
-            // );
+            $res = IssueManagementDocument::from('tra_issue_management_documents as t1')
+                ->leftJoin('tra_issue_management_applications as t2', 't1.issue_id', 't2.id')
+                ->leftJoin('tra_documentmanager_application as t3', 't1.document_id', 't3.id')
+                ->where('issue_id', $request->issue_id)
+                ->select('t1.*', 't3.doc_title as title', 't3.doc_version as version')
+                ->get();
         } catch (\Exception $exception) {
             $res = array(
                 'success' => false,
@@ -447,7 +516,7 @@ class IssueManagementController extends Controller
             );
         }
 
-        return \response()->json($results);
+        return \response()->json($res);
     }
     public function saveIssueManagementDocuments(Request $request)
     {
