@@ -23,7 +23,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementIssueGrid", {
   },
   tbar: [
     {
-      text: "Create",
+      text: "Select",
       iconCls: "x-fa fa-plus",
       action: "add",
       ui: "soft-blue",

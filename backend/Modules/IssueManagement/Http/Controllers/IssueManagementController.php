@@ -15,6 +15,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Modules\IssueManagement\Entities\IssueStatus;
 use Modules\IssueManagement\Entities\IssueManagement;
+use Modules\IssueManagement\Entities\IssueManagementAudit;
 use Modules\IssueManagement\Entities\IssueManagementDocument;
 use Modules\IssueManagement\Entities\IssueManagementRelatedIssue;
 
@@ -631,6 +632,71 @@ class IssueManagementController extends Controller
                     'success' => true,
                     'message' => 'Saved Successfully!!',
                     'results' => $IssueManagementRelatedIssue
+                );
+            }
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+    public function getIssueManagementAudits(Request $request)
+    {
+        try {
+            $qry = IssueManagementAudit::from('tra_issue_management_audits as t1')
+                ->leftJoin('tra_auditsmanager_application as t2', 't1.audit_id', 't2.id')
+                ->where('t1.issue_id', $request->issue_id)
+                ->select(
+                    't1.*',
+                    't2.reference_no',
+                    't2.audit_reference',
+                    't2.audit_title',
+                    // 't2.audit_type'
+                    // 't2.creation_date as raised_date',
+                    // 't3.title as issue_status',
+                    // 't4.title as issue_type'
+                )
+                ->get();
+            $results = convertStdClassObjToArray($qry);
+            $res = decryptArray($results);
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                "success" => false,
+                "message" => $throwable->getMessage()
+            );
+        }
+
+        return \response()->json($res);
+    }
+
+    public function saveIssueManagementAudits(Request $request)
+    {
+        try {
+            $active_application_id = $request->active_application_id;
+            if (is_numeric($active_application_id)) {
+                $issue_data = json_decode($request->audit_ids, true);
+                foreach ($issue_data as $issue) {
+                    $data = array(
+                        'issue_id' => $active_application_id,
+                        'audit_id' => $issue,
+                        'dola' => Carbon::now(),
+                        'altered_by' => $this->user_id,
+                    );
+                    $IssueManagementAudit = new IssueManagementAudit();
+                    $IssueManagementAudit->create($data);
+                }
+                $IssueManagementAudit = IssueManagementAudit::all();
+
+                $res = array(
+                    'success' => true,
+                    'message' => 'Saved Successfully!!',
+                    'results' => $IssueManagementAudit
                 );
             }
         } catch (\Exception $exception) {

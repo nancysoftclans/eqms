@@ -44,6 +44,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "selectissueform button[name=save_issue_btn]": {
         click: "saveIssueManagementRelatedIssues",
       },
+      "issueauditform button[name=save_audit_btn]": {
+        click: "saveIssueManagementAudits",
+      },
       issuemanagementdocgrid: {
         refresh: "refreshGrid",
       },
@@ -2830,6 +2833,51 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     };
   },
   saveIssueManagementRelatedIssues: function (btn) {
+    var me = this,
+      url = btn.action_url,
+      table = btn.table_name,
+      form = btn.up("form"),
+      win = form.up("window"),
+      storeID = btn.storeID,
+      store = Ext.getStore(storeID),
+      frm = form.getForm(),
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      active_application_id = activeTab
+        .down("hiddenfield[name=active_application_id]")
+        .getValue(),
+      application_code = activeTab
+        .down("hiddenfield[name=active_application_code]")
+        .getValue();
+    if (frm.isValid()) {
+      frm.submit({
+        url: url,
+        params: { active_application_id: active_application_id },
+        waitMsg: "Please wait...",
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (form, action) {
+          var response = Ext.decode(action.response.responseText),
+            success = response.success,
+            message = response.message;
+          if (success == true || success === true) {
+            toastr.success(message, "Success Response");
+            store.removeAll();
+            store.load();
+            win.close();
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (form, action) {
+          var resp = action.result;
+          toastr.error(resp.message, "Failure Response");
+        },
+      });
+    }
+  },
+  saveIssueManagementAudits: function (btn) {
     var me = this,
       url = btn.action_url,
       table = btn.table_name,

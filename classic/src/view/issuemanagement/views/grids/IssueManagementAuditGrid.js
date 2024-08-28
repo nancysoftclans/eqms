@@ -23,12 +23,12 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
   },
   tbar: [
     {
-      text: "Create",
+      text: "Select",
       iconCls: "x-fa fa-plus",
       action: "add",
       ui: "soft-blue",
-      childXtype: "issuestatusgroupsform",
-      winTitle: "Create Issue Status Group",
+      childXtype: "issueauditform",
+      winTitle: "Select Audit",
       winWidth: "80%",
       handler: "showAddConfigParamWinFrm",
       stores: "[]",
@@ -42,7 +42,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
         storeId: "issuemanagementauditstr",
         proxy: {
           api: {
-            read: "issuemanagement/getIssueManagementDocuments",
+            read: "issuemanagement/getIssueManagementAudits",
           },
         },
       },
@@ -65,29 +65,42 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
   columns: [
     {
       xtype: "gridcolumn",
-      dataIndex: "title",
+      dataIndex: "reference_no",
+      text: "ID",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "audit_reference",
+      text: "Reference",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "audit_title",
       text: "Title",
       flex: 1,
-      sortable: true,
+      tdCls: "wrap",
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "is_enabled",
-      text: "Active",
+      dataIndex: "audit_type",
+      text: "Type",
       flex: 1,
-      renderer: function (value, metaData) {
-        if (value) {
-          metaData.tdStyle = "color:green;";
-          return '<i class="fas fa-check"></i>';
-        }
-        metaData.tdStyle = "color:green;";
-        return '<i class="fas fa-times"></i>';
-      },
+      tdCls: "wrap",
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "dola",
-      text: "Date Modified",
+      dataIndex: "",
+      text: "Status",
+      flex: 1,
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "",
+      text: "Finding",
       flex: 1,
     },
     {
@@ -104,39 +117,11 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
           xtype: "menu",
           items: [
             {
-              text: "Edit",
-              iconCls: "x-fa fa-edit",
-              tooltip: "Edit Record",
-              action: "edit",
-              childXtype: "issuestatusgroupsform",
-              winTitle: "Edit Issue Status Group",
-              winWidth: "80%",
-              handler: "showEditConfigParamWinFrm",
-              bind: {
-                disabled: "{isReadOnly}",
-              },
-              stores: "[]",
-            },
-            {
-              text: "Disable",
-              iconCls: "x-fa fa-repeat",
-              table_name: "par_issue_status_groups",
-              storeID: "formCategoryStr",
-              hidden: true,
-              action_url: "configurations/softDeleteConfigRecord",
-              action: "soft_delete",
-              bind: {
-                disabled: "{isReadOnly}",
-              },
-              handler: "doDeleteConfigWidgetParam",
-            },
-            {
               text: "Delete",
               iconCls: "x-fa fa-trash",
               tooltip: "Delete Record",
-              table_name: "par_issue_status_groups",
-              storeID: "formCategoryStr",
-              hidden: true,
+              table_name: "tra_issue_management_audits",
+              storeID: "issuemanagementauditstr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
               bind: {
@@ -147,32 +132,13 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
                 disabled: "{hideDeleteButton}",
               },
             },
-            {
-              text: "Enable",
-              iconCls: "x-fa fa-undo",
-              tooltip: "Enable Record",
-              table_name: "par_issue_status_groups",
-              hidden: true,
-              storeID: "formCategoryStr",
-              action_url: "configurations/undoConfigSoftDeletes",
-              action: "enable",
-              disabled: true,
-              bind: {
-                disabled: "{isReadOnly}",
-              },
-              handler: "doDeleteConfigWidgetParam",
-            },
           ],
         },
       },
       onWidgetAttach: function (col, widget, rec) {
         var is_enabled = rec.get("is_enabled");
         if (is_enabled === 0 || is_enabled == 0) {
-          widget.down("menu menuitem[action=enable]").setDisabled(false);
-          widget.down("menu menuitem[action=soft_delete]").setDisabled(true);
         } else {
-          widget.down("menu menuitem[action=enable]").setDisabled(true);
-          widget.down("menu menuitem[action=soft_delete]").setDisabled(false);
         }
       },
     },
