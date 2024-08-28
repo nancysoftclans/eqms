@@ -27,8 +27,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementIssueGrid", {
       iconCls: "x-fa fa-plus",
       action: "add",
       ui: "soft-blue",
-      childXtype: "issuestatusgroupsform",
-      winTitle: "Create Issue Status Group",
+      childXtype: "selectissueform",
+      winTitle: "Select Issue",
       winWidth: "80%",
       handler: "showAddConfigParamWinFrm",
       stores: "[]",
@@ -42,7 +42,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementIssueGrid", {
         storeId: "issuemanagementissuestr",
         proxy: {
           api: {
-            read: "issuemanagement/getIssueManagementDocuments",
+            read: "issuemanagement/getIssueManagementRelatedIssues",
           },
         },
       },
@@ -65,30 +65,50 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementIssueGrid", {
   columns: [
     {
       xtype: "gridcolumn",
+      dataIndex: "reference_no",
+      text: "ID",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "raised_date",
+      text: "Date Raised",
+      flex: 1,
+      tdCls: "wrap",
+      renderer: Ext.util.Format.dateRenderer("d M Y"),
+    },
+    {
+      xtype: "gridcolumn",
       dataIndex: "title",
       text: "Title",
       flex: 1,
-      sortable: true,
+      tdCls: "wrap",
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "is_enabled",
-      text: "Active",
+      dataIndex: "issue_type",
+      text: "Type",
       flex: 1,
-      renderer: function (value, metaData) {
-        if (value) {
-          metaData.tdStyle = "color:green;";
-          return '<i class="fas fa-check"></i>';
-        }
-        metaData.tdStyle = "color:green;";
-        return '<i class="fas fa-times"></i>';
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "issue_status",
+      text: "Status",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      text: "Owner",
+      flex: 1,
+      tdCls: "wrap",
+      renderer: function (value, metaData, record) {
+        var firstName = record.get("first_name");
+        var lastName = record.get("last_name");
+        return firstName + " " + lastName;
       },
-    },
-    {
-      xtype: "gridcolumn",
-      dataIndex: "dola",
-      text: "Date Modified",
-      flex: 1,
     },
     {
       text: "Options",
@@ -107,9 +127,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementIssueGrid", {
               text: "Delete",
               iconCls: "x-fa fa-trash",
               tooltip: "Delete Record",
-              table_name: "par_issue_status_groups",
-              storeID: "formCategoryStr",
-              hidden: true,
+              table_name: "tra_issue_management_related_issues",
+              storeID: "issuemanagementissuestr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
               bind: {
@@ -120,32 +139,15 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementIssueGrid", {
                 disabled: "{hideDeleteButton}",
               },
             },
-            {
-              text: "Enable",
-              iconCls: "x-fa fa-undo",
-              tooltip: "Enable Record",
-              table_name: "par_issue_status_groups",
-              hidden: true,
-              storeID: "formCategoryStr",
-              action_url: "configurations/undoConfigSoftDeletes",
-              action: "enable",
-              disabled: true,
-              bind: {
-                disabled: "{isReadOnly}",
-              },
-              handler: "doDeleteConfigWidgetParam",
-            },
           ],
         },
       },
       onWidgetAttach: function (col, widget, rec) {
         var is_enabled = rec.get("is_enabled");
         if (is_enabled === 0 || is_enabled == 0) {
-          widget.down("menu menuitem[action=enable]").setDisabled(false);
-          widget.down("menu menuitem[action=soft_delete]").setDisabled(true);
+          // widget.down("menu menuitem[action=enable]").setDisabled(false);
         } else {
-          widget.down("menu menuitem[action=enable]").setDisabled(true);
-          widget.down("menu menuitem[action=soft_delete]").setDisabled(false);
+          // widget.down("menu menuitem[action=enable]").setDisabled(true);
         }
       },
     },

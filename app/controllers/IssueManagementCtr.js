@@ -41,6 +41,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issueselectdocumentfrm button[name=save_issuedocument_btn]": {
         click: "saveIssueManagementDocuments",
       },
+      "selectissueform button[name=save_issue_btn]": {
+        click: "saveIssueManagementRelatedIssues",
+      },
       issuemanagementdocgrid: {
         refresh: "refreshGrid",
       },
@@ -180,9 +183,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .down("hiddenfield[name=application_status_id]")
         .getValue(),
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down(
-        "issuemanagementdocgrid"
-      ),
+      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue(),
@@ -364,9 +365,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down(
-        "issuemanagementdocgrid"
-      ),
+      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
@@ -450,9 +449,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down(
-        "issuemanagementdocgrid"
-      ),
+      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
@@ -535,15 +532,11 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down(
-        "issuemanagementdocgrid"
-      ),
+      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    issuemanagementdocgrid
-      .down("button[name=add_upload]")
-      .setVisible(false);
+    issuemanagementdocgrid.down("button[name=add_upload]").setVisible(false);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -2791,7 +2784,10 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     if (frm.isValid()) {
       frm.submit({
         url: url,
-        params: { model: table, active_application_id: active_application_id },
+        params: {
+          active_application_id: active_application_id,
+          type: "Document",
+        },
         waitMsg: "Please wait...",
         headers: {
           Authorization: "Bearer " + access_token,
@@ -2832,5 +2828,50 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issue_id: issue_id,
       application_code: application_code,
     };
+  },
+  saveIssueManagementRelatedIssues: function (btn) {
+    var me = this,
+      url = btn.action_url,
+      table = btn.table_name,
+      form = btn.up("form"),
+      win = form.up("window"),
+      storeID = btn.storeID,
+      store = Ext.getStore(storeID),
+      frm = form.getForm(),
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      active_application_id = activeTab
+        .down("hiddenfield[name=active_application_id]")
+        .getValue(),
+      application_code = activeTab
+        .down("hiddenfield[name=active_application_code]")
+        .getValue();
+    if (frm.isValid()) {
+      frm.submit({
+        url: url,
+        params: { active_application_id: active_application_id },
+        waitMsg: "Please wait...",
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (form, action) {
+          var response = Ext.decode(action.response.responseText),
+            success = response.success,
+            message = response.message;
+          if (success == true || success === true) {
+            toastr.success(message, "Success Response");
+            store.removeAll();
+            store.load();
+            win.close();
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (form, action) {
+          var resp = action.result;
+          toastr.error(resp.message, "Failure Response");
+        },
+      });
+    }
   },
 });

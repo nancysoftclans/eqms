@@ -83,7 +83,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     var me = this,
       btn = item.up("button"),
       record = btn.getWidgetRecord(),
-      id = record.get("submission_id"),
+      id = record.get("id"),
       storeID = item.storeID,
       table_name = item.table_name,
       url = item.action_url;
