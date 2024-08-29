@@ -248,40 +248,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_fully_addressed: results.complaint_fully_addressed,
                 });
-            }
-
-            if (issuemanagementfrm.down("combo[name=issue_status_id]")) {
-              const issue_type_id = issuemanagementfrm
-                .down("combo[name=issue_type_id]")
-                .getValue();
-              Ext.Ajax.request({
-                method: "GET",
-                url: "issuemanagement/issue_types/" + issue_type_id,
-                headers: {
-                  Authorization: "Bearer " + access_token,
-                },
-                success: function (response) {
-                  var resp = Ext.JSON.decode(response.responseText),
-                    results = resp,
-                    issue_status_ids = JSON.parse(results.issue_status_ids);
-                  if (issue_status_ids && Array.isArray(issue_status_ids)) {
-                    // Get the issue_status_id combo
-                    var issueStatusCombo = issuemanagementfrm.down(
-                      "combo[name=issue_status_id]"
-                    );
-                    var store = issueStatusCombo.getStore();
-
-                    // Filter the store by issue_status_ids
-                    store.clearFilter();
-                    store.filterBy(function (record) {
-                      return issue_status_ids.includes(record.get("id"));
-                    });
-                  }
-                },
-                failure: function (response) {},
-                error: function (jqXHR, textStatus, errorThrown) {},
-              });
-            }
+            }            
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -2717,6 +2684,35 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 targetDate
               );
             }
+          }
+          if (me.down("combo[name=issue_status_id]")) {
+            const issue_type_id = me
+              .down("combo[name=issue_type_id]")
+              .getValue();
+            Ext.Ajax.request({
+              method: "GET",
+              url: "issuemanagement/issue_types/" + issue_type_id,
+              headers: {
+                Authorization: "Bearer " + access_token,
+              },
+              success: function (response) {
+                var resp = Ext.JSON.decode(response.responseText),
+                  results = resp,
+                  issue_status_ids = JSON.parse(results.issue_status_ids);
+                if (issue_status_ids && Array.isArray(issue_status_ids)) {
+                  // Get the issue_status_id combo
+                  var issueStatusCombo = me.down("combo[name=issue_status_id]");
+                  var store = issueStatusCombo.getStore();
+                  // Filter the store by issue_status_ids
+                  store.clearFilter();
+                  store.filterBy(function (record) {
+                    return issue_status_ids.includes(record.get("id"));
+                  });
+                }
+              },
+              failure: function (response) {},
+              error: function (jqXHR, textStatus, errorThrown) {},
+            });
           }
           //CHRIS
         } else {

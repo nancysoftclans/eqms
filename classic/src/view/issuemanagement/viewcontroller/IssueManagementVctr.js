@@ -2,7 +2,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
   extend: "Ext.app.ViewController",
   alias: "controller.issuemanagementvctr",
 
-  init: function () {},
+  init: function () { },
 
   setWorkflowCombosStore: function (obj, options) {
     this.fireEvent("setWorkflowCombosStore", obj, options);
@@ -47,13 +47,10 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       storeID = btn.storeID,
       store = Ext.getStore(storeID),
       frm = form.getForm();
-    var active_application_id = win
-      .down("hiddenfield[name=active_application_id]")
-      .getValue();
     if (frm.isValid()) {
       frm.submit({
         url: url,
-        params: { model: table, active_application_id: active_application_id },
+        params: { model: table },
         waitMsg: "Please wait...",
         headers: {
           Authorization: "Bearer " + access_token,
@@ -139,6 +136,11 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       me.fireEvent("refreshStores", storeArray);
     }
     form.loadRecord(record);
+    if (form.down("tagfield[name=issue_status_ids]")) {
+      issue_status_ids = JSON.parse(record.data.issue_status_ids);
+      issue_status_ids = issue_status_ids.join();
+      form.down("tagfield[name=issue_status_ids]").setValue(issue_status_ids);
+    }
 
     form.on("afterrender", function () {
       try {
@@ -330,8 +332,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       mainTabPnl = btn.up("#contentPanel"),
       containerPnl = mainTabPnl.getActiveTab();
     var process_id = containerPnl
-        .down("hiddenfield[name=process_id]")
-        .getValue(),
+      .down("hiddenfield[name=process_id]")
+      .getValue(),
       module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
       sub_module_id = containerPnl
         .down("hiddenfield[name=sub_module_id]")
@@ -405,7 +407,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       );
     }
   },
-  
+
 
   // saveIssueManagementInitialQualityReviewDetails: function (btn) {
   //   var wizard = btn.wizardpnl,

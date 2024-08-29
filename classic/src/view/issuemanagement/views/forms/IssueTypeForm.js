@@ -156,7 +156,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueTypeForm", {
           uncheckedValue: 0,
           fieldLabel: "Active",
           margin: "0 20 20 0",
-          name: "is_active",
+          name: "is_enabled",
           columnWidth: 0.33,
           allowBlank: true,
         },
