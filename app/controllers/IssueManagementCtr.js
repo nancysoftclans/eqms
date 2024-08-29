@@ -2637,11 +2637,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   me.loadRecord(model);
                   // Parse the string using JSON.parse() (assuming valid JSON format)
                   var section_ids_array = JSON.parse(results.section_ids);
-                  section_ids_array = section_ids_array.join();
-                  if (me.down("tagfield[name=section_ids]")) {
-                    me.down("tagfield[name=section_ids]").setValue(
-                      section_ids_array
-                    );
+                  if (section_ids_array) {
+                    section_ids_array = section_ids_array.join();
+                    if (me.down("tagfield[name=section_ids]")) {
+                      me.down("tagfield[name=section_ids]").setValue(
+                        section_ids_array
+                      );
+                    }
                   }
                   if (
                     me.down("radiogroup[name=complaint_direct_or_indirect]")
@@ -2696,6 +2698,16 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               targetDate.setDate(targetDate.getDate() + target_period);
               me.down("datefield[name=target_resolution_date]").setValue(
                 targetDate
+              );
+            }
+            if (me.down("datefield[name=follow_up_on]")) {
+              var followupDate = new Date();
+              var follow_up_period = me
+                .down("numberfield[name=follow_up_period]")
+                .getValue();
+                followupDate.setDate(followupDate.getDate() + follow_up_period);
+              me.down("datefield[name=follow_up_on]").setValue(
+                followupDate
               );
             }
           }

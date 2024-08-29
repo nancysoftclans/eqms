@@ -150,6 +150,10 @@ class IssueManagementController extends Controller
         $targetDateString = $request->target_resolution_date;
         $creationDateString = $request->creation_date;
 
+        if($request->follow_up_on){
+            $followupDateString = $request->follow_up_on;
+            $followupDateString = Carbon::parse($followupDateString);
+        }
         $targetDateString = Carbon::parse($targetDateString);
         $creationDateString = Carbon::parse($creationDateString);
 
@@ -164,6 +168,7 @@ class IssueManagementController extends Controller
                     'description' => $request->description,
                     'creation_date' => $creationDateString->format('Y-m-d'),
                     'target_resolution_date' => $targetDateString->format('Y-m-d'),
+                    'follow_up_on' => $request->follow_up_on,
                     'section_ids' => $request->section_ids,
                     'issue_status_id' => $request->issue_status_id,
                     'complainant_name' => $request->complainant_name,
@@ -267,23 +272,23 @@ class IssueManagementController extends Controller
                 );
                 $res = insertRecord('tra_submissions', $submission_params);
 
-                $data = $request->all();
                 $issue_data = array(
                     'submission_id' => $res['record_id'],
-                    'issue_type_id' => $data['issue_type_id'],
-                    'title' => $data['title'],
-                    'description' => $data['description'],
+                    'issue_type_id' => $request->issue_type_id,
+                    'title' => $request->title,
+                    'description' => $request->description,
                     'creation_date' => $creationDateString->format('Y-m-d'),
                     'target_resolution_date' => $targetDateString->format('Y-m-d'),
-                    'section_ids' => $data['section_ids'],
-                    'issue_status_id' => $data['issue_status_id'],
-                    'complainant_address' => $data['complainant_address'],
-                    'complainant_name' => $data['complainant_name'],
-                    'complainant_organisation' => $data['complainant_organisation'],
-                    'complainant_telephone' => $data['complainant_telephone'],
-                    'complainant_email' => $data['complainant_email'],
-                    'complaint_mode' => $data['complaint_mode'],
-                    'complaint_type' => $data['complaint_type'],
+                    'follow_up_on' => $request->follow_up_on,
+                    'section_ids' => $request->has('section_ids'),
+                    'issue_status_id' => $request->issue_status_id,
+                    'complainant_address' => $request->complainant_address,
+                    'complainant_name' => $request->complainant_name,
+                    'complainant_organisation' => $request->complainant_organisation,
+                    'complainant_telephone' => $request->complainant_telephone,
+                    'complainant_email' => $request->complainant_email,
+                    'complaint_mode' => $request->complaint_mode,
+                    'complaint_type' => $request->complaint_type,
                     'complaint_direct_or_indirect' => $request->complaint_direct_or_indirect,
                     'office_assigned_to' => $request->office_assigned_to,
                     'complaint_scheduling_delay' => $request->has('complaint_scheduling_delay'),
@@ -315,7 +320,7 @@ class IssueManagementController extends Controller
                     'created_by' => $user_id,
                     'altered_by' => $user_id,
                     'application_code' => $application_code,
-                    'workflow_stage_id' => $data['workflow_stage_id'],
+                    'workflow_stage_id' => $request->workflow_stage_id,
                     'application_status_id' => $application_status->status_id,
                     'reference_no' => $ref_number,
                     'tracking_no' => $ref_number,
