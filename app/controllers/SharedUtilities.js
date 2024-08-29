@@ -1446,6 +1446,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       storeID = btn.storeID,
       mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
       uploads_store = Ext.getStore(storeID),
       resumable = btn.resumable,
@@ -1454,7 +1455,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       //add parameters
       resumable.opts.query.id = formValues.id;
       resumable.opts.query.application_id = formValues.application_id;
-      resumable.opts.query.application_code = formValues.application_code;
+      resumable.opts.query.application_code = application_code;
       resumable.opts.query.process_id = formValues.process_id;
       resumable.opts.query.section_id = formValues.section_id;
       resumable.opts.query.module_id = formValues.module_id;
@@ -1498,8 +1499,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       rec = form.getValues(),
       id = rec.application_id,
       application_id = rec.application_id,
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
-      uploads_store = Ext.getStore("applicationDocumentsUploadsStr"),
+      uploads_store = Ext.getStore(btn.storeID),
       progressBar = Ext.widget("progress");
     // let browseFile = $('#browseFile');
     let resumable = new Resumable({
@@ -1555,11 +1557,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     resumable.on("fileSuccess", function (file, response) {
       // trigger when file upload complete
       response = JSON.parse(response);
-      uploads_store.load();
+      // uploads_store.load();
       success = response.success;
       if (success == true) {
         toastr.success("Uploaded Successfully", "Success Response");
-        uploads_store.load();
+        // uploads_store.load();
+        if(module_id ==  28){
+          
+        }
       } else {
         toastr.error(
           response.message + " If problem persist contact system admin",

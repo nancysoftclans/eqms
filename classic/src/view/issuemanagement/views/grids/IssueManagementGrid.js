@@ -144,7 +144,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       text: "Date Raised",
       flex: 1,
       tdCls: "wrap",
-      // renderer: Ext.util.Format.dateRenderer("d M Y"),
+      renderer: Ext.util.Format.dateRenderer("d M Y"),
     },
     {
       xtype: "gridcolumn",
@@ -179,6 +179,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       text: "Target Date",
       flex: 1,
       tdCls: "wrap",
+      renderer: Ext.util.Format.dateRenderer("d M Y"),
     },
     {
       xtype: "gridcolumn",
@@ -186,6 +187,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
       text: "Date Closed",
       flex: 1,
       tdCls: "wrap",
+      renderer: Ext.util.Format.dateRenderer("d M Y"),
     },
     {
       xtype: "widgetcolumn",

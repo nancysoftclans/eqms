@@ -26,6 +26,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementIssueGrid", {
       text: "Select",
       iconCls: "x-fa fa-plus",
       action: "add",
+      name: "select_issue_btn",
       ui: "soft-blue",
       childXtype: "selectissueform",
       winTitle: "Select Issue",

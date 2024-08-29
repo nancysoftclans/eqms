@@ -38,6 +38,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issuemanagementdocgrid button[name=select_document]": {
         click: "showApplicationDocUploadWin",
       },
+      "issuemanagementdocgrid button[name=add_upload]": {
+        click: "showApplicationDocUploadWin",
+      },
       "issueselectdocumentfrm button[name=save_issuedocument_btn]": {
         click: "saveIssueManagementDocuments",
       },
@@ -59,7 +62,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     },
   },
 
-  init: function () {},
+  init: function () { },
 
   listen: {
     controller: {
@@ -248,7 +251,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_fully_addressed: results.complaint_fully_addressed,
                 });
-            }            
+            }
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -503,11 +506,22 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
       issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
+      issuemanagementissuegrid = activeTab.down("issuemanagementissuegrid"),
+      issuemanagementauditgrid = activeTab.down("issuemanagementauditgrid"),
+
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
     issuemanagementdocgrid.down("button[name=add_upload]").setVisible(false);
-
+    issuemanagementdocgrid.down("button[name=select_document]").setVisible(false);
+    issuemanagementissuegrid.down("button[name=select_issue_btn]").setVisible(false);
+    issuemanagementauditgrid.down("button[name=select_audit_btn]").setVisible(false);
+    issuemanagementfrm
+      .getForm()
+      .getFields()
+      .each(function (field) {
+        field.setReadOnly(true);
+      });
     if (active_application_id) {
       Ext.Ajax.request({
         method: "GET",
@@ -2686,33 +2700,35 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             }
           }
           if (me.down("combo[name=issue_status_id]")) {
-            const issue_type_id = me
+            const issue_type_id = parseInt(me
               .down("combo[name=issue_type_id]")
-              .getValue();
-            Ext.Ajax.request({
-              method: "GET",
-              url: "issuemanagement/issue_types/" + issue_type_id,
-              headers: {
-                Authorization: "Bearer " + access_token,
-              },
-              success: function (response) {
-                var resp = Ext.JSON.decode(response.responseText),
-                  results = resp,
-                  issue_status_ids = JSON.parse(results.issue_status_ids);
-                if (issue_status_ids && Array.isArray(issue_status_ids)) {
-                  // Get the issue_status_id combo
-                  var issueStatusCombo = me.down("combo[name=issue_status_id]");
-                  var store = issueStatusCombo.getStore();
-                  // Filter the store by issue_status_ids
-                  store.clearFilter();
-                  store.filterBy(function (record) {
-                    return issue_status_ids.includes(record.get("id"));
-                  });
-                }
-              },
-              failure: function (response) {},
-              error: function (jqXHR, textStatus, errorThrown) {},
-            });
+              .getValue());
+            if (!isNaN(issue_type_id)) {
+              Ext.Ajax.request({
+                method: "GET",
+                url: "issuemanagement/issue_types/" + issue_type_id,
+                headers: {
+                  Authorization: "Bearer " + access_token,
+                },
+                success: function (response) {
+                  var resp = Ext.JSON.decode(response.responseText),
+                    results = resp,
+                    issue_status_ids = JSON.parse(results.issue_status_ids);
+                  if (issue_status_ids && Array.isArray(issue_status_ids)) {
+                    // Get the issue_status_id combo
+                    var issueStatusCombo = me.down("combo[name=issue_status_id]");
+                    var store = issueStatusCombo.getStore();
+                    // Filter the store by issue_status_ids
+                    store.clearFilter();
+                    store.filterBy(function (record) {
+                      return issue_status_ids.includes(record.get("id"));
+                    });
+                  }
+                },
+                failure: function (response) { },
+                error: function (jqXHR, textStatus, errorThrown) { },
+              });
+            }
           }
           //CHRIS
         } else {
@@ -2750,6 +2766,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .down("hiddenfield[name=active_application_code]")
         .getValue();
     if (application_code != "") {
+      form.setHeight(650);
       funcShowCustomizableWindow(
         winTitle,
         winWidth,

@@ -32,6 +32,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
       winWidth: "80%",
       stores: '["issuemanagementdocumentstr"]',
       storeID: "issuemanagementdocumentstr",
+      // handler: "showAddConfigParamWinFrm",
     },
     {
       xtype: "button",
@@ -42,7 +43,6 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
       winTitle: "Document Upload",
       childXtype: "applicationDocUploadsFrm",
       winWidth: "50%",
-      winHeight: "35%",
       stores: '["issuemanagementdocumentstr"]',
       storeID: "issuemanagementdocumentstr",
     },

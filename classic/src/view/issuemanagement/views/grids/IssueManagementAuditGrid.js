@@ -26,6 +26,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
       text: "Select",
       iconCls: "x-fa fa-plus",
       action: "add",
+      name: "select_audit_btn",
       ui: "soft-blue",
       childXtype: "issueauditform",
       winTitle: "Select Audit",

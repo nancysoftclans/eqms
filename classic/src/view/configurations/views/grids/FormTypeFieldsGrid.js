@@ -112,7 +112,7 @@ Ext.define('Admin.view.configurations.views.grids.FormTypeFieldsGrid', {
         }
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'is_readOnly',
+        dataIndex: 'is_readonly',
         text: 'Read Only',
         flex: 1,
         renderer: function (value, metaData) {
