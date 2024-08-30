@@ -78,6 +78,13 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
   columns: [
     {
       xtype: "gridcolumn",
+      dataIndex: "reference_no",
+      text: "ID",
+      sortable: true,
+      flex: 1,
+    },
+    {
+      xtype: "gridcolumn",
       dataIndex: "title",
       text: "Title",
       sortable: true,

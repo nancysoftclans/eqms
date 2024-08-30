@@ -2,11 +2,7 @@
 
 namespace Modules\IssueManagement\Http\Controllers;
 
-use response;
-use SoapFault;
-use SoapClient;
 use App\Models\WfProcess;
-use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Routing\Controller;
@@ -21,18 +17,7 @@ use Modules\IssueManagement\Entities\IssueManagementRelatedIssue;
 
 class IssueManagementController extends Controller
 {
-
     protected $user_id;
-    protected $username = "NDA";
-    protected $password = "NDAPWD";
-    protected $publicKeyPath = "D:/URA/public_key.pem";
-    protected $privateKeyPath = "D:/URA/private_key.pem";
-
-    protected $tinNumber = 1000052630;
-
-    protected $privateKeyPassword = "";
-    protected $wsdl = "https://testpayments.ura.go.ug/MDAService/PaymentServices.svc?WSDL";
-
     public function __construct(Request $req)
     {
         $is_mobile = $req->input('is_mobile');
@@ -54,86 +39,6 @@ class IssueManagementController extends Controller
         }
 
     }
-
-
-    public function test()
-    {
-        try {
-            $encryptedCredentials = $this->encryptCredentials($this->username, $this->password, $this->publicKeyPath);
-            $signedCredentials = $this->signCredentials($encryptedCredentials, $this->privateKeyPath);
-
-            $soapBody = <<<XML
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
-           <soapenv:Header/>
-           <soapenv:Body>
-              <tem:GetClientRegistration>
-                 <tem:TIN>$this->tinNumber</tem:TIN>
-                 <tem:concatenatedUsernamePasswordSignature>$signedCredentials</tem:concatenatedUsernamePasswordSignature>
-                 <tem:encryptedConcatenatedUsernamePassword>$encryptedCredentials</tem:encryptedConcatenatedUsernamePassword>
-                 <tem:userName>$this->username</tem:userName>
-              </tem:GetClientRegistration>
-           </soapenv:Body>
-        </soapenv:Envelope>
-        XML;
-
-            $url = "https://testpayments.ura.go.ug/MDAService/PaymentServices.svc";
-            $soapAction = "http://tempuri.org/IPaymentService/GetClientRegistration";
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $soapBody);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                "Content-Type: text/xml; charset=utf-8",
-                "Content-Length: " . strlen($soapBody),
-                "SOAPAction: $soapAction"
-            ));
-
-            // Execute cURL request and get response
-            $response = curl_exec($ch);
-
-            // return $response;
-            // Return the response
-            return response()->json($response);
-
-        } catch (SoapFault $fault) {
-            // Handle SOAP errors
-            return response()->json(['error' => $fault->getMessage()], 500);
-        }
-    }
-
-
-    function encryptCredentials($username, $password, $publicKeyPath)
-    {
-        // Concatenate username and password
-        $credentials = $username . $password;
-
-        // Load URA's public key
-        $publicKey = file_get_contents($publicKeyPath);
-
-        // Encrypt the credentials using the public key
-        openssl_public_encrypt($credentials, $encryptedCredentials, $publicKey, OPENSSL_PKCS1_PADDING);
-
-        // Return base64 encoded encrypted credentials
-        return base64_encode($encryptedCredentials);
-    }
-
-    function signCredentials($encryptedCredentials, $privateKeyPath)
-    {
-        // Load your private key
-        $privateKey = file_get_contents($privateKeyPath);
-        $privateKeyResource = openssl_pkey_get_private($privateKey);
-
-        // Sign the encrypted credentials
-        openssl_sign($encryptedCredentials, $signature, $privateKeyResource, OPENSSL_ALGO_SHA1);
-
-        // Free the private key from memory
-        openssl_free_key($privateKeyResource);
-
-        // Return base64 encoded signature
-        return base64_encode($signature);
-    }
-
-
     public function saveIssueDetails(Request $request)
     {
         $application_id = $request->input('application_id');
@@ -530,7 +435,7 @@ class IssueManagementController extends Controller
                 ->leftJoin('tra_issue_management_applications as t2', 't1.issue_id', 't2.id')
                 ->leftJoin('tra_documentmanager_application as t3', 't1.document_id', 't3.id')
                 ->where('issue_id', $request->issue_id)
-                ->select('t1.*', 't3.doc_title as title', 't3.doc_version as version')
+                ->select('t1.*', 't3.doc_title as title','t3.reference_no', 't3.doc_version as version')
                 ->get();
         } catch (\Exception $exception) {
             $res = array(

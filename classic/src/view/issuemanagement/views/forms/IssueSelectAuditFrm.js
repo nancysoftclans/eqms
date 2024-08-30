@@ -66,7 +66,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueSelectAuditFrm", {
           growMax: 100,
           queryMode: "local",
           valueField: "id",
-          displayField: "audit_title",
+          displayField: "reference_no",
           columnWidth: 1,
           listeners: {
             beforerender: {
