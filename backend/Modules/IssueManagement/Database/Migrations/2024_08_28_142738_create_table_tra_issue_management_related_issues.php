@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateTableParIssueTypes extends Migration
+class CreateTableTraIssueManagementRelatedIssues extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,11 @@ class CreateTableParIssueTypes extends Migration
      */
     public function up()
     {
-        Schema::create('par_issue_types', function (Blueprint $table) {
+        Schema::create('tra_issue_management_related_issues', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->text('description')->nullable();
-            $table->integer('is_enabled')->default(1);
+            $table->unsignedBigInteger('issue_id');
+            $table->integer('related_id')->nullable();
+            $table->boolean('is_enabled')->default(true);
             $table->integer('created_by')->default(0);
             $table->integer('altered_by')->default(0);
             $table->timestamp('created_on')->useCurrent();
@@ -32,6 +32,6 @@ class CreateTableParIssueTypes extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('par_issue_types');
+        Schema::dropIfExists('');
     }
 }

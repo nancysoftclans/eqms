@@ -110,6 +110,10 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
           xtype: "hiddenfield",
           name: "application_status_id",
         },
+        {
+          xtype: "hiddenfield",
+          name: "issue_type_id",
+        },
       ],
     },
   ],
@@ -128,34 +132,34 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
   ],
   initComponent: function () {
     var me = this;
-    this.tbar = {
-      reference: "progress",
-      itemId: "progress_tbar",
-      defaultButtonUI: "wizard-blue",
-      cls: "wizardprogressbar",
-      style: {
-        color: "#90c258",
-      },
-      bodystyle: {
-        color: "#90c258",
-      },
-      layout: {
-        pack: "center",
-      },
-      items: [
-        {
-          step: 0,
-          iconCls: "fa fa-exclamation-triangle",
-          enableToggle: true,
-          pressed: true,
-          text: "ISSUE MANAGEMENT",
-          max_step: 1,
-          action: "quickNav",
-          wizard: "issuereceivingwizard",
-          handler: "quickNavigation",
-        },
-      ],
-    };
+    // this.tbar = {
+    //   reference: "progress",
+    //   itemId: "progress_tbar",
+    //   defaultButtonUI: "wizard-blue",
+    //   cls: "wizardprogressbar",
+    //   style: {
+    //     color: "#90c258",
+    //   },
+    //   bodystyle: {
+    //     color: "#90c258",
+    //   },
+    //   layout: {
+    //     pack: "center",
+    //   },
+    //   items: [
+    //     {
+    //       step: 0,
+    //       iconCls: "fa fa-exclamation-triangle",
+    //       enableToggle: true,
+    //       pressed: true,
+    //       text: "ISSUE MANAGEMENT",
+    //       max_step: 1,
+    //       action: "quickNav",
+    //       wizard: "issuereceivingwizard",
+    //       handler: "quickNavigation",
+    //     },
+    //   ],
+    // };
     this.bbar = {
       reference: "navigation-toolbar",
       ui: "footer",

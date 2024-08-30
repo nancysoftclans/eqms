@@ -142,6 +142,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     auditchecklistgrid: {
       refresh: "refreshAuditChecklistItemsGrid",
     },
+    
   },
   listen: {
     controller: {
@@ -166,7 +167,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     },
   },
   setGridStore: function (me, options) {
-    // console.log(me);
     var config = options.config,
       isLoad = options.isLoad,
       toolbar = me.down("pagingtoolbar"),
@@ -191,7 +191,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   },
  
   setGridTreeStore: function (me, options) {
-    // console.log(me);
     var config = options.config,
       isLoad = options.isLoad,
       toolbar = me.down("pagingtoolbar"),
@@ -332,9 +331,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       title_suffix = ref_no;
 
     workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
-    console.log(workflow_details);
-
-    //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
       Ext.getBody().unmask();
       toastr.warning(
@@ -1451,6 +1447,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       storeID = btn.storeID,
       mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
       uploads_store = Ext.getStore(storeID),
       resumable = btn.resumable,
@@ -1459,7 +1456,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       //add parameters
       resumable.opts.query.id = formValues.id;
       resumable.opts.query.application_id = formValues.application_id;
-      resumable.opts.query.application_code = formValues.application_code;
+      resumable.opts.query.application_code = application_code;
       resumable.opts.query.process_id = formValues.process_id;
       resumable.opts.query.section_id = formValues.section_id;
       resumable.opts.query.module_id = formValues.module_id;
@@ -1503,8 +1500,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       rec = form.getValues(),
       id = rec.application_id,
       application_id = rec.application_id,
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
-      uploads_store = Ext.getStore("applicationDocumentsUploadsStr"),
+      uploads_store = Ext.getStore(btn.storeID),
       progressBar = Ext.widget("progress");
     // let browseFile = $('#browseFile');
     let resumable = new Resumable({
@@ -1542,7 +1540,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       testChunks: false,
       throttleProgressCallbacks: 1,
     });
-    // console.log(browseFile);
     resumable.assignBrowse(document.getElementById("browseButton"));
 
     resumable.on("fileAdded", function (file) {
@@ -1561,11 +1558,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     resumable.on("fileSuccess", function (file, response) {
       // trigger when file upload complete
       response = JSON.parse(response);
-      uploads_store.load();
+      // uploads_store.load();
       success = response.success;
       if (success == true) {
         toastr.success("Uploaded Successfully", "Success Response");
-        uploads_store.load();
+        // uploads_store.load();
+        if(module_id ==  28){
+          
+        }
       } else {
         toastr.error(
           response.message + " If problem persist contact system admin",
@@ -2089,8 +2089,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
 
 
     workflow_details = getAllWorkflowDetails(process_id, workflow_stage_id);
-
-    //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
       Ext.getBody().unmask();
       toastr.warning(
@@ -2211,10 +2209,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       module_id,
       sub_module_id,
     );
-
-    console.log(workflow_details);
-
-    //console.log(stage_category_id);
     if (!workflow_details || workflow_details.length < 1) {
       Ext.getBody().unmask();
       toastr.warning(
@@ -2541,7 +2535,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       testChunks: false,
       throttleProgressCallbacks: 1,
     });
-    // console.log(browseFile);
+    
     resumable.assignBrowse(document.getElementById("browseButton"));
 
     resumable.on("fileAdded", function (file) {
@@ -2970,6 +2964,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       };
     }
   },
-
+  
   
 });

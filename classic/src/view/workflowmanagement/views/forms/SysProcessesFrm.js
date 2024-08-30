@@ -209,7 +209,7 @@ Ext.define("Admin.view.workflowmanagement.views.forms.SysProcessesFrm", {
       name: "issue_type_id",
       allowBlank: true,
       valueField: "id",
-      displayField: "name",
+      displayField: "title",
       forceSelection: true,
       queryMode: "local",
       anyMatch: true,

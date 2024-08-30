@@ -112,7 +112,7 @@ Ext.define('Admin.view.configurations.views.forms.FormCategoryFrm', {
         name: 'sub_module_id',
         valueField: 'id',
         allowBlank: true,
-        hidden: true,
+        hidden: false,
         displayField: 'name',
         forceSelection: true,
         queryMode: 'local',

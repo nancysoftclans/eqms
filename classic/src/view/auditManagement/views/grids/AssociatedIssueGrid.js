@@ -39,7 +39,7 @@ Ext.define("Admin.view.auditManagement.views.grids.AssociatedIssueGrid", {
       labelWidth: 80,
       width: 320,
       valueField: "id",
-      displayField: "name",
+      displayField: "title",
       forceSelection: true,
       name: "issue_type_id",
       queryMode: "local",

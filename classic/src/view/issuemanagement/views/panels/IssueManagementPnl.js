@@ -11,51 +11,7 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
   viewModel: {
     type: "issuemanagementvm",
   },
-  items: [
-    {
-      xtype: "issuequalityreviewfrm",
-      autoScroll: true,
-      title: "Quality Office Review",
-      fieldDefaults: {
-        fieldStyle: {
-          color: "green",
-          "font-weight": "bold",
-        },
-      },
-    },
-    {
-      xtype: "issueresolutionfrm",
-      autoScroll: true,
-      title: "Resolution",
-      fieldDefaults: {
-        fieldStyle: {
-          color: "green",
-          "font-weight": "bold",
-        },
-      },
-    },
-    {
-      xtype: "issuerootcauseanalysisfrm",
-      autoScroll: true,
-      title: "Root Cause Analysis",
-      fieldDefaults: {
-        fieldStyle: {
-          color: "green",
-          "font-weight": "bold",
-        },
-      },
-    },
-    {
-      xtype: "issueinitialqualityreviewfrm",
-      autoScroll: true,
-      title: "Initial Review by Quality Office",
-      fieldDefaults: {
-        fieldStyle: {
-          color: "green",
-          "font-weight": "bold",
-        },
-      },
-    },
+  items: [    
     {
       xtype: "issuemanagementfrm",
       autoScroll: true,
@@ -68,19 +24,22 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
       },
     },
     {
-      xtype: "complainantdetailsfrm",
-      autoScroll: true,
-      title: "Complainant Details",
-      fieldDefaults: {
-        fieldStyle: {
-          color: "green",
-          "font-weight": "bold",
+      title: "Associated Items",
+      xtype: 'tabpanel',
+      items: [
+        {
+          xtype: "issuemanagementdocgrid",
+          title: "Associated Documents",
         },
-      },
+        {
+          xtype: "issuemanagementissuegrid",
+          title: "Associated Issues",
+        },
+        {
+          xtype: "issuemanagementauditgrid",
+          title: " Associated Audits",
+        }
+      ],
     },
-    {
-      xtype: "issuemanagementdocuploadsgrid",
-      title: "Documents",
-    }
   ],
 });

@@ -1,6 +1,6 @@
 Ext.define("Admin.view.issuemanagement.views.panels.IssueQualityReviewPanel", {
   extend: "Ext.panel.Panel",
-  xtype: "issuequalityofficereview",
+  xtype: "issuequalityreview",
   controller: "issuemanagementvctr",
   viewModel: "issuemanagementvm",
   layout: "fit",

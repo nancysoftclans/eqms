@@ -15,12 +15,17 @@ use Modules\IssueManagement\Http\Controllers\IssueManagementController;
 
 Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function () {
     Route::post('saveIssueDetails', [IssueManagementController::class, 'saveIssueDetails']);
-    Route::post('submitIssueManagementApplication', [IssueManagementController::class, 'submitIssueManagementApplication']);
+    // Route::post('submitIssueManagementApplication', [IssueManagementController::class, 'submitIssueManagementApplication']);
     Route::get('getIssueManagementDetails', [IssueManagementController::class, 'getIssueManagementDetails']);
     Route::get('getIssueManagementDetailsById/{active_application_id}', [IssueManagementController::class, 'getIssueManagementDetailsById']);
     Route::get('getIssueProcessDetails', [IssueManagementController::class, 'getIssueProcessDetails']);
-    Route::post('saveIssueInitialQualityReviewDetails', [IssueManagementController::class, 'saveIssueInitialQualityReviewDetails']);
-    Route::post('saveIssueRCADetails', [IssueManagementController::class, 'saveIssueRCADetails']);
-    Route::post('saveIssueResolutionwDetails', [IssueManagementController::class, 'saveIssueResolutionwDetails']);
-    Route::post('saveIssueQualityReviewDetails', [IssueManagementController::class, 'saveIssueQualityReviewDetails']);
+    Route::resource('issue_status_groups', 'IssueStatusGroupsController');
+    Route::resource('issue_types', 'IssueTypeController');
+    Route::get('getIssueManagementDocuments', [IssueManagementController::class, 'getIssueManagementDocuments']);
+    Route::post('saveIssueManagementDocuments', [IssueManagementController::class, 'saveIssueManagementDocuments']);
+    Route::get('getIssueManagementRelatedIssues', [IssueManagementController::class, 'getIssueManagementRelatedIssues']);
+    Route::post('saveIssueManagementRelatedIssues', [IssueManagementController::class, 'saveIssueManagementRelatedIssues']);
+    Route::get('getIssueManagementAudits', [IssueManagementController::class, 'getIssueManagementAudits']);
+    Route::post('saveIssueManagementAudits', [IssueManagementController::class, 'saveIssueManagementAudits']);
+    Route::get('test', [IssueManagementController::class, 'test']);
 });

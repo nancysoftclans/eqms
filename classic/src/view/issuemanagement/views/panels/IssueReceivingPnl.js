@@ -17,13 +17,22 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
       title: "Issue Details",
     },
     {
-      xtype: "complainantdetailsfrm",
-      autoScroll: true,
-      title: "Complainant Details",
-    },
-    {
-      xtype: "issuemanagementdocuploadsgrid",
-      title: "Documents",
+      title: "Associated Items",
+      xtype: 'tabpanel',
+      items: [
+        {
+          xtype: "issuemanagementdocgrid",
+          title: "Associated Documents",
+        },
+        {
+          xtype: "issuemanagementissuegrid",
+          title: "Associated Issues",
+        },
+        {
+          xtype: "",
+          title: " Associated Audits",
+        }
+      ],
     },
     {
       xtype: "hiddenfield",

@@ -14,6 +14,9 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
   setGridStore: function (obj, options) {
     this.fireEvent("setGridStore", obj, options);
   },
+  setGridTreeStore: function (obj, options) {
+    this.fireEvent("setGridTreeStore", obj, options);
+  },
 
   reloadParentGridOnChange: function (combo) {
     var grid = combo.up("grid"),
@@ -32,18 +35,56 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
   showIssueApplicationWorkflow: function (btn) {
     var application_type = btn.app_type,
       wrapper_xtype = btn.wrapper_xtype;
-    this.fireEvent('showApplicationWorkflow', application_type, wrapper_xtype);
+    this.fireEvent("showApplicationWorkflow", application_type, wrapper_xtype);
+  },
+
+  doCreateConfigParamWin: function (btn) {
+    var me = this,
+      url = btn.action_url,
+      table = btn.table_name,
+      form = btn.up("form"),
+      win = form.up("window"),
+      storeID = btn.storeID,
+      store = Ext.getStore(storeID),
+      frm = form.getForm();
+    if (frm.isValid()) {
+      frm.submit({
+        url: url,
+        params: { model: table },
+        waitMsg: "Please wait...",
+        headers: {
+          Authorization: "Bearer " + access_token,
+        },
+        success: function (form, action) {
+          var response = Ext.decode(action.response.responseText),
+            success = response.success,
+            message = response.message;
+          if (success == true || success === true) {
+            toastr.success(message, "Success Response");
+            store.removeAll();
+            store.load();
+            win.close();
+          } else {
+            toastr.error(message, "Failure Response");
+          }
+        },
+        failure: function (form, action) {
+          var resp = action.result;
+          toastr.error(resp.message, "Failure Response");
+        },
+      });
+    }
   },
 
   doDeleteConfigWidgetParam: function (item) {
     var me = this,
-      btn = item.up('button'),
+      btn = item.up("button"),
       record = btn.getWidgetRecord(),
-      id = record.get('submission_id'),
+      id = record.get("id"),
       storeID = item.storeID,
       table_name = item.table_name,
       url = item.action_url;
-    this.fireEvent('deleteRecord', id, table_name, storeID, url);
+    this.fireEvent("deleteRecord", id, table_name, storeID, url);
   },
 
   showIssueTypeConfigParam: function (item) {
@@ -59,6 +100,78 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       me.fireEvent("refreshStores", storeArray);
     }
     funcShowCustomizableWindow(winTitle, winWidth, form, "customizablewindow");
+  },
+
+  showAddConfigParamWinFrm: function (btn) {
+    var me = this,
+      childXtype = btn.childXtype,
+      winTitle = btn.winTitle,
+      winWidth = btn.winWidth,
+      child = Ext.widget(childXtype);
+
+    if (btn.has_params) {
+      var param_value = btn
+        .up("grid")
+        .down("hiddenfield[name=" + btn.param_name + "]")
+        .getValue();
+      child
+        .down("hiddenfield[name=" + btn.param_name + "]")
+        .setValue(param_value);
+    }
+    child.setHeight(600);
+    funcShowCustomizableWindow(winTitle, winWidth, child, "customizablewindow");
+  },
+
+  showEditConfigParamWinFrm: function (item) {
+    var me = this,
+      btn = item.up("button"),
+      record = btn.getWidgetRecord(),
+      childXtype = item.childXtype,
+      winTitle = item.winTitle,
+      winWidth = item.winWidth,
+      form = Ext.widget(childXtype),
+      storeArray = eval(item.stores),
+      arrayLength = storeArray.length;
+    if (arrayLength > 0) {
+      me.fireEvent("refreshStores", storeArray);
+    }
+    form.loadRecord(record);
+    if (form.down("tagfield[name=issue_status_ids]")) {
+      issue_status_ids = JSON.parse(record.data.issue_status_ids);
+      issue_status_ids = issue_status_ids.join();
+      form.down("tagfield[name=issue_status_ids]").setValue(issue_status_ids);
+    }
+
+    form.on("afterrender", function () {
+      try {
+        const property_ids = record.get("property_ids");
+        if (property_ids) {
+          const property_ids_array = JSON.parse(property_ids);
+          form.down("tagfield[name=property_ids]").setValue(property_ids_array);
+        }
+      } catch (e) {
+        console.error("Error parsing property_ids:", e);
+      }
+    });
+    form.setHeight(650);
+    funcShowCustomizableWindow(winTitle, winWidth, form, "customizablewindow");
+  },
+  onAddClick: function () {
+    var view = this.getView(),
+      rec =
+        new Admin.view.issuemanagement.viewmodel.IssueStatusGroupsLifecycleVm({
+          common: "",
+          light: "Mostly Shady",
+          price: 0,
+          availDate: Ext.Date.clearTime(new Date()),
+          indoor: false,
+        });
+
+    view.store.insert(0, rec);
+    view.findPlugin("cellediting").startEdit(rec, 0);
+  },
+  onRemoveClick: function (view, recIndex, cellIndex, item, e, record) {
+    record.drop();
   },
 
   showNewIssueApplication: function (btn) {
@@ -237,100 +350,12 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       workflow_stage_id = containerPnl
         .down("hiddenfield[name=workflow_stage_id]")
         .getValue(),
-      issuemanagementfrm = containerPnl.down("issuemanagementfrm"),
-      complainantdetailsfrm = containerPnl.down("complainantdetailsfrm");
+      issuemanagementfrm = containerPnl.down("issuemanagementfrm");
 
-    // Validate both forms
-    if (issuemanagementfrm.isValid() && complainantdetailsfrm.isValid()) {
-      // Gather data from each form
+    // Validate form
+    if (issuemanagementfrm.isValid()) {
+      // Gather data
       var issueManagementData = issuemanagementfrm.getValues();
-      var complainantDetailsData = complainantdetailsfrm.getValues();
-
-      // Combine the data
-      var combinedData = {
-        process_id: process_id,
-        module_id: module_id,
-        sub_module_id: sub_module_id,
-        application_code: application_code,
-        active_application_id: active_application_id,
-        application_status_id: application_status_id,
-        workflow_stage_id: workflow_stage_id,
-      };
-
-      for (var key in issueManagementData) {
-        combinedData[key] = issueManagementData[key];
-      }
-
-      for (var key in complainantDetailsData) {
-        combinedData[key] = complainantDetailsData[key];
-      }
-
-      // Submit the data to the endpoint
-      Ext.Ajax.request({
-        url: action_url,
-        waitMsg: "Please wait...",
-        method: "POST",
-        params: combinedData,
-        success: function (response) {
-          var resp = Ext.decode(response.responseText),
-            results = resp.results;
-          if (resp.success) {
-            containerPnl
-              .down("displayfield[name=tracking_no]")
-              .setValue(results.reference_no);
-            containerPnl
-              .down("hiddenfield[name=active_application_id]")
-              .setValue(results.active_application_id);
-            containerPnl
-              .down("hiddenfield[name=active_application_code]")
-              .setValue(results.application_code);
-            toastr.success(resp.message, "Success Response");
-          } else {
-            toastr.error(resp.message, "Failure Response");
-          }
-        },
-        failure: function (response) {
-          toastr.error(response.message, "Failure Response");
-        },
-      });
-    } else {
-      toastr.warning(
-        "Please fill all the required fields!!",
-        "Warning Response"
-      );
-    }
-  },
-
-  saveIssueManagementInitialQualityReviewDetails: function (btn) {
-    var wizard = btn.wizardpnl,
-      wizardPnl = btn.up(wizard),
-      action_url = btn.action_url,
-      form_panel = btn.form_panel,
-      mainTabPnl = btn.up("#contentPanel"),
-      containerPnl = mainTabPnl.getActiveTab();
-    var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
-      module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
-      sub_module_id = containerPnl
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue(),
-      active_application_id = containerPnl
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = containerPnl
-        .down("hiddenfield[name=active_application_code]")
-        .getValue(),
-      application_status_id = containerPnl
-        .down("hiddenfield[name=application_status_id]")
-        .getValue(),
-      workflow_stage_id = containerPnl
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue(),
-      issueinitialqualityreviewfrm = containerPnl.down("issueinitialqualityreviewfrm");
-
-    if (issueinitialqualityreviewfrm.isValid()) {
-      var issueManagementData = issueinitialqualityreviewfrm.getValues();
 
       // Combine the data
       var combinedData = {
@@ -382,245 +407,4 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       );
     }
   },
-
-  saveIssueRCAeviewDetails: function (btn) {
-    var wizard = btn.wizardpnl,
-      action_url = btn.action_url,
-      form_panel = btn.form_panel,
-      mainTabPnl = btn.up("#contentPanel"),
-      containerPnl = mainTabPnl.getActiveTab();
-    var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
-      module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
-      sub_module_id = containerPnl
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue(),
-      active_application_id = containerPnl
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = containerPnl
-        .down("hiddenfield[name=active_application_code]")
-        .getValue(),
-      application_status_id = containerPnl
-        .down("hiddenfield[name=application_status_id]")
-        .getValue(),
-      workflow_stage_id = containerPnl
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue()
-    issuerootcauseanalysisfrm = containerPnl.down('issuerootcauseanalysisfrm');
-
-    if (issuerootcauseanalysisfrm.isValid()) {
-      var issueManagementData = issuerootcauseanalysisfrm.getValues();
-
-      // Combine the data
-      var combinedData = {
-        process_id: process_id,
-        module_id: module_id,
-        sub_module_id: sub_module_id,
-        application_code: application_code,
-        active_application_id: active_application_id,
-        application_status_id: application_status_id,
-        workflow_stage_id: workflow_stage_id,
-      };
-
-      for (var key in issueManagementData) {
-        combinedData[key] = issueManagementData[key];
-      }
-
-      // Submit the data to the endpoint
-      Ext.Ajax.request({
-        url: action_url,
-        waitMsg: "Please wait...",
-        method: "POST",
-        params: combinedData,
-        success: function (response) {
-          var resp = Ext.decode(response.responseText),
-            results = resp.results;
-          if (resp.success) {
-            containerPnl
-              .down("displayfield[name=tracking_no]")
-              .setValue(results.reference_no);
-            containerPnl
-              .down("hiddenfield[name=active_application_id]")
-              .setValue(results.active_application_id);
-            containerPnl
-              .down("hiddenfield[name=active_application_code]")
-              .setValue(results.application_code);
-            toastr.success(resp.message, "Success Response");
-          } else {
-            toastr.error(resp.message, "Failure Response");
-          }
-        },
-        failure: function (response) {
-          toastr.error(response.message, "Failure Response");
-        },
-      });
-    } else {
-      toastr.error(
-        "Please fill all the required fields!!",
-        "Warning Response"
-      );
-    }
-  },
-  saveIssueResolutionwDetails: function (btn) {
-    var wizard = btn.wizardpnl,
-      action_url = btn.action_url,
-      form_panel = btn.form_panel,
-      mainTabPnl = btn.up("#contentPanel"),
-      containerPnl = mainTabPnl.getActiveTab();
-    var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
-      module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
-      sub_module_id = containerPnl
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue(),
-      active_application_id = containerPnl
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = containerPnl
-        .down("hiddenfield[name=active_application_code]")
-        .getValue(),
-      application_status_id = containerPnl
-        .down("hiddenfield[name=application_status_id]")
-        .getValue(),
-      workflow_stage_id = containerPnl
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue()
-    issueresolutionfrm = containerPnl.down('issueresolutionfrm');
-
-    if (issueresolutionfrm.isValid()) {
-      var issueManagementData = issueresolutionfrm.getValues();
-
-      // Combine the data
-      var combinedData = {
-        process_id: process_id,
-        module_id: module_id,
-        sub_module_id: sub_module_id,
-        application_code: application_code,
-        active_application_id: active_application_id,
-        application_status_id: application_status_id,
-        workflow_stage_id: workflow_stage_id,
-      };
-
-      for (var key in issueManagementData) {
-        combinedData[key] = issueManagementData[key];
-      }
-
-      // Submit the data to the endpoint
-      Ext.Ajax.request({
-        url: action_url,
-        waitMsg: "Please wait...",
-        method: "POST",
-        params: combinedData,
-        success: function (response) {
-          var resp = Ext.decode(response.responseText),
-            results = resp.results;
-          if (resp.success) {
-            containerPnl
-              .down("displayfield[name=tracking_no]")
-              .setValue(results.reference_no);
-            containerPnl
-              .down("hiddenfield[name=active_application_id]")
-              .setValue(results.active_application_id);
-            containerPnl
-              .down("hiddenfield[name=active_application_code]")
-              .setValue(results.application_code);
-            toastr.success(resp.message, "Success Response");
-          } else {
-            toastr.error(resp.message, "Failure Response");
-          }
-        },
-        failure: function (response) {
-          toastr.error(response.message, "Failure Response");
-        },
-      });
-    } else {
-      toastr.error(
-        "Please fill all the required fields!!",
-        "Warning Response"
-      );
-    }
-  },
-  saveIssueQualityReviewDetails: function (btn) {
-    var wizard = btn.wizardpnl,
-      action_url = btn.action_url,
-      form_panel = btn.form_panel,
-      mainTabPnl = btn.up("#contentPanel"),
-      containerPnl = mainTabPnl.getActiveTab();
-    var process_id = containerPnl
-      .down("hiddenfield[name=process_id]")
-      .getValue(),
-      module_id = containerPnl.down("hiddenfield[name=module_id]").getValue(),
-      sub_module_id = containerPnl
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue(),
-      active_application_id = containerPnl
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = containerPnl
-        .down("hiddenfield[name=active_application_code]")
-        .getValue(),
-      application_status_id = containerPnl
-        .down("hiddenfield[name=application_status_id]")
-        .getValue(),
-      workflow_stage_id = containerPnl
-        .down("hiddenfield[name=workflow_stage_id]")
-        .getValue()
-    issuequalityreviewfrm = containerPnl.down('issuequalityreviewfrm');
-
-    if (issuequalityreviewfrm.isValid()) {
-      var issueManagementData = issuequalityreviewfrm.getValues();
-
-      // Combine the data
-      var combinedData = {
-        process_id: process_id,
-        module_id: module_id,
-        sub_module_id: sub_module_id,
-        application_code: application_code,
-        active_application_id: active_application_id,
-        application_status_id: application_status_id,
-        workflow_stage_id: workflow_stage_id,
-      };
-
-      for (var key in issueManagementData) {
-        combinedData[key] = issueManagementData[key];
-      }
-
-      // Submit the data to the endpoint
-      Ext.Ajax.request({
-        url: action_url,
-        waitMsg: "Please wait...",
-        method: "POST",
-        params: combinedData,
-        success: function (response) {
-          var resp = Ext.decode(response.responseText),
-            results = resp.results;
-          if (resp.success) {
-            containerPnl
-              .down("displayfield[name=tracking_no]")
-              .setValue(results.reference_no);
-            containerPnl
-              .down("hiddenfield[name=active_application_id]")
-              .setValue(results.active_application_id);
-            containerPnl
-              .down("hiddenfield[name=active_application_code]")
-              .setValue(results.application_code);
-            toastr.success(resp.message, "Success Response");
-          } else {
-            toastr.error(resp.message, "Failure Response");
-          }
-        },
-        failure: function (response) {
-          toastr.error(response.message, "Failure Response");
-        },
-      });
-    } else {
-      toastr.error(
-        "Please fill all the required fields!!",
-        "Warning Response"
-      );
-    }
-  }
 });

@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateTableTraIssueManagementAddQualityreviewColumns extends Migration
+class UpdateTableIssueManagementAddIsEnabled extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class UpdateTableTraIssueManagementAddQualityreviewColumns extends Migration
     public function up()
     {
         Schema::table('tra_issue_management_applications', function (Blueprint $table) {
-            $table->integer('complaint_fully_addressed')->nullable();
+            $table->boolean('is_enabled')->default(true);
         });
     }
 

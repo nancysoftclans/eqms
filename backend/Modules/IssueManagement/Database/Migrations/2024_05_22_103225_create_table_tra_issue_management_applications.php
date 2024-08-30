@@ -18,6 +18,7 @@ class CreateTableTraIssueManagementApplications extends Migration
             $table->unsignedBigInteger('issue_type_id');
             $table->string('title');
             $table->text('description');
+            $table->date('creation_date')->nullable();
             $table->date('target_resolution_date')->nullable();
             $table->date('follow_up_on')->nullable();
             $table->integer('section_id');

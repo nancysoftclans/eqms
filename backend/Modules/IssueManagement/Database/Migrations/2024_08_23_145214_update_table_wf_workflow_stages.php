@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateTableTraIssueManagementAddQualityreviewColumns extends Migration
+class UpdateTableWfWorkflowStages extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class UpdateTableTraIssueManagementAddQualityreviewColumns extends Migration
      */
     public function up()
     {
-        Schema::table('tra_issue_management_applications', function (Blueprint $table) {
-            $table->integer('complaint_fully_addressed')->nullable();
+        Schema::table('wf_workflow_stages', function (Blueprint $table) {
+            $table->integer('issue_status_id')->default(0);
         });
     }
 
