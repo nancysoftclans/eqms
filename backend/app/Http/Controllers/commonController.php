@@ -38,6 +38,8 @@ class commonController extends Controller
         }
     }
 
+   
+
     public function saveApplicationChecklistDetails(Request $request)
     {
         $application_code = $request->input('application_code');
@@ -45,63 +47,62 @@ class commonController extends Controller
         $screening_details = json_decode($screening_details);
         $table_name = 'tra_checklistitems_responses';
         $user_id = $this->user_id;
-        $submission_details = getLastChecklistApplicationDetails($application_code);
-        
-        try {
-            $insert_params = array();
-            foreach ($screening_details as $screening_detail) {
-        
-                
-            if ($submission_details['success'] == true) {
-                   $application_id = $submission_details['results']->id;   
-            
 
-                if (validateIsNumeric($application_id)) {
-                    $where = array(
-                        'id' => $application_id
-                    );
-            
-                    $prev_data = getPreviousRecords($table_name, $where);
-                    $prev_data = $prev_data['results'][0];
-                    
-                   updateRecord($table_name, $where,  $prev_data, $user_id);
-                   
-                } 
-            }else {
-                    $insert_params[] = array(
-                        'application_code' => $application_code,
-                        'checklist_item_id' => $screening_detail->checklist_item_id,
-                        'pass_status' => $screening_detail->pass_status,
-                        'comment' => $screening_detail->comment,
-                        'observation' => $screening_detail->observation,
-                        'risk_type' => $screening_detail->risk_type,
-                        'risk_type_remarks' => $screening_detail->risk_type_remarks,
-                        'created_on' => Carbon::now(),
-                        'created_by' => $user_id
-                    );
+        try {
+            foreach ($screening_details as $screening_detail) {
+                $id = $screening_detail->item_resp_id;
+
+                $insert_params = [
+                    'application_code' => $application_code,
+                    'checklist_item_id' => $screening_detail->checklist_item_id,
+                    'pass_status' => $screening_detail->pass_status,
+                    'comment' => $screening_detail->comment,
+                    'observation' => $screening_detail->observation,
+                    'risk_type' => $screening_detail->risk_type,
+                    'risk_type_remarks' => $screening_detail->risk_type_remarks,
+                    'created_on' => Carbon::now(),
+                    'created_by' => $user_id,
+                ];
+
+                if (validateIsNumeric($id)) {
+                    $where = ['id' => $id];
+                    if (recordExists($table_name, $where)) {
+                        $prev_data = getPreviousRecords($table_name, $where);
+
+                        if ($prev_data['success'] == false) {
+                            return $prev_data;
+                        }
+
+                        $prev_data = $prev_data['results'][0];
+                        $res = updateRecord($table_name, $where, $insert_params, $user_id);
+                    }
+                } else {
+                    // Insert the new record
+                    if (!empty($insert_params)) {
+                        DB::table($table_name)->insert($insert_params);
+                    }
                 }
             }
-            if (count($insert_params) > 0) {
-                 DB::table($table_name)
-                    ->insert($insert_params);
-            }
-            $res = array(
+
+            $res = [
                 'success' => true,
-                'message' => 'Screening details saved successfully!!'
-            );
+                'message' => 'Screening details saved successfully!',
+            ];
         } catch (\Exception $exception) {
-            $res = array(
+            $res = [
                 'success' => false,
-                'message' => $exception->getMessage()
-            );
+                'message' => $exception->getMessage(),
+            ];
         } catch (\Throwable $throwable) {
-            $res = array(
+            $res = [
                 'success' => false,
-                'message' => $throwable->getMessage()
-            );
+                'message' => $throwable->getMessage(),
+            ];
         }
-        return \response()->json($res);
+
+        return response()->json($res);
     }
+
 
     public function getApplicationChecklistQueries(Request $request)
     {

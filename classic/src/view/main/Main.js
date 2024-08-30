@@ -72,6 +72,75 @@ Ext.define('Admin.view.main.Main', {
                 //     ui: 'soft-blue',
                 //     handler: 'funcViewScheduledTcMeetingDetails',
                 // },
+
+                {
+                    xtype: 'component',
+                    html: `
+                        <div style="display: flex; align-items: center; position: relative;">
+                            <input type="checkbox" id="enableNotification" style="display:none;" ${is_notification_enabled ? 'checked' : ''}>
+                            <label for="enableNotification" style="position: relative; display: inline-block; width: 34px; height: 20px;">
+                                <span style="position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: ${is_notification_enabled ? '#2196F3' : '#ccc'}; transition: .4s; border-radius: 20px;"></span>
+                                <span style="position: absolute; height: 16px; width: 16px; left: 2px; bottom: 2px; background-color: white; transition: .4s; border-radius: 50%; ${is_notification_enabled ? 'transform: translateX(14px);' : ''}"></span>
+                            </label>
+                            <span style="margin-left: 10px;">Notifications</span>
+                            <span id="notificationTooltip" class="x-fa fa-info-circle" style="position: absolute; right: -20px; top: 50%; transform: translateY(-50%); cursor: pointer;"></span>
+                        </div>
+                    `,
+                    listeners: {
+                        afterrender: function () {
+                            var checkbox = document.getElementById('enableNotification');
+                            var slider = checkbox.nextElementSibling;
+
+                            checkbox.addEventListener('change', function () {
+                                var isEnabled = checkbox.checked;
+
+                                if (isEnabled) {
+                                    slider.firstElementChild.style.backgroundColor = '#2196F3';
+                                    slider.lastElementChild.style.transform = 'translateX(14px)';
+                                } else {
+                                    slider.firstElementChild.style.backgroundColor = '#ccc';
+                                    slider.lastElementChild.style.transform = 'none';
+                                }
+
+                                // Make AJAX call
+                                Ext.Ajax.request({
+                                    url: 'updateNotificationEnabled',
+                                    params: {
+                                        is_enabled: isEnabled,
+                                        _token:token,
+                                    },
+                                    headers: {
+                                        'Authorization': 'Bearer ' + access_token
+                                    },
+                                    success: function(response) {
+                                        var resp = Ext.JSON.decode(response.responseText);
+                                        if (resp.success == true || resp.success === true) {
+                                           toastr.success(resp.message, 'Success');
+                                        } else {
+                                            toastr.error(resp.message, 'Error');
+                                        }
+                                    },
+                                    failure: function(response) {
+                                        toastr.error('Failed to update notification setting.', 'Error');
+                                    },
+                                    error: function(jqXHR, textStatus, errorThrown) {
+                                        toastr.error('Error: ' + errorThrown, 'Error Response');
+                                    }
+                                });
+                            });
+
+                            // Create the tooltip
+                            Ext.create('Ext.tip.ToolTip', {
+                                target: 'notificationTooltip',
+                                //width: 350,
+                                html: 'Turn on "Notifications" option to receive real-time notifications when assigned new tasks. Turn it off right now if you do not want to receive notifications anymore.'
+                            });
+                        }
+                    }
+                },{
+                     xtype: 'tbspacer',
+                     width: 15
+                  },
                 {
                     iconCls: 'x-fa fa-bell',
                     xtype: 'badgebutton',

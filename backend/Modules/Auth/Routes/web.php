@@ -14,11 +14,15 @@ use Modules\Auth\Http\Controllers\AuthController;
 
 Route::post('login',[AuthController::class,'login'])->name('login');
 Route::post('recoverForgotPassword',[AuthController::class,'recoverForgotPassword']);
+Route::post('updateNotificationEnabled',[AuthController::class,'updateNotificationEnabled']);
 Route::post('saveNewPassword',[AuthController::class,'passwordResetHandler']);
+Route::get('checkUserNewTasks',[AuthController::class,'checkUserNewTasks']);
 
 // Authenticated routes
 Route::group(['prefix' => 'auth','middleware' => ['auth:api', 'web']], function() {
     Route::post('logout',[AuthController::class,'logout']);
     Route::post('createAccount',[AuthController::class,'createAccount']);
+    
+   
 
 });

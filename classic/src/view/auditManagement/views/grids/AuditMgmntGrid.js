@@ -117,7 +117,13 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
         {
         xtype: 'gridcolumn',
         dataIndex: 'tracking_no',
-        text: 'Audit No',
+        text: 'ID',
+        flex: 1,
+        },
+        {
+        xtype: 'gridcolumn',
+        dataIndex: 'audit_reference',
+        text: 'Ref.',
         flex: 1,
         },
         {
@@ -127,10 +133,61 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
             flex: 1,
         },
         {
-            xtype: 'gridcolumn',
-            dataIndex: 'status',
-            text: 'findings',
+            xtype: "gridcolumn",
+            text: "Owner",
             flex: 1,
+            tdCls: "wrap",
+            renderer: function (value, metaData, record) {
+                // Concatenate first_name and last_name
+                var firstName = record.get("first_name");
+                var lastName = record.get("last_name");
+                var groupOwner = record.get("group_owner");
+                var fullName = firstName + " " + lastName;
+                 
+                if (fullName && groupOwner) {
+                    return fullName + ', ' + groupOwner;
+                } else {
+                    return fullName || groupOwner;
+                } 
+            },
+        },
+        {
+            xtype: 'gridcolumn',
+            dataIndex: 'audit_type_name',
+            text: 'Type',
+            flex: 1,
+        },
+        {
+        xtype: 'gridcolumn',
+        dataIndex: 'application_status',
+        text: 'Status',
+        flex: 1,
+        renderer: function(value, metaData) {//#000000
+            metaData.style = 'text-align: center; font-weight: bold;'; 
+            if (value === 'In Progress') {
+                metaData.style += ' background-color: #0000FF; color: #FFFFFF;'; 
+            }else if (value === 'Completed') {
+                metaData.style += ' background-color: #00FF00; color: #FFFFFF;'; 
+            }else if (value === 'Scheduled') {
+                metaData.style += ' background-color: #FFA500; color: #FFFFFF;'; 
+            }else if (value === 'closed') {
+                metaData.style += ' background-color: #808080; color: #FFFFFF;'; 
+            }else if (value === 'Planned') {
+                metaData.style += ' background-color: #87CEEB; color: #FFFFFF;'; 
+            }
+            return value;
+            }
+        },
+
+        {
+            xtype: 'gridcolumn',
+            dataIndex: 'findings',
+            text: 'Findings',
+            flex: 0.5,
+            renderer: function(value, metaData) {
+            metaData.style = 'text-align: center;font-weight: bold;';
+            return value;
+            }
         },
         {
             xtype: 'gridcolumn',

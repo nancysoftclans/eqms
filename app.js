@@ -2070,3 +2070,41 @@ function getIssueManagementWorkflowDetails(module_id, issue_type_id,sub_module_i
     });
     return results;
 }
+
+function checkUserNewTasks(mins) {
+    var runner = new Ext.util.TaskRunner(),
+        task,
+        me = this,
+        intraystore = Ext.getStore('intraystr'),
+        task = runner.newTask({ 
+        run: function () {
+            // Check if notifications are enabled before making the Ajax request
+            if (is_notification_enabled) {
+                Ext.Ajax.request({
+                    url: 'checkUserNewTasks',
+                    scope: this,
+                    headers: {
+                        'Authorization': 'Bearer ' + access_token
+                    },
+                    success: function (response) {
+                        var resp = Ext.JSON.decode(response.responseText);
+                        if (resp.success == true || resp.success === true) {
+                            intraystore.load();
+                            toastr.warning("Kindly Check you workspace you have a new Assignment!!", "System Notification");
+                            var audio = new Audio(base_url + '/resources/notifications/message-alert-190042.mp3');
+                            audio.play(); // Play the audio notification
+                        }
+                    },
+                    failure: function (response) {
+                        // Handle failure case if needed
+                    },
+                    error: function (jqXHR, textStatus, errorThrown) {
+                        toastr.error('Error: ' + errorThrown, 'Error Response');
+                    }
+                });
+            }
+        },
+        interval: mins
+    });
+    task.start();
+}

@@ -287,6 +287,7 @@ class AuthController extends Controller
                 $user = User::where('email',$req->guid)->first();
                 $user_id=$user->id;
                 $user_exists = User::find($user_id);
+                $data['is_notification_enabled'] = '';
                 if ($user_exists->count() > 0) {
                     $username = $user_exists->email;
                     $uuid = $user_exists->uuid;
@@ -339,6 +340,84 @@ class AuthController extends Controller
             );
         }
         return response()->json($res);
+    }
+
+    public function checkUserNewTasks() {
+        $user_id = \Auth::user()->id;
+        $res = [];
+
+        try {
+            $is_notifications_enabled = getSingleRecordColValue('users',array('id'=>$user_id), 'is_notifications_enabled');
+            if(!validateIsNumeric($is_notifications_enabled)){
+                 $res = array(
+                'success' => false,
+                'message' => 'Notifications Disabled!!'
+                );
+                echo json_encode($res);
+                exit();
+
+            }
+            $currentTime = Carbon::now();
+            $oneMinuteAgo = Carbon::now()->subMinute();
+
+            $qry = DB::table('tra_submissions as t1')
+                ->select(DB::raw("count(t1.id) as number_of_applications"))
+                ->where('t1.usr_to', $user_id)
+                ->where('is_read', 0)
+                ->whereBetween('t1.created_on', [$oneMinuteAgo, $currentTime]);
+
+            $results = $qry->first();
+            $number_of_applications = $results->number_of_applications;
+
+            if ($number_of_applications > 0) {
+                $res = [
+                    'success' => true,
+                    'message' => 'You have new Assignments!!'
+                ];
+            } else {
+                $res = [
+                    'success' => false,
+                    'message' => 'You have No new Assignments!!'
+                ];
+            }
+        } catch (\Exception $exception) {
+            $res = [
+                'success' => false,
+                'message' => $exception->getMessage()
+            ];
+        } catch (\Throwable $throwable) {
+            $res = [
+                'success' => false,
+                'message' => $throwable->getMessage()
+            ];
+        }
+
+        return response()->json($res);
+     }
+
+      public function updateNotificationEnabled(Request $req){
+        try {
+            $user_id = \Auth::user()->id;
+            $is_enabled = $req->input('is_enabled') === 'true' ? 1 : 0;
+            DB::table('users')
+                ->where('id', $user_id)
+                ->update(array('is_notifications_enabled' => $is_enabled));
+            $res = array(
+                'success' => true,
+                'message' => 'Notification setting updated successfully!!'
+            );
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                'success' => false,
+                'message' => $throwable->getMessage()
+            );
+        }
+        return $res;
     }
 
 

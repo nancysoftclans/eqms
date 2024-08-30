@@ -94,8 +94,8 @@ Ext.define("Admin.view.auditManagement.views.grids.AssociatedIssueGrid", {
         },
       },
       isLoad: true,
-    },
-    itemdblclick: "onSelectAssociatedIssueApplication",
+    }
+   // itemdblclick: "onSelectAssociatedIssueApplication",
   },
   features: [
     {

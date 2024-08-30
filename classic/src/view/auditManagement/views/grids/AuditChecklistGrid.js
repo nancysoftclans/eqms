@@ -34,6 +34,25 @@
         enableGroupingMenu: false
     }],
     tbar: [{
+        xtype: 'hiddenfield',
+        name: 'checklist_type_id'
+    },{
+        xtype: 'hiddenfield',
+        name: 'checklist_category_id'
+    },{
+        xtype: 'button',bind: {
+            disabled: '{isReadOnly}'
+        },
+        text: 'Add Item',
+        iconCls: 'x-fa fa-plus',
+        action: 'add',
+        ui: 'soft-blue',
+        childXtype: 'auditchecklistitemsfrm',
+        winTitle: 'Checklist Item',
+        winWidth: '40%',
+        handler: 'showAddChecklistItemConfigParamWinFrm',
+        stores: '[]'
+    },{
         xtype: 'exportbtn',
         hidden: true
     }, {
@@ -43,6 +62,9 @@
         xtype: 'hiddenfield',
         name: 'isReadOnly'
     }, {
+        xtype: 'hiddenfield',
+        name: 'item_resp_id'
+    },{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Applicable Checklist',
         labelWidth: 150,
@@ -113,13 +135,13 @@
      {
         xtype: 'gridcolumn',
         dataIndex: 'pass_status',
-        text: 'Pass Status',
+        text: 'Status',
         align: 'center', 
         tdCls: 'wrap',
         width: 120,
         editor: {
             xtype: 'combo', anyMatch: true,
-            store: 'confirmationstr',
+            store: 'checkliststatusstr',
             valueField: 'id',
             displayField: 'name',
             value: 1,
@@ -130,7 +152,7 @@
         },
         filter: {
             xtype: 'combo', anyMatch: true,
-            store: 'confirmationstr',
+            store: 'checkliststatusstr',
             queryMode: 'local',
             valueField: 'id',
             displayField: 'name'

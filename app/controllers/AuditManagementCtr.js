@@ -18,6 +18,9 @@ Ext.define('Admin.controller.AuditManagementCtr',{
         "auditfindingsfrm button[action=search_issue_type]": {
             click: "showAuditFinding",
         },
+        "auditchecklistitemsfrm button[action=save_audit_checklist]": {
+            click: "CreateAuditConfigParamWin",
+        },
         'auditchecklistgrid button[name=savegrid_screening_btn]': {
             click: 'saveApplicationChecklistDetails'
         },
@@ -30,9 +33,9 @@ Ext.define('Admin.controller.AuditManagementCtr',{
         audittypesgrid: {
             itemdblclick: "onAuditTypesGridClick",
         },
-        // associatedissuegrid: {
-        //     itemdblclick: "onAssociatedIssueGridClick",
-        // },
+        associatedissuegrid: {
+            itemdblclick: "viewAssociatedIssueGrid",
+        },
         auditfindingsgrid: {
           refresh: "refreshAuditFindingGrid",
         },
@@ -50,7 +53,7 @@ Ext.define('Admin.controller.AuditManagementCtr',{
                 onInitiateNewAuditPlan:'onInitiateNewAuditPlan',
                 viewAuditApplication: 'viewAuditApplication',
                 setCompStore: 'setCompStore',
-                onAssociatedIssueGridClick: 'viewAssociatedIssueGrid',
+               // onAssociatedIssueGridClick: 'viewAssociatedIssueGrid',
                 showRAuditApplicationSubmissionWin: 'showRAuditApplicationSubmissionWin'
             }
         }
@@ -181,22 +184,30 @@ Ext.define('Admin.controller.AuditManagementCtr',{
     }, 200);
   },
 
-  viewAssociatedIssueGrid: function (record, grid) {
+  viewAssociatedIssueGrid: function (view, record, item, index, e, eOpts) {
     var me = this,
+      grid = view.grid,
       win = grid.up("window"),
       title = record.get("title"),
+      issue_id = record.get("issue_id"),
+      raised_date = record.get("raised_date"),
+      issue_status = record.get("issue_status"),
       mask = new Ext.LoadMask({
         msg: "Please wait...",
         target: win,
       });
     mask.show();
-    console.log(title);
-    var auditfindingsfrm = Ext.widget("auditfindingsfrm");
-        auditfindingsfrm.down("textfield[name=title]").setValue(title);
+   frm=Ext.ComponentQuery.query("#auditfindingsfrm")[0];
+    
+      frm.down("textfield[name=title]").setValue(title);
+      frm.down("textfield[name=issue_id]").setValue(issue_id);
+      frm.down("textfield[name=raised_date]").setValue(raised_date);
+      frm.down("textfield[name=issue_status]").setValue(issue_status);
    
     Ext.Function.defer(function () {
       mask.hide();
       win.close();
+
     }, 200);
   },
 
@@ -500,6 +511,7 @@ Ext.define('Admin.controller.AuditManagementCtr',{
             params = [];
             for (var i = 0; i < store.data.items.length; i++) {
                 var record = store.data.items [i],
+                    item_resp_id = record.get('item_resp_id'),
                     checklist_item_id = record.get('checklist_item_id'),
                     pass_status = record.get('pass_status'),
                     comment = record.get('comment'),
@@ -511,6 +523,7 @@ Ext.define('Admin.controller.AuditManagementCtr',{
                     risk_type_remarks = record.get('risk_type_remarks');
                 var obj = {
                     application_id: application_id,
+                    item_resp_id: item_resp_id,
                     application_code: application_code,
                     item_resp_id: item_resp_id,
                     created_by: user_id,
@@ -537,6 +550,7 @@ Ext.define('Admin.controller.AuditManagementCtr',{
             url: 'api/saveApplicationChecklistDetails',
             params: {
                 application_id: application_id,
+                item_resp_id: item_resp_id,
                 application_code: application_code,
                 checklist_type: checklist_type,
                 screening_details: params
@@ -742,5 +756,49 @@ Ext.define('Admin.controller.AuditManagementCtr',{
       Ext.getBody().unmask();
     }
   },
+
+  CreateAuditConfigParamWin: function (btn) {
+        var me = this,
+            mainTabPanel = me.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            url = btn.action_url,
+            table = btn.table_name,
+            form = btn.up('form'),
+            win = form.up('window'),
+            grid = activeTab.down("auditchecklistgrid");
+            storeID = btn.storeID,
+            store = Ext.getStore(storeID),
+            frm = form.getForm();
+        if (frm.isValid()) {
+            frm.submit({
+                url: url,
+                params: {model: table},
+                waitMsg: 'Please wait...',
+                headers: {
+                    'Authorization': 'Bearer ' + access_token
+                },
+                success: function (form, action) {
+                    var response = Ext.decode(action.response.responseText),
+                        success = response.success,
+                        message = response.message;
+                    if (success == true || success === true) {
+                        toastr.success(message, "Success Response");
+                       // store.removeAll();
+                        //store.load();
+                        grid.getStore().reload();
+                        win.close();
+                    } else {
+                        toastr.error(message, 'Failure Response');
+                    }
+                },
+                failure: function (form, action) {
+                    var resp = action.result;
+
+                    console.log(resp);
+                    toastr.error(resp.message, 'Failure Response');
+                }
+            });
+        }
+    },
     
 });

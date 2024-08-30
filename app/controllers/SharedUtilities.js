@@ -23,6 +23,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     "Admin.store.administration.UsershareditemsStr",
     "Admin.store.AgreeConfirmationStr",
     "Admin.store.ComplianceRiskScaleStr",
+    "Admin.store.ChecklistStatusStr",
   ],
   control: {
     applicationdocuploadsgrid: {
