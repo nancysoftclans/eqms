@@ -193,7 +193,6 @@ class DocumentManagementController extends Controller
             $application_code = $request->input('application_code');
             $process_id = $request->input('process_id');
             $workflow_stage_id = $request->input('workflow_stage_id');
-            $application_status_id = $request->input('application_status_id');
             $zone_id = $request->input('zone_id');
             $module_id = $request->input('module_id');
             $sub_module_id = $request->input('sub_module_id');
@@ -231,7 +230,6 @@ class DocumentManagementController extends Controller
                 "doc_description" => $request->input('doc_description'),
                 "owner_type_id" => $request->input('owner_type_id'),
                 "doc_version" => $request->input('doc_version'),
-                "application_status_id" => $request->input('application_status_id'),
                 "document_type_id" => $request->input('document_type_id'),
                 "navigator_folder_id" => $request->input('navigator_folder_id'),
                 "document_number" => $doc_number,
@@ -318,6 +316,7 @@ class DocumentManagementController extends Controller
                 $app_data['reference_no'] = $ref_number;
                 $app_data['tracking_no'] = $ref_number;
                 $app_data['application_code'] = $application_code;
+                $app_data['application_status_id'] = $application_status->status_id;
                 $app_data['reg_serial'] = $application_code;
                 $app_data['created_by'] = \Auth::user()->id;
                 $app_data['created_on'] = Carbon::now();

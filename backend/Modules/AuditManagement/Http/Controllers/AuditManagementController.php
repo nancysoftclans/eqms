@@ -59,6 +59,7 @@ class AuditManagementController extends Controller
             $where = array(
                 'id' => $id
             );
+
             //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
 
             if (isset($id) && $id != "") {
@@ -129,7 +130,7 @@ class AuditManagementController extends Controller
         try{
            
             $audit_types_data = DB::table('par_qms_audit_types as t1')
-            ->select('t1.name as audit_type_name', 't1.id as audit_type_id', 't1.code')->get();
+            ->select('t1.*','t1.name as audit_type_name', 't1.id as audit_type_id', 't1.code')->get();
             
             $res = array(
                 'success' => true,
@@ -235,7 +236,9 @@ class AuditManagementController extends Controller
            
             $audit_types_data = DB::table('par_audit_findings as t1')
                                 ->leftJoin('par_finding_types as t2', 't1.finding_type_id', '=', 't2.id')
-                                ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type')
+                                ->leftJoin('tra_issue_management_applications as t3', 't1.issue_id', '=', 't3.id')
+                                ->leftJoin('par_issue_statuses as t4', 't3.issue_status_id', '=', 't4.id')
+                                ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type', 't3.title', 't3.created_on as raised_date', 't3.complainant_name', 't4.title as issue_status')
                                 ->where('t1.application_code', $application_code)
                                 ->get();
             
@@ -276,6 +279,7 @@ class AuditManagementController extends Controller
                 "sub_module_id" => $sub_module_id,
                 "module_id" => $module_id,
                 "application_status_id" => $request->input('application_status_id'),
+                "audit_reference" => $request->input('audit_reference'),
                 "audit_title" => $request->input('audit_title'),
                 "audit_type_id" => $request->input('audit_type_id'),
                 "audit_summary" => $request->input('audit_summary'),
@@ -421,14 +425,21 @@ class AuditManagementController extends Controller
          $results = DB::table('tra_auditsmanager_application as t1')
         ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
         ->leftJoin('par_qms_audit_types as t3', 't1.audit_type_id', '=', 't3.id')
+        ->leftJoin('users as t4', 't3.owner_user_id', '=', 't4.id')
+        ->leftJoin('par_groups as t5', 't3.owner_group_id', '=', 't5.id')
+        ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
+        ->leftJoin('par_audit_findings as t7', 't1.application_code', '=', 't7.application_code')
        
         ->select(
-        
+            DB::raw("decrypt(t4.first_name) as first_name,decrypt(t4.last_name) as last_name"),
             't1.*',
             't2.name as workflow_stage',
-            't3.name as audit_type_name'
+            't3.name as audit_type_name',
+            't5.name AS group_owner',
+            't6.name as application_status',
+             DB::raw("IFNULL(COUNT(t7.id), 0) as findings")
 
-        )->get();
+        )->groupBy('t1.id')->get();
 
             $results = convertStdClassObjToArray($results);
             $res = decryptArray($results);
@@ -494,13 +505,21 @@ class AuditManagementController extends Controller
             unset($post_data['id']);
             unset($post_data['unset_data']);
 
-            $table_data = $post_data;
+            //$table_data = $post_data;
             //dd($table_data);
             //add extra params
             $table_data['created_on'] = Carbon::now();
             $table_data['created_by'] = $user_id;
-           // $table_data['application_code'] = $application_code;
+            
+            $table_data = array(
+                "application_code" => $post_data['application_code'],
+                "finding_type_id" => $post_data['finding_type_id'],
+                "finding_title" => $post_data['finding_title'],
+                "description" => $post_data['description'],
+                "results" => $post_data['results'],
+                "issue_id"=> $post_data['issue_id'],
 
+            );
 
             $where = array(
                 'id' => $id
@@ -569,5 +588,7 @@ class AuditManagementController extends Controller
         return response()->json($res);
 
     }
+
+    
    
 }

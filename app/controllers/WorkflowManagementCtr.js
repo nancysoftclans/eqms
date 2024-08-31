@@ -287,6 +287,11 @@ Ext.define('Admin.controller.WorkflowManagementCtr', {
             var livedocumentapplicationwrapper = mainTabPanel.down("#livedocumentapplicationwrapper"),
                 liveCreationGridStore = livedocumentapplicationwrapper.down("grid");
             }
+
+            if(mainTabPanel.down("#auditManagementDashWrapperPnl")){
+            var auditManagementDashWrapperPnl = mainTabPanel.down("#auditManagementDashWrapperPnl"),
+                auditManagementGridStore = auditManagementDashWrapperPnl.down("grid");
+            }
             
             if(form.down('hiddenfield[name=non_mainpanel_close]')){
                 non_mainpanel_close = form.down('hiddenfield[name=non_mainpanel_close]').getValue();
@@ -311,6 +316,9 @@ Ext.define('Admin.controller.WorkflowManagementCtr', {
                         }
                         if(liveCreationGridStore){
                             liveCreationGridStore.getStore().reload();  
+                        }
+                        if(auditManagementGridStore){
+                            auditManagementGridStore.getStore().reload();
                         }
                         
                         if(store){

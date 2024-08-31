@@ -1,6 +1,7 @@
 Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
     extend: 'Ext.form.Panel',
     xtype: 'auditfindingsfrm',
+    itemId: 'auditfindingsfrm',
     controller: 'auditMgmntVctr',
     autoScroll: true,
       bodyPadding: 8,

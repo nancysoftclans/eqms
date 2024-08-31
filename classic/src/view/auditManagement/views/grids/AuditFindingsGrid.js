@@ -64,6 +64,15 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
             },
             isLoad: true
         },
+        beforeLoad: function () {
+            var store = this.getStore(),
+                grid = this.up('grid'),
+                application_code = grid.down('hiddenfield[name=application_code]').getValue();
+
+            store.getProxy().extraParams = {
+                application_code: application_code
+            };
+        }
     },
    
     bbar: [
@@ -88,8 +97,17 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
             //         };
             
             // },
+        //     beforeLoad: function () {
+        //     this.up('auditfindingsgrid').fireEvent('refresh', this);
+        // }
             beforeLoad: function () {
-            this.up('auditfindingsgrid').fireEvent('refresh', this);
+            var store = this.getStore(),
+                grid = this.up('grid'),
+                application_code = grid.down('hiddenfield[name=application_code]').getValue();
+
+            store.getProxy().extraParams = {
+                application_code: application_code
+            };
         }
         },
         '->',
@@ -119,17 +137,17 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'finding_owner',
-        text: 'Owner',
+        dataIndex: 'complainant_name',
+        text: 'Issue Owner',
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'finding_status',
-        text: 'Status',
+        dataIndex: 'issue_status',
+        text: 'Issue Status',
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'raised_on',
+        dataIndex: 'raised_date',
         text: 'Date Raised',
         flex: 1
     },{
@@ -151,7 +169,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
                     tooltip: 'Edit Record',
                     action: 'edit',
                     childXtype: 'auditfindingsfrm',
-                    winTitle: 'Edit Audit Type',
+                    winTitle: 'Edit Findings',
                     winWidth: '80%',
                     handler: 'showEditAuditTypeConfigParamWinFrm',bind: {
             disabled: '{isReadOnly}'

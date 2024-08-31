@@ -53,6 +53,8 @@
         var esign_url = '<?php echo $esign_url; ?>';
         var Ext = Ext || {}; // Ext namespace won't be defined yet...
 
+        var is_notification_enabled = '<?php echo $is_notification_enabled; ?>';
+
 
         // This function is called by the Microloader after it has performed basic
         // device detection. The results are provided in the "tags" object. You can
