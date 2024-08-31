@@ -31,8 +31,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementIssueGrid", {
       childXtype: "selectissueform",
       winTitle: "Select Issue",
       winWidth: "80%",
-      handler: "showAddConfigParamWinFrm",
-      stores: "[]",
+      stores: "[issuemanagementissuestr]",
+      storeID: "issuemanagementissuestr"
     },
   ],
   autoScroll: true,

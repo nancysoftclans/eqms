@@ -1,8 +1,9 @@
-Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
+Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid", {
   extend: "Ext.grid.Panel",
+  xtype: "issuemanagementorgareasgrid",
+  itemId: "issuemanagementorgareasgrid",
   controller: "issuemanagementvctr",
-  xtype: "issuemanagementdocgrid",
-  itemId: "issuemanagementdocgrid",
+
   features: [
     {
       ftype: "searching",
@@ -22,28 +23,16 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
   },
   tbar: [
     {
-      xtype: "button",
       text: "Select",
-      name: "select_document",
       iconCls: "x-fa fa-plus",
+      action: "add",
+      name: "select_orgarea_btn",
       ui: "soft-blue",
-      winTitle: "Select Documents",
-      childXtype: "issueselectdocumentfrm",
+      childXtype: "selectorgareaform",
+      winTitle: "Select",
       winWidth: "80%",
-      stores: '["issuemanagementdocumentstr"]',
-      storeID: "issuemanagementdocumentstr",
-    },
-    {
-      xtype: "button",
-      text: "Upload",
-      name: "add_upload",
-      iconCls: "x-fa fa-plus",
-      ui: "soft-blue",
-      winTitle: "Document Upload",
-      childXtype: "applicationDocUploadsFrm",
-      winWidth: "50%",
-      stores: '["issuemanagementdocumentstr"]',
-      storeID: "issuemanagementdocumentstr",
+      stores: "[issuemanagementorgareastr]",
+      storeID: "issuemanagementorgareastr"
     },
   ],
   autoScroll: true,
@@ -51,69 +40,36 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
     beforerender: {
       fn: "setGridTreeStore",
       config: {
-        storeId: "issuemanagementdocumentstr",
+        storeId: "issuemanagementorgareastr",
         proxy: {
           api: {
-            read: "issuemanagement/getIssueManagementDocuments",
+            read: "issuemanagement/getIssueManagementOrganisationalAreas",
           },
         },
       },
       isLoad: true,
     },
-    // itemdblclick: "onMenuItemTreeItemDblClick",
+    // itemdblclick: "showAddConfigParamWinFrm",
   },
+
   bbar: [
     {
       xtype: "pagingtoolbar",
-      width: "100%",
       displayInfo: true,
       displayMsg: "Showing {0} - {1} of {2} total records",
       emptyMsg: "No Records",
       beforeLoad: function () {
-        this.up("issuemanagementdocgrid").fireEvent("refresh", this);
+        this.up("issuemanagementorgareasgrid").fireEvent("refresh", this);
       },
     },
   ],
   columns: [
     {
       xtype: "gridcolumn",
-      dataIndex: "reference_no",
-      text: "ID",
-      sortable: true,
-      flex: 1,
-    },
-    {
-      xtype: "gridcolumn",
       dataIndex: "title",
       text: "Title",
-      sortable: true,
       flex: 1,
-    },
-    {
-      xtype: "gridcolumn",
-      dataIndex: "version",
-      text: "version",
-      flex: 1,
-    },
-    {
-      xtype: "gridcolumn",
-      dataIndex: "type",
-      text: "Type",
-      flex: 1,
-    },
-    {
-      xtype: "gridcolumn",
-      dataIndex: "is_enabled",
-      text: "Active",
-      flex: 1,
-      renderer: function (value, metaData) {
-        if (value) {
-          metaData.tdStyle = "color:green;";
-          return '<i class="fas fa-check"></i>';
-        }
-        metaData.tdStyle = "color:green;";
-        return '<i class="fas fa-times"></i>';
-      },
+      tdCls: "wrap",
     },
     {
       text: "Options",
@@ -129,18 +85,11 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
           xtype: "menu",
           items: [
             {
-              text: "Preview",
-              iconCls: "x-fa fa-eye",
-              handler: "previewUploadedDocument",
-              action: "preview",
-              download: 0,
-            },
-            {
               text: "Delete",
               iconCls: "x-fa fa-trash",
               tooltip: "Delete Record",
-              table_name: "tra_issue_management_documents",
-              storeID: "issuemanagementdocumentstr",
+              table_name: "tra_issue_management_organisational_areas",
+              storeID: "issuemanagementorgareastr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
               bind: {
@@ -158,10 +107,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
         var is_enabled = rec.get("is_enabled");
         if (is_enabled === 0 || is_enabled == 0) {
           // widget.down("menu menuitem[action=enable]").setDisabled(false);
-          // widget.down("menu menuitem[action=soft_delete]").setDisabled(true);
         } else {
           // widget.down("menu menuitem[action=enable]").setDisabled(true);
-          // widget.down("menu menuitem[action=soft_delete]").setDisabled(false);
         }
       },
     },

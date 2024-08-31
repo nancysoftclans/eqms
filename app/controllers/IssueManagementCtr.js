@@ -35,20 +35,35 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuemanagementwwizard: {
         afterrender: "prepapreIssueManagementPreview",
       },
+      "issuemanagementorgareasgrid button[name=select_orgarea_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
       "issuemanagementdocgrid button[name=select_document]": {
-        click: "showApplicationDocUploadWin",
+        click: "showIssueManagementAssociatedWin",
       },
       "issuemanagementdocgrid button[name=add_upload]": {
-        click: "showApplicationDocUploadWin",
+        click: "showIssueManagementAssociatedWin",
+      },
+      "issuemanagementissuegrid button[name=select_issue_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
+      "issuemanagementauditgrid button[name=select_audit_btn]": {
+        click: "showIssueManagementAssociatedWin",
       },
       "issueselectdocumentfrm button[name=save_issuedocument_btn]": {
-        click: "saveIssueManagementDocuments",
+        click: "saveIssueManagementAssociatedDetails",
       },
       "selectissueform button[name=save_issue_btn]": {
-        click: "saveIssueManagementRelatedIssues",
+        click: "saveIssueManagementAssociatedDetails",
       },
       "issueauditform button[name=save_audit_btn]": {
-        click: "saveIssueManagementAudits",
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      "selectorgareaform button[name=save_orgarea_btn]": {
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      issuemanagementorgareasgrid: {
+        refresh: "refreshGrid",
       },
       issuemanagementdocgrid: {
         refresh: "refreshGrid",
@@ -2759,7 +2774,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       },
     });
   },
-  showApplicationDocUploadWin: function (btn) {
+  showIssueManagementAssociatedWin: function (btn) {
     var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
       childXtype = btn.childXtype,
@@ -2792,54 +2807,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       );
     }
   },
-  saveIssueManagementDocuments: function (btn) {
-    var me = this,
-      url = btn.action_url,
-      table = btn.table_name,
-      form = btn.up("form"),
-      win = form.up("window"),
-      storeID = btn.storeID,
-      store = Ext.getStore(storeID),
-      frm = form.getForm(),
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      active_application_id = activeTab
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    if (frm.isValid()) {
-      frm.submit({
-        url: url,
-        params: {
-          active_application_id: active_application_id,
-          type: "Document",
-        },
-        waitMsg: "Please wait...",
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-        success: function (form, action) {
-          var response = Ext.decode(action.response.responseText),
-            success = response.success,
-            message = response.message;
-          if (success == true || success === true) {
-            toastr.success(message, "Success Response");
-            store.removeAll();
-            store.load();
-            win.close();
-          } else {
-            toastr.error(message, "Failure Response");
-          }
-        },
-        failure: function (form, action) {
-          var resp = action.result;
-          toastr.error(resp.message, "Failure Response");
-        },
-      });
-    }
-  },
   refreshGrid: function (me) {
     var store = me.store,
       grid = me.up("grid"),
@@ -2857,7 +2824,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       application_code: application_code,
     };
   },
-  saveIssueManagementRelatedIssues: function (btn) {
+  saveIssueManagementAssociatedDetails: function (btn) {
     var me = this,
       url = btn.action_url,
       table = btn.table_name,
@@ -2870,59 +2837,11 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       activeTab = mainTabPanel.getActiveTab(),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
         .getValue();
     if (frm.isValid()) {
       frm.submit({
         url: url,
-        params: { active_application_id: active_application_id },
-        waitMsg: "Please wait...",
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-        success: function (form, action) {
-          var response = Ext.decode(action.response.responseText),
-            success = response.success,
-            message = response.message;
-          if (success == true || success === true) {
-            toastr.success(message, "Success Response");
-            store.removeAll();
-            store.load();
-            win.close();
-          } else {
-            toastr.error(message, "Failure Response");
-          }
-        },
-        failure: function (form, action) {
-          var resp = action.result;
-          toastr.error(resp.message, "Failure Response");
-        },
-      });
-    }
-  },
-  saveIssueManagementAudits: function (btn) {
-    var me = this,
-      url = btn.action_url,
-      table = btn.table_name,
-      form = btn.up("form"),
-      win = form.up("window"),
-      storeID = btn.storeID,
-      store = Ext.getStore(storeID),
-      frm = form.getForm(),
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      active_application_id = activeTab
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    if (frm.isValid()) {
-      frm.submit({
-        url: url,
-        params: { active_application_id: active_application_id },
+        params: { active_application_id: active_application_id, type: 'Document' },
         waitMsg: "Please wait...",
         headers: {
           Authorization: "Bearer " + access_token,

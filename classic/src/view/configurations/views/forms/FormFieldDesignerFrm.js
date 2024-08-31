@@ -134,19 +134,21 @@ Ext.define('Admin.view.configurations.views.forms.FormFieldDesignerFrm', {
         name: 'formfield',
         allowBlank: true,
         hidden: true
-    },{
-        xtype: 'textfield',
-        fieldLabel: 'Field Group(No spaces and its optional)',
-        margin: '0 20 20 0',
-        name: 'group',
-        allowBlank: true
-    },{
-        xtype: 'textfield',
-        fieldLabel: 'Group Title (if added above)',
-        margin: '0 20 20 0',
-        name: 'group_title',
-        allowBlank: true
-    },{
+    },
+    // {
+    //     xtype: 'textfield',
+    //     fieldLabel: 'Field Group(No spaces and its optional)',
+    //     margin: '0 20 20 0',
+    //     name: 'group',
+    //     allowBlank: true
+    // },{
+    //     xtype: 'textfield',
+    //     fieldLabel: 'Group Title (if added above)',
+    //     margin: '0 20 20 0',
+    //     name: 'group_title',
+    //     allowBlank: true
+    // },
+    {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Source Defination',
         margin: '0 20 20 0',

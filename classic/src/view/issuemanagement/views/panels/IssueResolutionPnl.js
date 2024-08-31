@@ -30,6 +30,10 @@ Ext.define(
         xtype: 'tabpanel',
         items: [
           {
+            xtype: "issuemanagementorgareasgrid",
+            title: "Organisational Areas",
+          },
+          {
             xtype: "issuemanagementdocgrid",
             title: "Associated Documents",
           },
