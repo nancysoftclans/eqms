@@ -56,7 +56,7 @@ class IssueManagementController extends Controller
         $targetDateString = $request->target_resolution_date;
         $creationDateString = $request->creation_date;
 
-        if($request->follow_up_on){
+        if ($request->follow_up_on) {
             $followupDateString = $request->follow_up_on;
             $followupDateString = Carbon::parse($followupDateString);
         }
@@ -435,9 +435,13 @@ class IssueManagementController extends Controller
             $res = IssueManagementDocument::from('tra_issue_management_documents as t1')
                 ->leftJoin('tra_issue_management_applications as t2', 't1.issue_id', 't2.id')
                 ->leftJoin('tra_documentmanager_application as t3', 't1.document_id', 't3.id')
+                ->leftJoin('tra_application_uploadeddocuments as t4', 't1.upload_id', 't4.id')
                 ->where('issue_id', $request->issue_id)
-                ->select('t1.*', 't3.doc_title as title','t3.reference_no', 't3.doc_version as version')
+                ->select('t1.*', 
+                DB::raw('COALESCE(t3.doc_title, t4.initial_file_name) as title'),
+                't3.reference_no', 't3.doc_version as version', 't4.initial_file_name', 't4.application_code', 't4.node_ref')
                 ->get();
+
         } catch (\Exception $exception) {
             $res = array(
                 'success' => false,
@@ -456,7 +460,22 @@ class IssueManagementController extends Controller
     {
         try {
             $active_application_id = $request->active_application_id;
+            $application_id = $request->application_id;
+            $application_code = $request->application_code;
             $type = $request->type;
+            if (is_numeric($application_id) && is_numeric($application_code)) {
+                $documentdata = DB::table('tra_application_uploadeddocuments')->where('id', $application_id)->first();
+                $issuedata = IssueManagement::where('application_code', $application_code)->first();
+                $data = array(
+                    'issue_id' => $issuedata->id,
+                    'upload_id' => $application_id,
+                    'type' => 'Attached file',
+                    'dola' => Carbon::now(),
+                    'altered_by' => $this->user_id,
+                );
+                $IssueManagementDocument = new IssueManagementDocument();
+                $IssueManagementDocument->create($data);
+            }
             if (is_numeric($active_application_id)) {
                 $document_data = json_decode($request->document_ids, true);
                 foreach ($document_data as $document) {
@@ -470,14 +489,13 @@ class IssueManagementController extends Controller
                     $IssueManagementDocument = new IssueManagementDocument();
                     $IssueManagementDocument->create($data);
                 }
-                $IssueManagementDocument = IssueManagementDocument::all();
-
-                $res = array(
-                    'success' => true,
-                    'message' => 'Saved Successfully!!',
-                    'results' => $IssueManagementDocument
-                );
             }
+            $IssueManagementDocument = IssueManagementDocument::all();
+            $res = array(
+                'success' => true,
+                'message' => 'Saved Successfully!!',
+                'results' => $IssueManagementDocument
+            );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         } catch (\Throwable $throwable) {

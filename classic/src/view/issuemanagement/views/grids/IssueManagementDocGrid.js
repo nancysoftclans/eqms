@@ -155,13 +155,11 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementDocGrid", {
         },
       },
       onWidgetAttach: function (col, widget, rec) {
-        var is_enabled = rec.get("is_enabled");
-        if (is_enabled === 0 || is_enabled == 0) {
-          // widget.down("menu menuitem[action=enable]").setDisabled(false);
-          // widget.down("menu menuitem[action=soft_delete]").setDisabled(true);
+        var upload_id = rec.get("upload_id");
+        if (upload_id) {
+          widget.down("menu menuitem[action=preview]").setDisabled(false);
         } else {
-          // widget.down("menu menuitem[action=enable]").setDisabled(true);
-          // widget.down("menu menuitem[action=soft_delete]").setDisabled(false);
+          widget.down("menu menuitem[action=preview]").setDisabled(true);
         }
       },
     },

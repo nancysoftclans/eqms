@@ -1563,8 +1563,40 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       if (success == true) {
         toastr.success("Uploaded Successfully", "Success Response");
         // uploads_store.load();
-        if(module_id ==  28){
-          
+        if(module_id == 28){
+          Ext.Ajax.request({
+            method: "POST",
+            url: "issuemanagement/saveIssueManagementDocuments",
+            params: {
+              application_code: application_code,
+              application_id: response.record_id,
+              _token: token,
+            },
+            headers: {
+              Authorization: "Bearer " + access_token,
+            },
+            success: function (response) {
+              Ext.getBody().unmask();
+              var resp = Ext.JSON.decode(response.responseText),
+                message = resp.message,
+                success = resp.success;
+              if (success == true || success === true) {
+              } else {
+                // toastr.error(message, "Failure Response");
+              }
+            },
+            failure: function (response) {
+              Ext.getBody().unmask();
+              var resp = Ext.JSON.decode(response.responseText),
+                message = resp.message,
+                success = resp.success;
+              // toastr.error(message, "Failure Response");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              Ext.getBody().unmask();
+              // toastr.error("Error: " + errorThrown, "Error Response");
+            },
+          });
         }
       } else {
         toastr.error(
