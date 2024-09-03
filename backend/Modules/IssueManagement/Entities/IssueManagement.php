@@ -146,7 +146,16 @@ class IssueManagement extends Model
         'unsafe_acts',
         'inadequate_definition_of_tasks',
         'accountability',
-        'deputies_for_key_positions'
+        'deputies_for_key_positions',
+        'deviation_department',
+        'deviation_function',
+        'deviation_area_affected',
+        'deviation_reason',
+        'deviation_plannedorunplanned',
+        'deviation_from_date',
+        'deviation_to_date',
+        'deviation_impact',
+        'deviation_justification'
     ];
 
     public $timestamps = false;

@@ -60,7 +60,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueActivityGrid", {
     {
       xtype: "gridcolumn",
       dataIndex: "from_stage",
-      text: "From Stage",
+      text: "Stage",
       flex: 1,
       tdCls: "wrap",
     },
@@ -70,6 +70,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueActivityGrid", {
       text: "To Stage",
       flex: 1,
       tdCls: "wrap",
+      hidden:true
     },
     {
       xtype: "gridcolumn",

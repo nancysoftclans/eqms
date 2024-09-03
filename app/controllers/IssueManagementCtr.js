@@ -261,6 +261,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             }
             if (
               issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
                 "radiogroup[name=complaint_fully_addressed]"
               )
             ) {
@@ -401,6 +413,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             }
             if (
               issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
                 "radiogroup[name=complaint_fully_addressed]"
               )
             ) {
@@ -481,6 +505,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_direct_or_indirect:
                     results.complaint_direct_or_indirect,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
                 });
             }
             if (
@@ -575,6 +611,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_direct_or_indirect:
                     results.complaint_direct_or_indirect,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
                 });
             }
             if (
@@ -2672,6 +2720,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                       complaint_direct_or_indirect:
                         results.complaint_direct_or_indirect,
                     });
+                  }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_plannedorunplanned]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_plannedorunplanned]")
+                      .setValue({
+                        deviation_plannedorunplanned:
+                          results.deviation_plannedorunplanned,
+                      });
                   }
                   if (me.down("radiogroup[name=complaint_fully_addressed]")) {
                     me.down(

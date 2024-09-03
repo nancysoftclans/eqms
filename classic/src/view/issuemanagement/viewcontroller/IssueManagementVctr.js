@@ -4,6 +4,14 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
 
   init: function () { },
 
+  exportTo: function (btn) {
+    var cfg = Ext.merge({
+      title: 'Grid export demo',
+      fileName: 'GridExport' + '.' + (btn.cfg.ext || btn.cfg.type)
+    }, btn.cfg);
+
+    this.getView().saveDocumentAs(cfg);
+  },
   setWorkflowCombosStore: function (obj, options) {
     this.fireEvent("setWorkflowCombosStore", obj, options);
   },
