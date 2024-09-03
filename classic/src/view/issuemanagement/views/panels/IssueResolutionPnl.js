@@ -48,6 +48,11 @@ Ext.define(
         ],
       },
       {
+        xtype: "issueactivitygrid",
+        autoScroll: true,
+        title: "Activity",
+      },
+      {
         xtype: "hiddenfield",
         name: "_token",
         value: token,

@@ -45,5 +45,10 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
         }
       ],
     },
+    {
+      xtype: "issueactivitygrid",
+      autoScroll: true,
+      title: "Activity",
+    },
   ],
 });

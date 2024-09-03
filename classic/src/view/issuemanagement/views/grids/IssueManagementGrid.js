@@ -91,6 +91,10 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
         proxy: {
           url: "issuemanagement/getIssueManagementDetails",
         },
+        sorters: [{
+          property: 'raised_date',
+          direction: 'DESC'
+        }]
       },
       isLoad: true,
     },

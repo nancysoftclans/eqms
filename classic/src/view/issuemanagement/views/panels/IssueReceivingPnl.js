@@ -39,6 +39,11 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
       ],
     },
     {
+      xtype: "issueactivitygrid",
+      autoScroll: true,
+      title: "Activity",
+    },
+    {
       xtype: "hiddenfield",
       name: "_token",
       value: token,

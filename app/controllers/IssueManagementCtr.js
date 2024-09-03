@@ -74,6 +74,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuemanagementauditgrid: {
         refresh: "refreshGrid",
       },
+      issueactivitygrid: {
+        refresh: "refreshGrid",
+      },
     },
   },
 
@@ -748,8 +751,14 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           //render form
           var live_group_tracker = {};
           var group_tracker = [];
-          for (var i = result.length - 1; i >= 0; i--) {
-            var base_result = result[i];
+
+          // Sort the fields by group
+          result.sort(function (a, b) {
+            return (a.group || '').localeCompare(b.group || '');
+          });
+
+          // Process each field in the sorted result
+          result.forEach(function (base_result) {
             var field_name = base_result.field_name;
             var label = base_result.label;
             var is_enabled = base_result.is_enabled;
@@ -776,34 +785,36 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             var group = base_result.group;
             var group_title = base_result.group_title;
             var default_value = base_result.default_value;
+            var form_field_type_id = base_result.form_field_type_id;
             //for registers
             if (is_register == 1111) {
               is_readOnly = false;
               is_mandatory = false;
             }
-            if (group) {
-              if (group_tracker.includes(group)) {
-                fieldset = live_group_tracker[group];
-              } else {
-                fieldset = Ext.create("Ext.form.FieldSet", {
-                  xtype: "fieldset",
-                  columnWidth: 1,
-                  title: group_title,
-                  collapsible: true,
-                  layout: "column",
-                  defaults: {
-                    allowBlank: false,
-                    labelAlign: "top",
-                    columnWidth: 0.33,
-                    margin: 5,
-                  },
-                  items: [],
-                });
-                live_group_tracker[group] = fieldset;
-                group_tracker.push(group);
-              }
+            // Check if the group already has a fieldset
+            if (!group_tracker.includes(group)) {
+              // Create new fieldset for the group
+              var fieldset = Ext.create("Ext.form.FieldSet", {
+                xtype: "fieldset",
+                columnWidth: 1,
+                title: group_title,
+                collapsible: true,
+                layout: "column",
+                defaults: {
+                  allowBlank: false,
+                  labelAlign: "top",
+                  columnWidth: 0.33,
+                  margin: 5,
+                },
+                items: []
+              });
+
+              // Store the fieldset in the tracker
+              live_group_tracker[group] = fieldset;
+              group_tracker.push(group);
             } else {
-              fieldset = me;
+              // Use existing fieldset
+              var fieldset = live_group_tracker[group];
             }
 
             if (is_mandatory == 1) {
@@ -817,7 +828,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               is_hidden = false;
             }
             //for tag experiamental
-            if (result[i].form_field_type_id == 10) {
+            if (form_field_type_id == 10) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1181,7 +1192,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             }
 
             //end of experients
-            else if (result[i].form_field_type_id == 6) {
+            else if (form_field_type_id == 6) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1527,7 +1538,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //for filterable combo
-            else if (result[i].form_field_type_id == 9) {
+            else if (form_field_type_id == 9) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1975,7 +1986,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //for grid combo
-            else if (result[i].form_field_type_id == 7) {
+            else if (form_field_type_id == 7) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -2367,7 +2378,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //other fields
-            else if (result[i].form_field_type_id == 8) {
+            else if (form_field_type_id == 8) {
               if (is_readOnly == 1) {
                 var field = Ext.create("Ext.form." + xtype, {
                   layout: "column",
@@ -2464,7 +2475,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   ],
                 });
               }
-            } else if (result[i].form_field_type_id == 5) {
+            } else if (form_field_type_id == 5) {
               if (is_readOnly == 1) {
                 var field = Ext.create("Ext.form." + xtype, {
                   name: field_name,
@@ -2494,8 +2505,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   },
                 });
               }
-            } else if (result[i].form_field_type_id == 12) {
-              var items = result[i].default_value;
+            } else if (form_field_type_id == 12) {
+              var items = default_value;
               items = items.split(",");
               // Map the array of strings to an array of objects
               var items = items.map((label, index) => ({
@@ -2529,8 +2540,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   items: items,
                 });
               }
-            } else if (result[i].form_field_type_id == 13) {
-              var items = result[i].default_value;
+            } else if (form_field_type_id == 13) {
+              var items = default_value;
               items = JSON.parse(items);
 
               // Map the array of strings to an array of objects
@@ -2540,7 +2551,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }));
 
               if (is_readOnly == 1) {
-                var field = Ext.create("Ext.form.CheckboxGroup", {
+                var field = Ext.create("Ext.form." + xtype, {
                   fieldLabel: label,
                   hidden: is_hidden,
                   columnWidth: column_width,
@@ -2550,7 +2561,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   items: items,
                 });
               } else {
-                var field = Ext.create("Ext.form.CheckboxGroup", {
+                var field = Ext.create("Ext.form." + xtype, {
                   fieldLabel: label,
                   hidden: is_hidden,
                   columnWidth: column_width,
@@ -2588,22 +2599,14 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
 
-            fieldset.insert(start_index, field);
-          }
-          // console.log(live_group_tracker);
-          //insert fieldsets
-          const sortedKeys = Object.keys(live_group_tracker).sort(
-            (a, b) => b - a
-          );
-          sortedKeys.forEach((key) => {
-            const grouper = live_group_tracker[key];
-            me.add(1, grouper);
+            // Add the field to the fieldset
+            fieldset.add(field);
           });
-          // for (const key in live_group_tracker) {
-          //   const grouper = live_group_tracker[key];
-          //   me.add(1, grouper);
-
-          // }
+          // console.log(live_group_tracker);
+          // Insert fieldsets into the form in the sorted group order
+          group_tracker.forEach(function (group) {
+            me.add(live_group_tracker[group]);
+          });
           var found = false;
           if (me.up().up().getViewModel()) {
             var vmodel = me.up().up().getViewModel();
@@ -2720,7 +2723,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               var follow_up_period = me
                 .down("numberfield[name=follow_up_period]")
                 .getValue();
-                followupDate.setDate(followupDate.getDate() + follow_up_period);
+              followupDate.setDate(followupDate.getDate() + follow_up_period);
               me.down("datefield[name=follow_up_on]").setValue(
                 followupDate
               );

@@ -861,4 +861,40 @@ class IssueManagementController extends Controller
         }
         return \response()->json($res);
     }
+
+    public function getActivity(Request $request)
+    {
+        try {
+            $res = IssueManagement::from('tra_issue_management_applications as t1')
+                ->join('tra_applications_transitions as t2', 't1.application_code', 't2.application_code')
+                ->join('wf_workflow_stages as t3', 't2.from_stage', 't3.id')
+                ->join('wf_workflow_stages as t4', 't2.to_stage', 't4.id')
+                ->join('users as t5', 't2.author', 't5.id')
+                ->where('t1.application_code', $request->application_code)
+                ->select(
+                    't2.id',
+                    't3.name as from_stage',
+                    't4.name as to_stage',
+                    't5.first_name',
+                    't5.last_name',
+                    't2.remarks',
+                    't2.created_on'
+                )
+                ->get();
+            $res = convertStdClassObjToArray($res);
+            $res = decryptArray($res);
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                "success" => false,
+                "message" => $throwable->getMessage()
+            );
+        }
+
+        return \response()->json($res);
+    }
 }
