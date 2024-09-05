@@ -1973,6 +1973,7 @@ func_setDocumentGridStore: function(me){
   previewUploadedDocument: function (item) {
     var btn = item.up('button'),
         download = item.download,
+        grid = item.up('grid'),
         record = btn.getWidgetRecord(),
         node_ref = record.get('node_ref'),
         application_code = record.get('application_code'),

@@ -536,7 +536,6 @@ class AuditManagementController extends Controller
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
                     $res = updateRecord($table_name, $where, $table_data);
-
                     if($res['success'] == false) {
 
                     DB::rollBack();
