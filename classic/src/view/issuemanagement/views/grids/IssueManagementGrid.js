@@ -12,12 +12,12 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     preserveScrollOnReload: true,
     enableTextSelection: true,
     emptyText: "Nothing to display",
-    // getRowClass: function (record, rowIndex, rowParams, store) {
-    //   var is_enabled = record.get("is_enabled");
-    //   if (is_enabled == 0 || is_enabled === 0) {
-    //     return "invalid-row";
-    //   }
-    // },
+    getRowClass: function (record, rowIndex, rowParams, store) {
+      var is_enabled = record.get("is_enabled");
+      if (is_enabled == 0 || is_enabled === 0) {
+        return "invalid-row";
+      }
+    },
   },
   tbar: [
     {
@@ -26,6 +26,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     {
       xtype: "exportbtn",
+      // handler: 'exportTo'
     },
     {
       xtype: "tbspacer",
@@ -91,6 +92,10 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
         proxy: {
           url: "issuemanagement/getIssueManagementDetails",
         },
+        sorters: [{
+          property: 'raised_date',
+          direction: 'DESC'
+        }]
       },
       isLoad: true,
     },
@@ -209,7 +214,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
               storeID: "issuemanagementstr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
-              handler: 'doDeleteConfigWidgetParam',
+              handler: 'doDeleteIssueManagement',
               bind: {
                 disabled: '{hideDeleteButton}'
               },

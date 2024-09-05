@@ -28,6 +28,10 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
       xtype: 'tabpanel',
       items: [
         {
+          xtype: "issuemanagementorgareasgrid",
+          title: "Organisational Areas",
+        },
+        {
           xtype: "issuemanagementdocgrid",
           title: "Associated Documents",
         },
@@ -40,6 +44,11 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
           title: " Associated Audits",
         }
       ],
+    },
+    {
+      xtype: "issueactivitygrid",
+      autoScroll: true,
+      title: "Activity",
     },
   ],
 });

@@ -35,20 +35,35 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuemanagementwwizard: {
         afterrender: "prepapreIssueManagementPreview",
       },
+      "issuemanagementorgareasgrid button[name=select_orgarea_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
       "issuemanagementdocgrid button[name=select_document]": {
-        click: "showApplicationDocUploadWin",
+        click: "showIssueManagementAssociatedWin",
       },
       "issuemanagementdocgrid button[name=add_upload]": {
-        click: "showApplicationDocUploadWin",
+        click: "showIssueManagementAssociatedWin",
+      },
+      "issuemanagementissuegrid button[name=select_issue_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
+      "issuemanagementauditgrid button[name=select_audit_btn]": {
+        click: "showIssueManagementAssociatedWin",
       },
       "issueselectdocumentfrm button[name=save_issuedocument_btn]": {
-        click: "saveIssueManagementDocuments",
+        click: "saveIssueManagementAssociatedDetails",
       },
       "selectissueform button[name=save_issue_btn]": {
-        click: "saveIssueManagementRelatedIssues",
+        click: "saveIssueManagementAssociatedDetails",
       },
       "issueauditform button[name=save_audit_btn]": {
-        click: "saveIssueManagementAudits",
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      "selectorgareaform button[name=save_orgarea_btn]": {
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      issuemanagementorgareasgrid: {
+        refresh: "refreshGrid",
       },
       issuemanagementdocgrid: {
         refresh: "refreshGrid",
@@ -57,6 +72,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         refresh: "refreshGrid",
       },
       issuemanagementauditgrid: {
+        refresh: "refreshGrid",
+      },
+      issueactivitygrid: {
         refresh: "refreshGrid",
       },
     },
@@ -243,6 +261,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             }
             if (
               issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
                 "radiogroup[name=complaint_fully_addressed]"
               )
             ) {
@@ -296,7 +326,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
       valid = this.validateNewReceivingSubmission();
 
-    if (valid) {
+    if (valid === true) {
       showWorkflowSubmissionWin(
         active_application_id,
         application_code,
@@ -327,7 +357,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .getValue();
 
     if (!active_application_id) {
-      toastr.warning("Please Save Application Details!!", "Warning Response");
+      toastr.error("Please Save Application Details!!", "Warning Response");
       return false;
     }
 
@@ -379,6 +409,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_direct_or_indirect:
                     results.complaint_direct_or_indirect,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
                 });
             }
             if (
@@ -463,6 +505,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_direct_or_indirect:
                     results.complaint_direct_or_indirect,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
                 });
             }
             if (
@@ -557,6 +611,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_direct_or_indirect:
                     results.complaint_direct_or_indirect,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
                 });
             }
             if (
@@ -733,8 +799,14 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           //render form
           var live_group_tracker = {};
           var group_tracker = [];
-          for (var i = result.length - 1; i >= 0; i--) {
-            var base_result = result[i];
+
+          // Sort the fields by group
+          result.sort(function (a, b) {
+            return (a.group || '').localeCompare(b.group || '');
+          });
+
+          // Process each field in the sorted result
+          result.forEach(function (base_result) {
             var field_name = base_result.field_name;
             var label = base_result.label;
             var is_enabled = base_result.is_enabled;
@@ -761,34 +833,36 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             var group = base_result.group;
             var group_title = base_result.group_title;
             var default_value = base_result.default_value;
+            var form_field_type_id = base_result.form_field_type_id;
             //for registers
             if (is_register == 1111) {
               is_readOnly = false;
               is_mandatory = false;
             }
-            if (group) {
-              if (group_tracker.includes(group)) {
-                fieldset = live_group_tracker[group];
-              } else {
-                fieldset = Ext.create("Ext.form.FieldSet", {
-                  xtype: "fieldset",
-                  columnWidth: 1,
-                  title: group_title,
-                  collapsible: true,
-                  layout: "column",
-                  defaults: {
-                    allowBlank: false,
-                    labelAlign: "top",
-                    columnWidth: 0.33,
-                    margin: 5,
-                  },
-                  items: [],
-                });
-                live_group_tracker[group] = fieldset;
-                group_tracker.push(group);
-              }
+            // Check if the group already has a fieldset
+            if (!group_tracker.includes(group)) {
+              // Create new fieldset for the group
+              var fieldset = Ext.create("Ext.form.FieldSet", {
+                xtype: "fieldset",
+                columnWidth: 1,
+                title: group_title,
+                collapsible: true,
+                layout: "column",
+                defaults: {
+                  allowBlank: false,
+                  labelAlign: "top",
+                  columnWidth: 0.33,
+                  margin: 5,
+                },
+                items: []
+              });
+
+              // Store the fieldset in the tracker
+              live_group_tracker[group] = fieldset;
+              group_tracker.push(group);
             } else {
-              fieldset = me;
+              // Use existing fieldset
+              var fieldset = live_group_tracker[group];
             }
 
             if (is_mandatory == 1) {
@@ -802,7 +876,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               is_hidden = false;
             }
             //for tag experiamental
-            if (result[i].form_field_type_id == 10) {
+            if (form_field_type_id == 10) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1166,7 +1240,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             }
 
             //end of experients
-            else if (result[i].form_field_type_id == 6) {
+            else if (form_field_type_id == 6) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1512,7 +1586,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //for filterable combo
-            else if (result[i].form_field_type_id == 9) {
+            else if (form_field_type_id == 9) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1960,7 +2034,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //for grid combo
-            else if (result[i].form_field_type_id == 7) {
+            else if (form_field_type_id == 7) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -2352,7 +2426,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //other fields
-            else if (result[i].form_field_type_id == 8) {
+            else if (form_field_type_id == 8) {
               if (is_readOnly == 1) {
                 var field = Ext.create("Ext.form." + xtype, {
                   layout: "column",
@@ -2449,7 +2523,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   ],
                 });
               }
-            } else if (result[i].form_field_type_id == 5) {
+            } else if (form_field_type_id == 5) {
               if (is_readOnly == 1) {
                 var field = Ext.create("Ext.form." + xtype, {
                   name: field_name,
@@ -2479,8 +2553,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   },
                 });
               }
-            } else if (result[i].form_field_type_id == 12) {
-              var items = result[i].default_value;
+            } else if (form_field_type_id == 12) {
+              var items = default_value;
               items = items.split(",");
               // Map the array of strings to an array of objects
               var items = items.map((label, index) => ({
@@ -2514,8 +2588,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   items: items,
                 });
               }
-            } else if (result[i].form_field_type_id == 13) {
-              var items = result[i].default_value;
+            } else if (form_field_type_id == 13) {
+              var items = default_value;
               items = JSON.parse(items);
 
               // Map the array of strings to an array of objects
@@ -2525,7 +2599,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }));
 
               if (is_readOnly == 1) {
-                var field = Ext.create("Ext.form.CheckboxGroup", {
+                var field = Ext.create("Ext.form." + xtype, {
                   fieldLabel: label,
                   hidden: is_hidden,
                   columnWidth: column_width,
@@ -2535,7 +2609,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   items: items,
                 });
               } else {
-                var field = Ext.create("Ext.form.CheckboxGroup", {
+                var field = Ext.create("Ext.form." + xtype, {
                   fieldLabel: label,
                   hidden: is_hidden,
                   columnWidth: column_width,
@@ -2573,22 +2647,14 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
 
-            fieldset.insert(start_index, field);
-          }
-          // console.log(live_group_tracker);
-          //insert fieldsets
-          const sortedKeys = Object.keys(live_group_tracker).sort(
-            (a, b) => b - a
-          );
-          sortedKeys.forEach((key) => {
-            const grouper = live_group_tracker[key];
-            me.add(1, grouper);
+            // Add the field to the fieldset
+            fieldset.add(field);
           });
-          // for (const key in live_group_tracker) {
-          //   const grouper = live_group_tracker[key];
-          //   me.add(1, grouper);
-
-          // }
+          // console.log(live_group_tracker);
+          // Insert fieldsets into the form in the sorted group order
+          group_tracker.forEach(function (group) {
+            me.add(live_group_tracker[group]);
+          });
           var found = false;
           if (me.up().up().getViewModel()) {
             var vmodel = me.up().up().getViewModel();
@@ -2655,6 +2721,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                         results.complaint_direct_or_indirect,
                     });
                   }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_plannedorunplanned]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_plannedorunplanned]")
+                      .setValue({
+                        deviation_plannedorunplanned:
+                          results.deviation_plannedorunplanned,
+                      });
+                  }
                   if (me.down("radiogroup[name=complaint_fully_addressed]")) {
                     me.down(
                       "radiogroup[name=complaint_fully_addressed]"
@@ -2705,7 +2783,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               var follow_up_period = me
                 .down("numberfield[name=follow_up_period]")
                 .getValue();
-                followupDate.setDate(followupDate.getDate() + follow_up_period);
+              followupDate.setDate(followupDate.getDate() + follow_up_period);
               me.down("datefield[name=follow_up_on]").setValue(
                 followupDate
               );
@@ -2759,7 +2837,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       },
     });
   },
-  showApplicationDocUploadWin: function (btn) {
+  showIssueManagementAssociatedWin: function (btn) {
     var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
       childXtype = btn.childXtype,
@@ -2792,54 +2870,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       );
     }
   },
-  saveIssueManagementDocuments: function (btn) {
-    var me = this,
-      url = btn.action_url,
-      table = btn.table_name,
-      form = btn.up("form"),
-      win = form.up("window"),
-      storeID = btn.storeID,
-      store = Ext.getStore(storeID),
-      frm = form.getForm(),
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      active_application_id = activeTab
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    if (frm.isValid()) {
-      frm.submit({
-        url: url,
-        params: {
-          active_application_id: active_application_id,
-          type: "Document",
-        },
-        waitMsg: "Please wait...",
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-        success: function (form, action) {
-          var response = Ext.decode(action.response.responseText),
-            success = response.success,
-            message = response.message;
-          if (success == true || success === true) {
-            toastr.success(message, "Success Response");
-            store.removeAll();
-            store.load();
-            win.close();
-          } else {
-            toastr.error(message, "Failure Response");
-          }
-        },
-        failure: function (form, action) {
-          var resp = action.result;
-          toastr.error(resp.message, "Failure Response");
-        },
-      });
-    }
-  },
   refreshGrid: function (me) {
     var store = me.store,
       grid = me.up("grid"),
@@ -2857,7 +2887,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       application_code: application_code,
     };
   },
-  saveIssueManagementRelatedIssues: function (btn) {
+  saveIssueManagementAssociatedDetails: function (btn) {
     var me = this,
       url = btn.action_url,
       table = btn.table_name,
@@ -2870,59 +2900,11 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       activeTab = mainTabPanel.getActiveTab(),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
         .getValue();
     if (frm.isValid()) {
       frm.submit({
         url: url,
-        params: { active_application_id: active_application_id },
-        waitMsg: "Please wait...",
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-        success: function (form, action) {
-          var response = Ext.decode(action.response.responseText),
-            success = response.success,
-            message = response.message;
-          if (success == true || success === true) {
-            toastr.success(message, "Success Response");
-            store.removeAll();
-            store.load();
-            win.close();
-          } else {
-            toastr.error(message, "Failure Response");
-          }
-        },
-        failure: function (form, action) {
-          var resp = action.result;
-          toastr.error(resp.message, "Failure Response");
-        },
-      });
-    }
-  },
-  saveIssueManagementAudits: function (btn) {
-    var me = this,
-      url = btn.action_url,
-      table = btn.table_name,
-      form = btn.up("form"),
-      win = form.up("window"),
-      storeID = btn.storeID,
-      store = Ext.getStore(storeID),
-      frm = form.getForm(),
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      active_application_id = activeTab
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    if (frm.isValid()) {
-      frm.submit({
-        url: url,
-        params: { active_application_id: active_application_id },
+        params: { active_application_id: active_application_id, type: 'Document' },
         waitMsg: "Please wait...",
         headers: {
           Authorization: "Bearer " + access_token,

@@ -4,15 +4,13 @@ namespace Modules\IssueManagement\Entities;
 
 use Illuminate\Database\Eloquent\Model;
 
-class IssueManagementDocument extends Model
+class IssueManagementOrgArea extends Model
 {
-    protected $table = 'tra_issue_management_documents';
+    protected $table = 'tra_issue_management_organisational_areas';
 
     protected $fillable = [
         'issue_id',
-        'document_id',
-        'type',
-        'upload_id',
+        'department_id',
         'is_enabled',
         'created_by',
         'altered_by'

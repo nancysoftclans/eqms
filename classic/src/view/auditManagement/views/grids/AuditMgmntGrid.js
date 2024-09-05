@@ -63,9 +63,9 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
         },
          beforeLoad: function () {
               var grid = this.up("grid"),
-                pnl = grid.up("auditMgmntDashPnl"),
-                wrapper = pnl.up("auditManagementDashWrapperPnl"),
-                cnt = wrapper.up(),
+                // pnl = grid.up("auditMgmntDashPnl"),
+                // wrapper = pnl.up("auditManagementDashWrapperPnl"),
+                // cnt = wrapper.up(),
                 store = this.store,
                 grid = this.up("grid");
                 store.getProxy().extraParams = {
@@ -94,9 +94,9 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
 
             beforeLoad: function () {
               var grid = this.up("grid"),
-                pnl = grid.up("auditMgmntDashPnl"),
-                wrapper = pnl.up("auditManagementDashWrapperPnl"),
-                cnt = wrapper.up(),
+                // pnl = grid.up("auditMgmntDashPnl"),
+                // wrapper = pnl.up("auditManagementDashWrapperPnl"),
+                // cnt = wrapper.up(),
                 store = this.store,
                 grid = this.up("grid");
                 store.getProxy().extraParams = {

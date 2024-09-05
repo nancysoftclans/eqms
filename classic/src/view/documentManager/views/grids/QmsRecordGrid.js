@@ -94,9 +94,9 @@ Ext.define('Admin.view.documentManager.views.grids.QmsRecordGrid', {
 
             beforeLoad: function () {
               var grid = this.up("grid"),
-                pnl = grid.up("qmsrecordapps"),
-                wrapper = pnl.up("qmsrecordapplicationwrapper"),
-                cnt = wrapper.up(),
+                // pnl = grid.up("qmsrecordapps"),
+                // wrapper = pnl.up("qmsrecordapplicationwrapper"),
+                // cnt = wrapper.up(),
                 store = this.store,
                 grid = this.up("grid");
               store.getProxy().extraParams = {

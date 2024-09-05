@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Validator;
 use Modules\IssueManagement\Entities\IssueStatus;
 use Modules\IssueManagement\Entities\IssueManagement;
 use Modules\IssueManagement\Entities\IssueManagementAudit;
+use Modules\IssueManagement\Entities\IssueManagementOrgArea;
 use Modules\IssueManagement\Entities\IssueManagementDocument;
 use Modules\IssueManagement\Entities\IssueManagementRelatedIssue;
 
@@ -55,67 +56,23 @@ class IssueManagementController extends Controller
         $targetDateString = $request->target_resolution_date;
         $creationDateString = $request->creation_date;
 
-        if($request->follow_up_on){
+        if ($request->follow_up_on) {
             $followupDateString = $request->follow_up_on;
             $followupDateString = Carbon::parse($followupDateString);
         }
         $targetDateString = Carbon::parse($targetDateString);
         $creationDateString = Carbon::parse($creationDateString);
 
-
+        $issue_data = $request->all();
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
                 $IssueManagement = IssueManagement::findOrFail($active_application_id);
-                $IssueManagement->fill([
-                    'title' => $request->title,
-                    'issue_type_id' => $request->issue_type_id,
-                    'description' => $request->description,
-                    'creation_date' => $creationDateString->format('Y-m-d'),
-                    'target_resolution_date' => $targetDateString->format('Y-m-d'),
-                    'follow_up_on' => $request->follow_up_on,
-                    'section_ids' => $request->section_ids,
-                    'issue_status_id' => $request->issue_status_id,
-                    'complainant_name' => $request->complainant_name,
-                    'complainant_address' => $request->complainant_address,
-                    'complainant_organisation' => $request->complainant_organisation,
-                    'complainant_telephone' => $request->complainant_telephone,
-                    'complainant_email' => $request->complainant_email,
-                    'complaint_mode' => $request->complaint_mode,
-                    'complaint_type' => $request->complaint_type,
-                    'complaint_direct_or_indirect' => $request->complaint_direct_or_indirect,
-                    'office_assigned_to' => $request->office_assigned_to,
-                    'complaint_scheduling_delay' => $request->has('complaint_scheduling_delay'),
-                    'complaint_manner_of_advisor' => $request->has('complaint_manner_of_advisor'),
-                    'complaint_turnaround' => $request->has('complaint_turnaround'),
-                    'complaint_response_delay' => $request->has('complaint_response_delay'),
-                    'complaint_other' => $request->has('complaint_other'),
-                    'problem_statement' => $request->input('problem_statement'),
-                    'rca_team' => $request->input('rca_team'),
-                    'responsible_officer' => $request->input('responsible_officer'),
-                    'complaint_placing_budgetary' => $request->has('complaint_placing_budgetary'),
-                    'complaint_placing_schedule' => $request->has('complaint_placing_schedule'),
-                    'complaint_lacking_knowledge' => $request->has('complaint_lacking_knowledge'),
-                    'complaint_practicing_autocratic' => $request->has('complaint_practicing_autocratic'),
-                    'complaint_processes' => $request->has('complaint_processes'),
-                    'complaint_ineffective_processes' => $request->has('complaint_ineffective_processes'),
-                    'complaint_inefficient_processes' => $request->has('complaint_inefficient_processes'),
-                    'complaint_ineffective_support' => $request->has('complaint_ineffective_support'),
-                    'complaint_system_documentation' => $request->has('complaint_system_documentation'),
-                    'complaint_incomplete_system' => $request->has('complaint_incomplete_system'),
-                    'complaint_ineffective_system' => $request->has('complaint_ineffective_system'),
-                    'complaint_inefficient_system' => $request->has('complaint_inefficient_system'),
-                    'complaint_analytical_methods' => $request->has('complaint_analytical_methods'),
-                    'complaint_validated_methods' => $request->has('complaint_validated_methods'),
-                    'complaint_fully_addressed' => $request->input('complaint_fully_addressed'),
-                    'issue_resolution' => $request->input('issue_resolution'),
-                    'workflow_stage_id' => $request->workflow_stage_id,
-                    'dola' => Carbon::now(),
-                    'altered_by' => $user_id,
-                    'application_code' => $application_code,
-                    'process_id' => $request->process_id
-                ]);
-                $IssueManagement->save();
+                $issue_data['creation_date'] = $creationDateString->format('Y-m-d');
+                $issue_data['target_resolution_date'] = $targetDateString->format('Y-m-d');
+                $issue_data['dola'] = Carbon::now();
+                $issue_data['altered_by'] = $user_id;
+                $IssueManagement->update($issue_data);
                 //End Update
 
                 $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
@@ -177,63 +134,20 @@ class IssueManagementController extends Controller
                 );
                 $res = insertRecord('tra_submissions', $submission_params);
 
-                $issue_data = array(
-                    'submission_id' => $res['record_id'],
-                    'issue_type_id' => $request->issue_type_id,
-                    'title' => $request->title,
-                    'description' => $request->description,
-                    'creation_date' => $creationDateString->format('Y-m-d'),
-                    'target_resolution_date' => $targetDateString->format('Y-m-d'),
-                    'follow_up_on' => $request->follow_up_on,
-                    'section_ids' => $request->has('section_ids'),
-                    'issue_status_id' => $request->issue_status_id,
-                    'complainant_address' => $request->complainant_address,
-                    'complainant_name' => $request->complainant_name,
-                    'complainant_organisation' => $request->complainant_organisation,
-                    'complainant_telephone' => $request->complainant_telephone,
-                    'complainant_email' => $request->complainant_email,
-                    'complaint_mode' => $request->complaint_mode,
-                    'complaint_type' => $request->complaint_type,
-                    'complaint_direct_or_indirect' => $request->complaint_direct_or_indirect,
-                    'office_assigned_to' => $request->office_assigned_to,
-                    'complaint_scheduling_delay' => $request->has('complaint_scheduling_delay'),
-                    'complaint_manner_of_advisor' => $request->has('complaint_manner_of_advisor'),
-                    'complaint_turnaround' => $request->has('complaint_turnaround'),
-                    'complaint_response_delay' => $request->has('complaint_response_delay'),
-                    'complaint_other' => $request->has('complaint_other'),
-                    'problem_statement' => $request->input('problem_statement'),
-                    'rca_team' => $request->input('rca_team'),
-                    'responsible_officer' => $request->input('responsible_officer'),
-                    'complaint_placing_budgetary' => $request->has('complaint_placing_budgetary'),
-                    'complaint_placing_schedule' => $request->has('complaint_placing_schedule'),
-                    'complaint_lacking_knowledge' => $request->has('complaint_lacking_knowledge'),
-                    'complaint_practicing_autocratic' => $request->has('complaint_practicing_autocratic'),
-                    'complaint_processes' => $request->has('complaint_processes'),
-                    'complaint_ineffective_processes' => $request->has('complaint_ineffective_processes'),
-                    'complaint_inefficient_processes' => $request->has('complaint_inefficient_processes'),
-                    'complaint_ineffective_support' => $request->has('complaint_ineffective_support'),
-                    'complaint_system_documentation' => $request->has('complaint_system_documentation'),
-                    'complaint_incomplete_system' => $request->has('complaint_incomplete_system'),
-                    'complaint_ineffective_system' => $request->has('complaint_ineffective_system'),
-                    'complaint_inefficient_system' => $request->has('complaint_inefficient_system'),
-                    'complaint_analytical_methods' => $request->has('complaint_analytical_methods'),
-                    'complaint_validated_methods' => $request->has('complaint_validated_methods'),
-                    'issue_resolution' => $request->input('issue_resolution'),
-                    'complaint_fully_addressed' => $request->input('complaint_fully_addressed'),
-                    'created_on' => Carbon::now(),
-                    'dola' => Carbon::now(),
-                    'created_by' => $user_id,
-                    'altered_by' => $user_id,
-                    'application_code' => $application_code,
-                    'workflow_stage_id' => $request->workflow_stage_id,
-                    'application_status_id' => $application_status->status_id,
-                    'reference_no' => $ref_number,
-                    'tracking_no' => $ref_number,
-                    'process_id' => $process_id,
-                );
-
-
                 $IssueManagement = new IssueManagement();
+                $issue_data['creation_date'] = $creationDateString->format('Y-m-d');
+                $issue_data['target_resolution_date'] = $targetDateString->format('Y-m-d');
+                $issue_data['created_on'] = Carbon::now();
+                $issue_data['dola'] = Carbon::now();
+                $issue_data['created_by'] = $user_id;
+                $issue_data['altered_by'] = $user_id;
+                $issue_data['application_code'] = $application_code;
+                $issue_data['submission_id'] = $res['record_id'];
+                $issue_data['workflow_stage_id'] = $request->workflow_stage_id;
+                $issue_data['application_status_id'] = $application_status->status_id;
+                $issue_data['reference_no'] = $ref_number;
+                $issue_data['tracking_no'] = $ref_number;
+                $issue_data['process_id'] = $process_id;
                 $IssueManagement->create($issue_data);
                 if ($IssueManagement) {
                     $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
@@ -245,7 +159,7 @@ class IssueManagementController extends Controller
                         "message" => 'Data Saved Successfully!!',
                         "results" => $IssueManagement
                     );
-                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+                    // initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                 }
             }
         } catch (\Exception $exception) {
@@ -434,9 +348,19 @@ class IssueManagementController extends Controller
             $res = IssueManagementDocument::from('tra_issue_management_documents as t1')
                 ->leftJoin('tra_issue_management_applications as t2', 't1.issue_id', 't2.id')
                 ->leftJoin('tra_documentmanager_application as t3', 't1.document_id', 't3.id')
+                ->leftJoin('tra_application_uploadeddocuments as t4', 't1.upload_id', 't4.id')
                 ->where('issue_id', $request->issue_id)
-                ->select('t1.*', 't3.doc_title as title','t3.reference_no', 't3.doc_version as version')
+                ->select(
+                    't1.*',
+                    DB::raw('COALESCE(t3.doc_title, t4.initial_file_name) as title'),
+                    't3.reference_no',
+                    't3.doc_version as version',
+                    't4.initial_file_name',
+                    't4.application_code',
+                    't4.node_ref'
+                )
                 ->get();
+
         } catch (\Exception $exception) {
             $res = array(
                 'success' => false,
@@ -455,7 +379,22 @@ class IssueManagementController extends Controller
     {
         try {
             $active_application_id = $request->active_application_id;
+            $application_id = $request->application_id;
+            $application_code = $request->application_code;
             $type = $request->type;
+            if (is_numeric($application_id) && is_numeric($application_code)) {
+                $documentdata = DB::table('tra_application_uploadeddocuments')->where('id', $application_id)->first();
+                $issuedata = IssueManagement::where('application_code', $application_code)->first();
+                $data = array(
+                    'issue_id' => $issuedata->id,
+                    'upload_id' => $application_id,
+                    'type' => 'Attached file',
+                    'dola' => Carbon::now(),
+                    'altered_by' => $this->user_id,
+                );
+                $IssueManagementDocument = new IssueManagementDocument();
+                $IssueManagementDocument->create($data);
+            }
             if (is_numeric($active_application_id)) {
                 $document_data = json_decode($request->document_ids, true);
                 foreach ($document_data as $document) {
@@ -469,14 +408,13 @@ class IssueManagementController extends Controller
                     $IssueManagementDocument = new IssueManagementDocument();
                     $IssueManagementDocument->create($data);
                 }
-                $IssueManagementDocument = IssueManagementDocument::all();
-
-                $res = array(
-                    'success' => true,
-                    'message' => 'Saved Successfully!!',
-                    'results' => $IssueManagementDocument
-                );
             }
+            $IssueManagementDocument = IssueManagementDocument::all();
+            $res = array(
+                'success' => true,
+                'message' => 'Saved Successfully!!',
+                'results' => $IssueManagementDocument
+            );
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         } catch (\Throwable $throwable) {
@@ -554,22 +492,16 @@ class IssueManagementController extends Controller
     public function getIssueManagementAudits(Request $request)
     {
         try {
-            $qry = IssueManagementAudit::from('tra_issue_management_audits as t1')
+            $res = IssueManagementAudit::from('tra_issue_management_audits as t1')
                 ->leftJoin('tra_auditsmanager_application as t2', 't1.audit_id', 't2.id')
                 ->where('t1.issue_id', $request->issue_id)
                 ->select(
                     't1.*',
                     't2.reference_no',
                     't2.audit_reference',
-                    't2.audit_title',
-                    // 't2.audit_type'
-                    // 't2.creation_date as raised_date',
-                    // 't3.title as issue_status',
-                    // 't4.title as issue_type'
+                    't2.audit_title'
                 )
                 ->get();
-            $results = convertStdClassObjToArray($qry);
-            $res = decryptArray($results);
         } catch (\Exception $exception) {
             $res = array(
                 'success' => false,
@@ -614,6 +546,99 @@ class IssueManagementController extends Controller
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         }
+        return \response()->json($res);
+    }
+    public function getIssueManagementOrganisationalAreas(Request $request)
+    {
+        try {
+            $res = IssueManagementOrgArea::from('tra_issue_management_organisational_areas as t1')
+                ->leftJoin('par_departments as t2', 't1.department_id', 't2.id')
+                ->where('t1.issue_id', $request->issue_id)
+                ->select(
+                    't1.*',
+                    't2.name as title'
+                )
+                ->get();
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                "success" => false,
+                "message" => $throwable->getMessage()
+            );
+        }
+
+        return \response()->json($res);
+    }
+
+    public function saveIssueManagementOrganisationalAreas(Request $request)
+    {
+        try {
+            $active_application_id = $request->active_application_id;
+            if (is_numeric($active_application_id)) {
+                $issue_data = json_decode($request->department_ids, true);
+                foreach ($issue_data as $issue) {
+                    $data = array(
+                        'issue_id' => $active_application_id,
+                        'department_id' => $issue,
+                        'dola' => Carbon::now(),
+                        'altered_by' => $this->user_id,
+                    );
+                    $IssueManagementOrgArea = new IssueManagementOrgArea();
+                    $IssueManagementOrgArea->create($data);
+                }
+                $IssueManagementOrgArea = IssueManagementOrgArea::all();
+
+                $res = array(
+                    'success' => true,
+                    'message' => 'Saved Successfully!!',
+                    'results' => $IssueManagementOrgArea
+                );
+            }
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
+        }
+        return \response()->json($res);
+    }
+
+    public function getActivity(Request $request)
+    {
+        try {
+            $res = IssueManagement::from('tra_issue_management_applications as t1')
+                ->join('tra_applications_transitions as t2', 't1.application_code', 't2.application_code')
+                ->join('wf_workflow_stages as t3', 't2.from_stage', 't3.id')
+                ->join('wf_workflow_stages as t4', 't2.to_stage', 't4.id')
+                ->join('users as t5', 't2.author', 't5.id')
+                ->where('t1.application_code', $request->application_code)
+                ->select(
+                    't2.id',
+                    't3.name as from_stage',
+                    't4.name as to_stage',
+                    't5.first_name',
+                    't5.last_name',
+                    't2.remarks',
+                    't2.created_on'
+                )
+                ->get();
+            $res = convertStdClassObjToArray($res);
+            $res = decryptArray($res);
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                "success" => false,
+                "message" => $throwable->getMessage()
+            );
+        }
+
         return \response()->json($res);
     }
 }

@@ -28,6 +28,10 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueQualityReviewPnl", {
       xtype: 'tabpanel',
       items: [
         {
+          xtype: "issuemanagementorgareasgrid",
+          title: "Organisational Areas",
+        },
+        {
           xtype: "issuemanagementdocgrid",
           title: "Associated Documents",
         },
@@ -40,6 +44,11 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueQualityReviewPnl", {
           title: " Associated Audits",
         }
       ],
+    },
+    {
+      xtype: "issueactivitygrid",
+      autoScroll: true,
+      title: "Activity",
     },
     {
       xtype: "hiddenfield",

@@ -4,6 +4,14 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
 
   init: function () { },
 
+  exportTo: function (btn) {
+    var cfg = Ext.merge({
+      title: 'Grid export demo',
+      fileName: 'GridExport' + '.' + (btn.cfg.ext || btn.cfg.type)
+    }, btn.cfg);
+
+    this.getView().saveDocumentAs(cfg);
+  },
   setWorkflowCombosStore: function (obj, options) {
     this.fireEvent("setWorkflowCombosStore", obj, options);
   },
@@ -81,6 +89,16 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       btn = item.up("button"),
       record = btn.getWidgetRecord(),
       id = record.get("id"),
+      storeID = item.storeID,
+      table_name = item.table_name,
+      url = item.action_url;
+    this.fireEvent("deleteRecord", id, table_name, storeID, url);
+  },
+  doDeleteIssueManagement: function (item) {
+    var me = this,
+      btn = item.up("button"),
+      record = btn.getWidgetRecord(),
+      id = record.get("submission_id"),
       storeID = item.storeID,
       table_name = item.table_name,
       url = item.action_url;
@@ -324,7 +342,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     this.navigate(btn, wizardPnl, "next");
   },
 
-  saveIssueManagementApplicationReceivingBaseDetails: function (btn) {
+  saveIssueManagementApplicationDetails: function (btn) {
     var wizard = btn.wizardpnl,
       wizardPnl = btn.up(wizard),
       action_url = btn.action_url,
@@ -407,4 +425,75 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       );
     }
   },
+
+  previewUploadedDocument: function (item) {
+    var btn = item.up('button'),
+      download = item.download,
+      grid = item.up('grid'),
+      record = btn.getWidgetRecord(),
+      node_ref = record.get('node_ref'),
+      application_code = record.get('application_code'),
+      uploadeddocuments_id = record.get('upload_id');
+
+    if (node_ref != '') {
+      this.functDownloadAppDocument(node_ref, download, application_code, uploadeddocuments_id, grid);
+    }
+    else {
+      toastr.error('Document Not Uploaded', 'Failure Response');
+    }
+  },
+  functDownloadAppDocument: function (node_ref, download, application_code = null, uploadeddocuments_id = null, grid = '') {
+    // Mask the grid if it exists
+    if (grid != '') {
+      grid.mask('Document Preview..');
+    }
+
+    Ext.Ajax.request({
+      url: 'documentmanagement/getApplicationDocumentDownloadurl',
+      method: 'GET',
+      params: {
+        node_ref: node_ref,
+        application_code: application_code,
+        uploadeddocuments_id: uploadeddocuments_id
+      },
+      headers: {
+        'Authorization': 'Bearer ' + access_token,
+        'X-CSRF-Token': token
+      },
+      success: function (response) {
+        // Unmask the grid regardless of success
+        if (grid != '') {
+          grid.unmask();
+        }
+
+        var resp = Ext.JSON.decode(response.responseText),
+          success = resp.success,
+          document_url = resp.document_url;
+
+        if (success == true || success === true) {
+          // Open the document in a new tab
+          window.open(document_url, '_blank');
+        } else {
+          toastr.error(resp.message, 'Failure Response');
+        }
+      },
+      failure: function (response) {
+        // Always unmask the grid
+        if (grid != '') {
+          grid.unmask();
+        }
+        var resp = Ext.JSON.decode(response.responseText),
+          message = resp.message;
+        toastr.error(message, 'Failure Response');
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        // Always unmask the grid
+        if (grid != '') {
+          grid.unmask();
+        }
+        toastr.error('Error downloading data: ' + errorThrown, 'Error Response');
+      }
+    });
+  }
+
 });
