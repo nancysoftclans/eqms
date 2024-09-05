@@ -1166,6 +1166,27 @@ class DMSHelper
     }
     return $url;
 }
+static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
+{
+    $auth_resp = authDms('');
+    if (!isset($auth_resp['ticket'])) {
+        throw new \Exception('DMS authentication failed.');
+    }
+    $ticket = $auth_resp['ticket'];
+
+    // Get document name
+    $file_name = getSingleRecordColValue('tra_documents_prevversions', ['id' => $uploadeddocuments_id], 'initial_file_name');
+    $node_ref = getSingleRecordColValue('tra_documents_prevversions', ['id' => $uploadeddocuments_id], 'node_ref');
+    
+    // DMS URL
+    $server_address = Config('constants.dms.dms_url');
+    if ($version_id != '') {
+        $url = $server_address . 'service/api/node/content/workspace/SpacesStore/' . $node_ref . '/version/' . $version_id . '/' . urlencode($file_name) . '?a=false&alf_ticket=' . $ticket;
+    } else {
+        $url = $server_address . 'service/api/node/content/workspace/SpacesStore/' . $node_ref . '/' . urlencode($file_name) . '?a=false&alf_ticket=' . $ticket;
+    }
+    return $url;
+}
 
     static function downloadDocumentUrlOld($node_ref, $version_id)
     {

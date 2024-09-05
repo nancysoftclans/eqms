@@ -433,6 +433,7 @@ function funcShowCustomizableWindow(title, width, childObject, winXtype, btn=tru
     });
     Ext.create(view);
 }
+
 function funcShowStatelessCustomizableWindow(title, width, childObject, winXtype, btn=true) {
   // Ext.getBody().mask('in view mode');
      Ext.create('Ext.window.Window', {

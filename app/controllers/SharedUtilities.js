@@ -142,6 +142,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     auditchecklistgrid: {
       refresh: "refreshAuditChecklistItemsGrid",
     },
+    "button[name=upload_evidence_btn]": {
+      click: "uploadApplicationEvidence",
+      afterrender: "initializeResumableUploadEvidennce",
+    },
     
   },
   listen: {
@@ -1438,157 +1442,134 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       Ext.getBody().unmask();
     }
   },
-  uploadApplicationFile: function (btn) {
-    var me = this,
-      form = btn.up("form"),
-      win = form.up("window"),
-      frm = form.getForm(),
-      formValues = form.getValues(),
-      storeID = btn.storeID,
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
-      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
-      uploads_store = Ext.getStore(storeID),
-      resumable = btn.resumable,
-      progressBar = btn.progressBar;
-    if (resumable != "") {
-      //add parameters
-      resumable.opts.query.id = formValues.id;
-      resumable.opts.query.application_id = formValues.application_id;
-      resumable.opts.query.application_code = application_code;
-      resumable.opts.query.process_id = formValues.process_id;
-      resumable.opts.query.section_id = formValues.section_id;
-      resumable.opts.query.module_id = formValues.module_id;
-      resumable.opts.query.sub_module_id = formValues.sub_module_id;
-      resumable.opts.query.workflow_stage_id = formValues.workflow_stage_id;
-      resumable.opts.query.document_type_id = formValues.document_type_id;
-      resumable.opts.query.prodclass_category_id =
-        formValues.prodclass_category_id;
-      resumable.opts.query.importexport_permittype_id =
-        formValues.importexport_permittype_id;
-      resumable.opts.query.premise_type_id = formValues.premise_type_id;
-      resumable.opts.query.query_ref_id = formValues.query_ref_id;
-      resumable.opts.query.node_ref = formValues.node_ref;
-      resumable.opts.query.doctype_id = formValues.doctype_id;
-      resumable.opts.query.document_requirement_id =
-        formValues.document_requirement_id;
-      resumable.opts.query.assessment_by = formValues.assessment_by;
-      resumable.opts.query.assessment_start_date =
-        formValues.assessment_start_date;
-      resumable.opts.query.assessment_end_date = formValues.assessment_end_date;
-      resumable.opts.query.description = formValues.description;
 
-      funcShowCustomizableWindow(
-        "Upload Progress",
-        "20%",
-        progressBar,
-        "customizablewindow",
-        btn
-      );
-      resumable.upload();
-    } else {
-      toastr.error("Please select a file/document to upload!", "Missing File");
-    }
-  },
-  initializeResumableUpload: function (btn) {
-    var me = this,
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      form = btn.up("form"),
-      win = form.up("window"),
-      rec = form.getValues(),
-      id = rec.application_id,
-      application_id = rec.application_id,
-      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
-      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
-      uploads_store = Ext.getStore(btn.storeID),
-      progressBar = Ext.widget("progress");
-    // let browseFile = $('#browseFile');
-    let resumable = new Resumable({
-      target: "documentmanagement/resumableuploadApplicationDocumentFile",
-      query: {
-        _token: token,
-        view_module_id: module_id,
-        id: id,
-        application_id: application_id,
-        application_code: "",
-        process_id: "",
-        section_id: "",
-        module_id: "",
-        sub_module_id: "",
-        workflow_stage_id: "",
-        document_type_id: "",
-        prodclass_category_id: "",
-        importexport_permittype_id: "",
-        premise_type_id: "",
-        query_ref_id: "",
-        node_ref: "",
-        doctype_id: "",
-        document_requirement_id: "",
-        assessment_by: "",
-        assessment_start_date: "",
-        assessment_end_date: "",
-        description: "",
-      },
-      fileType: [],
-      chunkSize: 10 * 1024 * 1024, // 10mbs
-      headers: {
-        Authorization: "Bearer " + access_token,
-        Accept: "application/json",
-      },
-      testChunks: false,
-      throttleProgressCallbacks: 1,
-    });
-    resumable.assignBrowse(document.getElementById("browseButton"));
-
-    resumable.on("fileAdded", function (file) {
-      // trigger when file picked
-      document.getElementById("fileName").value = file.relativePath;
-      btn.resumable = resumable;
-      btn.progressBar = progressBar;
-      //resumable.upload() // to actually start uploading.
-    });
-
-    resumable.on("fileProgress", function (file) {
-      // trigger when file progress update
-      me.updateProgress(Math.floor(file.progress() * 100), progressBar);
-    });
-
-    resumable.on("fileSuccess", function (file, response) {
-      // trigger when file upload complete
-      response = JSON.parse(response);
-      // uploads_store.load();
-      success = response.success;
-      if (success == true) {
-        toastr.success("Uploaded Successfully", "Success Response");
-        // uploads_store.load();
-        if(module_id ==  28){
-          
+   uploadApplicationFile: function (btn) {
+        var me = this,
+            form = btn.up('form'),
+            win = form.up('window'),
+            frm = form.getForm(),
+            formValues = form.getValues(),
+            storeID = btn.storeID,
+            mainTabPanel = this.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
+            uploads_store = Ext.getStore(storeID),
+            resumable = btn.resumable,
+            progressBar = btn.progressBar;
+        if(resumable != ''){
+            //add parameters
+            resumable.opts.query.id=formValues.id;
+            resumable.opts.query.application_id=formValues.application_id;
+            resumable.opts.query.application_code=formValues.application_code;
+            resumable.opts.query.process_id=formValues.process_id;
+            resumable.opts.query.section_id=formValues.section_id;
+            resumable.opts.query.module_id=formValues.module_id;
+            resumable.opts.query.sub_module_id=formValues.sub_module_id;
+            resumable.opts.query.workflow_stage_id=formValues.workflow_stage_id;
+            resumable.opts.query.document_type_id=formValues.document_type_id;
+            resumable.opts.query.prodclass_category_id=formValues.prodclass_category_id;
+            resumable.opts.query.importexport_permittype_id=formValues.importexport_permittype_id;
+            resumable.opts.query.premise_type_id=formValues.premise_type_id;
+            resumable.opts.query.query_ref_id=formValues.query_ref_id;
+            resumable.opts.query.node_ref=formValues.node_ref;
+            resumable.opts.query.doctype_id=formValues.doctype_id;
+            resumable.opts.query.document_requirement_id=formValues.document_requirement_id;
+            resumable.opts.query.assessment_by=formValues.assessment_by;
+            resumable.opts.query.assessment_start_date=formValues.assessment_start_date;
+            resumable.opts.query.assessment_end_date=formValues.assessment_end_date;
+            resumable.opts.query.description=formValues.description;
+           
+            funcShowCustomizableWindow("Upload Progress", '20%', progressBar, 'customizablewindow', btn);
+            resumable.upload();
+        }else{
+             toastr.error('Please select a file/document to upload!', 'Missing File');
         }
-      } else {
-        toastr.error(
-          response.message + " If problem persist contact system admin",
-          "Failure Response!!"
-        );
-      }
-      progressBar.up("window").close();
-      win.close();
-      delete resumable;
-    });
+    },initializeResumableUpload: function(btn){
+        var me = this,
+            mainTabPanel = this.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            form = btn.up('form'),
+            win = form.up('window'),
+            rec = form.getValues(),
+            id = rec.application_id,
+            application_id = rec.application_id,
+            module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
+            uploads_store = Ext.getStore('applicationDocumentsUploadsStr'),
+            progressBar = Ext.widget('progress');
+        // let browseFile = $('#browseFile');
+        let resumable = new Resumable({
+            target: 'documentmanagement/resumableuploadApplicationDocumentFile',
+            query:{
+                _token:token,
+                view_module_id: module_id,
+                id: id,
+                application_id: application_id,
+                application_code: '',
+                process_id: '',
+                section_id: '',
+                module_id: '',
+                sub_module_id: '',
+                workflow_stage_id: '',
+                document_type_id: '',
+                prodclass_category_id: '',
+                importexport_permittype_id: '',
+                premise_type_id: '',
+                query_ref_id: '',
+                node_ref: '',
+                doctype_id: '',
+                document_requirement_id: '',
+                assessment_by: '',
+                assessment_start_date: '',
+                assessment_end_date: '',
+                description: ''
+            } ,
+            fileType: [],
+            chunkSize: 10*1024*1024, // 10mbs
+            headers: {
+                'Authorization': 'Bearer ' + access_token,
+                'Accept' : 'application/json'
+            },
+            testChunks: false,
+            throttleProgressCallbacks: 1,
+        });
+        // console.log(browseFile);
+        resumable.assignBrowse(document.getElementById('browseButton'));
 
-    resumable.on("fileError", function (file, response) {
-      // trigger when there is any error
-      progressBar.up("window").close();
-      res = JSON.parse(response);
-      uploads_store.load();
-      win.close();
-      toastr.error(
-        res.message + " If problem persist contact system admin",
-        "Failure Response!!"
-      );
-    });
-  },
+        resumable.on('fileAdded', function (file) { // trigger when file picked
+            document.getElementById('fileName').value = file.relativePath;
+            btn.resumable = resumable;
+            btn.progressBar = progressBar;
+            //resumable.upload() // to actually start uploading.
+        });
+
+        resumable.on('fileProgress', function (file) { // trigger when file progress update
+            me.updateProgress(Math.floor(file.progress() * 100), progressBar);
+        });
+
+        resumable.on('fileSuccess', function (file, response) { // trigger when file upload complete
+            response = JSON.parse(response);
+            console.log(uploads_store);
+            uploads_store.load();
+            success = response.success;
+            if(success == true){
+                toastr.success("Uploaded Successfully", 'Success Response');
+                uploads_store.load();
+            }else{
+                toastr.error(response.message+ " If problem persist contact system admin", 'Failure Response!!');
+            }
+            progressBar.up('window').close();
+            win.close();
+            delete resumable;
+        });
+
+        resumable.on('fileError', function (file, response) { // trigger when there is any error
+            progressBar.up('window').close();
+            res = JSON.parse(response);
+            uploads_store.load();
+            win.close();
+            toastr.error(res.message+ " If problem persist contact system admin", 'Failure Response!!');
+        });
+    },
   showReceivingApplicationSubmissionWin: function (btn) {
     Ext.getBody().mask("Please wait...");
     var mainTabPanel = this.getMainTabPanel(),
@@ -2964,6 +2945,297 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       };
     }
   },
+
+  uploadApplicationEvidence: function (btn) {
+    var me = this,
+      form = btn.up("form"),
+      win = form.up("window"),
+      frm = form.getForm(),
+      formValues = form.getValues(),
+      storeID = btn.storeID,
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+      uploads_store = Ext.getStore(storeID),
+      resumable = btn.resumable,
+      progressBar = btn.progressBar;
+
+     
+    if (resumable != "") {
+      //add parameters
+      resumable.opts.query.id = formValues.id;
+      resumable.opts.query.application_id = formValues.application_id;
+      resumable.opts.query.application_code = application_code;
+      resumable.opts.query.process_id = formValues.process_id;
+      resumable.opts.query.section_id = formValues.section_id;
+      resumable.opts.query.module_id = formValues.module_id;
+      resumable.opts.query.sub_module_id = formValues.sub_module_id;
+      resumable.opts.query.workflow_stage_id = formValues.workflow_stage_id;
+      resumable.opts.query.document_type_id = formValues.document_type_id;
+      resumable.opts.query.prodclass_category_id =
+        formValues.prodclass_category_id;
+      resumable.opts.query.importexport_permittype_id =
+        formValues.importexport_permittype_id;
+      resumable.opts.query.premise_type_id = formValues.premise_type_id;
+      resumable.opts.query.query_ref_id = formValues.query_ref_id;
+      resumable.opts.query.node_ref = formValues.node_ref;
+      resumable.opts.query.doctype_id = formValues.doctype_id;
+      resumable.opts.query.document_requirement_id =
+        formValues.document_requirement_id;
+      resumable.opts.query.assessment_by = formValues.assessment_by;
+      resumable.opts.query.assessment_start_date =
+        formValues.assessment_start_date;
+      resumable.opts.query.assessment_end_date = formValues.assessment_end_date;
+      resumable.opts.query.description = formValues.description;
+      resumable.opts.query.checklist_item_id = formValues.checklist_item_id;
+
+
+      funcShowCustomizableWindow(
+        "Upload Progress",
+        "20%",
+        progressBar,
+        "customizablewindow",
+        btn
+      );
+      resumable.upload();
+    } else {
+      toastr.error("Please select a file/document to upload!", "Missing File");
+    }
+  },
+
+  initializeResumableUploadEvidennce: function (btn) {
+    var me = this,
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      form = btn.up("form"),
+      win = form.up("window"),
+      rec = form.getValues(),
+      id = rec.application_id,
+      application_id = rec.application_id,
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+      uploads_store = Ext.getStore('applicationpaymentsstr'),
+      progressBar = Ext.widget("progress");
+
+    // let browseFile = $('#browseFile');
+    let resumable = new Resumable({
+      target: "documentmanagement/resumableuploadApplicationDocumentFile",
+      query: {
+        _token: token,
+        view_module_id: module_id,
+        id: id,
+        application_id: application_id,
+        application_code: "",
+        process_id: "",
+        section_id: "",
+        module_id: "",
+        sub_module_id: "",
+        workflow_stage_id: "",
+        document_type_id: "",
+        prodclass_category_id: "",
+        importexport_permittype_id: "",
+        premise_type_id: "",
+        query_ref_id: "",
+        node_ref: "",
+        doctype_id: "",
+        document_requirement_id: "",
+        assessment_by: "",
+        assessment_start_date: "",
+        assessment_end_date: "",
+        description: "",
+        checklist_item_id: "",
+
+        
+      },
+      fileType: [],
+      chunkSize: 10 * 1024 * 1024, // 10mbs
+      headers: {
+        Authorization: "Bearer " + access_token,
+        Accept: "application/json",
+      },
+      testChunks: false,
+      throttleProgressCallbacks: 1,
+    });
+    resumable.assignBrowse(document.getElementById("browseButton"));
+
+    resumable.on("fileAdded", function (file) {
+      // trigger when file picked
+      document.getElementById("fileName").value = file.relativePath;
+      btn.resumable = resumable;
+      btn.progressBar = progressBar;
+      //resumable.upload() // to actually start uploading.
+    });
+
+    resumable.on("fileProgress", function (file) {
+      // trigger when file progress update
+      me.updateProgress(Math.floor(file.progress() * 100), progressBar);
+    });
+
+    resumable.on("fileSuccess", function (file, response) {
+      // trigger when file upload complete
+      response = JSON.parse(response);
+       uploads_store.load();
+      success = response.success;
+      if (success == true) {
+        toastr.success("Uploaded Successfully", "Success Response");
+         uploads_store.load();
+        if(module_id ==  28){
+          
+        }
+      } else {
+        toastr.error(
+          response.message + " If problem persist contact system admin",
+          "Failure Response!!"
+        );
+      }
+      progressBar.up("window").close();
+      win.close();
+      delete resumable;
+    });
+
+    resumable.on("fileError", function (file, response) {
+      // trigger when there is any error
+      progressBar.up("window").close();
+      res = JSON.parse(response);
+      uploads_store.load();
+      win.close();
+      toastr.error(
+        res.message + " If problem persist contact system admin",
+        "Failure Response!!"
+      );
+    });
+  },
+
+  // uploadApplicationEvidence: function (btn) {
+  //       var me = this,
+  //           form = btn.up('form'),
+  //           win = form.up('window'),
+  //           frm = form.getForm(),
+  //           formValues = form.getValues(),
+  //           storeID = btn.storeID,
+  //           mainTabPanel = this.getMainTabPanel(),
+  //           activeTab = mainTabPanel.getActiveTab(),
+  //           module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
+  //           uploads_store = Ext.getStore(storeID),
+  //           resumable = btn.resumable,
+  //           progressBar = btn.progressBar;
+  //       if(resumable != ''){
+  //           //add parameters
+  //           resumable.opts.query.id=formValues.id;
+  //           resumable.opts.query.application_id=formValues.application_id;
+  //           resumable.opts.query.application_code=formValues.application_code;
+  //           resumable.opts.query.process_id=formValues.process_id;
+  //           resumable.opts.query.section_id=formValues.section_id;
+  //           resumable.opts.query.module_id=formValues.module_id;
+  //           resumable.opts.query.sub_module_id=formValues.sub_module_id;
+  //           resumable.opts.query.workflow_stage_id=formValues.workflow_stage_id;
+  //           resumable.opts.query.document_type_id=formValues.document_type_id;
+  //           resumable.opts.query.prodclass_category_id=formValues.prodclass_category_id;
+  //           resumable.opts.query.importexport_permittype_id=formValues.importexport_permittype_id;
+  //           resumable.opts.query.premise_type_id=formValues.premise_type_id;
+  //           resumable.opts.query.query_ref_id=formValues.query_ref_id;
+  //           resumable.opts.query.node_ref=formValues.node_ref;
+  //           resumable.opts.query.doctype_id=formValues.doctype_id;
+  //           resumable.opts.query.document_requirement_id=formValues.document_requirement_id;
+  //           resumable.opts.query.assessment_by=formValues.assessment_by;
+  //           resumable.opts.query.assessment_start_date=formValues.assessment_start_date;
+  //           resumable.opts.query.assessment_end_date=formValues.assessment_end_date;
+  //           resumable.opts.query.description=formValues.description;
+  //           resumable.opts.query.checklist_item_id = formValues.checklist_item_id;
+           
+  //           funcShowCustomizableWindow("Upload Progress", '20%', progressBar, 'customizablewindow', btn);
+  //           resumable.upload();
+  //       }else{
+  //            toastr.error('Please select a file/document to upload!', 'Missing File');
+  //       }
+  //   },initializeResumableUploadEvidennce: function(btn){
+  //       var me = this,
+  //           mainTabPanel = this.getMainTabPanel(),
+  //           activeTab = mainTabPanel.getActiveTab(),
+  //           form = btn.up('form'),
+  //           win = form.up('window'),
+  //           rec = form.getValues(),
+  //           id = rec.application_id,
+  //           application_id = rec.application_id,
+  //           module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
+  //           uploads_store = Ext.getStore('applicationpaymentsstr'),
+  //           progressBar = Ext.widget('progress');
+  //       // let browseFile = $('#browseFile');
+  //       let resumable = new Resumable({
+  //           target: 'documentmanagement/resumableuploadApplicationDocumentFile',
+  //           query:{
+  //               _token:token,
+  //               view_module_id: module_id,
+  //               id: id,
+  //               application_id: application_id,
+  //               application_code: '',
+  //               process_id: '',
+  //               section_id: '',
+  //               module_id: '',
+  //               sub_module_id: '',
+  //               workflow_stage_id: '',
+  //               document_type_id: '',
+  //               prodclass_category_id: '',
+  //               importexport_permittype_id: '',
+  //               premise_type_id: '',
+  //               query_ref_id: '',
+  //               node_ref: '',
+  //               doctype_id: '',
+  //               document_requirement_id: '',
+  //               assessment_by: '',
+  //               assessment_start_date: '',
+  //               assessment_end_date: '',
+  //               description: '',
+  //               checklist_item_id: "",
+  //           } ,
+  //           fileType: [],
+  //           chunkSize: 10*1024*1024, // 10mbs
+  //           headers: {
+  //               'Authorization': 'Bearer ' + access_token,
+  //               'Accept' : 'application/json'
+  //           },
+  //           testChunks: false,
+  //           throttleProgressCallbacks: 1,
+  //       });
+  //       // console.log(browseFile);
+  //       resumable.assignBrowse(document.getElementById('browseButton'));
+
+  //       resumable.on('fileAdded', function (file) { // trigger when file picked
+  //           document.getElementById('fileName').value = file.relativePath;
+  //           btn.resumable = resumable;
+  //           btn.progressBar = progressBar;
+  //           //resumable.upload() // to actually start uploading.
+  //       });
+
+  //       resumable.on('fileProgress', function (file) { // trigger when file progress update
+  //           me.updateProgress(Math.floor(file.progress() * 100), progressBar);
+  //       });
+
+  //       resumable.on('fileSuccess', function (file, response) { // trigger when file upload complete
+  //           response = JSON.parse(response);
+  //           console.log(uploads_store);
+  //           uploads_store.load();
+  //           success = response.success;
+  //           if(success == true){
+  //               toastr.success("Uploaded Successfully", 'Success Response');
+  //               uploads_store.load();
+  //           }else{
+  //               toastr.error(response.message+ " If problem persist contact system admin", 'Failure Response!!');
+  //           }
+  //           progressBar.up('window').close();
+  //           win.close();
+  //           delete resumable;
+  //       });
+
+  //       resumable.on('fileError', function (file, response) { // trigger when there is any error
+  //           progressBar.up('window').close();
+  //           res = JSON.parse(response);
+  //           uploads_store.load();
+  //           win.close();
+  //           toastr.error(res.message+ " If problem persist contact system admin", 'Failure Response!!');
+  //       });
+  //   },
   
   
 });

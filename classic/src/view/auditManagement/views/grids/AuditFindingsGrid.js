@@ -42,7 +42,8 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
                 winTitle: 'Add Finding',
                 winWidth: '80%',
                 handler: 'showAddConfigParamWinFrm',
-                stores: '[]'
+                stores: '[]',
+                hidden: true
     },{
         xtype: "tbspacer",
         width: 100,
@@ -122,9 +123,20 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
         xtype: 'gridcolumn',
         dataIndex: 'finding_id',
         text: 'ID',
-        flex: 1,
+        flex: 0.2,
         sortable: true
     },{
+        xtype: 'gridcolumn',
+        dataIndex: 'checklist_item',
+        text: 'Question',
+        flex: 2,
+        sortable: true,
+        renderer: function(value, metaData) {
+            metaData.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(value) + '"';
+            return value;
+        }
+    },
+    {
         xtype: 'gridcolumn',
         dataIndex: 'finding_title',
         text: 'Title',
