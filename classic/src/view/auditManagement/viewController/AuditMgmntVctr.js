@@ -274,10 +274,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             form = Ext.widget(childXtype),
             storeArray = eval(item.stores),
             arrayLength = storeArray.length;
-<<<<<<< HEAD
             
-=======
->>>>>>> 2695edf5a0b689d225add7553cb5e544a4809c2b
         if (arrayLength > 0) {
             me.fireEvent('refreshStores', storeArray);
         }
@@ -377,19 +374,12 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             win = form.up('window'),
             storeID = btn.storeID,
             store = Ext.getStore(storeID),
-<<<<<<< HEAD
             frm = form.getForm(),
             checklist_store = Ext.getStore('applicationpaymentsstr'), 
             activePanel = Ext.ComponentQuery.query("#wizardpnl")[0];
             applicationCode= activePanel.down('hiddenfield[name=active_application_code]').getValue();
 
         
-=======
-            frm = form.getForm(), 
-            activePanel = Ext.ComponentQuery.query("#wizardpnl")[0];
-            applicationCode= activePanel.down('hiddenfield[name=active_application_code]').getValue();
-            //console.log(applicationCode);
->>>>>>> 2695edf5a0b689d225add7553cb5e544a4809c2b
         if (frm.isValid()) {
             frm.submit({
                 url: url,
@@ -407,13 +397,10 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                         store.removeAll();
                         store.load();
                         win.close();
-<<<<<<< HEAD
 
                         if(checklist_store){
                             checklist_store.load();
                         }
-=======
->>>>>>> 2695edf5a0b689d225add7553cb5e544a4809c2b
                     } else {
                         toastr.error(message, 'Failure Response');
                     }
@@ -456,7 +443,6 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
              return false;
          }*/
     },
-<<<<<<< HEAD
 
     previewUploadedDocument: function (item) {
     var btn = item.up('button'),
@@ -541,7 +527,5 @@ generateDocumentPermit: function (application_code) {
         var action_url = 'reports/generateDocumentPermit?application_code=' + application_code;
         print_report(action_url);
     },
-=======
->>>>>>> 2695edf5a0b689d225add7553cb5e544a4809c2b
    
 })
