@@ -94,6 +94,16 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
       url = item.action_url;
     this.fireEvent("deleteRecord", id, table_name, storeID, url);
   },
+  doDeleteIssueManagement: function (item) {
+    var me = this,
+      btn = item.up("button"),
+      record = btn.getWidgetRecord(),
+      id = record.get("submission_id"),
+      storeID = item.storeID,
+      table_name = item.table_name,
+      url = item.action_url;
+    this.fireEvent("deleteRecord", id, table_name, storeID, url);
+  },
 
   showIssueTypeConfigParam: function (item) {
     var me = this,
@@ -332,7 +342,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     this.navigate(btn, wizardPnl, "next");
   },
 
-  saveIssueManagementApplicationReceivingBaseDetails: function (btn) {
+  saveIssueManagementApplicationDetails: function (btn) {
     var wizard = btn.wizardpnl,
       wizardPnl = btn.up(wizard),
       action_url = btn.action_url,

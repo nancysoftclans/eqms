@@ -214,7 +214,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
               storeID: "issuemanagementstr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
-              handler: 'doDeleteConfigWidgetParam',
+              handler: 'doDeleteIssueManagement',
               bind: {
                 disabled: '{hideDeleteButton}'
               },

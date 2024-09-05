@@ -326,7 +326,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
       valid = this.validateNewReceivingSubmission();
 
-    if (valid) {
+    if (valid === true) {
       showWorkflowSubmissionWin(
         active_application_id,
         application_code,
@@ -357,7 +357,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .getValue();
 
     if (!active_application_id) {
-      toastr.warning("Please Save Application Details!!", "Warning Response");
+      toastr.error("Please Save Application Details!!", "Warning Response");
       return false;
     }
 
