@@ -9860,4 +9860,247 @@ public function printAdministrativeSubmissionResponses(Request $req)
 
 
 }
+
+	// public function generateAuditReport(Request $req){
+
+	// 	try{
+	// 	$application_code = $req->application_code;
+	// 	$record = DB::table('tra_auditsmanager_application as t1')
+	// 							 ->join('tra_checklistitems_responses as t2', 't1.application_code','t2.application_code' )
+	// 							 ->join('par_checklist_items as t3', 't2.checklist_item_id','t3.id' )
+	// 							 ->leftjoin('tra_application_documents as t4', 't3.id','t4.checklist_item_id' )
+	// 							 ->leftjoin('tra_application_uploadeddocuments as t5', 't4.id','t5.application_document_id' )
+	// 							 ->join('par_audit_findings as t6', 't3.id','t6.checklist_item_id' )
+	// 							 ->select("t1.*")
+	// 							->where('t1.application_code',$application_code);
+	// 							//->first();
+	// 		$record = $record->get();
+	// 		$records = convertStdClassObjToArray($record);
+    //         $records = decryptArray($records);
+
+    // 	$pdf = new PdfProvider();
+    //     $pdf->Cell(0, 8,'PART IVA — PRODUCT DETAILS', 0, 1);
+	// 	$i = 1;
+	// 	$html = '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+	// 	$html .= '<thead>';
+	// 	$html .= '<tr style="font-weight:bold;">';
+	// 	$html .= '<th style="width: 4%; text-align: center;">No.</th>';
+	// 	$html .= '<th style="width: 7%; text-align: left;">Reg. No.</th>';
+	// 	$html .= '<th style="width: 7%; text-align: center;">Brand Name</th>';
+	// 	$html .= '<th style="width: 6%; text-align: center;">Generic Name</th>';
+	// 	$html .= '<th style="width: 6%; text-align: center;">GMDN Term Code</th>';
+	// 	$html .= '<th style="width: 6%; text-align: center;">GMDN Term Name</th>';
+	// 	$html .= '<th style="width: 7%; text-align: center;">Active ingredients</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Strength</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Unit (Strength)</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Number of Packs</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Units per Batch</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Batch No</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Mfg Date</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Expiry Date</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Units for Quantity</th>';
+	// 	$html .= '<th style="width: 6%; text-align: center;">Price Per pack (FOB)</th>';
+	// 	$html .= '<th style="width: 6%; text-align: center;">Total Cost (FOB)</th>';
+	// 	$html .= '<th style="width: 5%; text-align: center;">Currency Name</th>';
+	// 	$html .= '</tr>';
+	// 	$html .= '</thead>';
+
+	// 	$html .= '<tbody>';
+
+	// 	$counter = 1;
+	// 	$total_amount = 0;
+
+	// 	foreach ($records as $rec) {
+
+	// 	    $html .= '<tr>';
+	// 	    $html .= '<td style="width: 4%; text-align: center;">' . $counter . '</td>';
+	// 	    $html .= '<td style="width: 7%;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 7%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 6%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 6%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 6%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 7%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 6%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '<td style="width: 6%; text-align: center;">' . number_format($rec['application_code'], 2) . '</td>';
+	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
+	// 	    $html .= '</tr>';
+
+	// 	    if (!is_string($rec['application_code']) && $rec['application_code'] !== 'N/A') {
+	// 	        $total_amount += $rec['application_code'];
+	// 	    }
+	// 	    $counter++;
+	// 	}
+
+	// 	$total_amount = is_string($rec['application_code']) ? 'N/A' : number_format($application_code, 2);
+	// 	$html .= '</tbody>';
+	// 	$html .= '<tfoot>';
+	// 	$html .= '<tr style="font-weight: bold;">';
+	// 	$html .= '<td colspan="17" align="right">Total Value:</td>';
+	// 	$html .= '<td style="width: 5%; text-align: right;">' . $total_amount . '</td>';
+	// 	$html .= '</tr>';
+	// 	$html .= '</tfoot>';
+	// 	$html .= '</table>';
+
+	// 	$pdf->SetFont('times', '', 8);
+	// 	$pdf->writeHTML($html, true, false, true, false, '');
+
+
+	// 	}catch (\Exception $exception) {
+	// 				$res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+
+	// 	} catch (\Throwable $throwable) {
+	// 				$res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+	// 	}
+	// 	return response()->json($res);
+
+	// }
+
+	public function generateAuditReport(Request $req)
+{
+    try {
+        // Retrieve the application code from the request
+        $application_code = $req->input('application_code');
+
+        // Query to fetch the records
+        $records = DB::table('tra_auditsmanager_application as t1')
+            ->join('tra_checklistitems_responses as t2', 't1.application_code', 't2.application_code')
+            ->join('par_checklist_items as t3', 't2.checklist_item_id', 't3.id')
+            ->leftJoin('tra_application_documents as t4', 't3.id', 't4.checklist_item_id')
+            ->leftJoin('tra_application_uploadeddocuments as t5', 't4.id', 't5.application_document_id')
+            ->join('par_audit_findings as t6', 't3.id', 't6.checklist_item_id')
+            ->select("t1.*")
+            ->where('t1.application_code', $application_code)
+            ->get();
+
+        // Convert the result into an array
+        $records = convertStdClassObjToArray($records);
+        $records = decryptArray($records);
+
+        // Check if there are any records returned
+        if (empty($records)) {
+            return response()->json(['success' => false, 'message' => 'No records found for the given application code']);
+        }
+
+        // Initialize the PDF provider
+        $pdf = new PdfProvider();
+        $pdf->AddPage();
+        $pdf->SetFont('Times', '', 12);
+
+        // Add an image centered above the header text
+        $logo = getcwd() . '/resources/images/logo.jpg';
+		$logo = str_replace('\\', '/', $logo);
+        $pdf->Image($logo,85,25,43,19); // Adjust position and size as necessary
+        // Set the position for the header text
+        $pdf->SetY(42); // Adjust vertical position after image
+
+        // Define page width for alignment calculations
+        $pageWidth = $pdf->GetPageWidth();
+
+        // Left-aligned header text
+        $pdf->SetX(10);
+        $pdf->Cell(0, 10, 'BOMRA/QM/P03/F02', 0, 0, 'L');
+
+        // Center-aligned header text
+        $pdf->SetX(($pageWidth / 2) - (80)); // Adjust X position to center text (50 is approximate width of the text block)
+        $pdf->Cell(0, 10, 'Botswana Medicines Regulatory Authority', 0, 0, 'C');
+        
+        // Center-aligned second line of header text
+        $pdf->SetX(($pageWidth / 2) - (80)); // Adjust X position to center text
+        $pdf->Cell(0, 20, 'Internal Audit Report', 0, 0, 'C');
+
+        // Right-aligned header text
+        $pdf->SetX($pageWidth - 90); // Adjust X position for right-aligned text (90 is approximate width of the text block)
+        $pdf->Cell(0, 10, 'Issue No. 2.0', 0, 0, 'R');
+
+        // Add some space before the content starts
+        $pdf->Ln(20);
+
+         // Start building HTML content
+         
+        $html = '<h3></h3>';
+		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Audit ID</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Audit Type</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Reference</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Title</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Owner</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Status</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Start Date</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">End Date</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Summary & Scope</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '</table>';
+
+		$html .= '<h3></h3>';
+		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Function Audited:</th><td>' . htmlspecialchars('function') . '</td>';
+		$html .= '<th style="font-weight:bold;">Audit Standard:</th><td>' . htmlspecialchars('standard') . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Audit Criteria:</th><td>' . htmlspecialchars('criteria') . '</td>';
+		$html .= '<th style="font-weight:bold;">Audit Objectives:</th><td>' . htmlspecialchars('objectives') . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Additional Auditor:</th><td colspan="3">' . htmlspecialchars('Auditor') . '</td>';
+		$html .= '</tr>';
+		$html .= '</table>';
+
+
+		$html .= '<h3 style="font-weight: bold; border-bottom: 2px solid black; display: inline-block;">Questionnaire</h3>';
+
+
+
+
+        $html .= '<h3>Findings</h3>';
+        $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+        $html .= '<tr><th style="font-weight:bold;">Total Number of Findings</th><td>' . count($records) . '</td></tr>';
+        // Add findings rows here   
+        $html .= '</table>';
+
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+        // Output the PDF as a downloadable file
+        return response()->stream(
+            function () use ($pdf) {
+                $pdf->Output('Audit_Report.pdf', 'I'); // 'I' for inline display in browser
+            },
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="Audit_Report.pdf"',
+            ]
+        );
+
+    } catch (\Exception $exception) {
+        $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        return response()->json($res);
+    } catch (\Throwable $throwable) {
+        $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        return response()->json($res);
+    }
 }
+
+
+
+
+
+	}
+

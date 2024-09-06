@@ -523,9 +523,13 @@ functDownloadAppDocument:function(node_ref,download,application_code=null,upload
 
 
 },
-generateDocumentPermit: function (application_code) {
-        var action_url = 'reports/generateDocumentPermit?application_code=' + application_code;
-        print_report(action_url);
+generateAuditReport: function (item) {
+        var record = item.getWidgetRecord(),
+            application_code = record.get('application_code');
+            module_id = record.get('module_id');
+            sub_module_id = record.get('sub_module_id');
+        this.fireEvent('generateAuditReport', application_code,module_id,sub_module_id);
     },
+
    
 })

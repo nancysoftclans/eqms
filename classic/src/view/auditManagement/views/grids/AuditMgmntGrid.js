@@ -126,7 +126,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
             ui: 'soft-blue',
             text: 'Audit Report',
             iconCls: 'x-fa fa-certificate',
-            handler: 'generateDocumentPermit',
+            handler: 'generateAuditReport',
             bind: {
                 disabled: '{record.application_status_id == 9}'
                 //disabled: '{record.decision_id !== 1}'
