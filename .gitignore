@@ -11,5 +11,13 @@ classic.jsonp
 modern.json
 modern.jsonp
 backend/bootstrap/
+backend/storage/api-docs/api-docs.json
+bootstrap.js
+classic.json
+classic.jsonp
+modern.json
+modern.jsonp
+backend/bootstrap/
 production/*
 build/*
+backend.rar

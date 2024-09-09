@@ -238,7 +238,8 @@ class AuditManagementController extends Controller
                                 ->leftJoin('par_finding_types as t2', 't1.finding_type_id', '=', 't2.id')
                                 ->leftJoin('tra_issue_management_applications as t3', 't1.issue_id', '=', 't3.id')
                                 ->leftJoin('par_issue_statuses as t4', 't3.issue_status_id', '=', 't4.id')
-                                ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type', 't3.title', 't3.created_on as raised_date', 't3.complainant_name', 't4.title as issue_status')
+                                ->leftJoin('par_checklist_items as t5', 't1.checklist_item_id', '=', 't5.id')
+                                ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type', 't3.title', 't3.created_on as raised_date', 't3.complainant_name', 't4.title as issue_status', 't5.name as checklist_item')
                                 ->where('t1.application_code', $application_code)
                                 ->get();
             
@@ -492,7 +493,7 @@ class AuditManagementController extends Controller
 
     public function saveAuditFinding(Request $req) {
           try {
-             DB::beginTransaction();
+             //DB::beginTransaction();
             $user_id = \Auth::user()->id;
             $post_data = $req->post();
             $table_name = $post_data['table_name'];
@@ -518,6 +519,7 @@ class AuditManagementController extends Controller
                 "description" => $post_data['description'],
                 "results" => $post_data['results'],
                 "issue_id"=> $post_data['issue_id'],
+                "checklist_item_id" => $post_data['checklist_item_id'],
 
             );
 
@@ -526,15 +528,14 @@ class AuditManagementController extends Controller
             );
             //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
 
-            if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+           // if (isset($id) && $id != "") {
 
+                if (recordExists($table_name, $where)) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
                     $res = updateRecord($table_name, $where, $table_data);
-                    
                     if($res['success'] == false) {
 
                     DB::rollBack();
@@ -553,9 +554,12 @@ class AuditManagementController extends Controller
                     );
                 }
                 }
-            } else {
+           // }
+             else {
                 $table_data['dola'] = Carbon::now();
                 $res = insertRecord($table_name, $table_data);
+
+
 
                 if($res['success'] == false) {
 

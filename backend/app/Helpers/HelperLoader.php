@@ -920,6 +920,14 @@ if (!function_exists('downloadDocumentUrl')) {
 
     }
 }
+
+if (!function_exists('downloadDocumentPreviewUrl')) {
+    function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id = null)
+    {
+        return DMSHelper::downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id);
+
+    }
+}
 if (!function_exists('dmsGetNodePreviousVersions')) {
     function dmsGetNodePreviousVersions($node_ref, $version_ref = null)
     {
