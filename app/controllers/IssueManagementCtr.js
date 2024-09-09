@@ -834,6 +834,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             var group_title = base_result.group_title;
             var default_value = base_result.default_value;
             var form_field_type_id = base_result.form_field_type_id;
+            var options = base_result.options;
             //for registers
             if (is_register == 1111) {
               is_readOnly = false;
@@ -2554,72 +2555,76 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 });
               }
             } else if (form_field_type_id == 12) {
-              var items = default_value;
-              items = items.split(",");
-              // Map the array of strings to an array of objects
-              var items = items.map((label, index) => ({
-                boxLabel: label,
-                name: field_name,
-                inputValue: index + 1,
-              }));
+              if (options) {
+                var items = options;
+                items = JSON.parse(items);
+                // Map the array of strings to an array of objects
+                var items = items.map((object, index) => ({
+                  boxLabel: object.label,
+                  name: object.name,
+                  inputValue: index + 1,
+                }));
 
-              if (is_readOnly == 1) {
-                var field = Ext.create("Ext.form." + xtype, {
-                  name: field_name,
-                  fieldLabel: label,
-                  hidden: is_hidden,
-                  columnWidth: column_width,
-                  allowBlank: is_mandatory,
-                  readOnly: true,
-                  columns: 1,
-                  items: items,
-                });
-              } else {
-                var field = Ext.create("Ext.form." + xtype, {
-                  name: field_name,
-                  fieldLabel: label,
-                  hidden: is_hidden,
-                  columnWidth: column_width,
-                  columns: 1,
-                  allowBlank: is_mandatory,
-                  bind: {
-                    readOnly: "{isReadOnly}",
-                  },
-                  items: items,
-                });
+                if (is_readOnly == 1) {
+                  var field = Ext.create("Ext.form." + xtype, {
+                    name: field_name,
+                    fieldLabel: label,
+                    hidden: is_hidden,
+                    columnWidth: column_width,
+                    allowBlank: is_mandatory,
+                    readOnly: true,
+                    columns: 1,
+                    items: items,
+                  });
+                } else {
+                  var field = Ext.create("Ext.form." + xtype, {
+                    name: field_name,
+                    fieldLabel: label,
+                    hidden: is_hidden,
+                    columnWidth: column_width,
+                    columns: 1,
+                    allowBlank: is_mandatory,
+                    bind: {
+                      readOnly: "{isReadOnly}",
+                    },
+                    items: items,
+                  });
+                }
               }
             } else if (form_field_type_id == 13) {
-              var items = default_value;
-              items = JSON.parse(items);
+              if (options) {
+                var items = options;
+                items = JSON.parse(items);
 
-              // Map the array of strings to an array of objects
-              var items = items.map((label, index) => ({
-                boxLabel: label.boxLabel,
-                name: label.name,
-              }));
+                // Map the array of strings to an array of objects
+                var items = items.map((object, index) => ({
+                  boxLabel: object.label,
+                  name: object.name,
+                }));
 
-              if (is_readOnly == 1) {
-                var field = Ext.create("Ext.form." + xtype, {
-                  fieldLabel: label,
-                  hidden: is_hidden,
-                  columnWidth: column_width,
-                  allowBlank: is_mandatory,
-                  readOnly: true,
-                  columns: 1,
-                  items: items,
-                });
-              } else {
-                var field = Ext.create("Ext.form." + xtype, {
-                  fieldLabel: label,
-                  hidden: is_hidden,
-                  columnWidth: column_width,
-                  allowBlank: is_mandatory,
-                  columns: 1,
-                  bind: {
-                    readOnly: "{isReadOnly}",
-                  },
-                  items: items,
-                });
+                if (is_readOnly == 1) {
+                  var field = Ext.create("Ext.form." + xtype, {
+                    fieldLabel: label,
+                    hidden: is_hidden,
+                    columnWidth: column_width,
+                    allowBlank: is_mandatory,
+                    readOnly: true,
+                    columns: 1,
+                    items: items,
+                  });
+                } else {
+                  var field = Ext.create("Ext.form." + xtype, {
+                    fieldLabel: label,
+                    hidden: is_hidden,
+                    columnWidth: column_width,
+                    allowBlank: is_mandatory,
+                    columns: 1,
+                    bind: {
+                      readOnly: "{isReadOnly}",
+                    },
+                    items: items,
+                  });
+                }
               }
             } else {
               if (is_readOnly == 1) {
