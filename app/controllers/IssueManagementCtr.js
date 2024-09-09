@@ -2746,6 +2746,42 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                         results.complaint_fully_addressed,
                     });
                   }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_approved]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_approved]")
+                      .setValue({
+                        deviation_approved:
+                          results.deviation_approved,
+                      });
+                  }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_notified]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_notified]")
+                      .setValue({
+                        deviation_notified:
+                          results.deviation_notified,
+                      });
+                  }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_addressed]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_addressed]")
+                      .setValue({
+                        deviation_addressed:
+                          results.deviation_addressed,
+                      });
+                  }
                 } else {
                   toastr.error(message, "Failure Response");
                 }

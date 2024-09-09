@@ -153,7 +153,7 @@ Ext.define('Admin.view.configurations.views.forms.FormFieldDesignerFrm', {
         name: 'options',
         allowBlank: true,
         hidden: true,
-        value: 'Default text here'
+        value: '[  {"label": "Label 1", "name": "label1_name"}, {"label": "Label 2", "name": "label2_name"} ]'
     },
     // {
     //     xtype: 'textfield',

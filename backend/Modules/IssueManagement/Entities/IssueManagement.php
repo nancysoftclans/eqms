@@ -155,7 +155,17 @@ class IssueManagement extends Model
         'deviation_from_date',
         'deviation_to_date',
         'deviation_impact',
-        'deviation_justification'
+        'deviation_justification',
+        'deviation_approved',
+        'deviation_approved_comments',
+        'investigation_details',
+        'proposed_action_plan',
+        'actions_implemented',
+        'actions_undertaken',
+        'deviation_notified',
+        'effectiveness_comments',
+        'quality_office_comments',
+        'deviation_addressed',
     ];
 
     public $timestamps = false;
