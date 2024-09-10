@@ -26,7 +26,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     {
       xtype: "exportbtn",
-      // handler: 'exportTo'
+      handler: 'exportTo'
     },
     {
       xtype: "tbspacer",
@@ -219,6 +219,16 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
                 disabled: '{hideDeleteButton}'
               },
             },
+            {
+              text: "Issue Report",
+              iconCls: "x-fa fa-certificate",
+              tooltip: "Issue Report",
+              table_name: "tra_submissions",
+              storeID: "issuemanagementstr",
+              action_url: "issuemanagement/generateIssueReport",
+              action: "issue_report",
+              handler: 'generateIssueReport'
+            },
           ],
         },
       },
@@ -227,8 +237,13 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
         if (issue_status === 1) {
           widget.down('menu menuitem[action=actual_delete]').setHidden(false);
         }
+        if (issue_status === 8) {
+          widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+          widget.down('menu menuitem[action=issue_report]').setHidden(false);
+        }
         else {
           widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+          widget.down('menu menuitem[action=issue_report]').setHidden(true);
         }
       }
     },
