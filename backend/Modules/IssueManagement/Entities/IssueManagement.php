@@ -166,6 +166,12 @@ class IssueManagement extends Model
         'effectiveness_comments',
         'quality_office_comments',
         'deviation_addressed',
+        'requisition_officer',
+        'designation',
+        'drivers',
+        'trip_purpose',
+        'destination',
+        'number_of_passengers',
     ];
 
     public $timestamps = false;

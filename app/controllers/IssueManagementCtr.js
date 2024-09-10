@@ -562,6 +562,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       issuemanagementissuegrid = activeTab.down("issuemanagementissuegrid"),
       issuemanagementauditgrid = activeTab.down("issuemanagementauditgrid"),
+      issuemanagementorgareasgrid = activeTab.down("issuemanagementorgareasgrid"),
 
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
@@ -570,6 +571,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     issuemanagementdocgrid.down("button[name=select_document]").setVisible(false);
     issuemanagementissuegrid.down("button[name=select_issue_btn]").setVisible(false);
     issuemanagementauditgrid.down("button[name=select_audit_btn]").setVisible(false);
+    issuemanagementorgareasgrid.down("button[name=select_orgarea_btn]").setVisible(false);
     issuemanagementfrm
       .getForm()
       .getFields()
@@ -2897,7 +2899,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .down("hiddenfield[name=active_application_code]")
         .getValue();
     if (application_code != "") {
-      form.setHeight(650);
+      form.setHeight(400);
       funcShowCustomizableWindow(
         winTitle,
         winWidth,
