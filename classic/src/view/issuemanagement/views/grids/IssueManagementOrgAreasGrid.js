@@ -30,7 +30,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
       ui: "soft-blue",
       childXtype: "selectorgareaform",
       winTitle: "Select",
-      winWidth: "80%",
+      winWidth: "60%",
       stores: "[issuemanagementorgareastr]",
       storeID: "issuemanagementorgareastr"
     },
