@@ -6,8 +6,8 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
 
   exportTo: function (btn) {
     var cfg = Ext.merge({
-      title: 'Grid export demo',
-      fileName: 'GridExport' + '.' + (btn.cfg.ext || btn.cfg.type)
+      title: 'Issue List',
+      fileName: 'Issues' + '.' + (btn.cfg.ext || btn.cfg.type)
     }, btn.cfg);
 
     this.getView().saveDocumentAs(cfg);
@@ -494,6 +494,16 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
         toastr.error('Error downloading data: ' + errorThrown, 'Error Response');
       }
     });
-  }
+  },
 
+  generateIssueReport: function (item) {
+    var btn = item.up("button"),
+      record = btn.getWidgetRecord(),
+      application_code = record.get('application_code'),
+      module_id = record.get('module_id'),
+      sub_module_id = record.get('sub_module_id'),
+      action_url = item.action_url;
+    action_url = action_url + '?application_code=' + application_code;
+    print_report(action_url);
+  },
 });

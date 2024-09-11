@@ -9,6 +9,7 @@ use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Modules\Reports\Providers\PdfProvider;
 use Modules\IssueManagement\Entities\IssueStatus;
 use Modules\IssueManagement\Entities\IssueManagement;
 use Modules\IssueManagement\Entities\IssueManagementAudit;
@@ -641,4 +642,162 @@ class IssueManagementController extends Controller
 
         return \response()->json($res);
     }
+
+    public function generateIssueReport(Request $request)
+    {
+        try {
+            $application_code = $request->input('application_code');
+
+            // Query to fetch the Issue
+            $records = IssueManagement::from('tra_issue_management_applications as t1')
+                ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
+                ->leftJoin('wf_workflow_stages as t3', 't1.workflow_stage_id', '=', 't3.id')
+                ->leftjoin('wf_processes as t4', 't2.process_id', '=', 't4.id')
+                ->join('par_issue_statuses as t5', 't1.issue_status_id', 't5.id')
+                ->join('users as t6', 't1.created_by', 't6.id')
+                ->join('par_complaint_modes as t7', 't1.complaint_mode', 't7.id')
+                ->join('par_departments as t8', 't1.office_assigned_to', 't8.id')
+                ->select(
+                    't2.*',
+                    't1.*',
+                    't7.name as complaint_mode',
+                    't8.name as office_assigned',
+                    't3.name as workflow_stage',
+                    't4.name as process_name',
+                    't1.created_on as raised_date',
+                    't5.title as issue_status',
+                    't1.id as active_application_id',
+                    't2.current_stage as workflow_stage_id',
+                    DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
+                )
+                ->where('t1.application_code', $application_code)
+                ->get();
+
+            // Convert the result into an array
+            $records = convertStdClassObjToArray($records);
+            $records = decryptArray($records);
+
+            // Check if there are any records returned
+            if (empty($records)) {
+                return response()->json(['success' => false, 'message' => 'No records found for the given application code']);
+            }
+
+            // Initialize the PDF provider
+            $pdf = new PdfProvider();
+            $pdf->AddPage();
+            $pdf->SetFont('Times', '', 12);
+
+            // Add an image centered above the header text (adjust paths as necessary)
+            $logo = getcwd() . '/resources/images/logo.jpg';
+            $logo = str_replace('\\', '/', $logo);
+            $pdf->Image($logo, 85, 25, 43, 19);
+
+            // Set the position for the header text
+            $pdf->SetY(42);
+            $pageWidth = $pdf->GetPageWidth();
+
+            // Left-aligned header text
+            $pdf->SetX(10);
+            $pdf->Cell(0, 10, 'BOMRA/QM/P03/F01', 0, 0, 'L');
+
+            // Center-aligned header text
+            $pdf->SetX(($pageWidth / 2) - 80);
+            $pdf->Cell(0, 10, 'Botswana Medicines Regulatory Authority', 0, 0, 'C');
+
+            // Center-aligned second line of header text
+            $pdf->SetX(($pageWidth / 2) - 80);
+            $pdf->Cell(0, 20, 'Customer Complaints and Appeals Form', 0, 0, 'C');
+
+            // Right-aligned header text
+            $pdf->SetX($pageWidth - 90);
+            $pdf->Cell(0, 10, 'Issue No. 4.0', 0, 0, 'R');
+
+            $pdf->Ln(20);
+
+            $html = '<table border="0" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse;">';
+            $html .= '<tr><th style="font-weight: bold;">Date:</th><td>' . date('Y-m-d') . '</td><th style="font-weight: bold;">Complaint No:</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Name of Complainant:</th><td>' . htmlspecialchars($records[0]['complainant_name']) . '</td>';
+            $html .= '<th style="font-weight: bold;">Name of Organization:</th><td>' . htmlspecialchars($records[0]['complainant_organisation']) . '</td></tr>';
+
+            $html .= '<tr><th style="font-weight: bold;">Address:</th><td>' . htmlspecialchars($records[0]['complainant_address']) . '</td>';
+            $html .= '<th style="font-weight: bold;">Telephone:</th><td>' . htmlspecialchars($records[0]['complainant_telephone']) . '</td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">E-mail:</th><td colspan="3">' . htmlspecialchars($records[0]['complainant_email']) . '</td></tr>';
+
+            $html .= '<tr><th style="font-weight: bold;">Mode of Complaint:</th><td colspan="3">' . htmlspecialchars($records[0]['complaint_mode']) . '</td></tr>';
+            $html .= '</table>';
+
+
+
+            $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+
+            $html .= '<tr><td colspan="4"><h3>Details of the complaint.</h3><br>' . nl2br(htmlspecialchars($records[0]['description'])) . '</td></tr>';
+
+
+            // Initial Review
+            $html .= '<tr><td colspan="1"><h3>Initial Review By Quality Office:</h3></td><td colspan="3">Office Assigned to: <u>' . htmlspecialchars($records[0]['office_assigned']) . '</u></td></tr>';
+
+            $html .= '<tr><td colspan="1"><h3>Initial Review by:</h3></td><td colspan="2">' . htmlspecialchars($records[0]['office_assigned']) . '</td><td><h3>Date:</h3></td></tr>';
+            // $html .= '<tr><th>Date:</th><td>' . htmlspecialchars($records[0]['review_date']) . '</td>';
+            // $html .= '<th colspan="2"></th></tr>';
+
+            // Root Cause Analysis
+            $html .= '<tr><th colspan="4">Root Cause Analysis</th></tr>';
+            $html .= '<tr><td colspan="4">Complete Non-Conformity Form – BOMRA/QM/P08/F01.</td></tr>';
+
+            // Resolution and Approval
+            $html .= '<tr><th>Resolution Reached:</th><td>' . htmlspecialchars($records[0]['issue_resolution']) . '</td>';
+            // $html .= '<th>Date Communicated:</th><td>' . htmlspecialchars($records[0]['resolution_date']) . '</td></tr>';
+            // $html .= '<tr><th>Assigned Officer:</th><td>' . htmlspecialchars($records[0]['assigned_officer']) . '</td>';
+            // $html .= '<th>Approval by HOD/Supervisor:</th><td>' . htmlspecialchars($records[0]['hod_approval']) . '</td></tr>';
+            // $html .= '<tr><th>Date:</th><td>' . htmlspecialchars($records[0]['hod_approval_date']) . '</td>';
+            $html .= '<th colspan="2"></th></tr>';
+
+            // Verification of Effectiveness of Actions
+            // $html .= '<tr><th>Verified by Supervisor:</th><td>' . htmlspecialchars($records[0]['supervisor_verification']) . '</td>';
+            // $html .= '<th>Date:</th><td>' . htmlspecialchars($records[0]['supervisor_verification_date']) . '</td></tr>';
+            // $html .= '<tr><th>Confirmed by Quality Office:</th><td>' . htmlspecialchars($records[0]['quality_office_confirmation']) . '</td>';
+            // $html .= '<th>Date:</th><td>' . htmlspecialchars($records[0]['quality_office_confirmation_date']) . '</td></tr>';
+
+            // End of table
+            $html .= '</table>';
+
+            // Appeals section
+            $html .= '<h3>Appeals</h3>';
+            $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+            // $html .= '<tr><th>Appeal Date:</th><td>' . htmlspecialchars($records[0]['appeal_date']) . '</td>';
+            // $html .= '<th>Appeal No:</th><td>' . htmlspecialchars($records[0]['appeal_no']) . '</td></tr>';
+            // $html .= '<tr><th>Details of the Appeal:</th><td colspan="3">' . htmlspecialchars($records[0]['appeal_details']) . '</td></tr>';
+            // $html .= '<tr><th>Appeal Status:</th><td>' . htmlspecialchars($records[0]['appeal_status']) . '</td></tr>';
+            $html .= '</table>';
+
+            // Appeal verification
+            $html .= '<h3>Verification by Quality Office</h3>';
+            $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+            // $html .= '<tr><th>Verification by:</th><td>' . htmlspecialchars($records[0]['verification_by']) . '</td>';
+            // $html .= '<th>Date:</th><td>' . htmlspecialchars($records[0]['verification_date']) . '</td></tr>';
+            $html .= '</table>';
+
+            // Write the HTML content to the PDF
+            $pdf->writeHTML($html, true, false, true, false, '');
+
+            // Output the PDF as a downloadable file
+            return response()->stream(
+                function () use ($pdf) {
+                    $pdf->Output('Issue_Report.pdf', 'I'); // 'I' for inline display in browser
+                },
+                200,
+                [
+                    'Content-Type' => 'application/pdf',
+                    'Content-Disposition' => 'inline; filename="Issue_Report.pdf"',
+                ]
+            );
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+            return response()->json($res);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+            return response()->json($res);
+        }
+    }
+
 }
