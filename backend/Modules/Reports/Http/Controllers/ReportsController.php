@@ -9861,108 +9861,6 @@ public function printAdministrativeSubmissionResponses(Request $req)
 
 }
 
-	// public function generateAuditReport(Request $req){
-
-	// 	try{
-	// 	$application_code = $req->application_code;
-	// 	$record = DB::table('tra_auditsmanager_application as t1')
-	// 							 ->join('tra_checklistitems_responses as t2', 't1.application_code','t2.application_code' )
-	// 							 ->join('par_checklist_items as t3', 't2.checklist_item_id','t3.id' )
-	// 							 ->leftjoin('tra_application_documents as t4', 't3.id','t4.checklist_item_id' )
-	// 							 ->leftjoin('tra_application_uploadeddocuments as t5', 't4.id','t5.application_document_id' )
-	// 							 ->join('par_audit_findings as t6', 't3.id','t6.checklist_item_id' )
-	// 							 ->select("t1.*")
-	// 							->where('t1.application_code',$application_code);
-	// 							//->first();
-	// 		$record = $record->get();
-	// 		$records = convertStdClassObjToArray($record);
-    //         $records = decryptArray($records);
-
-    // 	$pdf = new PdfProvider();
-    //     $pdf->Cell(0, 8,'PART IVA — PRODUCT DETAILS', 0, 1);
-	// 	$i = 1;
-	// 	$html = '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
-	// 	$html .= '<thead>';
-	// 	$html .= '<tr style="font-weight:bold;">';
-	// 	$html .= '<th style="width: 4%; text-align: center;">No.</th>';
-	// 	$html .= '<th style="width: 7%; text-align: left;">Reg. No.</th>';
-	// 	$html .= '<th style="width: 7%; text-align: center;">Brand Name</th>';
-	// 	$html .= '<th style="width: 6%; text-align: center;">Generic Name</th>';
-	// 	$html .= '<th style="width: 6%; text-align: center;">GMDN Term Code</th>';
-	// 	$html .= '<th style="width: 6%; text-align: center;">GMDN Term Name</th>';
-	// 	$html .= '<th style="width: 7%; text-align: center;">Active ingredients</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Strength</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Unit (Strength)</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Number of Packs</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Units per Batch</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Batch No</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Mfg Date</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Expiry Date</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Units for Quantity</th>';
-	// 	$html .= '<th style="width: 6%; text-align: center;">Price Per pack (FOB)</th>';
-	// 	$html .= '<th style="width: 6%; text-align: center;">Total Cost (FOB)</th>';
-	// 	$html .= '<th style="width: 5%; text-align: center;">Currency Name</th>';
-	// 	$html .= '</tr>';
-	// 	$html .= '</thead>';
-
-	// 	$html .= '<tbody>';
-
-	// 	$counter = 1;
-	// 	$total_amount = 0;
-
-	// 	foreach ($records as $rec) {
-
-	// 	    $html .= '<tr>';
-	// 	    $html .= '<td style="width: 4%; text-align: center;">' . $counter . '</td>';
-	// 	    $html .= '<td style="width: 7%;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 7%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 6%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 6%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 6%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 7%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 6%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '<td style="width: 6%; text-align: center;">' . number_format($rec['application_code'], 2) . '</td>';
-	// 	    $html .= '<td style="width: 5%; text-align: center;">' . htmlspecialchars($rec['application_code']) . '</td>';
-	// 	    $html .= '</tr>';
-
-	// 	    if (!is_string($rec['application_code']) && $rec['application_code'] !== 'N/A') {
-	// 	        $total_amount += $rec['application_code'];
-	// 	    }
-	// 	    $counter++;
-	// 	}
-
-	// 	$total_amount = is_string($rec['application_code']) ? 'N/A' : number_format($application_code, 2);
-	// 	$html .= '</tbody>';
-	// 	$html .= '<tfoot>';
-	// 	$html .= '<tr style="font-weight: bold;">';
-	// 	$html .= '<td colspan="17" align="right">Total Value:</td>';
-	// 	$html .= '<td style="width: 5%; text-align: right;">' . $total_amount . '</td>';
-	// 	$html .= '</tr>';
-	// 	$html .= '</tfoot>';
-	// 	$html .= '</table>';
-
-	// 	$pdf->SetFont('times', '', 8);
-	// 	$pdf->writeHTML($html, true, false, true, false, '');
-
-
-	// 	}catch (\Exception $exception) {
-	// 				$res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
-
-	// 	} catch (\Throwable $throwable) {
-	// 				$res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
-	// 	}
-	// 	return response()->json($res);
-
-	// }
-
 	public function generateAuditReport(Request $req)
 {
     try {
@@ -10063,17 +9961,87 @@ public function printAdministrativeSubmissionResponses(Request $req)
 		$html .= '</tr>';
 		$html .= '</table>';
 
+		$html .= '<br><br>';
 
-		$html .= '<h3 style="font-weight: bold; border-bottom: 2px solid black; display: inline-block;">Questionnaire</h3>';
+		$html .= '<h3 style="margin: 0, padding: 0; border-bottom: 1px solid gray;">Questionnaire</h3>';
+		$html .= '<div style="margin-bottom: 600px;"></div>'; 
+		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse;">';
+		$html .= '<tr style="background-color: #d3d3d3;">';
+		$html .= '<th>Question</th>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<td>';
+		$html .= 'Fulfilled <input type="checkbox" /> Not Fulfilled <input type="checkbox" /> N/A <input type="checkbox" />';
+		$html .= '</td>';
+		$html .= '</tr>';
+		$html .= '<tr style="background-color: #d3d3d3;">';
+		$html .= '<th>Note</th>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<td></td>';
+		$html .= '</tr>';
+		$html .= '<tr style="background-color: #d3d3d3;">';
+		$html .= '<th>Evidence</th>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<td></td>';
+		$html .= '</tr>';
+		$html .= '</table>';
+
+		
+		$html .= '<div style="page-break-before: always;"></div>';
 
 
+		$html .= '<h3 style="margin: 0, padding: 0; border-bottom: 1px solid gray;">Findings</h3>';
+		$html .= '<div style="margin-bottom: 600px;"></div>'; 
+		$html .= '<p style="font-weight:bold;">Total number of findings: </p>'. htmlspecialchars('');
+
+		$html .= '<br></br>';
 
 
-        $html .= '<h3>Findings</h3>';
-        $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
-        $html .= '<tr><th style="font-weight:bold;">Total Number of Findings</th><td>' . count($records) . '</td></tr>';
-        // Add findings rows here   
-        $html .= '</table>';
+		$html .= '<h3></h3>';
+		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Finding ID</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Type</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Title</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Raised Against</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Status</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Created</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Completed</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Result</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Related Issue</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Issue ID</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Type</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Title</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Owner</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Status</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+			$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Raised</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Closed</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '</tr>';
+		$html .= '</table>';
+
+
 
         $pdf->writeHTML($html, true, false, true, false, '');
 
