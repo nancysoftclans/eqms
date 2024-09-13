@@ -175,22 +175,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     workflowContainer
       .down("hiddenfield[name=issue_type_id]")
       .setValue(issue_type_id);
-    var issuemanagementfrm = workflowContainer.down("issuemanagementfrm");
-
-    // issuemanagementfrm.down("combo[name=issue_type]").setValue(issue_type_id);
-    // issuemanagementfrm.down("combo[name=issue_status_id]").setValue(1);
-    // issuemanagementfrm
-    //   .down("datefield[name=creation_date]")
-    //   .setValue(new Date());
-
-    // // Calculate the date 10 days from now
-    // var targetDate = new Date();
-    // targetDate.setDate(targetDate.getDate() + 10);
-
-    // // Set the target resolution date field to 10 days from now
-    // issuemanagementfrm
-    //   .down("datefield[name=target_resolution_date]")
-    //   .setValue(targetDate);
 
     dashboardWrapper.add(workflowContainer);
 
@@ -201,26 +185,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
   launchissuereceivingWizard: function (pnl) {
     Ext.getBody().mask("Please wait...");
-    var me = this,
-      activeTab = pnl,
-      application_status_id = activeTab
-        .down("hiddenfield[name=application_status_id]")
-        .getValue(),
+    var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
-      sub_module_id = activeTab
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue(),
-      workflow_stage_id = activeTab
-        .down("hiddenfield[name=workflow_stage_id]")
         .getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(false);
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
     active_application_id = parseInt(active_application_id);
     if (!isNaN(active_application_id)) {
       Ext.Ajax.request({
@@ -368,11 +339,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -464,11 +433,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
 
     if (active_application_id) {
       Ext.Ajax.request({

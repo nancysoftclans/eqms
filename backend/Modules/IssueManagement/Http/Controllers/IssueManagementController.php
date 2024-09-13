@@ -715,48 +715,38 @@ class IssueManagementController extends Controller
             $pdf->Ln(20);
 
             $html = '<table border="0" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse;">';
-            $html .= '<tr><th style="font-weight: bold;">Date:</th><td>' . date('Y-m-d') . '</td><th style="font-weight: bold;">Complaint No:</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td></tr>';
-            $html .= '<tr><th style="font-weight: bold;">Name of Complainant:</th><td>' . htmlspecialchars($records[0]['complainant_name']) . '</td>';
-            $html .= '<th style="font-weight: bold;">Name of Organization:</th><td>' . htmlspecialchars($records[0]['complainant_organisation']) . '</td></tr>';
-
-            $html .= '<tr><th style="font-weight: bold;">Address:</th><td>' . htmlspecialchars($records[0]['complainant_address']) . '</td>';
-            $html .= '<th style="font-weight: bold;">Telephone:</th><td>' . htmlspecialchars($records[0]['complainant_telephone']) . '</td></tr>';
-            $html .= '<tr><th style="font-weight: bold;">E-mail:</th><td colspan="3">' . htmlspecialchars($records[0]['complainant_email']) . '</td></tr>';
-
-            $html .= '<tr><th style="font-weight: bold;">Mode of Complaint:</th><td colspan="3">' . htmlspecialchars($records[0]['complaint_mode']) . '</td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Date:</th><td><u>' . date('Y-m-d') . '</u></td><th style="font-weight: bold;">Complaint No:</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Name of Complainant:</th><td><u>' . htmlspecialchars($records[0]['complainant_name']) . '</u></td>';
+            $html .= '<th style="font-weight: bold;">Name of Organization:</th><td><u>' . htmlspecialchars($records[0]['complainant_organisation']) . '</u></td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Address:</th><td><u>' . htmlspecialchars($records[0]['complainant_address']) . '</u></td>';
+            $html .= '<th style="font-weight: bold;">Telephone:</th><td><u>' . htmlspecialchars($records[0]['complainant_telephone']) . '</u></td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">E-mail:</th><td colspan="3"><u>' . htmlspecialchars($records[0]['complainant_email']) . '</u></td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Mode of Complaint:</th><td colspan="3"><u>' . htmlspecialchars($records[0]['complaint_mode']) . '</u></td></tr>';
             $html .= '</table>';
 
 
 
-            $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+            $html .= '<br><table border="1" cellpadding="5" cellspacing="0" width="100%">';
 
-            $html .= '<tr><td colspan="4"><h3>Details of the complaint.</h3><br>' . nl2br(htmlspecialchars($records[0]['description'])) . '</td></tr>';
+            $html .= '<tr><td colspan="4"><b>Details of the complaint.</b><br>' . nl2br(htmlspecialchars($records[0]['description'])) . '</td></tr>';
 
 
             // Initial Review
-            $html .= '<tr><td colspan="1"><h3>Initial Review By Quality Office:</h3></td><td colspan="3">Office Assigned to: <u>' . htmlspecialchars($records[0]['office_assigned']) . '</u></td></tr>';
+            $html .= '<tr><td colspan="1"><b>Initial Review By Quality Office:</b></td><td colspan="3">Office Assigned to: <u>' . htmlspecialchars($records[0]['office_assigned']) . '</u></td></tr>';
 
-            $html .= '<tr><td colspan="1"><h3>Initial Review by:</h3></td><td colspan="2">' . htmlspecialchars($records[0]['office_assigned']) . '</td><td><h3>Date:</h3></td></tr>';
-            // $html .= '<tr><th>Date:</th><td>' . htmlspecialchars($records[0]['review_date']) . '</td>';
-            // $html .= '<th colspan="2"></th></tr>';
+            $html .= '<tr><td colspan="1"><b>Initial Review by:</b></td><td colspan="2">' . htmlspecialchars($records[0]['office_assigned']) . '</td><td><b>Date: </b>' . htmlspecialchars($records[0]['target_resolution_date']) . '</td></tr>';
+           
 
             // Root Cause Analysis
-            $html .= '<tr><th colspan="4">Root Cause Analysis</th></tr>';
-            $html .= '<tr><td colspan="4">Complete Non-Conformity Form – BOMRA/QM/P08/F01.</td></tr>';
+            $html .= '<tr><td colspan="4"><b>Root Cause Analysis:</b> Complete Non-Conformity Form – <b>BOMRA/QM/P08/F01.</b></td></tr>';
 
             // Resolution and Approval
-            $html .= '<tr><th>Resolution Reached:</th><td>' . htmlspecialchars($records[0]['issue_resolution']) . '</td>';
-            // $html .= '<th>Date Communicated:</th><td>' . htmlspecialchars($records[0]['resolution_date']) . '</td></tr>';
-            // $html .= '<tr><th>Assigned Officer:</th><td>' . htmlspecialchars($records[0]['assigned_officer']) . '</td>';
-            // $html .= '<th>Approval by HOD/Supervisor:</th><td>' . htmlspecialchars($records[0]['hod_approval']) . '</td></tr>';
-            // $html .= '<tr><th>Date:</th><td>' . htmlspecialchars($records[0]['hod_approval_date']) . '</td>';
-            $html .= '<th colspan="2"></th></tr>';
+            $html .= '<tr><td colspan="4"><b>Resolution reached and communicated to the customer.</b><br>' . htmlspecialchars($records[0]['issue_resolution']) . '</td></tr>';
+            
 
             // Verification of Effectiveness of Actions
-            // $html .= '<tr><th>Verified by Supervisor:</th><td>' . htmlspecialchars($records[0]['supervisor_verification']) . '</td>';
-            // $html .= '<th>Date:</th><td>' . htmlspecialchars($records[0]['supervisor_verification_date']) . '</td></tr>';
-            // $html .= '<tr><th>Confirmed by Quality Office:</th><td>' . htmlspecialchars($records[0]['quality_office_confirmation']) . '</td>';
-            // $html .= '<th>Date:</th><td>' . htmlspecialchars($records[0]['quality_office_confirmation_date']) . '</td></tr>';
+            $html .= '<tr><td colspan="1"><b>Assigned Officer:</b></td><td colspan="2"></td><td><b>Date: </b>' . htmlspecialchars($records[0]['target_resolution_date']) . '</td></tr>';
+            
 
             // End of table
             $html .= '</table>';

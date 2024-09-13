@@ -26,7 +26,23 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     {
       xtype: "exportbtn",
-      handler: 'exportTo'
+      menu: {
+        defaults: {
+          handler: 'exportTo'
+        },
+        items: [{
+          text: 'Excel',
+          cfg: {
+            type: 'excel07',
+            ext: 'xlsx'
+          }
+        }, {
+          text: 'CSV',
+          cfg: {
+            type: 'csv'
+          }
+        }]
+      }
     },
     {
       xtype: "tbspacer",
@@ -238,7 +254,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
           widget.down('menu menuitem[action=actual_delete]').setHidden(false);
         }
         if (issue_status === 8) {
-          widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+          // widget.down('menu menuitem[action=actual_delete]').setHidden(true);
           widget.down('menu menuitem[action=issue_report]').setHidden(false);
         }
         else {
