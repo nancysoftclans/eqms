@@ -234,6 +234,7 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
               bind: {
                 disabled: '{hideDeleteButton}'
               },
+              hidden: true
             },
             {
               text: "Issue Report",
@@ -243,7 +244,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
               storeID: "issuemanagementstr",
               action_url: "issuemanagement/generateIssueReport",
               action: "issue_report",
-              handler: 'generateIssueReport'
+              handler: 'generateIssueReport',
+              hidden: true
             },
           ],
         },
@@ -254,13 +256,13 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
           widget.down('menu menuitem[action=actual_delete]').setHidden(false);
         }
         if (issue_status === 8) {
-          // widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+          widget.down('menu menuitem[action=actual_delete]').setHidden(true);
           widget.down('menu menuitem[action=issue_report]').setHidden(false);
         }
-        else {
-          widget.down('menu menuitem[action=actual_delete]').setHidden(true);
-          widget.down('menu menuitem[action=issue_report]').setHidden(true);
-        }
+        // else {
+        //   widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+        //   widget.down('menu menuitem[action=issue_report]').setHidden(true);
+        // }
       }
     },
   ],

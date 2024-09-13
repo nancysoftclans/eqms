@@ -495,12 +495,18 @@ class IssueManagementController extends Controller
         try {
             $res = IssueManagementAudit::from('tra_issue_management_audits as t1')
                 ->leftJoin('tra_auditsmanager_application as t2', 't1.audit_id', 't2.id')
+                ->leftJoin('par_system_statuses as t3', 't2.application_status_id', 't3.id')
+                ->leftJoin('par_qms_audit_types as t4', 't2.audit_type_id', 't4.id')
+                ->leftJoin('par_audit_findings as t5', 't2.application_code', 't5.application_code')
                 ->where('t1.issue_id', $request->issue_id)
                 ->select(
                     't1.*',
                     't2.reference_no',
                     't2.audit_reference',
-                    't2.audit_title'
+                    't2.audit_title',
+                    't3.name as status',
+                    't4.name as audit_type',
+                    // DB::raw("IFNULL(COUNT(t5.id), 0) as findings")
                 )
                 ->get();
         } catch (\Exception $exception) {

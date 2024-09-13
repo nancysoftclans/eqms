@@ -93,16 +93,16 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "",
+      dataIndex: "status",
       text: "Status",
       flex: 1,
     },
-    {
-      xtype: "gridcolumn",
-      dataIndex: "",
-      text: "Finding",
-      flex: 1,
-    },
+    // {
+    //   xtype: "gridcolumn",
+    //   dataIndex: "findings",
+    //   text: "Finding",
+    //   flex: 1,
+    // },
     {
       text: "Options",
       xtype: "widgetcolumn",
