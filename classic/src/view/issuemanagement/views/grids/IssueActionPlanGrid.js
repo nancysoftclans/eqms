@@ -1,7 +1,7 @@
-Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid", {
+Ext.define("Admin.view.issuemanagement.views.grids.IssueActionPlanGrid", {
   extend: "Ext.grid.Panel",
-  xtype: "issuemanagementorgareasgrid",
-  itemId: "issuemanagementorgareasgrid",
+  xtype: "issueactionplangrid",
+  itemId: "issueactionplangrid",
   controller: "issuemanagementvctr",
 
   features: [
@@ -23,16 +23,16 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
   },
   tbar: [
     {
-      text: "Select",
+      text: "Add",
       iconCls: "x-fa fa-plus",
       action: "add",
-      name: "select_orgarea_btn",
+      name: "add_action_plan_btn",
       ui: "soft-blue",
-      childXtype: "issueselectorgareafrm",
-      winTitle: "Select",
-      winWidth: "60%",
-      stores: "[issuemanagementorgareastr]",
-      storeID: "issuemanagementorgareastr"
+      childXtype: "addactionplanform",
+      winTitle: "Action Plan",
+      winWidth: "50%",
+      stores: "[issuemanagementactionplanstr]",
+      storeID: "issuemanagementactionplanstr"
     },
   ],
   autoScroll: true,
@@ -40,16 +40,15 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
     beforerender: {
       fn: "setGridTreeStore",
       config: {
-        storeId: "issuemanagementorgareastr",
+        storeId: "issuemanagementactionplanstr",
         proxy: {
           api: {
-            read: "issuemanagement/getIssueManagementOrganisationalAreas",
+            read: "issuemanagement/issue_action_plans",
           },
         },
       },
       isLoad: true,
     },
-    // itemdblclick: "showAddConfigParamWinFrm",
   },
 
   bbar: [
@@ -59,17 +58,48 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
       displayMsg: "Showing {0} - {1} of {2} total records",
       emptyMsg: "No Records",
       beforeLoad: function () {
-        this.up("issuemanagementorgareasgrid").fireEvent("refresh", this);
+        this.up("issueactionplangrid").fireEvent("refresh", this);
       },
     },
   ],
   columns: [
     {
       xtype: "gridcolumn",
-      dataIndex: "title",
-      text: "Title",
+      dataIndex: "id",
+      text: "ID",
+      flex: 1,
+      hidden: true,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "action",
+      text: "Action",
       flex: 1,
       tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "responsible_person",
+      text: "Responsible Person",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "start_date",
+      text: "Start Date",
+      flex: 1,
+      tdCls: "wrap",
+      // renderer: Ext.util.Format.dateRenderer("d M Y"),
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "completion_date",
+      text: "Completion Date",
+      flex: 1,
+      tdCls: "wrap",
+      // renderer: Ext.util.Format.dateRenderer("d M Y"),
     },
     {
       text: "Options",
@@ -85,11 +115,25 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
           xtype: "menu",
           items: [
             {
+              text: "Edit",
+              iconCls: "x-fa fa-edit",
+              tooltip: "Edit Record",
+              action: "edit",
+              childXtype: "addactionplanform",
+              winTitle: "Edit Action Plan",
+              winWidth: "50%",
+              handler: "showEditConfigParamWinFrm",
+              bind: {
+                disabled: "{isReadOnly}",
+              },
+              stores: "[]",
+            },
+            {
               text: "Delete",
               iconCls: "x-fa fa-trash",
               tooltip: "Delete Record",
-              table_name: "tra_issue_management_organisational_areas",
-              storeID: "issuemanagementorgareastr",
+              table_name: "tra_issue_management_action_plans",
+              storeID: "issuemanagementissuestr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
               bind: {

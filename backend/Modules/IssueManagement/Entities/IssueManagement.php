@@ -179,6 +179,11 @@ class IssueManagement extends Model
         'arrival_time',
         'vehicle_type',
         'justification_of_late_application',
+        'change_description',
+        'change_purpose',
+        'change_impact',
+        'change_revalidation',
+        'hod_comments',
     ];
 
     public $timestamps = false;

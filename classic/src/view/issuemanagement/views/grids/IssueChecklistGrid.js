@@ -1,7 +1,7 @@
-Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid", {
+Ext.define("Admin.view.issuemanagement.views.grids.IssueChecklistGrid", {
   extend: "Ext.grid.Panel",
-  xtype: "issuemanagementorgareasgrid",
-  itemId: "issuemanagementorgareasgrid",
+  xtype: "issuechecklistgrid",
+  itemId: "issuechecklistgrid",
   controller: "issuemanagementvctr",
 
   features: [
@@ -26,13 +26,13 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
       text: "Select",
       iconCls: "x-fa fa-plus",
       action: "add",
-      name: "select_orgarea_btn",
+      name: "select_issue_btn",
       ui: "soft-blue",
-      childXtype: "issueselectorgareafrm",
-      winTitle: "Select",
-      winWidth: "60%",
-      stores: "[issuemanagementorgareastr]",
-      storeID: "issuemanagementorgareastr"
+      childXtype: "selectissueform",
+      winTitle: "Select Issue",
+      winWidth: "80%",
+      stores: "[issuemanagementissuestr]",
+      storeID: "issuemanagementissuestr"
     },
   ],
   autoScroll: true,
@@ -40,10 +40,10 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
     beforerender: {
       fn: "setGridTreeStore",
       config: {
-        storeId: "issuemanagementorgareastr",
+        storeId: "issuemanagementissuestr",
         proxy: {
           api: {
-            read: "issuemanagement/getIssueManagementOrganisationalAreas",
+            read: "issuemanagement/getIssueManagementRelatedIssues",
           },
         },
       },
@@ -59,17 +59,57 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
       displayMsg: "Showing {0} - {1} of {2} total records",
       emptyMsg: "No Records",
       beforeLoad: function () {
-        this.up("issuemanagementorgareasgrid").fireEvent("refresh", this);
+        // this.up("issuemanagementissuegrid").fireEvent("refresh", this);
       },
     },
   ],
   columns: [
     {
       xtype: "gridcolumn",
+      dataIndex: "reference_no",
+      text: "ID",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "raised_date",
+      text: "Date Raised",
+      flex: 1,
+      tdCls: "wrap",
+      renderer: Ext.util.Format.dateRenderer("d M Y"),
+    },
+    {
+      xtype: "gridcolumn",
       dataIndex: "title",
       text: "Title",
       flex: 1,
       tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "issue_type",
+      text: "Type",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      dataIndex: "issue_status",
+      text: "Status",
+      flex: 1,
+      tdCls: "wrap",
+    },
+    {
+      xtype: "gridcolumn",
+      text: "Owner",
+      flex: 1,
+      tdCls: "wrap",
+      renderer: function (value, metaData, record) {
+        var firstName = record.get("first_name");
+        var lastName = record.get("last_name");
+        return firstName + " " + lastName;
+      },
     },
     {
       text: "Options",
@@ -88,8 +128,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementOrgAreasGrid",
               text: "Delete",
               iconCls: "x-fa fa-trash",
               tooltip: "Delete Record",
-              table_name: "tra_issue_management_organisational_areas",
-              storeID: "issuemanagementorgareastr",
+              table_name: "tra_issue_management_related_issues",
+              storeID: "issuemanagementissuestr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
               bind: {

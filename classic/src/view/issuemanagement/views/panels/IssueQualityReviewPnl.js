@@ -24,6 +24,16 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueQualityReviewPnl", {
       },
     },
     {
+      xtype: "issueactionplangrid",
+      autoScroll: true,
+      title: "Action Plan",
+    },
+    {
+      xtype: "issuechecklistgrid",
+      autoScroll: true,
+      title: "Checklist",
+    },
+    {
       title: "Associated Items",
       xtype: 'tabpanel',
       items: [

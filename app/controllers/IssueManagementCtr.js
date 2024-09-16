@@ -50,6 +50,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issuemanagementauditgrid button[name=select_audit_btn]": {
         click: "showIssueManagementAssociatedWin",
       },
+      "issueactionplangrid button[name=add_action_plan_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
       "issueselectdocumentfrm button[name=save_issuedocument_btn]": {
         click: "saveIssueManagementAssociatedDetails",
       },
@@ -60,6 +63,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         click: "saveIssueManagementAssociatedDetails",
       },
       "selectorgareaform button[name=save_orgarea_btn]": {
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      "addactionplanform button[name=save_action_plan_btn]": {
         click: "saveIssueManagementAssociatedDetails",
       },
       issuemanagementorgareasgrid: {
@@ -76,6 +82,12 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       },
       issueactivitygrid: {
         refresh: "refreshGrid",
+      },
+      issueactionplangrid: {
+        refresh: "refreshGrid"
+      },
+      issuechecklistgrid: {
+        refresh: "refreshGrid"
       },
     },
   },
@@ -433,6 +445,8 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
+      issuechecklistgrid = activeTab.down("issuechecklistgrid"),
+      issueactionplangrid = activeTab.down("issueactionplangrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
@@ -497,12 +511,31 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   complaint_fully_addressed: results.complaint_fully_addressed,
                 });
             }
-            // issuemanagementfrm
-            //   .getForm()
-            //   .getFields()
-            //   .each(function (field) {
-            //     field.setReadOnly(true);
-            //   });
+            //Enable/Disable Action Plans/Checlists
+            Ext.Ajax.request({
+              method: "GET",
+              url:
+                "issuemanagement/issue_types/" +
+                results.issue_type_id,
+              headers: {
+                Authorization: "Bearer " + access_token,
+              },
+              success: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText);
+
+                if (resp.is_checklist_tied != 1) {
+                  issuechecklistgrid.destroy();
+                }
+                if (resp.has_action_plan != 1) {
+                  issueactionplangrid.destroy();
+                }
+              },
+              failure: function (response) {
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+              },
+            });
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -518,6 +551,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           toastr.error("Error: " + errorThrown, "Error Response");
         },
       });
+
     } else {
       Ext.getBody().unmask();
     }

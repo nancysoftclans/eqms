@@ -466,14 +466,21 @@ class IssueManagementController extends Controller
             if (is_numeric($active_application_id)) {
                 $issue_data = json_decode($request->issue_ids, true);
                 foreach ($issue_data as $issue) {
-                    $data = array(
-                        'issue_id' => $active_application_id,
-                        'related_id' => $issue,
-                        'dola' => Carbon::now(),
-                        'altered_by' => $this->user_id,
-                    );
-                    $IssueManagementRelatedIssue = new IssueManagementRelatedIssue();
-                    $IssueManagementRelatedIssue->create($data);
+                    //Check if it exists
+                    $IssueManagementRelatedIssue = IssueManagementRelatedIssue::where('issue_id', $active_application_id)
+                        ->where('related_id', $issue)->first();
+                    if ($IssueManagementRelatedIssue) {
+
+                    } else {
+                        $data = array(
+                            'issue_id' => $active_application_id,
+                            'related_id' => $issue,
+                            'dola' => Carbon::now(),
+                            'altered_by' => $this->user_id,
+                        );
+                        $IssueManagementRelatedIssue = new IssueManagementRelatedIssue();
+                        $IssueManagementRelatedIssue->create($data);
+                    }
                 }
                 $IssueManagementRelatedIssue = IssueManagementRelatedIssue::all();
 
@@ -531,14 +538,21 @@ class IssueManagementController extends Controller
             if (is_numeric($active_application_id)) {
                 $issue_data = json_decode($request->audit_ids, true);
                 foreach ($issue_data as $issue) {
-                    $data = array(
-                        'issue_id' => $active_application_id,
-                        'audit_id' => $issue,
-                        'dola' => Carbon::now(),
-                        'altered_by' => $this->user_id,
-                    );
-                    $IssueManagementAudit = new IssueManagementAudit();
-                    $IssueManagementAudit->create($data);
+                    //Check if it exists
+                    $IssueManagementAudit = IssueManagementAudit::where('issue_id', $active_application_id)
+                        ->where('audit_id', $issue)->first();
+                    if ($IssueManagementAudit) {
+
+                    } else {
+                        $data = array(
+                            'issue_id' => $active_application_id,
+                            'audit_id' => $issue,
+                            'dola' => Carbon::now(),
+                            'altered_by' => $this->user_id,
+                        );
+                        $IssueManagementAudit = new IssueManagementAudit();
+                        $IssueManagementAudit->create($data);
+                    }
                 }
                 $IssueManagementAudit = IssueManagementAudit::all();
 
@@ -587,15 +601,23 @@ class IssueManagementController extends Controller
             $active_application_id = $request->active_application_id;
             if (is_numeric($active_application_id)) {
                 $issue_data = json_decode($request->department_ids, true);
-                foreach ($issue_data as $issue) {
-                    $data = array(
-                        'issue_id' => $active_application_id,
-                        'department_id' => $issue,
-                        'dola' => Carbon::now(),
-                        'altered_by' => $this->user_id,
-                    );
-                    $IssueManagementOrgArea = new IssueManagementOrgArea();
-                    $IssueManagementOrgArea->create($data);
+                foreach ($issue_data as $department_id) {
+                    //Check if it exists
+                    $IssueManagementOrgArea = IssueManagementOrgArea::where('issue_id', $active_application_id)
+                        ->where('department_id', $department_id)->first();
+                    if ($IssueManagementOrgArea) {
+
+                    } else {
+                        $data = array(
+                            'issue_id' => $active_application_id,
+                            'department_id' => $department_id,
+                            'dola' => Carbon::now(),
+                            'altered_by' => $this->user_id,
+                        );
+                        $IssueManagementOrgArea = new IssueManagementOrgArea();
+                        $IssueManagementOrgArea->create($data);
+                    }
+
                 }
                 $IssueManagementOrgArea = IssueManagementOrgArea::all();
 
@@ -741,18 +763,18 @@ class IssueManagementController extends Controller
             $html .= '<tr><td colspan="1"><b>Initial Review By Quality Office:</b></td><td colspan="3">Office Assigned to: <u>' . htmlspecialchars($records[0]['office_assigned']) . '</u></td></tr>';
 
             $html .= '<tr><td colspan="1"><b>Initial Review by:</b></td><td colspan="2">' . htmlspecialchars($records[0]['office_assigned']) . '</td><td><b>Date: </b>' . htmlspecialchars($records[0]['target_resolution_date']) . '</td></tr>';
-           
+
 
             // Root Cause Analysis
             $html .= '<tr><td colspan="4"><b>Root Cause Analysis:</b> Complete Non-Conformity Form – <b>BOMRA/QM/P08/F01.</b></td></tr>';
 
             // Resolution and Approval
             $html .= '<tr><td colspan="4"><b>Resolution reached and communicated to the customer.</b><br>' . htmlspecialchars($records[0]['issue_resolution']) . '</td></tr>';
-            
+
 
             // Verification of Effectiveness of Actions
             $html .= '<tr><td colspan="1"><b>Assigned Officer:</b></td><td colspan="2"></td><td><b>Date: </b>' . htmlspecialchars($records[0]['target_resolution_date']) . '</td></tr>';
-            
+
 
             // End of table
             $html .= '</table>';

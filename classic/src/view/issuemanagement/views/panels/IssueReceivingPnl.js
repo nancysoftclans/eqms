@@ -13,9 +13,9 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
   items: [
     {
       xtype: "issuemanagementfrm",
-      autoScroll: true,
+      autoScroll: true,      
       title: "Issue Details",
-    },
+    },    
     {
       title: "Associated Items",
       xtype: 'tabpanel',
@@ -38,6 +38,7 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
         }
       ],
     },
+    
     {
       xtype: "issueactivitygrid",
       autoScroll: true,
