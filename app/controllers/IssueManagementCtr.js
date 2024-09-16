@@ -89,6 +89,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuechecklistgrid: {
         refresh: "refreshGrid"
       },
+      'issuechecklistgrid button[name=savegrid_screening_btn]': {
+        click: 'saveApplicationChecklistDetails'
+      },
     },
   },
 
@@ -2919,16 +2922,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       grid = me.up("grid"),
       mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    issue_id = activeTab
-      .down("hiddenfield[name=active_application_id]")
-      .getValue();
+      application_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      issue_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      workflow_stage = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
     store.getProxy().extraParams = {
+      application_id: application_id,
       issue_id: issue_id,
       application_code: application_code,
+      process_id: process_id,
+      workflow_stage: workflow_stage
     };
   },
   saveIssueManagementAssociatedDetails: function (btn) {
@@ -2973,4 +2978,93 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       });
     }
   },
+  saveApplicationChecklistDetails: function (btn) {
+    btn.setLoading(true);
+    var mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      application_id = activeTab.down('hiddenfield[name=active_application_id]').getValue(),
+      application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
+      screeningGrid = activeTab.down('issuechecklistgrid');
+    this.commitApplicationChecklistDetails(btn, application_id, application_code, screeningGrid);
+  },
+
+  commitApplicationChecklistDetails: function (btn, application_id, application_code, screeningGrid) {
+    var checklist_type = screeningGrid.down('combo[name=applicable_checklist]').getValue(),
+      store = screeningGrid.getStore(),
+      params = [];
+    for (var i = 0; i < store.data.items.length; i++) {
+      var record = store.data.items[i],
+        item_resp_id = record.get('item_resp_id'),
+        checklist_item_id = record.get('checklist_item_id'),
+        pass_status = record.get('pass_status'),
+        comment = record.get('comment'),
+        observation = record.get('observation'),
+        auditor_comment = record.get('auditor_comment'),
+        auditorpass_status = record.get('auditorpass_status'),
+        item_resp_id = record.get('item_resp_id'),
+        risk_type = record.get('risk_type'),
+        risk_type_remarks = record.get('risk_type_remarks');
+      var obj = {
+        application_id: application_id,
+        item_resp_id: item_resp_id,
+        application_code: application_code,
+        item_resp_id: item_resp_id,
+        created_by: user_id,
+        checklist_item_id: checklist_item_id,
+        pass_status: pass_status,
+        comment: comment,
+        auditor_comment: auditor_comment,
+        auditorpass_status: auditorpass_status,
+        observation: observation,
+        risk_type: risk_type,
+        risk_type_remarks: risk_type_remarks
+      };
+      if (record.dirty) {
+        params.push(obj);
+      }
+    }
+    if (params.length < 1) {
+      btn.setLoading(false);
+      toastr.warning('No records to save!!', 'Warning Response');
+      return false;
+    }
+    params = JSON.stringify(params);
+    Ext.Ajax.request({
+      url: 'api/saveApplicationChecklistDetails',
+      params: {
+        application_id: application_id,
+        item_resp_id: item_resp_id,
+        application_code: application_code,
+        checklist_type: checklist_type,
+        screening_details: params
+      },
+      headers: {
+        'Authorization': 'Bearer ' + access_token,
+        'X-CSRF-Token': token
+      },
+      success: function (response) {
+        btn.setLoading(false);
+        var resp = Ext.JSON.decode(response.responseText),
+          success = resp.success,
+          message = resp.message;
+        if (success == true || success === true) {
+          toastr.success(message, 'Success Response');
+          store.load();
+        } else {
+          toastr.error(message, 'Failure Response');
+        }
+      },
+      failure: function (response) {
+        btn.setLoading(false);
+        var resp = Ext.JSON.decode(response.responseText),
+          message = resp.message;
+        toastr.error(message, 'Failure Response');
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        btn.setLoading(false);
+        toastr.error('Error: ' + errorThrown, 'Error Response');
+      }
+    });
+  },
+
 });
