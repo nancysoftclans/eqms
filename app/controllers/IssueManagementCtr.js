@@ -50,6 +50,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issuemanagementauditgrid button[name=select_audit_btn]": {
         click: "showIssueManagementAssociatedWin",
       },
+      "issueactionplangrid button[name=add_action_plan_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
       "issueselectdocumentfrm button[name=save_issuedocument_btn]": {
         click: "saveIssueManagementAssociatedDetails",
       },
@@ -60,6 +63,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         click: "saveIssueManagementAssociatedDetails",
       },
       "selectorgareaform button[name=save_orgarea_btn]": {
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      "addactionplanform button[name=save_action_plan_btn]": {
         click: "saveIssueManagementAssociatedDetails",
       },
       issuemanagementorgareasgrid: {
@@ -76,6 +82,15 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       },
       issueactivitygrid: {
         refresh: "refreshGrid",
+      },
+      issueactionplangrid: {
+        refresh: "refreshGrid"
+      },
+      issuechecklistgrid: {
+        refresh: "refreshGrid"
+      },
+      'issuechecklistgrid button[name=savegrid_screening_btn]': {
+        click: 'saveApplicationChecklistDetails'
       },
     },
   },
@@ -175,22 +190,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     workflowContainer
       .down("hiddenfield[name=issue_type_id]")
       .setValue(issue_type_id);
-    var issuemanagementfrm = workflowContainer.down("issuemanagementfrm");
-
-    // issuemanagementfrm.down("combo[name=issue_type]").setValue(issue_type_id);
-    // issuemanagementfrm.down("combo[name=issue_status_id]").setValue(1);
-    // issuemanagementfrm
-    //   .down("datefield[name=creation_date]")
-    //   .setValue(new Date());
-
-    // // Calculate the date 10 days from now
-    // var targetDate = new Date();
-    // targetDate.setDate(targetDate.getDate() + 10);
-
-    // // Set the target resolution date field to 10 days from now
-    // issuemanagementfrm
-    //   .down("datefield[name=target_resolution_date]")
-    //   .setValue(targetDate);
 
     dashboardWrapper.add(workflowContainer);
 
@@ -201,26 +200,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
   launchissuereceivingWizard: function (pnl) {
     Ext.getBody().mask("Please wait...");
-    var me = this,
-      activeTab = pnl,
-      application_status_id = activeTab
-        .down("hiddenfield[name=application_status_id]")
-        .getValue(),
+    var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
-      sub_module_id = activeTab
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue(),
-      workflow_stage_id = activeTab
-        .down("hiddenfield[name=workflow_stage_id]")
         .getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(false);
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
     active_application_id = parseInt(active_application_id);
     if (!isNaN(active_application_id)) {
       Ext.Ajax.request({
@@ -368,11 +354,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -464,11 +448,11 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
+      issuechecklistgrid = activeTab.down("issuechecklistgrid"),
+      issueactionplangrid = activeTab.down("issueactionplangrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -530,12 +514,31 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   complaint_fully_addressed: results.complaint_fully_addressed,
                 });
             }
-            // issuemanagementfrm
-            //   .getForm()
-            //   .getFields()
-            //   .each(function (field) {
-            //     field.setReadOnly(true);
-            //   });
+            //Enable/Disable Action Plans/Checlists
+            Ext.Ajax.request({
+              method: "GET",
+              url:
+                "issuemanagement/issue_types/" +
+                results.issue_type_id,
+              headers: {
+                Authorization: "Bearer " + access_token,
+              },
+              success: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText);
+
+                if (resp.is_checklist_tied != 1) {
+                  issuechecklistgrid.destroy();
+                }
+                if (resp.has_action_plan != 1) {
+                  issueactionplangrid.destroy();
+                }
+              },
+              failure: function (response) {
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+              },
+            });
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -551,6 +554,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           toastr.error("Error: " + errorThrown, "Error Response");
         },
       });
+
     } else {
       Ext.getBody().unmask();
     }
@@ -2918,16 +2922,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       grid = me.up("grid"),
       mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    issue_id = activeTab
-      .down("hiddenfield[name=active_application_id]")
-      .getValue();
+      application_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      issue_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      workflow_stage = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
     store.getProxy().extraParams = {
+      application_id: application_id,
       issue_id: issue_id,
       application_code: application_code,
+      process_id: process_id,
+      workflow_stage: workflow_stage
     };
   },
   saveIssueManagementAssociatedDetails: function (btn) {
@@ -2972,4 +2978,93 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       });
     }
   },
+  saveApplicationChecklistDetails: function (btn) {
+    btn.setLoading(true);
+    var mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      application_id = activeTab.down('hiddenfield[name=active_application_id]').getValue(),
+      application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
+      screeningGrid = activeTab.down('issuechecklistgrid');
+    this.commitApplicationChecklistDetails(btn, application_id, application_code, screeningGrid);
+  },
+
+  commitApplicationChecklistDetails: function (btn, application_id, application_code, screeningGrid) {
+    var checklist_type = screeningGrid.down('combo[name=applicable_checklist]').getValue(),
+      store = screeningGrid.getStore(),
+      params = [];
+    for (var i = 0; i < store.data.items.length; i++) {
+      var record = store.data.items[i],
+        item_resp_id = record.get('item_resp_id'),
+        checklist_item_id = record.get('checklist_item_id'),
+        pass_status = record.get('pass_status'),
+        comment = record.get('comment'),
+        observation = record.get('observation'),
+        auditor_comment = record.get('auditor_comment'),
+        auditorpass_status = record.get('auditorpass_status'),
+        item_resp_id = record.get('item_resp_id'),
+        risk_type = record.get('risk_type'),
+        risk_type_remarks = record.get('risk_type_remarks');
+      var obj = {
+        application_id: application_id,
+        item_resp_id: item_resp_id,
+        application_code: application_code,
+        item_resp_id: item_resp_id,
+        created_by: user_id,
+        checklist_item_id: checklist_item_id,
+        pass_status: pass_status,
+        comment: comment,
+        auditor_comment: auditor_comment,
+        auditorpass_status: auditorpass_status,
+        observation: observation,
+        risk_type: risk_type,
+        risk_type_remarks: risk_type_remarks
+      };
+      if (record.dirty) {
+        params.push(obj);
+      }
+    }
+    if (params.length < 1) {
+      btn.setLoading(false);
+      toastr.warning('No records to save!!', 'Warning Response');
+      return false;
+    }
+    params = JSON.stringify(params);
+    Ext.Ajax.request({
+      url: 'api/saveApplicationChecklistDetails',
+      params: {
+        application_id: application_id,
+        item_resp_id: item_resp_id,
+        application_code: application_code,
+        checklist_type: checklist_type,
+        screening_details: params
+      },
+      headers: {
+        'Authorization': 'Bearer ' + access_token,
+        'X-CSRF-Token': token
+      },
+      success: function (response) {
+        btn.setLoading(false);
+        var resp = Ext.JSON.decode(response.responseText),
+          success = resp.success,
+          message = resp.message;
+        if (success == true || success === true) {
+          toastr.success(message, 'Success Response');
+          store.load();
+        } else {
+          toastr.error(message, 'Failure Response');
+        }
+      },
+      failure: function (response) {
+        btn.setLoading(false);
+        var resp = Ext.JSON.decode(response.responseText),
+          message = resp.message;
+        toastr.error(message, 'Failure Response');
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        btn.setLoading(false);
+        toastr.error('Error: ' + errorThrown, 'Error Response');
+      }
+    });
+  },
+
 });

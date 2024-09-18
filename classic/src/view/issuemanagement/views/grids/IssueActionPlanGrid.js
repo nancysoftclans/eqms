@@ -1,7 +1,7 @@
-Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
+Ext.define("Admin.view.issuemanagement.views.grids.IssueActionPlanGrid", {
   extend: "Ext.grid.Panel",
-  xtype: "issuemanagementauditgrid",
-  itemId: "issuemanagementauditgrid",
+  xtype: "issueactionplangrid",
+  itemId: "issueactionplangrid",
   controller: "issuemanagementvctr",
 
   features: [
@@ -23,16 +23,16 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
   },
   tbar: [
     {
-      text: "Select",
+      text: "Add",
       iconCls: "x-fa fa-plus",
       action: "add",
-      name: "select_audit_btn",
+      name: "add_action_plan_btn",
       ui: "soft-blue",
-      childXtype: "issueauditform",
-      winTitle: "Select Audit",
-      winWidth: "80%",
-      stores: "[issuemanagementauditstr]",
-      storeID: "issuemanagementauditstr"
+      childXtype: "addactionplanform",
+      winTitle: "Action Plan",
+      winWidth: "50%",
+      stores: "[issuemanagementactionplanstr]",
+      storeID: "issuemanagementactionplanstr"
     },
   ],
   autoScroll: true,
@@ -40,10 +40,10 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
     beforerender: {
       fn: "setGridTreeStore",
       config: {
-        storeId: "issuemanagementauditstr",
+        storeId: "issuemanagementactionplanstr",
         proxy: {
           api: {
-            read: "issuemanagement/getIssueManagementAudits",
+            read: "issuemanagement/issue_action_plans",
           },
         },
       },
@@ -58,51 +58,49 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
       displayMsg: "Showing {0} - {1} of {2} total records",
       emptyMsg: "No Records",
       beforeLoad: function () {
-        this.up("issuemanagementauditgrid").fireEvent("refresh", this);
+        this.up("issueactionplangrid").fireEvent("refresh", this);
       },
     },
   ],
   columns: [
     {
       xtype: "gridcolumn",
-      dataIndex: "reference_no",
+      dataIndex: "id",
       text: "ID",
       flex: 1,
+      hidden: true,
       tdCls: "wrap",
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "audit_reference",
-      text: "Reference",
+      dataIndex: "action",
+      text: "Action",
       flex: 1,
       tdCls: "wrap",
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "audit_title",
-      text: "Title",
+      dataIndex: "responsible_person",
+      text: "Responsible Person",
       flex: 1,
       tdCls: "wrap",
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "audit_type",
-      text: "Type",
+      dataIndex: "start_date",
+      text: "Start Date",
       flex: 1,
       tdCls: "wrap",
+      // renderer: Ext.util.Format.dateRenderer("d M Y"),
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "status",
-      text: "Status",
+      dataIndex: "completion_date",
+      text: "Completion Date",
       flex: 1,
+      tdCls: "wrap",
+      // renderer: Ext.util.Format.dateRenderer("d M Y"),
     },
-    // {
-    //   xtype: "gridcolumn",
-    //   dataIndex: "findings",
-    //   text: "Finding",
-    //   flex: 1,
-    // },
     {
       text: "Options",
       xtype: "widgetcolumn",
@@ -117,11 +115,25 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
           xtype: "menu",
           items: [
             {
+              text: "Edit",
+              iconCls: "x-fa fa-edit",
+              tooltip: "Edit Record",
+              action: "edit",
+              childXtype: "addactionplanform",
+              winTitle: "Edit Action Plan",
+              winWidth: "50%",
+              handler: "showEditConfigParamWinFrm",
+              bind: {
+                disabled: "{isReadOnly}",
+              },
+              stores: "[]",
+            },
+            {
               text: "Delete",
               iconCls: "x-fa fa-trash",
               tooltip: "Delete Record",
-              table_name: "tra_issue_management_audits",
-              storeID: "issuemanagementauditstr",
+              table_name: "tra_issue_management_action_plans",
+              storeID: "issuemanagementissuestr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
               bind: {

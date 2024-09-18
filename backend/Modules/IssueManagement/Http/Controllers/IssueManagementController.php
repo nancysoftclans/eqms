@@ -466,14 +466,21 @@ class IssueManagementController extends Controller
             if (is_numeric($active_application_id)) {
                 $issue_data = json_decode($request->issue_ids, true);
                 foreach ($issue_data as $issue) {
-                    $data = array(
-                        'issue_id' => $active_application_id,
-                        'related_id' => $issue,
-                        'dola' => Carbon::now(),
-                        'altered_by' => $this->user_id,
-                    );
-                    $IssueManagementRelatedIssue = new IssueManagementRelatedIssue();
-                    $IssueManagementRelatedIssue->create($data);
+                    //Check if it exists
+                    $IssueManagementRelatedIssue = IssueManagementRelatedIssue::where('issue_id', $active_application_id)
+                        ->where('related_id', $issue)->first();
+                    if ($IssueManagementRelatedIssue) {
+
+                    } else {
+                        $data = array(
+                            'issue_id' => $active_application_id,
+                            'related_id' => $issue,
+                            'dola' => Carbon::now(),
+                            'altered_by' => $this->user_id,
+                        );
+                        $IssueManagementRelatedIssue = new IssueManagementRelatedIssue();
+                        $IssueManagementRelatedIssue->create($data);
+                    }
                 }
                 $IssueManagementRelatedIssue = IssueManagementRelatedIssue::all();
 
@@ -495,12 +502,18 @@ class IssueManagementController extends Controller
         try {
             $res = IssueManagementAudit::from('tra_issue_management_audits as t1')
                 ->leftJoin('tra_auditsmanager_application as t2', 't1.audit_id', 't2.id')
+                ->leftJoin('par_system_statuses as t3', 't2.application_status_id', 't3.id')
+                ->leftJoin('par_qms_audit_types as t4', 't2.audit_type_id', 't4.id')
+                ->leftJoin('par_audit_findings as t5', 't2.application_code', 't5.application_code')
                 ->where('t1.issue_id', $request->issue_id)
                 ->select(
                     't1.*',
                     't2.reference_no',
                     't2.audit_reference',
-                    't2.audit_title'
+                    't2.audit_title',
+                    't3.name as status',
+                    't4.name as audit_type',
+                    // DB::raw("IFNULL(COUNT(t5.id), 0) as findings")
                 )
                 ->get();
         } catch (\Exception $exception) {
@@ -525,14 +538,21 @@ class IssueManagementController extends Controller
             if (is_numeric($active_application_id)) {
                 $issue_data = json_decode($request->audit_ids, true);
                 foreach ($issue_data as $issue) {
-                    $data = array(
-                        'issue_id' => $active_application_id,
-                        'audit_id' => $issue,
-                        'dola' => Carbon::now(),
-                        'altered_by' => $this->user_id,
-                    );
-                    $IssueManagementAudit = new IssueManagementAudit();
-                    $IssueManagementAudit->create($data);
+                    //Check if it exists
+                    $IssueManagementAudit = IssueManagementAudit::where('issue_id', $active_application_id)
+                        ->where('audit_id', $issue)->first();
+                    if ($IssueManagementAudit) {
+
+                    } else {
+                        $data = array(
+                            'issue_id' => $active_application_id,
+                            'audit_id' => $issue,
+                            'dola' => Carbon::now(),
+                            'altered_by' => $this->user_id,
+                        );
+                        $IssueManagementAudit = new IssueManagementAudit();
+                        $IssueManagementAudit->create($data);
+                    }
                 }
                 $IssueManagementAudit = IssueManagementAudit::all();
 
@@ -581,15 +601,23 @@ class IssueManagementController extends Controller
             $active_application_id = $request->active_application_id;
             if (is_numeric($active_application_id)) {
                 $issue_data = json_decode($request->department_ids, true);
-                foreach ($issue_data as $issue) {
-                    $data = array(
-                        'issue_id' => $active_application_id,
-                        'department_id' => $issue,
-                        'dola' => Carbon::now(),
-                        'altered_by' => $this->user_id,
-                    );
-                    $IssueManagementOrgArea = new IssueManagementOrgArea();
-                    $IssueManagementOrgArea->create($data);
+                foreach ($issue_data as $department_id) {
+                    //Check if it exists
+                    $IssueManagementOrgArea = IssueManagementOrgArea::where('issue_id', $active_application_id)
+                        ->where('department_id', $department_id)->first();
+                    if ($IssueManagementOrgArea) {
+
+                    } else {
+                        $data = array(
+                            'issue_id' => $active_application_id,
+                            'department_id' => $department_id,
+                            'dola' => Carbon::now(),
+                            'altered_by' => $this->user_id,
+                        );
+                        $IssueManagementOrgArea = new IssueManagementOrgArea();
+                        $IssueManagementOrgArea->create($data);
+                    }
+
                 }
                 $IssueManagementOrgArea = IssueManagementOrgArea::all();
 
@@ -715,48 +743,38 @@ class IssueManagementController extends Controller
             $pdf->Ln(20);
 
             $html = '<table border="0" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse;">';
-            $html .= '<tr><th style="font-weight: bold;">Date:</th><td>' . date('Y-m-d') . '</td><th style="font-weight: bold;">Complaint No:</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td></tr>';
-            $html .= '<tr><th style="font-weight: bold;">Name of Complainant:</th><td>' . htmlspecialchars($records[0]['complainant_name']) . '</td>';
-            $html .= '<th style="font-weight: bold;">Name of Organization:</th><td>' . htmlspecialchars($records[0]['complainant_organisation']) . '</td></tr>';
-
-            $html .= '<tr><th style="font-weight: bold;">Address:</th><td>' . htmlspecialchars($records[0]['complainant_address']) . '</td>';
-            $html .= '<th style="font-weight: bold;">Telephone:</th><td>' . htmlspecialchars($records[0]['complainant_telephone']) . '</td></tr>';
-            $html .= '<tr><th style="font-weight: bold;">E-mail:</th><td colspan="3">' . htmlspecialchars($records[0]['complainant_email']) . '</td></tr>';
-
-            $html .= '<tr><th style="font-weight: bold;">Mode of Complaint:</th><td colspan="3">' . htmlspecialchars($records[0]['complaint_mode']) . '</td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Date:</th><td><u>' . date('Y-m-d') . '</u></td><th style="font-weight: bold;">Complaint No:</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Name of Complainant:</th><td><u>' . htmlspecialchars($records[0]['complainant_name']) . '</u></td>';
+            $html .= '<th style="font-weight: bold;">Name of Organization:</th><td><u>' . htmlspecialchars($records[0]['complainant_organisation']) . '</u></td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Address:</th><td><u>' . htmlspecialchars($records[0]['complainant_address']) . '</u></td>';
+            $html .= '<th style="font-weight: bold;">Telephone:</th><td><u>' . htmlspecialchars($records[0]['complainant_telephone']) . '</u></td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">E-mail:</th><td colspan="3"><u>' . htmlspecialchars($records[0]['complainant_email']) . '</u></td></tr>';
+            $html .= '<tr><th style="font-weight: bold;">Mode of Complaint:</th><td colspan="3"><u>' . htmlspecialchars($records[0]['complaint_mode']) . '</u></td></tr>';
             $html .= '</table>';
 
 
 
-            $html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+            $html .= '<br><table border="1" cellpadding="5" cellspacing="0" width="100%">';
 
-            $html .= '<tr><td colspan="4"><h3>Details of the complaint.</h3><br>' . nl2br(htmlspecialchars($records[0]['description'])) . '</td></tr>';
+            $html .= '<tr><td colspan="4"><b>Details of the complaint.</b><br>' . nl2br(htmlspecialchars($records[0]['description'])) . '</td></tr>';
 
 
             // Initial Review
-            $html .= '<tr><td colspan="1"><h3>Initial Review By Quality Office:</h3></td><td colspan="3">Office Assigned to: <u>' . htmlspecialchars($records[0]['office_assigned']) . '</u></td></tr>';
+            $html .= '<tr><td colspan="1"><b>Initial Review By Quality Office:</b></td><td colspan="3">Office Assigned to: <u>' . htmlspecialchars($records[0]['office_assigned']) . '</u></td></tr>';
 
-            $html .= '<tr><td colspan="1"><h3>Initial Review by:</h3></td><td colspan="2">' . htmlspecialchars($records[0]['office_assigned']) . '</td><td><h3>Date:</h3></td></tr>';
-            // $html .= '<tr><th>Date:</th><td>' . htmlspecialchars($records[0]['review_date']) . '</td>';
-            // $html .= '<th colspan="2"></th></tr>';
+            $html .= '<tr><td colspan="1"><b>Initial Review by:</b></td><td colspan="2">' . htmlspecialchars($records[0]['office_assigned']) . '</td><td><b>Date: </b>' . htmlspecialchars($records[0]['target_resolution_date']) . '</td></tr>';
+
 
             // Root Cause Analysis
-            $html .= '<tr><th colspan="4">Root Cause Analysis</th></tr>';
-            $html .= '<tr><td colspan="4">Complete Non-Conformity Form – BOMRA/QM/P08/F01.</td></tr>';
+            $html .= '<tr><td colspan="4"><b>Root Cause Analysis:</b> Complete Non-Conformity Form – <b>BOMRA/QM/P08/F01.</b></td></tr>';
 
             // Resolution and Approval
-            $html .= '<tr><th>Resolution Reached:</th><td>' . htmlspecialchars($records[0]['issue_resolution']) . '</td>';
-            // $html .= '<th>Date Communicated:</th><td>' . htmlspecialchars($records[0]['resolution_date']) . '</td></tr>';
-            // $html .= '<tr><th>Assigned Officer:</th><td>' . htmlspecialchars($records[0]['assigned_officer']) . '</td>';
-            // $html .= '<th>Approval by HOD/Supervisor:</th><td>' . htmlspecialchars($records[0]['hod_approval']) . '</td></tr>';
-            // $html .= '<tr><th>Date:</th><td>' . htmlspecialchars($records[0]['hod_approval_date']) . '</td>';
-            $html .= '<th colspan="2"></th></tr>';
+            $html .= '<tr><td colspan="4"><b>Resolution reached and communicated to the customer.</b><br>' . htmlspecialchars($records[0]['issue_resolution']) . '</td></tr>';
+
 
             // Verification of Effectiveness of Actions
-            // $html .= '<tr><th>Verified by Supervisor:</th><td>' . htmlspecialchars($records[0]['supervisor_verification']) . '</td>';
-            // $html .= '<th>Date:</th><td>' . htmlspecialchars($records[0]['supervisor_verification_date']) . '</td></tr>';
-            // $html .= '<tr><th>Confirmed by Quality Office:</th><td>' . htmlspecialchars($records[0]['quality_office_confirmation']) . '</td>';
-            // $html .= '<th>Date:</th><td>' . htmlspecialchars($records[0]['quality_office_confirmation_date']) . '</td></tr>';
+            $html .= '<tr><td colspan="1"><b>Assigned Officer:</b></td><td colspan="2"></td><td><b>Date: </b>' . htmlspecialchars($records[0]['target_resolution_date']) . '</td></tr>';
+
 
             // End of table
             $html .= '</table>';

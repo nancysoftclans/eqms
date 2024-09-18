@@ -172,6 +172,18 @@ class IssueManagement extends Model
         'trip_purpose',
         'destination',
         'number_of_passengers',
+        'trip_purpose_id',
+        'date_of_travel',
+        'departure_time',
+        'return_date',
+        'arrival_time',
+        'vehicle_type',
+        'justification_of_late_application',
+        'change_description',
+        'change_purpose',
+        'change_impact',
+        'change_revalidation',
+        'hod_comments',
     ];
 
     public $timestamps = false;

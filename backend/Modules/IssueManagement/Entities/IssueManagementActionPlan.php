@@ -5,24 +5,23 @@ namespace Modules\IssueManagement\Entities;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class IssueType extends Model
+class IssueManagementActionPlan extends Model
 {
     use HasFactory;
 
-    protected $table = 'par_issue_types';
+    protected $table = 'tra_issue_management_action_plans';
 
     protected $fillable = [
-        'title',
-        'description',
-        'form_id',
-        'status_group_id',
-        'issue_type_category_id',
+        'issue_id',
+        'action',
+        'responsible_person',
+        'start_date',
+        'completion_date',
         'is_enabled',
         'created_by',
         'altered_by',
-        'is_checklist_tied',
-        'checklist_category_id',
-        'has_action_plan'
+        'created_on',
+        'dola'
     ];
 
     public $timestamps = false;
