@@ -1831,12 +1831,19 @@ class WorkflowController extends Controller
                 ->leftJoin('tra_checklistitems_queries as t4', function ($join) use ($query_id) {
                     $join->on('t4.checklist_item_id', '=', 't1.id')
                         ->where('t4.query_id', $query_id);
-                })
+                }) 
                 ->join('par_checklist_types as t3', 't1.checklist_type_id', '=', 't3.id')
                 ->join('par_checklist_categories as t5', 't3.checklist_category_id', '=', 't5.id')
-                ->leftJoin('par_audit_findings as t6', 't1.id', '=', 't6.checklist_item_id')
+
+                ->leftJoin('par_audit_findings as t6', function ($join) use ($application_code) {
+                    $join->on('t1.id', '=', 't6.checklist_item_id')
+                        ->where('t6.application_code', '=', $application_code);
+                })
                 ->leftJoin('tra_application_documents as t7', 't1.id', '=', 't7.checklist_item_id')
-                ->leftJoin('tra_application_uploadeddocuments as t8', 't7.id', '=', 't8.application_document_id')
+                ->leftJoin('tra_application_uploadeddocuments as t8', function ($join) use ($application_code) {
+                    $join->on('t7.id', '=', 't8.application_document_id')
+                        ->where('t7.application_code', '=', $application_code);
+                })
                 ->select(DB::raw("t1.*, t1.id as checklist_item_id, t1.serial_no as order_no, 
                               t2.id as item_resp_id, t2.pass_status, t2.comment, t2.observation, 
                               t2.auditor_comment, t3.name as checklist_type, 

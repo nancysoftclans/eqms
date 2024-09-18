@@ -14,38 +14,35 @@ class PdfProvider extends TcpdfFpdi
   function Header(){
    $this->setMargins(7,25,10,true);
   
-		if ($this->PageNo() ==1) {
+	//
 						$org_info = $this->getOrganisationInfo();
-				$logo = getcwd() . '/resources/images/cert_logo.png';
-			$this->Image($logo,65,20,80,33);
+				$logo = getcwd() . '/resources/images/logo.jpg';
+		 	//$this->Image($logo,65,20,80,33);
+				$this->Image($logo,85,25,43,19);
 		 
-		}
+	//	}
 	}
-  function Footer()
-	{
-		//Position at 1.5 cm from bottom
-		$this->SetY(-23);
-		//Arial italic 8
 
-    $this->SetFont('times','',8);
+ public function Footer()
+    {
+        // Set the position at 15 mm from bottom
+        $this->SetY(-23);
 
-		$text1 = 'This document is property of the Botswana Medicines Regulatory Authority (BOMRA). It is strictly confidential and may on no account be reproduced, copied or';
-		$text2 = ' divulged to any third party without prior authorization by BOMRA Management.';
-
-		$this->Cell(0, 4, $text1, 0, 1, 'C'); // First line
-		$this->Cell(0, 4, $text2, 0, 1, 'C'); // Second line
+        // Set font for footer
+        $this->SetFont('helvetica', 'I', 8);
     
-    /*
-		 if ($this->page == 1) {
-          $this->get_Docqrcode($this->params);
-          $postion = $this->params['position'];
-          $qr_code  = getcwd().'/assets/uploads/app_detail.png';
-          $this->Image($qr_code,178,$postion,16);
-		 }
-     */
-		 $this->SetY(-90);
-		 
-	}public function get_Docqrcode($params){
+   		 // Get the current date
+    		$currentDate = date('d-m-Y');
+
+   		 // Left-aligned date
+   			 $this->Cell(0, 10, $currentDate, 0, 0, 'L');
+   
+        // Page number
+        $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().' of '.$this->getAliasNbPages(), 0, 0, 'R');
+    }
+
+
+	public function get_Docqrcode($params){
 		$qr_code = new Ciqrcode($params);
 		//get the details 
 		

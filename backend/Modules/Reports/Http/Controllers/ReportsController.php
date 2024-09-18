@@ -9874,7 +9874,29 @@ public function printAdministrativeSubmissionResponses(Request $req)
             ->leftJoin('tra_application_documents as t4', 't3.id', 't4.checklist_item_id')
             ->leftJoin('tra_application_uploadeddocuments as t5', 't4.id', 't5.application_document_id')
             ->join('par_audit_findings as t6', 't3.id', 't6.checklist_item_id')
-            ->select("t1.*")
+            ->join('par_qms_audit_types as t7', 't1.audit_type_id', 't7.id')
+            ->join('users as t8', 't1.applicant_id', 't8.id')
+            ->join('par_system_statuses as t9', 't1.application_status_id', 't9.id')
+            ->join('par_finding_types as t10', 't6.finding_type_id', 't10.id')
+            ->leftjoin('tra_issue_management_applications as t11', 't6.issue_id', 't11.id')
+            ->leftjoin('par_issue_statuses as t12', 't11.issue_status_id', 't12.id')
+           // ->join('tra_issue_management_related_issues as t13', 't11.id', 't13.related_id')
+            ->select(
+            	DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"),
+            	DB::raw("(SELECT tracking_no FROM tra_issue_management_applications as sub_t11 JOIN tra_issue_management_related_issues as t13 ON t13.related_id = sub_t11.id) as related_issue"),
+            	DB::raw("(SELECT par_issue_types.title FROM tra_issue_management_applications as sub_t11 
+                  JOIN tra_issue_management_related_issues as t13 
+                  ON t13.related_id = sub_t11.id 
+                  LEFT JOIN par_issue_types ON sub_t11.issue_type_id = par_issue_types.id) as related_issue_type"),
+            	DB::raw("(SELECT title FROM tra_issue_management_applications as sub_t11 JOIN tra_issue_management_related_issues as t13 ON t13.related_id = sub_t11.id) as related_title"),
+            	DB::raw("(SELECT decrypt(users.first_name) FROM tra_issue_management_applications as sub_t11 
+                  JOIN tra_issue_management_related_issues as t13 ON t13.related_id = sub_t11.id LEFT JOIN users ON sub_t11.created_by = users.id) as related_issue_owner"),
+            	DB::raw("(SELECT par_issue_statuses.title FROM tra_issue_management_applications as sub_t11 
+                  JOIN tra_issue_management_related_issues as t13 ON t13.related_id = sub_t11.id 
+                  LEFT JOIN par_issue_statuses ON sub_t11.application_status_id = par_issue_statuses.id) as related_issue_status"),
+            	DB::raw("(SELECT sub_t11.created_on FROM tra_issue_management_applications as sub_t11 JOIN tra_issue_management_related_issues as t13 ON t13.related_id = sub_t11.id) as related_issue_raised_date"),
+            	DB::raw("(SELECT sub_t11.date_closed FROM tra_issue_management_applications as sub_t11 JOIN tra_issue_management_related_issues as t13 ON t13.related_id = sub_t11.id) as related_issue_closed_date"),
+            		't1.application_code', 't1.tracking_no as audit_id', 't1.audit_reference', 't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't2.comment', 't5.initial_file_name', 't6.id as finding_id', 't6.finding_title', 't7.name as audit_type', 't9.name as status', 't10.name as finding_type', 't11.tracking_no as raised_against', 't11.created_on as issue_raised_date', 't11.date_closed as issue_closed_date', 't11.issue_resolution', 't11.id as issue_no', 't12.title as issue_status')  	
             ->where('t1.application_code', $application_code)
             ->get();
 
@@ -9893,71 +9915,71 @@ public function printAdministrativeSubmissionResponses(Request $req)
         $pdf->SetFont('Times', '', 12);
 
         // Add an image centered above the header text
-        $logo = getcwd() . '/resources/images/logo.jpg';
-		$logo = str_replace('\\', '/', $logo);
-        $pdf->Image($logo,85,25,43,19); // Adjust position and size as necessary
-        // Set the position for the header text
-        $pdf->SetY(42); // Adjust vertical position after image
+        // $logo = getcwd() . '/resources/images/logo.jpg';
+		// $logo = str_replace('\\', '/', $logo);
+        // $pdf->Image($logo,85,25,43,19); // Adjust position and size as necessary
+        // // Set the position for the header text
+        // $pdf->SetY(42); // Adjust vertical position after image
 
-        // Define page width for alignment calculations
-        $pageWidth = $pdf->GetPageWidth();
+        // // Define page width for alignment calculations
+        // $pageWidth = $pdf->GetPageWidth();
 
-        // Left-aligned header text
-        $pdf->SetX(10);
-        $pdf->Cell(0, 10, 'BOMRA/QM/P03/F02', 0, 0, 'L');
+        // // Left-aligned header text
+        // $pdf->SetX(10);
+        // $pdf->Cell(0, 10, 'BOMRA/'. $records[0]['audit_id'], 0, 0, 'L');
 
-        // Center-aligned header text
-        $pdf->SetX(($pageWidth / 2) - (80)); // Adjust X position to center text (50 is approximate width of the text block)
-        $pdf->Cell(0, 10, 'Botswana Medicines Regulatory Authority', 0, 0, 'C');
+        // // Center-aligned header text
+        // $pdf->SetX(($pageWidth / 2) - (80)); // Adjust X position to center text (50 is approximate width of the text block)
+        // $pdf->Cell(0, 10, 'Botswana Medicines Regulatory Authority', 0, 0, 'C');
         
-        // Center-aligned second line of header text
-        $pdf->SetX(($pageWidth / 2) - (80)); // Adjust X position to center text
-        $pdf->Cell(0, 20, 'Internal Audit Report', 0, 0, 'C');
+        // // Center-aligned second line of header text
+        // $pdf->SetX(($pageWidth / 2) - (80)); // Adjust X position to center text
+        // $pdf->Cell(0, 20, 'Internal Audit Report', 0, 0, 'C');
 
-        // Right-aligned header text
-        $pdf->SetX($pageWidth - 90); // Adjust X position for right-aligned text (90 is approximate width of the text block)
-        $pdf->Cell(0, 10, 'Issue No. 2.0', 0, 0, 'R');
+        // // Right-aligned header text
+        // $pdf->SetX($pageWidth - 90); // Adjust X position for right-aligned text (90 is approximate width of the text block)
+        // $pdf->Cell(0, 10, 'Issue No. '. $records[0]['issue_no'], 0, 0, 'R');
 
-        // Add some space before the content starts
-        $pdf->Ln(20);
+        // // Add some space before the content starts
+         $pdf->Ln(20);
 
          // Start building HTML content
          
         $html = '<h3></h3>';
 		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Audit ID</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">Audit Type</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit ID</th><td>' . htmlspecialchars($records[0]['audit_id']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Type</th><td>' . htmlspecialchars($records[0]['audit_type']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Reference</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">Title</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Reference</th><td>' . htmlspecialchars($records[0]['audit_reference']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td>' . htmlspecialchars($records[0]['audit_title']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Owner</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">Status</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Owner</th><td>' . htmlspecialchars($records[0]['first_name']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td>' . htmlspecialchars($records[0]['status']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Start Date</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">End Date</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Start Date</th><td>' . htmlspecialchars($records[0]['audit_start_date']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">End Date</th><td>' . htmlspecialchars($records[0]['audit_end_date']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Summary & Scope</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Summary & Scope</th><td colspan="3">' . htmlspecialchars('') . '</td>';
 		$html .= '</tr>';
 		$html .= '</table>';
 
 		$html .= '<h3></h3>';
 		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Function Audited:</th><td>' . htmlspecialchars('function') . '</td>';
-		$html .= '<th style="font-weight:bold;">Audit Standard:</th><td>' . htmlspecialchars('standard') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Function Audited:</th><td>' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Standard:</th><td>' . htmlspecialchars('') . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Audit Criteria:</th><td>' . htmlspecialchars('criteria') . '</td>';
-		$html .= '<th style="font-weight:bold;">Audit Objectives:</th><td>' . htmlspecialchars('objectives') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Criteria:</th><td>' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Objectives:</th><td>' . htmlspecialchars('') . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Additional Auditor:</th><td colspan="3">' . htmlspecialchars('Auditor') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Additional Auditor:</th><td colspan="3">' . htmlspecialchars('') . '</td>';
 		$html .= '</tr>';
 		$html .= '</table>';
 
@@ -9978,13 +10000,13 @@ public function printAdministrativeSubmissionResponses(Request $req)
 		$html .= '<th>Note</th>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<td></td>';
+		$html .= '<td> ' . htmlspecialchars($records[0]['comment']) . ' </td>';
 		$html .= '</tr>';
 		$html .= '<tr style="background-color: #d3d3d3;">';
 		$html .= '<th>Evidence</th>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<td></td>';
+		$html .= '<td> ' . htmlspecialchars($records[0]['initial_file_name']) . ' </td>';
 		$html .= '</tr>';
 		$html .= '</table>';
 
@@ -10002,42 +10024,42 @@ public function printAdministrativeSubmissionResponses(Request $req)
 		$html .= '<h3></h3>';
 		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Finding ID</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">Type</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Finding ID</th><td>' . htmlspecialchars($records[0]['finding_id']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Type</th><td>' . htmlspecialchars($records[0]['finding_type']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Title</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td colspan="3">' . htmlspecialchars($records[0]['finding_title']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Raised Against</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Raised Against</th><td colspan="3">' . htmlspecialchars($records[0]['raised_against']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Status</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td colspan="3">' . htmlspecialchars($records[0]['issue_status']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Created</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">Completed</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Created</th><td>' . htmlspecialchars($records[0]['issue_raised_date']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Completed</th><td colspan="3">' . htmlspecialchars($records[0]['issue_closed_date']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Result</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Result</th><td colspan="3">' . htmlspecialchars($records[0]['issue_resolution']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Related Issue</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold;">Related Issue</th><td colspan="3">' . htmlspecialchars($records[0]['related_issue']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Issue ID</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">Type</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Issue ID</th><td>' . htmlspecialchars($records[0]['related_issue']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Type</th><td colspan="3">' . htmlspecialchars($records[0]['related_issue_type']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Title</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td colspan="3">' . htmlspecialchars($records[0]['related_title']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Owner</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">Status</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Owner</th><td>' . htmlspecialchars($records[0]['related_issue_owner']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td colspan="3">' . htmlspecialchars($records[0]['related_issue_status']) . '</td>';
 		$html .= '</tr>';
 			$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Raised</th><td>' . htmlspecialchars($records[0]['application_code']) . '</td>';
-		$html .= '<th style="font-weight:bold;">Closed</th><td colspan="3">' . htmlspecialchars($records[0]['application_code']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Raised</th><td>' . htmlspecialchars($records[0]['related_issue_raised_date']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Closed</th><td colspan="3">' . htmlspecialchars($records[0]['related_issue_closed_date']) . '</td>';
 		$html .= '</tr>';
 		$html .= '</table>';
 
@@ -10065,10 +10087,6 @@ public function printAdministrativeSubmissionResponses(Request $req)
         return response()->json($res);
     }
 }
-
-
-
-
-
-	}
+	
+}
 
