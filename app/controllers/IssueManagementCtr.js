@@ -62,7 +62,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       "issueauditform button[name=save_audit_btn]": {
         click: "saveIssueManagementAssociatedDetails",
       },
-      "selectorgareaform button[name=save_orgarea_btn]": {
+      "issueselectorgareafrm button[name=save_orgarea_btn]": {
         click: "saveIssueManagementAssociatedDetails",
       },
       "addactionplanform button[name=save_action_plan_btn]": {
