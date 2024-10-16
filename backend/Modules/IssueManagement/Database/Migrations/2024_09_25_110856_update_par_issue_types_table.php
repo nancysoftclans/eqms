@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class UpdateTableTraAuditsmanagerApplication extends Migration
+class UpdateParIssueTypesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class UpdateTableTraAuditsmanagerApplication extends Migration
      */
     public function up()
     {
-        Schema::table('tra_auditsmanager_application', function (Blueprint $table) {
-            $table->boolean('is_enabled')->default(true);
+        Schema::table('par_issue_types', function (Blueprint $table) {
+            $table->integer('form_id')->nullable()->change();
         });
     }
 

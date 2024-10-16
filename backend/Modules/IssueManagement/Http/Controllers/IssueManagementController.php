@@ -48,6 +48,8 @@ class IssueManagementController extends Controller
         $workflow_stage_id = $request->input('workflow_stage_id');
         $module_id = $request->input('module_id');
         $sub_module_id = $request->input('sub_module_id');
+        $WfProcess = WfProcess::where('sub_module_id', $sub_module_id)->first();
+        $section_id = $WfProcess->section_id;
         $application_code = $request->input('application_code');
         $active_application_id = $request->input('active_application_id');
         $user_id = $this->user_id;
@@ -131,7 +133,8 @@ class IssueManagementController extends Controller
                     'remarks' => 'Initial save of the application',
                     'date_received' => Carbon::now(),
                     'created_on' => Carbon::now(),
-                    'created_by' => $user_id
+                    'created_by' => $user_id,
+                    'section_id' => $section_id
                 );
                 $res = insertRecord('tra_submissions', $submission_params);
 

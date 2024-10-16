@@ -62,6 +62,17 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
           },
         },
         {
+          xtype: 'displayfield',
+          name: 'reference_no',
+          hidden: true,
+          fieldLabel: 'Ref No',
+          fieldStyle: {
+            'color': 'green',
+            'font-weight': 'bold',
+            'font-size': '10px'
+          }
+        },
+        {
           xtype: "tbseparator",
           hidden: true,
           width: 20,
@@ -97,6 +108,10 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
         {
           xtype: "hiddenfield",
           name: "sub_module_id",
+        },
+        {
+          xtype: "hiddenfield",
+          name: "section_id",
         },
         {
           xtype: "hiddenfield",

@@ -489,7 +489,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       .setValue(application_status);
     tab.down("displayfield[name=tracking_no]").setValue(tracking_no);
     tab.down("hiddenfield[name=application_code]").setValue(application_code);
-    //tab.down('displayfield[name=reference_no]').setValue(reference_no);;;;;;
+    tab.down('displayfield[name=reference_no]').setValue(reference_no);
   },
    updateSubmissionsTable: function (record, update_type) {
     var application_id = record.get("active_application_id"),
