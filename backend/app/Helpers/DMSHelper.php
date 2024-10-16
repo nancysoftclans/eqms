@@ -229,6 +229,7 @@ class DMSHelper
     {
         //authenticate and then create account 
         $auth_resp = authDms('');
+
         $ticket = $auth_resp['ticket'];
 
         $client = new Client([
@@ -245,6 +246,7 @@ class DMSHelper
             )->getBody()->getContents();
 
             $response = json_decode((string)$response);
+
 
             if ($user_data['userName'] == $response->userName) {
 
@@ -942,7 +944,7 @@ class DMSHelper
 //create a new node
     public static function dmsCreateAppRootNodesChildren($parent_node, $node_details)
     { 
-       
+      
         $auth_resp = self::authDms('');
         if(!isset($auth_resp['ticket'])){
             return $auth_resp;
@@ -1098,12 +1100,14 @@ class DMSHelper
 			$destination_node = str_replace("*","-",$destination_node);
 			
             $destination_node = 'workspace://SpacesStore/' . $destination_node;
+
             if ($update_noderef != '') {
 
                 $update_noderef = 'workspace://SpacesStore/' . $update_noderef;
-
             }
+
             $upload_url = Config('constants.dms.dms_url') . 'service/api/upload?alf_ticket=' . $ticket;
+
             $curl_request = curl_init();
             curl_setopt($curl_request, CURLOPT_URL, $upload_url);
             curl_setopt($curl_request, CURLOPT_RETURNTRANSFER, true);
@@ -1112,10 +1116,14 @@ class DMSHelper
 
             $args = new CurlFile($document_path, 'text/plain', $origFileName);
 
+  
+
             curl_setopt($curl_request, CURLOPT_POSTFIELDS, array('contenttype' => 'cm:content', 'description' => 'Document Upload', 'filename' => $origFileName, 'updateNodeRef' => $update_noderef, 'destination' => $destination_node, 'filedata' => $args));
 
             $result = curl_exec($curl_request);
             $response = json_decode((string)$result);
+
+
 
             if (isset($response->nodeRef)) {
                 $nodeRef = str_replace("workspace://SpacesStore/", "", $response->nodeRef);
@@ -1322,6 +1330,7 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
             ->select('t1.*')
             ->where(array('t1.application_code' => $application_code))
             ->first();
+
         if ($rec) {
             $record = $rec;
         }else{
@@ -1375,18 +1384,19 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
             ->where(array('t1.application_code' => $application_code, 't1.document_type_id' => $document_type_id))
             ->first();
 
-            
         if ($rec) {
             $record = $rec;
         } else {
             //get the documetn Type Name
             $document_type = getParameterItem('par_document_types', $document_type_id, 'mysql');
+
             //create nore
             $node_name = $document_type;
             $node_details = array(
                 'name' => $node_name . str_random(5),
                 'nodeType' => 'cm:folder');
             $response = dmsCreateAppRootNodesChildren($parentnode_ref, $node_details);
+
             if ($response['success']) {
                 $dms_node_id = $response['node_details']->id;
                 //save the details to the tra_application_documentstypedefination
@@ -1479,6 +1489,7 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
         $exists = recordExists('tra_application_documentsdefination', ['application_code'=>$application_code]);
         if(!$exists){
             $dms_node_details = self::getApplicationSubModuleNodeDetails($module_id, $sub_module_id, $user_id);
+
             $nodeTracking = str_replace("/", "-", $ref_number);
             $parentNode_ref = $dms_node_details->node_ref;//
             $node_details = array(
@@ -1486,6 +1497,7 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
                 'nodeType' => 'cm:folder'
             );
             $dms_res = self::dmsCreateAppRootNodesChildren($parentNode_ref, $node_details);
+
             if ($dms_res['success']) {
                 $dms_node_id = $dms_res['node_details']->id;
                 return self::saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, '', $ref_number, $dms_node_id, $user_id);

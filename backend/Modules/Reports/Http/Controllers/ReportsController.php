@@ -9876,7 +9876,7 @@ public function printAdministrativeSubmissionResponses(Request $req)
            // ->join('tra_issue_management_related_issues as t13', 't11.id', 't13.related_id')
             ->select(
             	 DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"),
-            		't1.application_code', 't1.tracking_no as audit_id', 't1.audit_reference', 't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't7.name as audit_type', 't9.name as status')  	
+            		't1.application_code', 't1.tracking_no as audit_id', 't1.audit_reference', 't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't1.audit_summary', 't7.name as audit_type', 't9.name as status')  	
             ->where('t1.application_code', $application_code)
             ->get();
 
@@ -10120,48 +10120,52 @@ public function printAdministrativeSubmissionResponses(Request $req)
 		$html .= '<br></br>';
 
 
+
+	foreach($issue_raised_against_findings_record as $finding_record){
 		$html .= '<h3></h3>';
 		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Finding ID</th><td>' . htmlspecialchars('') . '</td>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Type</th><td>' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Finding ID</th><td>' . htmlspecialchars($finding_record['finding_id']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Type</th><td>' . htmlspecialchars($finding_record['finding_type']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td colspan="3">' . htmlspecialchars($finding_record['finding_title']) . '</td>';  
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Raised Against</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Raised Against</th><td colspan="3">' . htmlspecialchars($record['audit_id']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td colspan="3">' . htmlspecialchars($record['status']) . '</td>';
+		$html .= '</tr>';
+
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Created</th><td>' . htmlspecialchars($record['audit_start_date']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Completed</th><td colspan="3">' . htmlspecialchars($record['audit_end_date']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Created</th><td>' . htmlspecialchars('') . '</td>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Completed</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Result</th><td colspan="3">' . htmlspecialchars($record['audit_summary']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Result</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold;">Related Issue</th><td colspan="3">' . htmlspecialchars($finding_record['related_issue']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold;">Related Issue</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Issue ID</th><td>' . htmlspecialchars($finding_record['issue_id']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Type</th><td colspan="3">' . htmlspecialchars($finding_record['issue_type']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Issue ID</th><td>' . htmlspecialchars('') . '</td>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Type</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td colspan="3">' . htmlspecialchars($finding_record['title']) . '</td>';
 		$html .= '</tr>';
 		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td colspan="3">' . htmlspecialchars('') . '</td>';
-		$html .= '</tr>';
-		$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Owner</th><td>' . htmlspecialchars('') . '</td>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Owner</th><td>' . htmlspecialchars($finding_record['first_name']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td colspan="3">' . htmlspecialchars($finding_record['raised_against_status']) . '</td>';
 		$html .= '</tr>';
 			$html .= '<tr>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Raised</th><td>' . htmlspecialchars('') . '</td>';
-		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Closed</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Raised</th><td>' . htmlspecialchars($finding_record['issue_raised']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Closed</th><td colspan="3">' . htmlspecialchars($finding_record['date_closed']) . '</td>';
 		$html .= '</tr>';
 		$html .= '</table>';
-
+	
+}
 
         $pdf->writeHTML($html, true, false, true, false, '');
 

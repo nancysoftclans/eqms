@@ -372,7 +372,6 @@ class DocumentManagementController extends Controller
                 if ($res['success']) {
                 initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
 
-        
                 
 
                 } else {
@@ -1173,11 +1172,11 @@ class DocumentManagementController extends Controller
             if ($file == '') {
                 $file = $req->file('uploaded_doc');
             }
-
             DB::beginTransaction();
             $app_rootnode = getApplicationRootNode($application_code);
+
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
-            // dd($app_rootnode);
+           
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
             $reg_serial = 0;
@@ -1270,6 +1269,7 @@ class DocumentManagementController extends Controller
                     } else {
 
                         $res = insertRecord($table_name, $doc_app_details);
+
                     }
 
                     if (isset($res['success']) && $res['success'] == true) {
@@ -1287,7 +1287,10 @@ class DocumentManagementController extends Controller
                         $res = $this->uploadZipDocuments($file, $parent_id, $application_document_id, $document_requirement_id, $app_rootnode, $node_ref, $zipFolderName);
                     } else {
                         //upload doc
+
                         $res = $this->uploadDocument($file, $parent_id, $application_document_id, $document_requirement_id, $app_rootnode, $node_ref, $application_code);
+
+
                     }
                 } else {
                     $res = array(
@@ -1483,6 +1486,7 @@ class DocumentManagementController extends Controller
         //confirm extension if allowed dms_node_id
         $docextension_check = $this->validateDocumentExtension($extension, $document_requirement_id);
         $is_allowedextension = $docextension_check['is_allowedextension'];
+
         if (!$is_allowedextension) {
             $allowed_filetypes = $docextension_check['allowed_filetypes'];
             $res = array('success' => false, 'message' => 'Uploaded file should only contain the following allowed file formats :.' . $allowed_filetypes);
@@ -1491,12 +1495,13 @@ class DocumentManagementController extends Controller
             //$file->move($destination, $savedName);
             $document_path = $destination . $savedName;
 
-            //check if tje dpcument type has been mapped and not autoCreate the folder
+            //check if the document type has been mapped and not autoCreate the folder
             $document_requirement = getParameterItem('par_document_types', $document_requirement_id);
             //get the application root folder
 
             $uploadfile_name = $document_requirement . str_random(5) . '.' . $extension;
             $destination_node = $app_rootnode->node_ref;
+
             //upload to dms
             $response = dmsUploadNodeDocument($destination_node, $file_path, $uploadfile_name, $node_ref);
 
@@ -1553,6 +1558,7 @@ class DocumentManagementController extends Controller
 
 
             $app_rootnode = getApplicationRootNode($application_code);
+
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
@@ -2636,8 +2642,7 @@ public function getApplicationDocumentDownloadurl(Request $req)
 
             $file = $fileReceived->getFile(); // get file
 
-
-            // $extension = $file->getClientOriginalExtension();
+                        // $extension = $file->getClientOriginalExtension();
             // $fileName = str_replace('.'.$extension, '', $file->getClientOriginalName()); //file name without extenstion
             // $fileName .= '.' . $extension; // a unique file name
 
