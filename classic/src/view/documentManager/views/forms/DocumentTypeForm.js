@@ -28,7 +28,7 @@ Ext.define('Admin.view.documentManager.views.forms.DocumentTypeForm', {
         xtype: 'hiddenfield',
         margin: '0 20 20 0',
         name: 'table_name',
-        value: 'par_document_types',
+        value: 'par_qms_documents_types',
         allowBlank: true
     }, {
         xtype: 'hiddenfield',

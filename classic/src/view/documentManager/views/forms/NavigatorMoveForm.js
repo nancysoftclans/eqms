@@ -80,7 +80,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorMoveForm',{
                     proxy: {
                         url: 'documentmanagement/navigatorMoveFolder',
                         extraParams: {
-                          //  table_name: 'par_document_types'
+                          //  table_name: 'par_qms_documents_types'
                         }
                      }
                 },

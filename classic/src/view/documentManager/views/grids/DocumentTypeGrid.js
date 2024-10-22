@@ -209,7 +209,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 var store = this.store,
                    grid = this.up('grid');
                     store.getProxy().extraParams = {
-                        table_name:'par_document_types'
+                        table_name:'par_qms_documents_types'
                     };
             
             },
@@ -367,7 +367,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 }, {
                     text: 'Disable',
                     iconCls: 'x-fa fa-repeat',
-                    table_name: 'par_document_types',
+                    table_name: 'par_qms_documents_types',
                     storeID: 'formCategoryStr',
                     hidden: true,
                     action_url: 'configurations/softDeleteConfigRecord',
@@ -379,7 +379,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                     text: 'Delete',
                     iconCls: 'x-fa fa-trash',
                     tooltip: 'Delete Record',
-                    table_name: 'par_document_types',
+                    table_name: 'par_qms_documents_types',
                     storeID: 'formCategoryStr',
                     hidden: true,
                     action_url: 'configurations/deleteConfigRecord',  
@@ -393,7 +393,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                     text: 'Enable',
                     iconCls: 'x-fa fa-undo',
                     tooltip: 'Enable Record',
-                    table_name: 'par_document_types',
+                    table_name: 'par_qms_documents_types',
                     hidden: true,
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/undoConfigSoftDeletes',

@@ -29,7 +29,6 @@ Ext.define('Admin.view.documentManager.views.toolbars.DocumentTypeTb', {
                 xtype: 'menu',
                     items:[{
                     text: 'Create Document',
-                   // iconCls: 'x-fa fa-file',
                     iconCls: 'x-fa fa-envelope',
                     handler:'onInitiateDocumentApplication',
                     app_type: 101

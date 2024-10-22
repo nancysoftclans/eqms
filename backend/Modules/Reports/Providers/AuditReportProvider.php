@@ -3,55 +3,38 @@
 namespace Modules\Reports\Providers;
 
 use setasign\Fpdi\TcpdfFpdi;
-class PdfProvider extends TcpdfFpdi
+class AuditReportProvider extends TcpdfFpdi
 {
   public $params = array();
+   private $tracking_no='';
+   private $issue_no='';
+
+   
 	public function __construct($qr_data=array()){
 			parent::__construct();
 		$this->params = $qr_data;
-		
-	}
+}
+	
+
+	public function setImportHeader($tracking_no,$issue_no) {
+        $this->tracking_no = $tracking_no;
+        $this->issue_no = $issue_no;
+    }
+  function Header(){
+			 $this->setMargins(7, 50, 7, true);
    
-    // function Header()
-    // {
-    //    $this->setMargins(7, 50, 7, true);
-    //    $this->SetFont('Times', 'B', 14);
 
-    //     // Only add header content on the first page or if specific pages require it
-    //     if ($this->PageNo() == 1 || $this->PageNo() > 1) {
+			/*$this->Cell(20,0,'',0,1);
+		   $this->Cell(0,4,$org_info->org_name,0,1,'C');
+		   $this->Cell(0,4,$org_info->location.',' .$org_info->street,0,1,'C');
+		   $this->Cell(0,4,$org_info->postal_address.', '.$org_info->region_name,0,1,'C');
+		   $this->Cell(0,4,$org_info->email.' : '.$org_info->website,0,1,'C');
+		   $this->ln();
+		   $this->Cell(0,4,'The Medicines and Allied Substances Act, 2013',0,1,'C');
+		   */
 
-    //     //	$this->setMargins(7, 50, 7, true);
-    //        $logo = getcwd() . '/resources/images/logo.jpg';
-		// 			$logo = str_replace('\\', '/', $logo);
-    //     $this->Image($logo, 85, 25, 30); // Adjust position and size as necessary
-    //     // Set the position for the header text
-    //     $this->SetY(30); // Adjust vertical position after image
-
-    //     // Define page width for alignment calculations
-    //     $pageWidth = $this->GetPageWidth();
-
-    //     // Left-aligned header text
-    //     $this->SetX(10);
-    //     $this->Cell(0, 10, 'BOMRA/', 0, 0, 'L');
-
-    //     // Center-aligned header text
-    //     $this->SetX(($pageWidth / 2) - (105)); // Adjust X position to center text (50 is approximate width of the text block)
-    //     $this->Cell(0, 10, 'Botswana Medicines Regulatory Authority', 0, 0, 'C');
-        
-    //     // Center-aligned second line of header text
-    //     $this->SetX(($pageWidth / 2) - (105)); // Adjust X position to center text
-    //     $this->Cell(0, 20, 'Internal Audit Report', 0, 0, 'C');
-
-    //     // Right-aligned header text
-    //     $this->SetX($pageWidth - 90); // Adjust X position for right-aligned text (90 is approximate width of the text block)
-    //     $this->Cell(0, 10, 'Issue No. ', 0, 0, 'R');
-    //     }
-
-    
-    function Header()
-{
-    $this->setMargins(7, 50, 7, true);
-    $this->SetFont('Times', 'B', 14);
+		      // $this->setMargins(7, 50, 7, true);
+    $this->SetFont('Times', 'B', 12);
 
     // Define page width for alignment calculations
     $pageWidth = $this->GetPageWidth();
@@ -71,7 +54,7 @@ class PdfProvider extends TcpdfFpdi
 
         // Left-aligned header text
         $this->SetX(10);
-        $this->Cell(0, 10, 'BOMRA/', 0, 0, 'L');
+        $this->Cell(0, 10, 'BOMRA/' .$this->tracking_no, 0, 0, 'L');
 
         // Center-aligned header text
         $centerText1 = 'Botswana Medicines Regulatory Authority';
@@ -95,21 +78,59 @@ class PdfProvider extends TcpdfFpdi
         $this->Cell($centerTextWidth2, 2, $centerText2, 0, 1, 'C');
 
         // Right-aligned header text
-        $rightText = 'Issue No. ';
+        $rightText = 'Issue No. ' .$this->issue_no;
         $rightTextWidth = $this->GetStringWidth($rightText);
         $rightXPosition = $pageWidth - $rightTextWidth - 10; // 10 is the margin from the right edge
 
         $this->SetXY($rightXPosition, $headerY);
         $this->Cell($rightTextWidth, 10, $rightText, 0, 0, 'R');
+    }else{
+
     }
-}
-
-
-
-
- public function Footer()
-    {
-        // Set the position at 15 mm from bottom
+				
+	}
+	function getOrganisationInfo(){
+			$data = array('org_name'=>strtoupper('Zambia Medicines Regulatory Authority'), 
+								'postal_address'=>'P.O. Box 31890,',
+								'region_name'=>'Lusaka, Zambia',
+								'email'=>'pharmacy@zamra.co.zm',
+								'website'=>'www.zamra.co.zm',
+								'street'=>'Off Kenneth Kaunda International Airport Road,',
+								'location'=>' Plot No. 2350/M.',
+								'act'=>'(The Medicines and Allied Substances Act, 2013)',
+								'fax'=>'',
+								'telephone'=>'+260 211 432 350, +260 211 432 351,+260 211 432 352',
+								'org_acynm'=>'ZAMRA',
+								'logo'=>'logo.jpg',
+								
+						);
+			$org_info = (object)$data;
+			return $org_info;
+		}
+  function Footer()
+	{
+		/*//Position at 1.5 cm from bottom
+		$this->SetY(-15);
+		//Arial italic 8
+		$startY = $this->GetY();
+								$startX = $this->GetX();
+    $this->SetFont('times','',8);
+     
+    $this->SetLineWidth(0.3);
+    $this->Line(0+30,$startY,180,$startY);
+			
+    $this->Cell(0,8,'Branches:Ndola, Chipata, Lvingstone, Chirundu, Nakonde, Solwezi, Kasama, Kenneth Kaunda International Airport(KKIA)',0,1,'C');
+   
+    
+		 if ($this->page == 1) {
+          $this->get_Docqrcode($this->params);
+          $postion = $this->params['position'];
+          $qr_code  = getcwd().'/assets/uploads/app_detail.png';
+          $this->Image($qr_code,178,$postion,16);
+		 }
+     */
+		//// $this->SetY(-90);
+		  // Set the position at 15 mm from bottom
         $this->SetY(-15);
 
         // Set font for footer
@@ -123,20 +144,13 @@ class PdfProvider extends TcpdfFpdi
    
         // Page number
         $this->Cell(0, 10, 'Page '.$this->getAliasNumPage().' of '.$this->getAliasNbPages(), 0, 0, 'R');
-    }
-
-
-	public function get_Docqrcode($params){
+		 
+	}public function get_Docqrcode($params){
 		$qr_code = new Ciqrcode($params);
 		//get the details 
 		
 		$qr_code->generate($params); 
 		
 	 }
-function getOrganisationInfo(){
-			
-						$org_info = getSingleRecord('tra_organisation_information', array('id'=>1));
-			
-			return $org_info;
-		}
+
 }
