@@ -699,7 +699,7 @@ class AuditManagementController extends Controller
 
     public function getAuditManagementDetails(Request $req)
     {
-        
+     
         try {
          $results = DB::table('tra_auditsmanager_application as t1')
         ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
@@ -724,13 +724,14 @@ class AuditManagementController extends Controller
             $res = decryptArray($results);
 
         } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', _CLASS_), \Auth::user()->id);
         } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', _CLASS_), \Auth::user()->id);
         }
         return $res;
     }
 
+    
     public function prepapreAuditApplicationReceiving(Request $req)
     {
         $application_id = $req->input('application_id');
