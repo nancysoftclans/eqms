@@ -12,8 +12,40 @@ use Modules\IssueManagement\Entities\IssueType;
 
 class IssueTypeController extends Controller
 {
-    public function index()
+
+    public function logAction($action, $request, $ref_id=null){
+        $table_name = 'eqms_issue_types_logs';
+        $user_id = Auth::user()->id;
+        //$application_code = $request->input('application_code') ?? null;
+        $ref_id = $request->input('id');
+        $created_on = Carbon::now();
+        $title = $request->input('title');
+        $description = $request->input('description');
+        $form_id = $request->input('form_id');
+        $status_group_id = $request->input('status_group_id');
+        $issue_type_category_id = $request->input('issue_type_category_id');
+        $is_enabled = $request->input('is_enabled');
+
+        $logData = [
+            'user_id' => $user_id,
+            //'application_code' => $application_code,
+            'action' => $action,
+            'ref_id' => $ref_id,
+            'title' => $title,
+            'description'=> $description,
+            'form_id'=> $form_id,
+            'status_group_id'=> $status_group_id,
+            'is_enabled'=> $is_enabled,
+            'issue_type_category_id' => $issue_type_category_id,
+            'created_on' => $created_on,
+        ];
+
+        DB::table($table_name)->insert($logData);
+    }
+    public function index(Request $request)
     {
+        $this->logAction('Viewed issue types', $request);
+
         $IssueType = IssueType::from('par_issue_types as it')
             ->join('par_form_categories as fc', 'it.form_id', 'fc.id')
             ->leftJoin('par_issue_status_groups as isg', 'it.status_group_id', 'isg.id')
@@ -25,6 +57,7 @@ class IssueTypeController extends Controller
 
     public function store(Request $request)
     {
+        $this->logAction('store issue types', $request);
         try {
             $id = $request->input('id');
             if (validateIsNumeric($id)) {
@@ -77,6 +110,7 @@ class IssueTypeController extends Controller
                 $res = array(
                     "success" => true,
                     "message" => 'Data Saved Successfully!!',
+                    "id" => $id,
                     "results" => $IssueType
                 );
             }
@@ -96,8 +130,9 @@ class IssueTypeController extends Controller
         return response()->json($res);
     }
 
-    public function show($id)
+    public function show($id, Request $request)
     {
+        $this->logAction('show issue types', $request);
         $IssueType = IssueType::from('par_issue_types as it')
             ->join('par_form_categories as fc', 'it.form_id', 'fc.id')
             ->leftJoin('par_issue_status_groups as isg', 'it.status_group_id', 'isg.id')
@@ -110,6 +145,7 @@ class IssueTypeController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->logAction('updated issue types', $request);
         $rules = array(
             'title' => 'required',
         );
@@ -150,8 +186,9 @@ class IssueTypeController extends Controller
         return response()->json($res);
     }
 
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
+        $this->logAction('destroy issue types', $request);
         try {
             $IssueType = IssueType::find($id);
 

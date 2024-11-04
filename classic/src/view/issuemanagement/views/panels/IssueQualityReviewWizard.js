@@ -173,6 +173,20 @@ Ext.define(
             name: "back_to_list",
             hidden: true,
           },
+          {
+            text: 'Logs',
+            iconCls: 'x-fa fa-list',
+            tooltip: 'View Logs',
+            action: 'logs',
+            childXtype: 'issueloggrid',
+            winTitle: 'Logs',
+            winWidth: '100%',
+            handler: 'showLogGridwin',
+            // bind: {
+            //     disabled: '{isReadOnly}'
+            // },
+            stores: '[]'
+        },
           "->",
           {
             text: "Save Details",

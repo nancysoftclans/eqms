@@ -2,6 +2,7 @@
 
 namespace Modules\IssueManagement\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
@@ -11,6 +12,29 @@ use Modules\IssueManagement\Entities\IssueStatusGroups;
 
 class IssueStatusGroupsController extends Controller
 {
+
+    public function logAction($action, $request, $ref_id=null){
+        $table_name = 'eqms_issue_status_groups_logs';
+        $user_id = Auth::user()->id;
+        //$application_code = $request->input('application_code') ?? null;
+        $ref_id = $request->input('id');
+        $title = $request->input('title');
+        $is_enabled = $request->input('is_enabled');
+
+        $created_on = Carbon::now();
+
+        $logData = [
+            'user_id' => $user_id,
+            //'application_code' => $application_code,
+            'action' => $action,
+            'title' => $title,
+            'is_enabled' => $is_enabled,
+            'ref_id'=> $ref_id,
+            'created_on' => $created_on,
+        ];
+        DB::table($table_name)->insert($logData);
+    }
+    
     public function index()
     {
         $IssueStatusGroups = IssueStatusGroups::all();
@@ -19,6 +43,7 @@ class IssueStatusGroupsController extends Controller
 
     public function store(Request $request)
     {
+        $this->logAction('store issue status group', $request);
         try {
             $id = $request->input('id');
             if (validateIsNumeric($id)) {
@@ -97,6 +122,7 @@ class IssueStatusGroupsController extends Controller
 
     public function update(Request $request, $id)
     {
+        $this->logAction('update issue types', $request);
         $rules = array(
             'title' => 'required',
         );
@@ -137,8 +163,9 @@ class IssueStatusGroupsController extends Controller
         return response()->json($res);
     }
 
-    public function destroy($id)
+    public function destroy($id, Request $request)
     {
+        $this->logAction('delete issue types', $request);
         try {
             $IssueStatusGroups = IssueStatusGroups::find($id);
 

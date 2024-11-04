@@ -195,7 +195,21 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
             disabled: '{isReadOnly}'
         },
                     handler: 'doDeleteConfigWidgetParam'
-                }
+                },
+                // {
+                //     text: 'Logs',
+                //     iconCls: 'x-fa fa-list',
+                //     tooltip: 'View Logs',
+                //     action: 'logs',
+                //     childXtype: 'audittypeloggrid',
+                //     winTitle: 'Logs',
+                //     winWidth: '100%',
+                //     handler: 'showLogConfigwin',
+                //     // bind: {
+                //     //     disabled: '{isReadOnly}'
+                //     // },
+                //     stores: '[]'
+                // }
                 ]
             }
         }, onWidgetAttach: function (col, widget, rec) {

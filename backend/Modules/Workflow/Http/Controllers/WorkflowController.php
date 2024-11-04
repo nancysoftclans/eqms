@@ -67,6 +67,110 @@ class WorkflowController extends Controller
                     exit();
                 }
                 $this->user_id = Auth::user()->id;
+                $method = $request->route()->getActionMethod();
+                $inputTable = $request->input('table_name');
+                $module_id = $request->input('module_id');
+                $sub_module_id = $request->input('sub_module_id');
+                $curr_stage_id = $request->input('curr_stage_id');
+                $current_stage_name = $request->input('current_stage_name');
+                $application_status = $request->input('application_status');
+                $application_status_id = $request->input('application_status_id');
+                $responsible_user = $request->input('responsible_user');
+                $process_id = $request->input('process_id');
+                $id = $request->input('id');
+                $user_id = $this->user_id;
+                $application_code = $request->input('application_code') ?? null;
+                $created_on = Carbon::now();
+                $table = $request->input('table_name');
+                $workflow_stage_id = $request->input('workflow_stage_id');
+                $doc_title = $request->input('doc_title');
+                $document_type_id = $request->input('document_type_id');
+                $doc_version = $request->input('doc_version');
+                $owner_type_id = $request->input('owner_type_id');
+                $owner_user_id = $request->input('owner_user_id');
+                $owner_group_id = $request->input('owner_group_id');
+                $doc_description = $request->input('doc_description');
+                $navigator_name = $request->input('navigator_name');
+                $navigator_folder_id = $request->input('navigator_folder_id');
+
+
+                $action = '';
+                //$table_name = 'eqms_workflow_management_logs';
+                switch ($method) {
+                    case 'handleApplicationSubmission':
+                            
+                        $action = 'Submit application';
+                        break;
+                    case 'saveEditedConfigCommonData':
+
+                        $action = 'saved edited configuration common data';
+                        break;
+                    case 'deleteConfigRecord':
+                        $action = 'deleted configuration record';
+                        break;
+                    case 'saveDocumentTypes':
+                        $action = 'saved document types';
+                        break;
+                    case 'navigatorFolder':
+                        $action = 'saved navigator folder';
+                        break;
+                    default:
+                        break;
+                }
+
+                $table_data = null;
+
+                switch ($table) {
+                    case 'tra_documentmanager_application':
+                        $table_name = 'eqms_document_management_logs';
+                        $table_data = array(
+                            'user_id' => $user_id,
+                            'application_code' => $application_code,
+                            'module_id'=>$module_id,
+                            'sub_module_id'=>$sub_module_id,
+                            'workflow_stage_id' => $workflow_stage_id,
+                            'doc_title' => $doc_title,
+                            'document_type_id' => $document_type_id,
+                            'doc_version' => $doc_version,
+                            'owner_type_id' => $owner_type_id,
+                            'owner_user_id' => $owner_user_id,
+                            'owner_group_id' => $owner_group_id,
+                            'doc_description' => $doc_description,
+                            'navigator_name' => $navigator_name,
+                            'navigator_folder_id' => $navigator_folder_id,
+                            'action' => $action,
+                            'application_status_id' => $application_status_id,
+                            'created_on' => $created_on,
+                            'current_stage_name' => $current_stage_name,
+                            'application_status' => $application_status,
+                            'curr_stage_id' => $curr_stage_id
+                        );
+                }
+
+                if ($table_data) {
+                    //$dbtable = $table_name;
+                    //$user_id = $this->user_id;
+                    //$application_code = $request->input('application_code') ?? null;
+                    //$created_on = Carbon::now();
+                
+                    // $table_data = array(
+                    //     'user_id' => $user_id,
+                    //     'application_code' => $application_code,
+                    //     'module_id'=>$module_id,
+                    //     'sub_module_id'=>$sub_module_id,
+                    //     'action' => $action,
+                    //     'curr_stage_id' => $curr_stage_id,
+                    //     'current_stage_name' => $current_stage_name,
+                    //     'application_status' => $application_status,
+                    //     'application_status_id' => $application_status_id,
+                    //     'responsible_user' => $responsible_user,
+                    //     'process_id' => $process_id,
+                    //     'submitted_by' => $user_id,
+                    //     'created_on' => $created_on,
+                    // );
+                    // Insert to the database
+                    DB::table($table_name)->insert($table_data);
+                }              
                 return $next($request);
             });
         }

@@ -20,6 +20,7 @@ Ext.define('Admin.view.auditManagement.views.forms.NewAuditTypeDetailsFrm',{
         margin: 5,
         labelAlign: 'top'
     },
+    itemId: 'NewAuditDetails',
 
      
     items: [{
@@ -39,6 +40,7 @@ Ext.define('Admin.view.auditManagement.views.forms.NewAuditTypeDetailsFrm',{
         fieldLabel: 'id',
         margin: '0 20 20 0',
         name: 'id',
+        //value:'id',
         allowBlank: true
     }, 
      {

@@ -203,6 +203,20 @@ Ext.define('Admin.view.documentManager.views.panels.NewQMSRecordWizard', {
                     name: 'back_to_list',
                     hidden: true
                 },
+                {
+                    text: 'Logs',
+                    iconCls: 'x-fa fa-list',
+                    tooltip: 'View Logs',
+                    action: 'logs',
+                    childXtype: 'documentLoggrid',
+                    winTitle: 'Logs',
+                    winWidth: '100%',
+                    handler: 'showLogConfigwin',
+                    // bind: {
+                    //     disabled: '{isReadOnly}'
+                    // },
+                    stores: '[]'
+                },
                 '->',
                 {
                     text: 'Previous',

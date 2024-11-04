@@ -35,7 +35,7 @@ Ext.define('Admin.controller.AuditManagementCtr',{
         // },
         auditfindingsgrid: {
           refresh: "refreshAuditFindingGrid",
-        },
+        }
     },
 
     /**
@@ -90,6 +90,10 @@ Ext.define('Admin.controller.AuditManagementCtr',{
             // workflowContainer.getViewModel().set({readOnly:false});
     },
 
+
+    onLogButtonClick: function(btn) {
+
+    },
     showAuditTypes: function (btn) {
     var me = this,
       childXtype = btn.childXtype,
@@ -116,6 +120,7 @@ Ext.define('Admin.controller.AuditManagementCtr',{
         .down("hiddenfield[name=application_code]")
         .setValue(application_code);
     }
+
     funcShowCustomizableWindow(
       winTitle,
       winWidth,

@@ -33,10 +33,82 @@ class commonController extends Controller
                     //exit();
                 }
                 $this->user_id =1;// \Auth::user()->id;
+
+
+                // $method = $request->route()->getActionMethod();
+                // $inputTable = $request->input('table_name');
+                // $module_id = $request->input('module_id');
+                // $sub_module_id = $request->input('sub_module_id');
+                // $curr_stage_id = $request->input('curr_stage_id');
+                // $current_stage_name = $request->input('current_stage_name');
+                // $application_status = $request->input('application_status');
+                // $application_status_id = $request->input('application_status_id');
+                // $responsible_user = $request->input('responsible_user');
+                // $process_id = $request->input('process_id');
+                // $id = $request->input('id');
+
+                // $action = '';
+                // $table_name = 'eqms_workflow_management_logs';
+                // switch ($method) {
+                //     case 'saveApplicationChecklistDetails':
+                //         if ($module_id == '29') {
+                //             $table_name = 'eqms_audit_management_logs';
+                            
+                //             $action = 'Submit audit';
+                            
+                //         } else if ($module_id == '28') {
+                //             $table_name = 'eqms_issue_management_logs';
+                            
+                //             $action = 'Submit audit';
+                //         }
+                //         break;
+                //     case 'saveEditedConfigCommonData':
+
+                //         $action = 'saved edited configuration common data';
+                //         break;
+                //     case 'deleteConfigRecord':
+                //         $action = 'deleted configuration record';
+                //         break;
+                //     case 'saveDocumentTypes':
+                //         $action = 'saved document types';
+                //         break;
+                //     case 'navigatorFolder':
+                //         $action = 'saved navigator folder';
+                //         break;
+                //     default:
+                //         break;
+                // }
+
+                // if ($action != '') {
+                //     $dbtable = $table_name;
+                //     $user_id = $this->user_id;
+                //     $application_code = $request->input('application_code') ?? null;
+                //     $created_on = Carbon::now();
+                
+                //     $table_data = array(
+                //         'user_id' => $user_id,
+                //         'application_code' => $application_code,
+                //         'module_id'=>$module_id,
+                //         'sub_module_id'=>$sub_module_id,
+                //         'action' => $action,
+                //         'curr_stage_id' => $curr_stage_id,
+                //         'current_stage_name' => $current_stage_name,
+                //         'application_status' => $application_status,
+                //         'application_status_id' => $application_status_id,
+                //         'responsible_user' => $responsible_user,
+                //         'process_id' => $process_id,
+                //         'submitted_by' => $user_id,
+                //         'created_on' => $created_on,
+                //     );
+                //     // Insert to the database
+                //     DB::table($dbtable)->insert($table_data);
+                // }              
                 return $next($request);
             });
         }
     }
+
+   
 
     public function saveApplicationChecklistDetails(Request $request)
     {
@@ -45,63 +117,62 @@ class commonController extends Controller
         $screening_details = json_decode($screening_details);
         $table_name = 'tra_checklistitems_responses';
         $user_id = $this->user_id;
-        $submission_details = getLastChecklistApplicationDetails($application_code);
-        
-        try {
-            $insert_params = array();
-            foreach ($screening_details as $screening_detail) {
-        
-                
-            if ($submission_details['success'] == true) {
-                   $application_id = $submission_details['results']->id;   
-            
 
-                if (validateIsNumeric($application_id)) {
-                    $where = array(
-                        'id' => $application_id
-                    );
-            
-                    $prev_data = getPreviousRecords($table_name, $where);
-                    $prev_data = $prev_data['results'][0];
-                    
-                   updateRecord($table_name, $where,  $prev_data, $user_id);
-                   
-                } 
-            }else {
-                    $insert_params[] = array(
-                        'application_code' => $application_code,
-                        'checklist_item_id' => $screening_detail->checklist_item_id,
-                        'pass_status' => $screening_detail->pass_status,
-                        'comment' => $screening_detail->comment,
-                        'observation' => $screening_detail->observation,
-                        'risk_type' => $screening_detail->risk_type,
-                        'risk_type_remarks' => $screening_detail->risk_type_remarks,
-                        'created_on' => Carbon::now(),
-                        'created_by' => $user_id
-                    );
+        try {
+            foreach ($screening_details as $screening_detail) {
+                $id = $screening_detail->item_resp_id;
+
+                $insert_params = [
+                    'application_code' => $application_code,
+                    'checklist_item_id' => $screening_detail->checklist_item_id,
+                    'pass_status' => $screening_detail->pass_status,
+                    'comment' => $screening_detail->comment,
+                    'observation' => $screening_detail->observation,
+                    'risk_type' => $screening_detail->risk_type,
+                    'risk_type_remarks' => $screening_detail->risk_type_remarks,
+                    'created_on' => Carbon::now(),
+                    'created_by' => $user_id,
+                ];
+
+                if (validateIsNumeric($id)) {
+                    $where = ['id' => $id];
+                    if (recordExists($table_name, $where)) {
+                        $prev_data = getPreviousRecords($table_name, $where);
+
+                        if ($prev_data['success'] == false) {
+                            return $prev_data;
+                        }
+
+                        $prev_data = $prev_data['results'][0];
+                        $res = updateRecord($table_name, $where, $insert_params, $user_id);
+                    }
+                } else {
+                    // Insert the new record
+                    if (!empty($insert_params)) {
+                        DB::table($table_name)->insert($insert_params);
+                    }
                 }
             }
-            if (count($insert_params) > 0) {
-                 DB::table($table_name)
-                    ->insert($insert_params);
-            }
-            $res = array(
+
+            $res = [
                 'success' => true,
-                'message' => 'Screening details saved successfully!!'
-            );
+                'message' => 'Screening details saved successfully!',
+            ];
         } catch (\Exception $exception) {
-            $res = array(
+            $res = [
                 'success' => false,
-                'message' => $exception->getMessage()
-            );
+                'message' => $exception->getMessage(),
+            ];
         } catch (\Throwable $throwable) {
-            $res = array(
+            $res = [
                 'success' => false,
-                'message' => $throwable->getMessage()
-            );
+                'message' => $throwable->getMessage(),
+            ];
         }
-        return \response()->json($res);
+
+        return response()->json($res);
     }
+
 
     public function getApplicationChecklistQueries(Request $request)
     {
@@ -6344,7 +6415,6 @@ class commonController extends Controller
             $poe_details = $main_qry->get();
                 if(count($poe_details) > 0){
                     foreach($poe_details as $poe){
-                        $application_code= $poe->application_code;
                         $application_id= $poe->application_id;
                         $premise_id= $poe->premise_id;
                         $sender_receiver_id= $poe->sender_receiver_id;

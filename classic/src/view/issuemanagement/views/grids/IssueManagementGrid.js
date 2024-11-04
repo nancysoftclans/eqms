@@ -212,8 +212,23 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
               handler: 'doDeleteConfigWidgetParam',
               bind: {
                 disabled: '{hideDeleteButton}'
-              },
+              }
+              
             },
+            {
+              text: 'Logs',
+                iconCls: 'x-fa fa-list',
+                tooltip: 'View Logs',
+                action: 'logs',
+                childXtype: 'issueloggrid',
+                winTitle: 'Logs',
+                winWidth: '100%',
+                handler: 'showLogConfigwin',
+                // bind: {
+                //     disabled: '{isReadOnly}'
+                // },
+                stores: '[]'
+            }
           ],
         },
       },

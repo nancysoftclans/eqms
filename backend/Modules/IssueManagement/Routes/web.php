@@ -28,4 +28,11 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::get('getIssueManagementAudits', [IssueManagementController::class, 'getIssueManagementAudits']);
     Route::post('saveIssueManagementAudits', [IssueManagementController::class, 'saveIssueManagementAudits']);
     Route::get('test', [IssueManagementController::class, 'test']);
+
+    Route::get('getIssueLogs', [IssueManagementController::class,'getIssueLogs']);
+    Route::post('getIssueLogs', [IssueManagementController::class,'getIssueLogs']);
+    Route::get('getIssueTypeLogs', [IssueManagementController::class,'getIssueTypeLogs']);
+    Route::get('getIssueStatusGroupsLogs', [IssueManagementController::class,'getIssueStatusGroupsLogs']);
+    Route::get('getIssueTypeCategoriesLogs', [IssueManagementController::class,'getIssueTypeCategoriesLogs']);
+    Route::get('getIssueStatusesLogs', [IssueManagementController::class,'getIssueStatusesLogs']);
 });

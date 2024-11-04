@@ -2,11 +2,7 @@
 
 namespace Modules\IssueManagement\Http\Controllers;
 
-use response;
-use SoapFault;
-use SoapClient;
 use App\Models\WfProcess;
-use App\Models\Submission;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Routing\Controller;
@@ -21,18 +17,7 @@ use Modules\IssueManagement\Entities\IssueManagementRelatedIssue;
 
 class IssueManagementController extends Controller
 {
-
     protected $user_id;
-    protected $username = "NDA";
-    protected $password = "NDAPWD";
-    protected $publicKeyPath = "D:/URA/public_key.pem";
-    protected $privateKeyPath = "D:/URA/private_key.pem";
-
-    protected $tinNumber = 1000052630;
-
-    protected $privateKeyPassword = "";
-    protected $wsdl = "https://testpayments.ura.go.ug/MDAService/PaymentServices.svc?WSDL";
-
     public function __construct(Request $req)
     {
         $is_mobile = $req->input('is_mobile');
@@ -49,6 +34,63 @@ class IssueManagementController extends Controller
                     exit();
                 }
                 $this->user_id = Auth::user()->id;
+
+                $method = $request->route()->getActionMethod();
+                
+                $req = $request;                
+                $table_name = 'eqms_issue_management_logs';
+                $user_id = $this->user_id;
+                $application_code = $request->input('application_code') ?? $req->input('application_code') ?? null;
+                $workflow_stage_id = $request->input('workflow_stage_id');
+                $module_id = $request->input('module_id');
+                $sub_module_id = $request->input('sub_module_id');
+                $application_status_id = $request->input('application_status-id');
+                $issue_status_id = $request->input('issue_status_id');
+                $issue_type_id = $request->input('issue_type_id');
+                $created_on = Carbon::now();
+                $id = $request->input('id');
+
+                $action = '';
+                switch ($method) {
+                    case 'saveIssueDetails':
+                        $action = 'Saved issue details';
+                        break;
+                    case 'submitIssueManagementApplication':
+                        $action = 'submitted issue management application';
+                        break;
+                    case 'saveIssueManagementDocuments':
+                        $action = 'saved issue management documents';
+                        break;
+                    case 'saveIssueManagementRelatedIssues':
+                        $action = 'saved issue management related issues';
+                        break;
+                    case 'saveIssueManagementAudits':
+                        $action = 'saved issue management audits';
+                        break;
+                    default:
+                        break;
+                }
+
+                
+                if ($action != ''){
+                    $table_data = array(
+                        'user_id' => $user_id,
+                        'application_code' => $application_code,
+                        'action' => $action,
+                        'ref_id' => $id,
+                        'workflow_stage_id' => $workflow_stage_id,
+                        'module_id' => $module_id,
+                        'sub_module_id' => $sub_module_id,
+                        'application_status_id' => $application_status_id,
+                        'issue_status_id' => $issue_status_id,
+                        'issue_type_id' => $issue_type_id,
+                        'created_on' => $created_on,
+                    );
+    
+                    DB::table($table_name)->insert($table_data);
+                }
+                
+
                 return $next($request);
             });
         }
@@ -56,81 +98,256 @@ class IssueManagementController extends Controller
     }
 
 
-    public function test()
-    {
+    public function getIssueStatusGroupsLogs(Request $request) {
+        //Capture input values
         try {
-            $encryptedCredentials = $this->encryptCredentials($this->username, $this->password, $this->publicKeyPath);
-            $signedCredentials = $this->signCredentials($encryptedCredentials, $this->privateKeyPath);
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
 
-            $soapBody = <<<XML
-        <soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:tem="http://tempuri.org/">
-           <soapenv:Header/>
-           <soapenv:Body>
-              <tem:GetClientRegistration>
-                 <tem:TIN>$this->tinNumber</tem:TIN>
-                 <tem:concatenatedUsernamePasswordSignature>$signedCredentials</tem:concatenatedUsernamePasswordSignature>
-                 <tem:encryptedConcatenatedUsernamePassword>$encryptedCredentials</tem:encryptedConcatenatedUsernamePassword>
-                 <tem:userName>$this->username</tem:userName>
-              </tem:GetClientRegistration>
-           </soapenv:Body>
-        </soapenv:Envelope>
-        XML;
-
-            $url = "https://testpayments.ura.go.ug/MDAService/PaymentServices.svc";
-            $soapAction = "http://tempuri.org/IPaymentService/GetClientRegistration";
-            $ch = curl_init($url);
-            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-            curl_setopt($ch, CURLOPT_POST, true);
-            curl_setopt($ch, CURLOPT_POSTFIELDS, $soapBody);
-            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-                "Content-Type: text/xml; charset=utf-8",
-                "Content-Length: " . strlen($soapBody),
-                "SOAPAction: $soapAction"
-            ));
-
-            // Execute cURL request and get response
-            $response = curl_exec($ch);
-
-            // return $response;
-            // Return the response
-            return response()->json($response);
-
-        } catch (SoapFault $fault) {
-            // Handle SOAP errors
-            return response()->json(['error' => $fault->getMessage()], 500);
+                //get log entries
+                $audit_logs = DB::table('eqms_issue_status_groups_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')//perform a join to users table to get username
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             //'logs.application_code', 
+                             'logs.action',
+                             'logs.title',
+                            //  'logs.description',
+                            //  'logs.form_id',
+                            //  'logs.status_group_id',
+                            //  'logs.issue_type_category_id',
+                             'logs.is_enabled', 
+                             'logs.created_on');
+                //filter logs by id
+                if ($ref_id) {
+                    $audit_logs->where('logs.ref_id', '=', $ref_id);
+                }
+    
+                $audit_logs = $audit_logs->orderBy('logs.id', 'desc')->get();
+            } else {
+               
+                $audit_logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $audit_logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
+    
+        return response()->json($res);
     }
 
 
-    function encryptCredentials($username, $password, $publicKeyPath)
-    {
-        // Concatenate username and password
-        $credentials = $username . $password;
+    public function getIssueStatusesLogs(Request $request) {
+        //Capture input values
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
 
-        // Load URA's public key
-        $publicKey = file_get_contents($publicKeyPath);
-
-        // Encrypt the credentials using the public key
-        openssl_public_encrypt($credentials, $encryptedCredentials, $publicKey, OPENSSL_PKCS1_PADDING);
-
-        // Return base64 encoded encrypted credentials
-        return base64_encode($encryptedCredentials);
+                //get log entries
+                $audit_logs = DB::table('eqms_issue_statuses_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')//perform a join to users table to get username
+                    ->join('par_issue_states as state', 'logs.issue_state_id', '=', 'state.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             //'logs.application_code', 
+                             'logs.action',
+                             'logs.title',
+                             'state.title as issue_state_id',
+                             //'logs.issue_state_id',
+                             //'logs.description',
+                             //'logs.form_id',
+                             //'logs.status_group_id',
+                             //'logs.issue_type_category_id',
+                             'user.email as submitted_by',
+                             'logs.is_enabled', 
+                             'logs.created_on');
+                //filter logs by id
+                if ($ref_id) {
+                    $audit_logs->where('logs.ref_id', '=', $ref_id);
+                }
+    
+                $audit_logs = $audit_logs->orderBy('logs.id', 'desc')->get();
+            } else {
+               
+                $audit_logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $audit_logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
     }
 
-    function signCredentials($encryptedCredentials, $privateKeyPath)
-    {
-        // Load your private key
-        $privateKey = file_get_contents($privateKeyPath);
-        $privateKeyResource = openssl_pkey_get_private($privateKey);
+    public function getIssueTypeCategoriesLogs(Request $request) {
+        //Capture input values
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
 
-        // Sign the encrypted credentials
-        openssl_sign($encryptedCredentials, $signature, $privateKeyResource, OPENSSL_ALGO_SHA1);
+                //get log entries
+                $audit_logs = DB::table('eqms_issue_types_categories_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')//perform a join to users table to get username
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             //'logs.application_code', 
+                             'logs.action',
+                             'logs.title',
+                             //'logs.description',
+                             //'logs.form_id',
+                             //'logs.status_group_id',
+                             //'logs.issue_type_category_id',
+                             'user.email as submitted_by',
+                             'logs.is_enabled', 
+                             'logs.created_on');
+                //filter logs by id
+                if ($ref_id) {
+                    $audit_logs->where('logs.ref_id', '=', $ref_id);
+                }
+    
+                $audit_logs = $audit_logs->orderBy('logs.id', 'desc')->get();
+            } else {
+               
+                $audit_logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $audit_logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
 
-        // Free the private key from memory
-        openssl_free_key($privateKeyResource);
 
-        // Return base64 encoded signature
-        return base64_encode($signature);
+
+    public function getIssueTypeLogs(Request $request) {
+        //Capture input values
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
+
+                //get log entries
+                $audit_logs = DB::table('eqms_issue_types_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')//perform a join to users table to get username
+                    ->join('par_issue_type_categories as categories', 'logs.issue_type_category_id', '=', 'categories.id')
+                    ->join('par_issue_status_groups as groups', 'logs.status_group_id', '=', 'groups.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             //'logs.application_code', 
+                             'logs.action',
+                             'logs.title',
+                             'logs.description',
+                             'logs.form_id',
+                             //'logs.status_group_id',
+                             'groups.title as status_group_id',
+                             //'logs.issue_type_category_id',
+                             'categories.title as issue_type_category_id',
+                             'logs.is_enabled', 
+                             'logs.created_on');
+                //filter logs by id
+                if ($ref_id) {
+                    $audit_logs->where('logs.ref_id', '=', $ref_id);
+                }
+    
+                $audit_logs = $audit_logs->orderBy('logs.id', 'desc')->get();
+            } else {
+               
+                $audit_logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $audit_logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
+
+
+
+    public function getIssueLogs(Request $request) {
+        //Capture input values
+        try {
+            $ref_id = $request->input('ref_id');
+            //$application_code = $request->input('application_code');
+           //check if application code is present
+            if ($ref_id) {
+
+                //get log entries
+                $audit_logs = DB::table('eqms_issue_management_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->join('wf_workflow_stages as workflow', 'logs.workflow_stage_id', '=', 'workflow.id')//perform a join to users table to get username
+                    ->join('par_issue_statuses as statuses', 'logs.issue_status_id', '=', 'statuses.id')
+                    ->join('par_issue_types as types', 'logs.issue_type_id', '=', 'types.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             'logs.application_code',
+                             'logs.module_id',
+                             'logs.sub_module_id',
+                             //'logs.workflow_stage_id',
+                             'workflow.name as workflow_stage_id',
+                             'logs.application_status_id',
+                             //'logs.issue_status_id',
+                             'statuses.title as issue_status_id',
+                             'types.title as issue_type_id',
+                             //'logs.issue_type_id', 
+                             'logs.action', 
+                             'logs.created_on')
+                    ->where('logs.ref_id', '=', $ref_id)
+                    ->orderBy('created_on', 'desc') // order by created_on
+                    ->get();
+            } else {
+               
+                $audit_logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $audit_logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
     }
 
 
@@ -530,7 +747,7 @@ class IssueManagementController extends Controller
                 ->leftJoin('tra_issue_management_applications as t2', 't1.issue_id', 't2.id')
                 ->leftJoin('tra_documentmanager_application as t3', 't1.document_id', 't3.id')
                 ->where('issue_id', $request->issue_id)
-                ->select('t1.*', 't3.doc_title as title', 't3.doc_version as version')
+                ->select('t1.*', 't3.doc_title as title','t3.reference_no', 't3.doc_version as version')
                 ->get();
         } catch (\Exception $exception) {
             $res = array(

@@ -2590,6 +2590,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   renderParameterMenu: function (parameter_id) {
     var def_id = parameter_id,
       contentPnl = this.getMainTabPanel();
+      console.log("def id = " + def_id);
     Ext.getBody().mask("Loading...");
     //check if tab item is currently open
     if (contentPnl.getComponent("item_id" + def_id)) {
@@ -2614,12 +2615,18 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           "X-CSRF-Token": token,
         },
         success: function (response) {
+          //var savedRecordId = resp.id; // The id returned from the server after saving
+
+            // Find the hidden field and set the new id
+          //form.down('hiddenfield[name=id]').setValue(savedRecordId);
           var resp = Ext.JSON.decode(response.responseText),
             success = resp.success,
             message = resp.message,
             result = resp.results,
             title = resp.title;
+            ref_id = resp.ref_id;
           table_name = resp.table_name;
+        
           if (success == true || success === true) {
             var panel = Ext.create("Ext.panel.Panel", {
               viewModel: "configurationsvm",
@@ -2671,6 +2678,13 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                 },
                 {
                   xtype: "hiddenfield",
+                  name:"id",
+                  value: id,
+                  fieldLabel: 'id',
+                  allowBlank: true
+                },
+                {
+                  xtype: "hiddenfield",
                   name: "db_con",
                   fieldLabel: "db_con",
                   allowBlank: true,
@@ -2696,10 +2710,12 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                     var grid = this.up("grid"),
                       store = grid.getStore(),
                       def_id = grid.down("hiddenfield[name=def_id]").getValue();
+                      //id = grid.down("hiddenfield[name=id]").getValue();
 
                     var store = this.getStore();
                     store.getProxy().extraParams = {
                       def_id: def_id,
+                      //ref_id:id
                     };
                   },
                 },
@@ -2803,6 +2819,58 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                           disabled: true,
                           handler: "deleteRecordFromIDByConnection",
                         },
+                        {
+                          text: 'Logs',
+                          iconCls: 'x-fa fa-list',
+                          tooltip: 'View Logs',
+                          action: 'logs',
+                          //childXtype: 'findingtypeloggrid',
+                          winTitle: 'Logs',
+                          winWidth: '100%',
+                          handler: function(btn) {
+                            var button = btn.up('button'),
+                                grid = button.up('grid'),
+                                record = button.getWidgetRecord(),
+                                def_id = grid.down("hiddenfield[name=def_id]").getValue();
+                                //def_id = record.get('def_id') || btn.def_id,
+                                //childXtype = btn.childXtype,
+                                winWidth = '100%',
+                                winTitle = "logs",
+                                storeArray = eval(btn.stores),
+                                arrayLength = storeArray.length;
+
+                            var childXtype;
+                            if (def_id === '175') {
+                                childXtype = 'issueTypeCategoriesLoggrid';
+                            } else if (def_id === '172') {
+                                childXtype = 'issueStatusLoggrid';
+                            } else if (def_id === '176'){
+                                childXtype = 'findingtypeloggrid';
+                            } else {
+                                childXtype = 'defaultLogGrid';
+                            }
+                    
+                            // Refresh stores if there are any
+                            if (arrayLength > 0) {
+                                this.fireEvent('refreshStores', storeArray);
+                            }
+                    
+                            var refId = record.get('id');
+                            var logGrid = Ext.widget(childXtype);
+                            console.log(logGrid);
+                            
+                            // Set reference ID in the log grid
+                            logGrid.down('textfield[name=id]').setValue(refId);
+                    
+                            // Show window with customizable settings
+                            funcShowCustomizableWindow(winTitle, winWidth, logGrid, 'customizablewindow');
+                        },
+                    
+                          // bind: {
+                          //     disabled: '{isReadOnly}'
+                          // },
+                          stores: '[]'
+                      }
                       ],
                     },
                   },

@@ -1,0 +1,13 @@
+{
+    "name": "GBT",
+    "alias": "gbt",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\GBT\\Providers\\GBTServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

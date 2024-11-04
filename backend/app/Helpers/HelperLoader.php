@@ -1522,3 +1522,10 @@ if (!function_exists('generateDocumentNumber')) {
     }
 }
 
+if (!function_exists('checkNotificationEnabled')) {
+    function checkNotificationEnabled($user_id)
+    {
+        return UtilityHelper::checkNotificationEnabled($user_id);
+    }
+}
+

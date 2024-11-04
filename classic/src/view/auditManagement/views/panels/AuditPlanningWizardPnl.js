@@ -201,7 +201,17 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
         this.bbar = {
             reference: 'navigation-toolbar',
             ui: 'footer',
-            items: ['->',
+            items: [{
+                text: 'Logs',
+                iconCls: 'x-fa fa-list',
+                //handler: 'getAuditLogsClick'
+                tooltip: 'View Logs',
+                action: 'logs',
+                childXtype: 'loggrid',
+                winTitle: 'Logs',
+                winWidth: '100%',
+                handler: 'showLogGridwin'
+            },'->',
                 //  {
                 //     text: 'Previous',
                 //     ui: 'soft-blue',

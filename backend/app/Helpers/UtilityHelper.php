@@ -196,7 +196,7 @@ class UtilityHelper
             'module_id' => $module_id,
             'sub_module_id' => $sub_module_id
         );
-
+ 
         $results = DB::table('par_application_statuses as t1')
             ->join('par_system_statuses as t2', 't1.status_id', '=', 't2.id')
             ->select('t1.status_id', 't2.name')
@@ -2833,6 +2833,11 @@ static function convertArrayToString($array){
         return $doc_number;
      
         
+    }
+
+    static function checkNotificationEnabled($user_id){
+        $is_notifications_enabled = getSingleRecordColValue('users',array('id'=>$user_id), 'is_notifications_enabled');
+        return validateIsNumeric($is_notifications_enabled) ? true : false;
     }
 
 

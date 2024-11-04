@@ -159,7 +159,9 @@ class init extends Controller
         $data['system_dashboard'] = $user_dashboard;
         $data['refreshTimer'] = $refreshTimer;
         $data['esign_url'] = Config('constants.esign.web_url');
-        
+
+        $is_notification_enabled = checkNotificationEnabled($user_id);
+        $data['is_notification_enabled'] = $is_notification_enabled;        
 
         return view('init', $data);
     }

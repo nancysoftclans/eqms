@@ -173,6 +173,20 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueStatusGroupsGrid", {
               },
               handler: "doDeleteConfigWidgetParam",
             },
+            {
+              text: 'Logs',
+              iconCls: 'x-fa fa-list',
+              tooltip: 'View Logs',
+              action: 'logs',
+              childXtype: 'issuestatusgrploggrid',
+              winTitle: 'Logs',
+              winWidth: '100%',
+              handler: 'showLogConfigwin',
+              // bind: {
+              //     disabled: '{isReadOnly}'
+              // },
+              stores: '[]'
+          },
           ],
         },
       },
