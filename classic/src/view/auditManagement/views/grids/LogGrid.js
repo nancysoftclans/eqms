@@ -3,14 +3,6 @@ Ext.define('Admin.view.auditManagement.views.grids.LogGrid', {
     xtype: 'loggrid',
     itemId: 'loggrid',
     controller: 'auditMgmntVctr',
-    //title: 'Activity',
-    //layout: 'card',
-    //collapsible: true,
-    //collapseDirection: 'right',
-    //collapsed: true, 
-    //width: 200,
-    //margin: '0 5 0 0',
-    //selType: 'cellmodel',
 
 
     // plugins: [{
@@ -65,10 +57,6 @@ Ext.define('Admin.view.auditManagement.views.grids.LogGrid', {
             var mainTabPnl = Ext.ComponentQuery.query('#contentPanel')[0], // Get the main panel
                 containerPnl = mainTabPnl.getActiveTab();
 
-            //  process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
-            //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
-            //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
-                //refId = containerPnl.down('hiddenfield[name=id]').getValue();
                 applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
             store.getProxy().extraParams = {
                 table_name: 'eqms_audit_management_logs',
@@ -79,13 +67,7 @@ Ext.define('Admin.view.auditManagement.views.grids.LogGrid', {
     }],
 
     columns: [
-    //     {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'id',
-    //     text: 'Log ID',
-    //     flex: 1,
-    //     sortable: true
-    // }, 
+    
     {
         xtype: 'gridcolumn',
         dataIndex: 'user_id',
@@ -93,13 +75,6 @@ Ext.define('Admin.view.auditManagement.views.grids.LogGrid', {
         flex: 1,
         sortable: true
     },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'user_name',
-    //     text: 'User',
-    //     flex: 1,
-    //     sortable: true
-    // },
         {xtype: 'gridcolumn',
         dataIndex: 'application_code',
         text: 'Application Code',
@@ -113,34 +88,7 @@ Ext.define('Admin.view.auditManagement.views.grids.LogGrid', {
         flex: 2,
         sortable: true
     },
-    {
-        xtype: 'gridcolumn',
-        dataIndex: 'process_id',
-        text: 'Process Id',
-        flex: 1,
-        sortable: true
-    },
-    {
-        xtype: 'gridcolumn',
-        dataIndex: 'module_id',
-        text: 'Module id',
-        flex: 1,
-        sortable: true
-    },
-    {
-        xtype: 'gridcolumn',
-        dataIndex: 'sub_module_id',
-        text: 'Sub module id',
-        flex: 1,
-        sortable: true
-    },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'audit_type_name',
-    //     text: 'Audit type name',
-    //     flex: 1,
-    //     sortable: true
-    // },
+
     {
         xtype: 'gridcolumn',
         dataIndex: 'responsible_user',

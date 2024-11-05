@@ -1,6 +1,7 @@
 Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
     extend: 'Ext.form.Panel',
     xtype: 'auditfindingsfrm',
+    itemId: 'auditfindingsfrm',
     controller: 'auditMgmntVctr',
     autoScroll: true,
       bodyPadding: 8,
@@ -40,7 +41,13 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
         margin: '0 20 20 0',
         name: 'id',
         allowBlank: true
-    }, 
+    }, {
+        xtype: 'hiddenfield',
+        fieldLabel: 'checklist_item_id',
+        margin: '0 20 20 0',
+        name: 'checklist_item_id',
+        allowBlank: true
+    },
      {
         xtype:'fieldset',
         columnWidth: 1,

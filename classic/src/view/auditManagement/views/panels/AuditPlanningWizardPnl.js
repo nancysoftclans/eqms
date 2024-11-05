@@ -238,7 +238,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanningWizardPnl',{
 
                 },
                 {
-                    text: 'Submit Audit for Scheduling',
+                    text: 'Change Status',
                     ui: 'soft-blue',
                     iconCls: 'fa fa-check',
                     name: 'process_submission_btn',

@@ -62,6 +62,17 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
           },
         },
         {
+          xtype: 'displayfield',
+          name: 'reference_no',
+          hidden: true,
+          fieldLabel: 'Ref No',
+          fieldStyle: {
+            'color': 'green',
+            'font-weight': 'bold',
+            'font-size': '10px'
+          }
+        },
+        {
           xtype: "tbseparator",
           hidden: true,
           width: 20,
@@ -97,6 +108,10 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
         {
           xtype: "hiddenfield",
           name: "sub_module_id",
+        },
+        {
+          xtype: "hiddenfield",
+          name: "section_id",
         },
         {
           xtype: "hiddenfield",
@@ -194,16 +209,19 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingWizard", {
           form_panel: "#issuemanagementfrm",
           action_url: "issuemanagement/saveIssueDetails",
           wizard: "issuereceivingwizard",
-          handler: "saveIssueManagementApplicationReceivingBaseDetails",
+          handler: "saveIssueManagementApplicationDetails",
         },
         {
-          text: "Submit Application",
+          text: "Forward Application",
           ui: "soft-blue",
+          formBind: true,
+          form_panel: "#issuemanagementfrm",
           iconCls: "fa fa-check",
           name: "process_submission_btn",
           storeID: "issuemanagementstr",
           table_name: "tra_issue_management_applications",
           winWidth: "50%",
+          action_url: "issuemanagement/saveIssueDetails",
           handler: "showIssueManagementSubmissionWin",
         },
         // {

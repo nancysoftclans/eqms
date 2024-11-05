@@ -66,17 +66,13 @@ Ext.define('Admin.view.issuemanagement.views.grids.LogGrid', {
             var mainTabPnl = Ext.ComponentQuery.query('#contentPanel')[0], // Get the main panel
                 containerPnl = mainTabPnl.getActiveTab();
 
-            //  process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
-            //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
-            //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
-                //applicationCode = containerPnl.down('textfield[name=active_application_code]').getValue();
             var  refId = grid.down('textfield[name=id]').getValue();
              //var grid = this.up('grid'),
             console.log(refId);
 
             store.getProxy().extraParams = {
                 table_name: 'eqms_issue_management_logs',
-                //application_code: applicationCode,
+
                 ref_id:refId
             };
         }

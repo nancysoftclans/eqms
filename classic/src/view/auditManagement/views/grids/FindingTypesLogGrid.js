@@ -47,11 +47,8 @@ Ext.define('Admin.view.auditManagement.views.grids.FindingTypeLogGrid', {
                 storeId: 'findingtypestore',
                 proxy: {
                     api: {
-                        read: 'auditManagement/getFindingTypeLogs'  //getFindingTypeLogs url in backend
+                        read: 'auditManagement/getFindingTypeLogs'  //getFindingTypeLogs url
                     },
-                    // headers: {
-                    //     'Record-ID': response.data.record_id // Pass the record ID in the header
-                    // }
                     
                 },
             },
@@ -72,16 +69,7 @@ Ext.define('Admin.view.auditManagement.views.grids.FindingTypeLogGrid', {
                 containerPnl = mainTabPnl.getActiveTab();
             var formdata = Ext.ComponentQuery.query('#NewAuditDetails')[0];
             console.log(formdata)
-                //console.log(containerPnl);
-            //  process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
-            //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
-            //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
-               // refId = containerPnl.down('hiddenfield[name=id]').getValue();
              var refId = grid.down('textfield[name=id]').getValue();
-             //var grid = this.up('grid'),
-             console.log(refId);
-
-                //applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
             store.getProxy().extraParams = {
                 table_name: 'par_finding_types_logs',
                 //application_code: applicationCode,
@@ -91,13 +79,6 @@ Ext.define('Admin.view.auditManagement.views.grids.FindingTypeLogGrid', {
     }],
 
     columns: [
-    //     {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'id',
-    //     text: 'Log ID',
-    //     flex: 1,
-    //     sortable: true
-    // }, 
     {
         xtype: 'gridcolumn',
         dataIndex: 'user_id',
@@ -125,69 +106,6 @@ Ext.define('Admin.view.auditManagement.views.grids.FindingTypeLogGrid', {
         flex: 2,
         sortable: true
     },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'is_enabled',
-    //     text: 'Is Enabled',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'submitted_by',
-    //     text: 'Submitted By',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'sub_module_id',
-    //     text: 'Sub module id',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'audit_type_name',
-    //     text: 'Audit type name',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'responsible_user',
-    //     text: 'User responsible',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'current_stage_name',
-    //     text: 'Stage',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'application_status',
-    //     text: 'Status',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'curr_stage_id',
-    //     text: 'Stage id',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'application_status_id',
-    //     text: 'Status id',
-    //     flex: 1,
-    //     sortable: true
-    // },
     {
         xtype: 'gridcolumn',
         dataIndex: 'submitted_by',

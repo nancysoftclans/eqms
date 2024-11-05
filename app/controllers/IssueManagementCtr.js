@@ -35,20 +35,41 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuemanagementwwizard: {
         afterrender: "prepapreIssueManagementPreview",
       },
+      "issuemanagementorgareasgrid button[name=select_orgarea_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
       "issuemanagementdocgrid button[name=select_document]": {
-        click: "showApplicationDocUploadWin",
+        click: "showIssueManagementAssociatedWin",
       },
       "issuemanagementdocgrid button[name=add_upload]": {
-        click: "showApplicationDocUploadWin",
+        click: "showIssueManagementAssociatedWin",
+      },
+      "issuemanagementissuegrid button[name=select_issue_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
+      "issuemanagementauditgrid button[name=select_audit_btn]": {
+        click: "showIssueManagementAssociatedWin",
+      },
+      "issueactionplangrid button[name=add_action_plan_btn]": {
+        click: "showIssueManagementAssociatedWin",
       },
       "issueselectdocumentfrm button[name=save_issuedocument_btn]": {
-        click: "saveIssueManagementDocuments",
+        click: "saveIssueManagementAssociatedDetails",
       },
       "selectissueform button[name=save_issue_btn]": {
-        click: "saveIssueManagementRelatedIssues",
+        click: "saveIssueManagementAssociatedDetails",
       },
       "issueauditform button[name=save_audit_btn]": {
-        click: "saveIssueManagementAudits",
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      "issueselectorgareafrm button[name=save_orgarea_btn]": {
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      "addactionplanform button[name=save_action_plan_btn]": {
+        click: "saveIssueManagementAssociatedDetails",
+      },
+      issuemanagementorgareasgrid: {
+        refresh: "refreshGrid",
       },
       issuemanagementdocgrid: {
         refresh: "refreshGrid",
@@ -58,6 +79,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       },
       issuemanagementauditgrid: {
         refresh: "refreshGrid",
+      },
+      issueactivitygrid: {
+        refresh: "refreshGrid",
+      },
+      issueactionplangrid: {
+        refresh: "refreshGrid"
+      },
+      issuechecklistgrid: {
+        refresh: "refreshGrid"
+      },
+      'issuechecklistgrid button[name=savegrid_screening_btn]': {
+        click: 'saveApplicationChecklistDetails'
       },
     },
   },
@@ -157,22 +190,6 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     workflowContainer
       .down("hiddenfield[name=issue_type_id]")
       .setValue(issue_type_id);
-    var issuemanagementfrm = workflowContainer.down("issuemanagementfrm");
-
-    // issuemanagementfrm.down("combo[name=issue_type]").setValue(issue_type_id);
-    // issuemanagementfrm.down("combo[name=issue_status_id]").setValue(1);
-    // issuemanagementfrm
-    //   .down("datefield[name=creation_date]")
-    //   .setValue(new Date());
-
-    // // Calculate the date 10 days from now
-    // var targetDate = new Date();
-    // targetDate.setDate(targetDate.getDate() + 10);
-
-    // // Set the target resolution date field to 10 days from now
-    // issuemanagementfrm
-    //   .down("datefield[name=target_resolution_date]")
-    //   .setValue(targetDate);
 
     dashboardWrapper.add(workflowContainer);
 
@@ -183,26 +200,13 @@ Ext.define("Admin.controller.IssueManagementCtr", {
 
   launchissuereceivingWizard: function (pnl) {
     Ext.getBody().mask("Please wait...");
-    var me = this,
-      activeTab = pnl,
-      application_status_id = activeTab
-        .down("hiddenfield[name=application_status_id]")
-        .getValue(),
+    var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
-      sub_module_id = activeTab
-        .down("hiddenfield[name=sub_module_id]")
-        .getValue(),
-      workflow_stage_id = activeTab
-        .down("hiddenfield[name=workflow_stage_id]")
         .getValue();
 
     activeTab.down("button[name=recommendation]").setVisible(false);
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
     active_application_id = parseInt(active_application_id);
     if (!isNaN(active_application_id)) {
       Ext.Ajax.request({
@@ -239,6 +243,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_direct_or_indirect:
                     results.complaint_direct_or_indirect,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
                 });
             }
             if (
@@ -296,7 +312,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
       valid = this.validateNewReceivingSubmission();
 
-    if (valid) {
+    if (valid === true) {
       showWorkflowSubmissionWin(
         active_application_id,
         application_code,
@@ -327,7 +343,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .getValue();
 
     if (!active_application_id) {
-      toastr.warning("Please Save Application Details!!", "Warning Response");
+      toastr.error("Please Save Application Details!!", "Warning Response");
       return false;
     }
 
@@ -338,11 +354,9 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -379,6 +393,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_direct_or_indirect:
                     results.complaint_direct_or_indirect,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
                 });
             }
             if (
@@ -422,11 +448,11 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     Ext.getBody().mask("Please wait...");
     var activeTab = pnl,
       issuemanagementfrm = activeTab.down("issuemanagementfrm"),
-      issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
+      issuechecklistgrid = activeTab.down("issuechecklistgrid"),
+      issueactionplangrid = activeTab.down("issueactionplangrid"),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
         .getValue();
-    // issuemanagementdocgrid.down("button[name=select_document]").setVisible(true);
 
     if (active_application_id) {
       Ext.Ajax.request({
@@ -467,6 +493,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             }
             if (
               issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
                 "radiogroup[name=complaint_fully_addressed]"
               )
             ) {
@@ -476,12 +514,31 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   complaint_fully_addressed: results.complaint_fully_addressed,
                 });
             }
-            // issuemanagementfrm
-            //   .getForm()
-            //   .getFields()
-            //   .each(function (field) {
-            //     field.setReadOnly(true);
-            //   });
+            //Enable/Disable Action Plans/Checlists
+            Ext.Ajax.request({
+              method: "GET",
+              url:
+                "issuemanagement/issue_types/" +
+                results.issue_type_id,
+              headers: {
+                Authorization: "Bearer " + access_token,
+              },
+              success: function (response) {
+                Ext.getBody().unmask();
+                var resp = Ext.JSON.decode(response.responseText);
+
+                if (resp.is_checklist_tied != 1) {
+                  issuechecklistgrid.destroy();
+                }
+                if (resp.has_action_plan != 1) {
+                  issueactionplangrid.destroy();
+                }
+              },
+              failure: function (response) {
+              },
+              error: function (jqXHR, textStatus, errorThrown) {
+              },
+            });
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -497,6 +554,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           toastr.error("Error: " + errorThrown, "Error Response");
         },
       });
+
     } else {
       Ext.getBody().unmask();
     }
@@ -508,6 +566,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       issuemanagementdocgrid = activeTab.down("issuemanagementdocgrid"),
       issuemanagementissuegrid = activeTab.down("issuemanagementissuegrid"),
       issuemanagementauditgrid = activeTab.down("issuemanagementauditgrid"),
+      issuemanagementorgareasgrid = activeTab.down("issuemanagementorgareasgrid"),
 
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
@@ -516,6 +575,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
     issuemanagementdocgrid.down("button[name=select_document]").setVisible(false);
     issuemanagementissuegrid.down("button[name=select_issue_btn]").setVisible(false);
     issuemanagementauditgrid.down("button[name=select_audit_btn]").setVisible(false);
+    issuemanagementorgareasgrid.down("button[name=select_orgarea_btn]").setVisible(false);
     issuemanagementfrm
       .getForm()
       .getFields()
@@ -557,6 +617,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                 .setValue({
                   complaint_direct_or_indirect:
                     results.complaint_direct_or_indirect,
+                });
+            }
+            if (
+              issuemanagementfrm.down(
+                "radiogroup[name=deviation_plannedorunplanned]"
+              )
+            ) {
+              issuemanagementfrm
+                .down("radiogroup[name=deviation_plannedorunplanned]")
+                .setValue({
+                  deviation_plannedorunplanned:
+                    results.deviation_plannedorunplanned,
                 });
             }
             if (
@@ -733,8 +805,14 @@ Ext.define("Admin.controller.IssueManagementCtr", {
           //render form
           var live_group_tracker = {};
           var group_tracker = [];
-          for (var i = result.length - 1; i >= 0; i--) {
-            var base_result = result[i];
+
+          // Sort the fields by group
+          result.sort(function (a, b) {
+            return (a.group || '').localeCompare(b.group || '');
+          });
+
+          // Process each field in the sorted result
+          result.forEach(function (base_result) {
             var field_name = base_result.field_name;
             var label = base_result.label;
             var is_enabled = base_result.is_enabled;
@@ -761,34 +839,37 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             var group = base_result.group;
             var group_title = base_result.group_title;
             var default_value = base_result.default_value;
+            var form_field_type_id = base_result.form_field_type_id;
+            var options = base_result.options;
             //for registers
             if (is_register == 1111) {
               is_readOnly = false;
               is_mandatory = false;
             }
-            if (group) {
-              if (group_tracker.includes(group)) {
-                fieldset = live_group_tracker[group];
-              } else {
-                fieldset = Ext.create("Ext.form.FieldSet", {
-                  xtype: "fieldset",
-                  columnWidth: 1,
-                  title: group_title,
-                  collapsible: true,
-                  layout: "column",
-                  defaults: {
-                    allowBlank: false,
-                    labelAlign: "top",
-                    columnWidth: 0.33,
-                    margin: 5,
-                  },
-                  items: [],
-                });
-                live_group_tracker[group] = fieldset;
-                group_tracker.push(group);
-              }
+            // Check if the group already has a fieldset
+            if (!group_tracker.includes(group)) {
+              // Create new fieldset for the group
+              var fieldset = Ext.create("Ext.form.FieldSet", {
+                xtype: "fieldset",
+                columnWidth: 1,
+                title: group_title,
+                collapsible: true,
+                layout: "column",
+                defaults: {
+                  allowBlank: false,
+                  labelAlign: "top",
+                  columnWidth: 0.33,
+                  margin: 5,
+                },
+                items: []
+              });
+
+              // Store the fieldset in the tracker
+              live_group_tracker[group] = fieldset;
+              group_tracker.push(group);
             } else {
-              fieldset = me;
+              // Use existing fieldset
+              var fieldset = live_group_tracker[group];
             }
 
             if (is_mandatory == 1) {
@@ -802,7 +883,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               is_hidden = false;
             }
             //for tag experiamental
-            if (result[i].form_field_type_id == 10) {
+            if (form_field_type_id == 10) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1166,7 +1247,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
             }
 
             //end of experients
-            else if (result[i].form_field_type_id == 6) {
+            else if (form_field_type_id == 6) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1512,7 +1593,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //for filterable combo
-            else if (result[i].form_field_type_id == 9) {
+            else if (form_field_type_id == 9) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -1960,7 +2041,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //for grid combo
-            else if (result[i].form_field_type_id == 7) {
+            else if (form_field_type_id == 7) {
               if (is_multiparent) {
                 if (is_readOnly == 1) {
                   var configs = {
@@ -2352,7 +2433,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
             //other fields
-            else if (result[i].form_field_type_id == 8) {
+            else if (form_field_type_id == 8) {
               if (is_readOnly == 1) {
                 var field = Ext.create("Ext.form." + xtype, {
                   layout: "column",
@@ -2449,7 +2530,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   ],
                 });
               }
-            } else if (result[i].form_field_type_id == 5) {
+            } else if (form_field_type_id == 5) {
               if (is_readOnly == 1) {
                 var field = Ext.create("Ext.form." + xtype, {
                   name: field_name,
@@ -2479,73 +2560,77 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                   },
                 });
               }
-            } else if (result[i].form_field_type_id == 12) {
-              var items = result[i].default_value;
-              items = items.split(",");
-              // Map the array of strings to an array of objects
-              var items = items.map((label, index) => ({
-                boxLabel: label,
-                name: field_name,
-                inputValue: index + 1,
-              }));
+            } else if (form_field_type_id == 12) {
+              if (options) {
+                var items = options;
+                items = JSON.parse(items);
+                // Map the array of strings to an array of objects
+                var items = items.map((object, index) => ({
+                  boxLabel: object.label,
+                  name: object.name,
+                  inputValue: index + 1,
+                }));
 
-              if (is_readOnly == 1) {
-                var field = Ext.create("Ext.form." + xtype, {
-                  name: field_name,
-                  fieldLabel: label,
-                  hidden: is_hidden,
-                  columnWidth: column_width,
-                  allowBlank: is_mandatory,
-                  readOnly: true,
-                  columns: 1,
-                  items: items,
-                });
-              } else {
-                var field = Ext.create("Ext.form." + xtype, {
-                  name: field_name,
-                  fieldLabel: label,
-                  hidden: is_hidden,
-                  columnWidth: column_width,
-                  columns: 1,
-                  allowBlank: is_mandatory,
-                  bind: {
-                    readOnly: "{isReadOnly}",
-                  },
-                  items: items,
-                });
+                if (is_readOnly == 1) {
+                  var field = Ext.create("Ext.form." + xtype, {
+                    name: field_name,
+                    fieldLabel: label,
+                    hidden: is_hidden,
+                    columnWidth: column_width,
+                    allowBlank: is_mandatory,
+                    readOnly: true,
+                    columns: 1,
+                    items: items,
+                  });
+                } else {
+                  var field = Ext.create("Ext.form." + xtype, {
+                    name: field_name,
+                    fieldLabel: label,
+                    hidden: is_hidden,
+                    columnWidth: column_width,
+                    columns: 1,
+                    allowBlank: is_mandatory,
+                    bind: {
+                      readOnly: "{isReadOnly}",
+                    },
+                    items: items,
+                  });
+                }
               }
-            } else if (result[i].form_field_type_id == 13) {
-              var items = result[i].default_value;
-              items = JSON.parse(items);
+            } else if (form_field_type_id == 13) {
+              if (options) {
+                var items = options;
+                items = JSON.parse(items);
 
-              // Map the array of strings to an array of objects
-              var items = items.map((label, index) => ({
-                boxLabel: label.boxLabel,
-                name: label.name,
-              }));
+                // Map the array of strings to an array of objects
+                var items = items.map((object, index) => ({
+                  boxLabel: object.label,
+                  name: object.name,
+                }));
 
-              if (is_readOnly == 1) {
-                var field = Ext.create("Ext.form.CheckboxGroup", {
-                  fieldLabel: label,
-                  hidden: is_hidden,
-                  columnWidth: column_width,
-                  allowBlank: is_mandatory,
-                  readOnly: true,
-                  columns: 1,
-                  items: items,
-                });
-              } else {
-                var field = Ext.create("Ext.form.CheckboxGroup", {
-                  fieldLabel: label,
-                  hidden: is_hidden,
-                  columnWidth: column_width,
-                  allowBlank: is_mandatory,
-                  columns: 1,
-                  bind: {
-                    readOnly: "{isReadOnly}",
-                  },
-                  items: items,
-                });
+                if (is_readOnly == 1) {
+                  var field = Ext.create("Ext.form." + xtype, {
+                    fieldLabel: label,
+                    hidden: is_hidden,
+                    columnWidth: column_width,
+                    allowBlank: is_mandatory,
+                    readOnly: true,
+                    columns: 1,
+                    items: items,
+                  });
+                } else {
+                  var field = Ext.create("Ext.form." + xtype, {
+                    fieldLabel: label,
+                    hidden: is_hidden,
+                    columnWidth: column_width,
+                    allowBlank: is_mandatory,
+                    columns: 1,
+                    bind: {
+                      readOnly: "{isReadOnly}",
+                    },
+                    items: items,
+                  });
+                }
               }
             } else {
               if (is_readOnly == 1) {
@@ -2573,22 +2658,14 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               }
             }
 
-            fieldset.insert(start_index, field);
-          }
-          // console.log(live_group_tracker);
-          //insert fieldsets
-          const sortedKeys = Object.keys(live_group_tracker).sort(
-            (a, b) => b - a
-          );
-          sortedKeys.forEach((key) => {
-            const grouper = live_group_tracker[key];
-            me.add(1, grouper);
+            // Add the field to the fieldset
+            fieldset.add(field);
           });
-          // for (const key in live_group_tracker) {
-          //   const grouper = live_group_tracker[key];
-          //   me.add(1, grouper);
-
-          // }
+          // console.log(live_group_tracker);
+          // Insert fieldsets into the form in the sorted group order
+          group_tracker.forEach(function (group) {
+            me.add(live_group_tracker[group]);
+          });
           var found = false;
           if (me.up().up().getViewModel()) {
             var vmodel = me.up().up().getViewModel();
@@ -2655,6 +2732,18 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                         results.complaint_direct_or_indirect,
                     });
                   }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_plannedorunplanned]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_plannedorunplanned]")
+                      .setValue({
+                        deviation_plannedorunplanned:
+                          results.deviation_plannedorunplanned,
+                      });
+                  }
                   if (me.down("radiogroup[name=complaint_fully_addressed]")) {
                     me.down(
                       "radiogroup[name=complaint_fully_addressed]"
@@ -2662,6 +2751,42 @@ Ext.define("Admin.controller.IssueManagementCtr", {
                       complaint_fully_addressed:
                         results.complaint_fully_addressed,
                     });
+                  }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_approved]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_approved]")
+                      .setValue({
+                        deviation_approved:
+                          results.deviation_approved,
+                      });
+                  }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_notified]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_notified]")
+                      .setValue({
+                        deviation_notified:
+                          results.deviation_notified,
+                      });
+                  }
+                  if (
+                    me.down(
+                      "radiogroup[name=deviation_addressed]"
+                    )
+                  ) {
+                    me
+                      .down("radiogroup[name=deviation_addressed]")
+                      .setValue({
+                        deviation_addressed:
+                          results.deviation_addressed,
+                      });
                   }
                 } else {
                   toastr.error(message, "Failure Response");
@@ -2705,7 +2830,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
               var follow_up_period = me
                 .down("numberfield[name=follow_up_period]")
                 .getValue();
-                followupDate.setDate(followupDate.getDate() + follow_up_period);
+              followupDate.setDate(followupDate.getDate() + follow_up_period);
               me.down("datefield[name=follow_up_on]").setValue(
                 followupDate
               );
@@ -2759,7 +2884,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       },
     });
   },
-  showApplicationDocUploadWin: function (btn) {
+  showIssueManagementAssociatedWin: function (btn) {
     var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
       childXtype = btn.childXtype,
@@ -2778,7 +2903,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         .down("hiddenfield[name=active_application_code]")
         .getValue();
     if (application_code != "") {
-      form.setHeight(650);
+      form.setHeight(400);
       funcShowCustomizableWindow(
         winTitle,
         winWidth,
@@ -2792,72 +2917,26 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       );
     }
   },
-  saveIssueManagementDocuments: function (btn) {
-    var me = this,
-      url = btn.action_url,
-      table = btn.table_name,
-      form = btn.up("form"),
-      win = form.up("window"),
-      storeID = btn.storeID,
-      store = Ext.getStore(storeID),
-      frm = form.getForm(),
-      mainTabPanel = this.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      active_application_id = activeTab
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    if (frm.isValid()) {
-      frm.submit({
-        url: url,
-        params: {
-          active_application_id: active_application_id,
-          type: "Document",
-        },
-        waitMsg: "Please wait...",
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-        success: function (form, action) {
-          var response = Ext.decode(action.response.responseText),
-            success = response.success,
-            message = response.message;
-          if (success == true || success === true) {
-            toastr.success(message, "Success Response");
-            store.removeAll();
-            store.load();
-            win.close();
-          } else {
-            toastr.error(message, "Failure Response");
-          }
-        },
-        failure: function (form, action) {
-          var resp = action.result;
-          toastr.error(resp.message, "Failure Response");
-        },
-      });
-    }
-  },
   refreshGrid: function (me) {
     var store = me.store,
       grid = me.up("grid"),
       mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    issue_id = activeTab
-      .down("hiddenfield[name=active_application_id]")
-      .getValue();
+      application_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
+      application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
+      issue_id = activeTab.down("hiddenfield[name=active_application_id]").getValue(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      workflow_stage = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
     store.getProxy().extraParams = {
+      application_id: application_id,
       issue_id: issue_id,
       application_code: application_code,
+      process_id: process_id,
+      workflow_stage: workflow_stage
     };
   },
-  saveIssueManagementRelatedIssues: function (btn) {
+  saveIssueManagementAssociatedDetails: function (btn) {
     var me = this,
       url = btn.action_url,
       table = btn.table_name,
@@ -2870,14 +2949,11 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       activeTab = mainTabPanel.getActiveTab(),
       active_application_id = activeTab
         .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
         .getValue();
     if (frm.isValid()) {
       frm.submit({
         url: url,
-        params: { active_application_id: active_application_id },
+        params: { active_application_id: active_application_id, type: 'Document' },
         waitMsg: "Please wait...",
         headers: {
           Authorization: "Bearer " + access_token,
@@ -2902,49 +2978,93 @@ Ext.define("Admin.controller.IssueManagementCtr", {
       });
     }
   },
-  saveIssueManagementAudits: function (btn) {
-    var me = this,
-      url = btn.action_url,
-      table = btn.table_name,
-      form = btn.up("form"),
-      win = form.up("window"),
-      storeID = btn.storeID,
-      store = Ext.getStore(storeID),
-      frm = form.getForm(),
-      mainTabPanel = this.getMainTabPanel(),
+  saveApplicationChecklistDetails: function (btn) {
+    btn.setLoading(true);
+    var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
-      active_application_id = activeTab
-        .down("hiddenfield[name=active_application_id]")
-        .getValue(),
-      application_code = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    if (frm.isValid()) {
-      frm.submit({
-        url: url,
-        params: { active_application_id: active_application_id },
-        waitMsg: "Please wait...",
-        headers: {
-          Authorization: "Bearer " + access_token,
-        },
-        success: function (form, action) {
-          var response = Ext.decode(action.response.responseText),
-            success = response.success,
-            message = response.message;
-          if (success == true || success === true) {
-            toastr.success(message, "Success Response");
-            store.removeAll();
-            store.load();
-            win.close();
-          } else {
-            toastr.error(message, "Failure Response");
-          }
-        },
-        failure: function (form, action) {
-          var resp = action.result;
-          toastr.error(resp.message, "Failure Response");
-        },
-      });
-    }
+      application_id = activeTab.down('hiddenfield[name=active_application_id]').getValue(),
+      application_code = activeTab.down('hiddenfield[name=active_application_code]').getValue(),
+      screeningGrid = activeTab.down('issuechecklistgrid');
+    this.commitApplicationChecklistDetails(btn, application_id, application_code, screeningGrid);
   },
+
+  commitApplicationChecklistDetails: function (btn, application_id, application_code, screeningGrid) {
+    var checklist_type = screeningGrid.down('combo[name=applicable_checklist]').getValue(),
+      store = screeningGrid.getStore(),
+      params = [];
+    for (var i = 0; i < store.data.items.length; i++) {
+      var record = store.data.items[i],
+        item_resp_id = record.get('item_resp_id'),
+        checklist_item_id = record.get('checklist_item_id'),
+        pass_status = record.get('pass_status'),
+        comment = record.get('comment'),
+        observation = record.get('observation'),
+        auditor_comment = record.get('auditor_comment'),
+        auditorpass_status = record.get('auditorpass_status'),
+        item_resp_id = record.get('item_resp_id'),
+        risk_type = record.get('risk_type'),
+        risk_type_remarks = record.get('risk_type_remarks');
+      var obj = {
+        application_id: application_id,
+        item_resp_id: item_resp_id,
+        application_code: application_code,
+        item_resp_id: item_resp_id,
+        created_by: user_id,
+        checklist_item_id: checklist_item_id,
+        pass_status: pass_status,
+        comment: comment,
+        auditor_comment: auditor_comment,
+        auditorpass_status: auditorpass_status,
+        observation: observation,
+        risk_type: risk_type,
+        risk_type_remarks: risk_type_remarks
+      };
+      if (record.dirty) {
+        params.push(obj);
+      }
+    }
+    if (params.length < 1) {
+      btn.setLoading(false);
+      toastr.warning('No records to save!!', 'Warning Response');
+      return false;
+    }
+    params = JSON.stringify(params);
+    Ext.Ajax.request({
+      url: 'api/saveApplicationChecklistDetails',
+      params: {
+        application_id: application_id,
+        item_resp_id: item_resp_id,
+        application_code: application_code,
+        checklist_type: checklist_type,
+        screening_details: params
+      },
+      headers: {
+        'Authorization': 'Bearer ' + access_token,
+        'X-CSRF-Token': token
+      },
+      success: function (response) {
+        btn.setLoading(false);
+        var resp = Ext.JSON.decode(response.responseText),
+          success = resp.success,
+          message = resp.message;
+        if (success == true || success === true) {
+          toastr.success(message, 'Success Response');
+          store.load();
+        } else {
+          toastr.error(message, 'Failure Response');
+        }
+      },
+      failure: function (response) {
+        btn.setLoading(false);
+        var resp = Ext.JSON.decode(response.responseText),
+          message = resp.message;
+        toastr.error(message, 'Failure Response');
+      },
+      error: function (jqXHR, textStatus, errorThrown) {
+        btn.setLoading(false);
+        toastr.error('Error: ' + errorThrown, 'Error Response');
+      }
+    });
+  },
+
 });

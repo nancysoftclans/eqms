@@ -707,9 +707,10 @@ class DbHelper
     }
 
     static function getSingleRecordColValue($table, $where, $col, $con)
-    {
+    {        
+        
         $val = DB::connection($con)->table($table)->where($where)->value($col);
-       
+        
         return $val;
     }
 

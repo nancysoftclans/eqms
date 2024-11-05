@@ -160,6 +160,71 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueTypeForm", {
           columnWidth: 0.33,
           allowBlank: true,
         },
+        {
+          xtype: 'combo', anyMatch: true,
+          name: 'is_checklist_tied',
+          store: 'confirmationstr',
+          valueField: 'id',
+          displayField: 'name',
+          queryMode: 'local',
+          forceSelection: true,
+          columnWidth: 0.5,
+          fieldLabel: 'Tied to Checklist?',
+          value: 2,
+          listeners: {
+            change: function (cmb, newVal) {
+              var form = cmb.up('form'),
+                checklistCategory = form.down('combo[name=checklist_category_id]');
+              if (newVal == 1 || newVal === 1) {
+                checklistCategory.allowBlank = false;
+                checklistCategory.validate();
+                checklistCategory.setVisible(true);
+              } else {
+                checklistCategory.reset();
+                checklistCategory.allowBlank = true;
+                checklistCategory.validate();
+                checklistCategory.setVisible(false);
+              }
+            }
+          }
+        }, {
+          xtype: 'combo', anyMatch: true,
+          fieldLabel: 'Checklist Category',
+          name: 'checklist_category_id',
+          allowBlank: true,
+          valueField: 'id',
+          displayField: 'name',
+          columnWidth: 0.5,
+          queryMode: 'local',
+          hidden: true,
+          listeners: {
+            beforerender: {
+              fn: 'setWorkflowCombosStore',
+              config: {
+                pageSize: 1000,
+                proxy: {
+                  url: 'configurations/getConfigParamFromTable',
+                  extraParams: {
+                    table_name: 'par_checklist_categories'
+                  }
+                }
+              },
+              isLoad: true
+            }
+          }
+        },
+        {
+          xtype: 'combo', anyMatch: true,
+          name: 'has_action_plan',
+          store: 'confirmationstr',
+          valueField: 'id',
+          displayField: 'name',
+          queryMode: 'local',
+          forceSelection: true,
+          columnWidth: 0.5,
+          fieldLabel: 'Has Action Plan?',
+          value: 2,
+        },
       ],
     },
   ],

@@ -41,7 +41,7 @@ class AuthController extends Controller
                 'attempt_status' => 1//date('Y-m-d H:i:s')
             );
             // dd($attemptLoginParams);
-            insertRecord('tra_login_attempts', $attemptLoginParams, 1);
+            insertRecord('tra_login_attempts', $attemptLoginParams, 1, "");
             $res = array(
                 'success' => false,
                 'message' => 'Authentication Failed...User or Password Mismatch!!'
@@ -72,7 +72,7 @@ class AuthController extends Controller
                 'attempt_status' => 2
             );
             $where = array('account_id'=>$user->id);
-           updateRecord('tra_failed_login_attempts', $where, $update, 1);
+           updateRecord('tra_failed_login_attempts', $where, $update, 1, "");
            
             //register with passport authenticator for access token
             $response = $http->post(url('/').'/oauth/token', [
@@ -104,7 +104,7 @@ class AuthController extends Controller
                 // }else{
                 //     $dms_ticket = '';
                 // }
-                insertRecord('tra_login_logs', $login_log);
+                insertRecord('tra_login_logs', $login_log, "", "");
                 if(isset($res['access_token'])){
 
                     $req->session()->put('token', funcEncrypt($res['access_token']));
@@ -135,7 +135,7 @@ class AuthController extends Controller
                         'attempt_status' => 2
                     );
                     $where = array('account_id'=>$user->id);
-                    updateRecord('tra_failed_login_attempts', $where, $update, 1);
+                    updateRecord('tra_failed_login_attempts', $where, $update, 1, "");
                     $no_of_attempts = 0;
                 }
                 //increment the counter
@@ -147,7 +147,7 @@ class AuthController extends Controller
                         'date' => date('Y-m-d H:i:s'),
                         'reason' => 'Failed login attempts 3 times within 24hrs'
                     );
-                    insertRecord('tra_blocked_accounts', $blockedAccountParams, 1);
+                    insertRecord('tra_blocked_accounts', $blockedAccountParams, 1, "");
                     $res = array(
                         'success' => false,
                         'message' => 'Authentication Failed...Your account has been blocked!!'
@@ -160,7 +160,7 @@ class AuthController extends Controller
                 }
                 //update
                 $where = array('account_id' => $user->id,'attempt_status'=>1);
-                $ee = updateRecord('tra_failed_login_attempts', $where, array('attempts' => $no_of_attempts + 1), 1);
+                $ee = updateRecord('tra_failed_login_attempts', $where, array('attempts' => $no_of_attempts + 1), 1, "");
 
                 $response = $res;
             }
@@ -177,7 +177,7 @@ class AuthController extends Controller
                     'time' => date('Y-m-d H:i:s'),
                     'attempt_status' => 1
                 );
-                insertRecord('tra_failed_login_attempts', $loginAttemptsParams, 1);
+                insertRecord('tra_failed_login_attempts', $loginAttemptsParams, 1, "");
                 $response = array(
                     'success' => false,
                     'message' => 'Authentication Failed...You have ' . (3 - $attempts) . ' attempts remaining!!!!'
@@ -223,7 +223,7 @@ class AuthController extends Controller
                         'date_generated' => Carbon::now()
                     );
                     $user_passwordData = str_random(8);
-                    insertRecord('tra_password_reset', $pwdResetParams, 1);
+                    insertRecord('tra_password_reset', $pwdResetParams, 1, "");
                     if (is_connected()) {
                         //send the mail here
                         // $subject = 'Botswana Management Information System :Password Recovery';
@@ -308,7 +308,7 @@ class AuthController extends Controller
                         DB::table('tra_password_reset')->where('user_id', $user_id)->delete();
 
                         //update update on first time login
-                       updateRecord('users', ['id'=>$user_id], ['force_password_change' => 0]);
+                       updateRecord('users', ['id'=>$user_id], ['force_password_change' => 0], "", "");
 
                         $res = array(
                             'success' => true,

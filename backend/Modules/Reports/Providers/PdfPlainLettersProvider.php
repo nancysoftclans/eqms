@@ -6,13 +6,24 @@ use setasign\Fpdi\TcpdfFpdi;
 class PdfPlainLettersProvider extends TcpdfFpdi
 {
   public $params = array();
+   private $isImport='';
+   private $inspector_signatoryname='';
+   private $inspected_on='';
+
+   
 	public function __construct($qr_data=array()){
 			parent::__construct();
 		$this->params = $qr_data;
-		
-	}
+}
+	
+
+	public function setImportFooter($isImport,$inspector_signatoryname,$inspected_on) {
+        $this->isImport = $isImport;
+        $this->inspector_signatoryname = $inspector_signatoryname;
+        $this->inspected_on = $inspected_on;
+    }
   function Header(){
-			$this->setMargins(5,25,5,true);
+			$this->setMargins(5,5,5,true);
    
 
 			/*$this->Cell(20,0,'',0,1);

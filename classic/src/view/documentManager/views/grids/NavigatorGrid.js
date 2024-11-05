@@ -312,7 +312,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     text: 'Disable',
                     iconCls: 'x-fa fa-repeat',
                     hidden: true,
-                    table_name: 'par_document_types',
+                    table_name: 'par_qms_documents_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/softDeleteConfigRecord',
                     action: 'soft_delete',bind: {
@@ -324,7 +324,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     iconCls: 'x-fa fa-trash',
                     tooltip: 'Delete Record',
                     hidden: true,
-                    table_name: 'par_document_types',
+                    table_name: 'par_qms_documents_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/deleteConfigRecord',  
                     action: 'actual_delete',bind: {
@@ -338,7 +338,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     iconCls: 'x-fa fa-undo',
                     tooltip: 'Enable Record',
                     hidden: true,
-                    table_name: 'par_document_types',
+                    table_name: 'par_qms_documents_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/undoConfigSoftDeletes',
                     action: 'enable',
@@ -346,7 +346,21 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             disabled: '{isReadOnly}'
         },
                     handler: 'doDeleteConfigWidgetParam'
-                }
+                },
+                // {
+                //     text: 'Logs',
+                //     iconCls: 'x-fa fa-list',
+                //     tooltip: 'View Logs',
+                //     action: 'logs',
+                //     childXtype: 'documentLoggrid',
+                //     winTitle: 'Logs',
+                //     winWidth: '100%',
+                //     handler: 'showLogConfigwin',
+                //     // bind: {
+                //     //     disabled: '{isReadOnly}'
+                //     // },
+                //     stores: '[]'
+                // },
                 ]
             }
         }, onWidgetAttach: function (col, widget, rec) {

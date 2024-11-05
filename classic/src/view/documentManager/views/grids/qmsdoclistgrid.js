@@ -75,9 +75,9 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
         },
          beforeLoad: function () {
               var grid = this.up("grid"),
-                pnl = grid.up("documentcreationapps"),
-                wrapper = pnl.up("documentapplicationwrapper"),
-                cnt = wrapper.up(),
+                // pnl = grid.up("documentcreationapps"),
+                // wrapper = pnl.up("documentapplicationwrapper"),
+                // cnt = wrapper.up(),
                 store = this.store,
                 grid = this.up("grid");
                 store.getProxy().extraParams = {
@@ -106,9 +106,9 @@ Ext.define('Admin.view.documentManager.views.grids.QmsDocListGrid', {
 
             beforeLoad: function () {
               var grid = this.up("grid"),
-                pnl = grid.up("documentcreationapps"),
-                wrapper = pnl.up("documentapplicationwrapper"),
-                cnt = wrapper.up(),
+                // pnl = grid.up("documentcreationapps"),
+                // wrapper = pnl.up("documentapplicationwrapper"),
+                // cnt = wrapper.up(),
                 store = this.store,
                 grid = this.up("grid");
                 store.getProxy().extraParams = {

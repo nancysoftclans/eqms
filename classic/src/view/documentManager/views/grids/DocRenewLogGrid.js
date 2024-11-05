@@ -46,7 +46,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
         beforerender: {
             fn: 'setGridStore',
             config: {
-                storeId:'issuetypelogstore',
+                storeId:'docrenewlogstore',
                 proxy: {
                     api: {
                         read: 'documentmanagement/getDocumentLogs'
@@ -85,20 +85,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
     }],
 
     columns: [
-    //     {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'title',
-    //     text: 'Title',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'description',
-    //     text: 'Description',
-    //     flex: 1,
-    //     sortable: true
-    // },
+   
     {
         xtype: 'gridcolumn',
         dataIndex: 'user_name',
@@ -120,13 +107,6 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
         flex: 1,
         sortable: true
     },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'status_group_id',
-    //     text: 'status group id',
-    //     flex: 1,
-    //     sortable: true
-    // },
     {
         xtype: 'gridcolumn',
         dataIndex: 'submitted_by',
@@ -134,13 +114,6 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
         flex: 1,
         sortable: true
     },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'is_enabled',
-    //     text: 'is enabled',
-    //     flex: 1,
-    //     sortable: true
-    // },
     {
         xtype: 'gridcolumn',
         dataIndex: 'created_on',

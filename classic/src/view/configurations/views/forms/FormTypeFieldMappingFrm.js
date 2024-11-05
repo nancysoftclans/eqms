@@ -29,13 +29,13 @@ Ext.define('Admin.view.configurations.views.forms.FormTypeFieldMappingFrm', {
         margin: '0 20 20 0',
         name: 'id',
         allowBlank: true
-    },{
+    }, {
         xtype: 'hiddenfield',
         fieldLabel: 'Form Caregory',
         margin: '0 20 20 0',
         name: 'form_category_id',
         allowBlank: false
-    },{
+    }, {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Field',
         margin: '0 20 20 0',
@@ -50,7 +50,7 @@ Ext.define('Admin.view.configurations.views.forms.FormTypeFieldMappingFrm', {
                 config: {
                     pageSize: 1000,
                     proxy: {
-                        
+
                         extraParams: {
                             table_name: 'par_formfield_designs'
                         }
@@ -58,10 +58,10 @@ Ext.define('Admin.view.configurations.views.forms.FormTypeFieldMappingFrm', {
                 },
                 isLoad: true
             }
-           
+
         }
-        
-    },{
+
+    }, {
         xtype: 'checkbox',
         inputValue: 1,
         uncheckedValue: 0,
@@ -69,7 +69,7 @@ Ext.define('Admin.view.configurations.views.forms.FormTypeFieldMappingFrm', {
         margin: '0 20 20 0',
         name: 'is_mandatory',
         allowBlank: true
-    },{
+    }, {
         xtype: 'checkbox',
         inputValue: 1,
         uncheckedValue: 0,
@@ -77,7 +77,7 @@ Ext.define('Admin.view.configurations.views.forms.FormTypeFieldMappingFrm', {
         margin: '0 20 20 0',
         name: 'is_readOnly',
         allowBlank: true
-    },{
+    }, {
         xtype: 'checkbox',
         inputValue: 1,
         uncheckedValue: 0,
@@ -85,7 +85,7 @@ Ext.define('Admin.view.configurations.views.forms.FormTypeFieldMappingFrm', {
         margin: '0 20 20 0',
         name: 'is_hidden',
         allowBlank: true
-    },{
+    }, {
         xtype: 'checkbox',
         inputValue: 1,
         uncheckedValue: 0,
@@ -93,33 +93,47 @@ Ext.define('Admin.view.configurations.views.forms.FormTypeFieldMappingFrm', {
         margin: '0 20 20 0',
         name: 'is_enabled',
         allowBlank: true
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Default Value',
         margin: '0 20 20 0',
         name: 'default_value',
         allowBlank: true
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Column Width',
         margin: '0 20 20 0',
         name: 'column_width',
         value: 0.33,
         allowBlank: true
-    },{
+    }, {
         xtype: 'numberfield',
         fieldLabel: 'Order No',
         margin: '0 20 20 0',
         name: 'order_no',
         allowBlank: true
-    }],
-    dockedItems:[
+    },
+    {
+        xtype: 'textfield',
+        fieldLabel: 'Field Group(No spaces and its optional)',
+        margin: '0 20 20 0',
+        name: 'group',
+        allowBlank: true
+    }, {
+        xtype: 'textfield',
+        fieldLabel: 'Group Title (if added above)',
+        margin: '0 20 20 0',
+        name: 'group_title',
+        allowBlank: true
+    },
+    ],
+    dockedItems: [
         {
             xtype: 'toolbar',
             ui: 'footer',
             dock: 'bottom',
-            items:[
-                '->',{
+            items: [
+                '->', {
                     text: 'Save Details',
                     iconCls: 'x-fa fa-save',
                     action: 'save',

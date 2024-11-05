@@ -63,11 +63,13 @@ Ext.define('Admin.view.commoninterfaces.grids.PreviousDocumentVersionsGrid', {
         mode: 'local'
     }],
  
-    columns: [{
+    columns: [
+    {
         xtype: 'gridcolumn',
         dataIndex: 'version_no',
         text: 'Document Version',
         // flex: 1
+        hidden: true,
         width: 150,
         tdCls: 'wrap'
     },{
@@ -75,6 +77,7 @@ Ext.define('Admin.view.commoninterfaces.grids.PreviousDocumentVersionsGrid', {
         dataIndex: 'document_type',
         text: 'Document Type',
         // flex: 1
+        hidden: true,
         width: 150,
         tdCls: 'wrap'
     }, {
@@ -82,12 +85,14 @@ Ext.define('Admin.view.commoninterfaces.grids.PreviousDocumentVersionsGrid', {
         dataIndex: 'document_requirement',
         text: 'Required Document(s)',
         // flex: 1
+        hidden: true,
         width: 150,
         tdCls: 'wrap'
     }, {
         xtype: 'gridcolumn',
         dataIndex: 'is_mandatory',
         text: 'Is Mandatory',
+        hidden: true,
         flex: 0.7,
         width: 100,
         tdCls: 'wrap',
@@ -106,44 +111,45 @@ Ext.define('Admin.view.commoninterfaces.grids.PreviousDocumentVersionsGrid', {
         xtype: 'gridcolumn',
         dataIndex: 'file_name',
         text: 'File Name',
-        // flex: 1
-        width: 150,
+        flex: 1,
         tdCls: 'wrap'
     }, {
         xtype: 'gridcolumn',
         dataIndex: 'initial_file_name',
         text: 'Initial File Name',
-        // flex: 1
-        width: 150,
+        flex: 1,
+        hidden: true,
         tdCls: 'wrap'
     }, {
-        xtype: 'gridcolumn',
-        dataIndex: 'uploaded_by',
-        text: 'Upload By',
-        // flex: 1,
-        width: 150,
-        tdCls: 'wrap'
-    }, {
+      xtype: "gridcolumn",
+      text: "Upload By",
+      flex: 1,
+      tdCls: "wrap",
+      renderer: function (value, metaData, record) {
+        // Concatenate first_name and last_name
+        var firstName = record.get("first_name");
+        var lastName = record.get("last_name");
+        var groupOwner = record.get("group_owner");
+        var fullName = firstName + " " + lastName;
+         
+        if (fullName && groupOwner) {
+            return fullName + ', ' + groupOwner;
+        } else {
+            return fullName || groupOwner;
+        } 
+      },
+    },{
         xtype: 'gridcolumn',
         dataIndex: 'uploaded_on',
         text: 'Upload Date',
-        // flex: 1,
-        width: 150,
+        flex: 1,
         tdCls: 'wrap',
         renderer: Ext.util.Format.dateRenderer('d/m/Y H:i:s')
     }, {
         xtype: 'gridcolumn',
         dataIndex: 'file_type',
         text: 'File Type',
-        // flex: 1
-        width: 150,
-        tdCls: 'wrap'
-    }, {
-        xtype: 'gridcolumn',
-        dataIndex: 'remarks',
-        text: 'Remarks',
-        // flex: 1
-        width: 150,
+        flex: 1,
         tdCls: 'wrap'
     }, {
         text: 'Options',
@@ -158,10 +164,11 @@ Ext.define('Admin.view.commoninterfaces.grids.PreviousDocumentVersionsGrid', {
             menu: {
                 xtype: 'menu',
                 items: [{
-                    text: 'Preview/',
+                    text: 'Preview',
                     iconCls: 'x-fa fa-eye',
                     handler: 'previewUploadedDocument',
-                    download: 0
+                    action: 'preview',
+                    download: 1
                 }]
             }
         }

@@ -161,6 +161,107 @@ class AuditManagementController extends Controller
     }
 
 
+    // public function ActionLog($method, $request, $res)
+    // {
+    //     $user_id = \Auth::user()->id;
+    //     $module_id = $request->input('module_id');
+    //     $sub_module_id = $request->input('sub_module_id');
+    //     $application_code = $request->input('application_code');
+    //     $process_id = $request->input('process_id');
+    //     $workflow_stage_id = $request->input('workflow_stage_id');
+    //     $active_application_id = $request->input('active_application_id'); 
+    //     $application_status_id = $request->input('application_status_id');
+    //     $id = $request->input('id');
+    //     $table = $request->input('table_name');
+    //     $audit_title = $request->input('audit_title');
+    //     $audit_type_name = $request->input('audit_type_name');
+    //     $audit_type_id = $request->input('audit_type_id');
+    //     $audit_summary = $request->input('audit_summary');
+    //     $is_full_day = $request->input('is_full_day');
+    //     $audit_start_date = $request->input('audit_start_date');
+    //     $audit_end_date = $request->input('audit_end_date');
+    //     $start_time = $request->input('start_time');
+    //     $end_time = $request->input('end_time');
+    //     $curr_stage_id = $request->input('curr_stage_id');
+    //     $current_stage_name = $request->input('current_stage_name');
+    //     $application_status = $request->input('application_status');
+    //     $responsible_user = $request->input('responsible_user');
+    //     $code = $request->input('code');
+    //     $name = $request->input('name');
+    //     $prefix = $request->input('prefix');
+    //     $is_enabled = $request->input('is_enabled');
+
+    //     // Determine action based on method
+    //     $action = '';
+    //     switch ($method) {
+    //         case 'saveAuditType':
+    //             $action = $id ? "updated audit type" : "created audit type";
+    //             break;
+    //         case 'saveNewAuditPlanDetails':
+    //             $action = $id ? 'updated audit plan details' : 'created new audit plan details';
+    //             break;
+    //         case 'deleteConfigRecord':
+    //             $action = "deleted configurations record";
+    //             break;
+    //         case 'saveAuditFinding':
+    //             $action = $id ? 'updated audit finding' : 'created new audit finding';
+    //             break;
+    //         default:
+    //             break;
+    //     }
+
+    //     // Determine table and prepare log data
+    //     $table_data = null;
+    //     switch ($table) {
+    //         case "par_finding_types":
+    //             $table_name = "audit_finding_types_logs";
+    //             break;
+    //         case "par_qms_audit_types":
+    //             $table_name = "par_qms_audit_type_logs";
+    //             $table_data = [
+    //                 'user_id' => $user_id,
+    //                 'action' => $action,
+    //                 'created_on' => now(),
+    //                 'ref_id' => $id,
+    //                 'code' => $code,
+    //                 'name' => $name,
+    //                 'prefix' => $prefix,
+    //                 'is_enabled' => $is_enabled,
+    //                 'submitted_by' => $user_id,
+    //             ];
+    //             break;
+    //         case "tra_auditsmanager_application":
+    //             $table_name = "eqms_audit_management_logs";
+    //             $table_data = [
+    //                 'user_id' => $user_id,
+    //                 'application_code' => $application_code,
+    //                 'action' => $action,
+    //                 'created_on' => now(),
+    //                 'ref_id' => $id,
+    //                 'module_id' => $module_id,
+    //                 'sub_module_id' => $sub_module_id,
+    //                 'process_id' => $process_id,
+    //                 'audit_type_id' => $audit_type_id,
+    //                 'current_stage_name' => $current_stage_name,
+    //                 'application_status' => $application_status,
+    //                 'curr_stage_id' => $curr_stage_id,
+    //                 'application_status_id' => $application_status_id,
+    //                 'responsible_user' => $responsible_user,
+    //                 'submitted_by' => $user_id,
+    //             ];
+    //             break;
+    //         default:
+    //             break;
+    //     }
+
+    //     // Insert log if table_data is set
+    //     if ($table_data) {
+    //         DB::table($table_name)->insert($table_data);
+    //     }
+    // }
+
+
+
     public function saveAuditType(Request $req) {
 
 
@@ -375,7 +476,8 @@ class AuditManagementController extends Controller
 
                 //log entries
                 $audit_logs = DB::table('eqms_audit_management_logs as logs')
-                ->join('users as user', 'logs.user_id', '=', 'user.id') 
+                ->join('users as user', 'logs.user_id', '=', 'user.id')
+
                 ->select(
                     'user.email as user_id','logs.application_code', 'logs.action', 'logs.created_on','logs.module_id',
                     'logs.sub_module_id','logs.process_id','logs.audit_type_id','user.email as  submitted_by','logs.current_stage_name',
@@ -515,7 +617,8 @@ class AuditManagementController extends Controller
                                 ->leftJoin('par_finding_types as t2', 't1.finding_type_id', '=', 't2.id')
                                 ->leftJoin('tra_issue_management_applications as t3', 't1.issue_id', '=', 't3.id')
                                 ->leftJoin('par_issue_statuses as t4', 't3.issue_status_id', '=', 't4.id')
-                                ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type', 't3.title', 't3.created_on as raised_date', 't3.complainant_name', 't4.title as issue_status')
+                                ->leftJoin('par_checklist_items as t5', 't1.checklist_item_id', '=', 't5.id')
+                                ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type', 't3.title', 't3.created_on as raised_date', 't3.complainant_name', 't4.title as issue_status', 't5.name as checklist_item')
                                 ->where('t1.application_code', $application_code)
                                 ->get();
             
@@ -774,7 +877,7 @@ class AuditManagementController extends Controller
 
     public function saveAuditFinding(Request $req) {
           try {
-             DB::beginTransaction();
+             //DB::beginTransaction();
             $user_id = \Auth::user()->id;
             $post_data = $req->post();
             $table_name = $post_data['table_name'];
@@ -800,6 +903,7 @@ class AuditManagementController extends Controller
                 "description" => $post_data['description'],
                 "results" => $post_data['results'],
                 "issue_id"=> $post_data['issue_id'],
+                "checklist_item_id" => $post_data['checklist_item_id'],
 
             );
 
@@ -808,15 +912,14 @@ class AuditManagementController extends Controller
             );
             //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
 
-            if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+           // if (isset($id) && $id != "") {
 
+                if (recordExists($table_name, $where)) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
                     $res = updateRecord($table_name, $where, $table_data);
-                    
                     if($res['success'] == false) {
 
                     DB::rollBack();
@@ -835,9 +938,12 @@ class AuditManagementController extends Controller
                     );
                 }
                 }
-            } else {
+           // }
+             else {
                 $table_data['dola'] = Carbon::now();
                 $res = insertRecord($table_name, $table_data);
+
+
 
                 if($res['success'] == false) {
 

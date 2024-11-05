@@ -10,7 +10,7 @@ Ext.define('Admin.view.configurations.views.forms.FormFieldDesignerFrm', {
         labelAlign: 'top',
         allowBlank: false
     },
-    
+
     items: [{
         xtype: 'hiddenfield',
         margin: '0 20 20 0',
@@ -29,19 +29,19 @@ Ext.define('Admin.view.configurations.views.forms.FormFieldDesignerFrm', {
         margin: '0 20 20 0',
         name: 'id',
         allowBlank: true
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Label',
         margin: '0 20 20 0',
         name: 'label',
         allowBlank: false
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Field Name',
         margin: '0 20 20 0',
         name: 'field_name',
         allowBlank: false
-    },{
+    }, {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Field Type',
         margin: '0 20 20 0',
@@ -56,97 +56,119 @@ Ext.define('Admin.view.configurations.views.forms.FormFieldDesignerFrm', {
                 fn: 'setCompStore',
                 config: {
                     proxy: {
-                        
+
                         extraParams: {
                             table_name: 'par_form_field_types'
                         }
                     }
-                   },
-              isLoad: true
+                },
+                isLoad: true
             },
-            change: function(combo, newVal, oldVal, eopts) {
+            change: function (combo, newVal, oldVal, eopts) {
                 var form = combo.up('form'),
                     table = form.down('textfield[name=combo_table]'),
                     displayfield = form.down('textfield[name=displayfield]'),
                     valuefield = form.down('textfield[name=valuefield]'),
                     def_id = form.down('combobox[name=def_id]'),
                     tpl_block = form.down('textarea[name=tpl_block]'),
-                    formfield = form.down('textfield[name=formfield]');
+                    formfield = form.down('textfield[name=formfield]'),
+                    optionsfield = form.down('textfield[name=options]');
 
-                if(newVal == 6 || newVal == 7 || newVal == 9|| newVal == 10){
+                if (newVal == 6 || newVal == 7 || newVal == 9 || newVal == 10) {
                     table.setVisible(true);
                     displayfield.setVisible(true);
-                    valuefield.setVisible(true); 
-                    def_id.setVisible(false); 
-                    formfield.setVisible(false); 
+                    valuefield.setVisible(true);
+                    def_id.setVisible(false);
+                    formfield.setVisible(false);
                     tpl_block.setVisible(true);
-                }else if(newVal == 8){
+                    optionsfield.setVisible(false);
+                } else if (newVal == 8) {
                     table.setVisible(false);
                     displayfield.setVisible(true);
                     def_id.setVisible(true);
                     valuefield.setVisible(true);
                     formfield.setVisible(true);
                     tpl_block.setVisible(false);
-                }else{
+                    optionsfield.setVisible(false);
+                } else if (newVal == 12 || newVal == 13) {
                     table.setVisible(false);
                     displayfield.setVisible(false);
-                    def_id.setVisible(false); 
-                    valuefield.setVisible(false);    
-                    formfield.setVisible(false);   
-                    tpl_block.setVisible(false); 
-                 
+                    def_id.setVisible(false);
+                    valuefield.setVisible(false);
+                    formfield.setVisible(false);
+                    tpl_block.setVisible(false);
+                    optionsfield.setVisible(true);
+                } else {
+                    table.setVisible(false);
+                    displayfield.setVisible(false);
+                    def_id.setVisible(false);
+                    valuefield.setVisible(false);
+                    formfield.setVisible(false);
+                    tpl_block.setVisible(false);
+                    optionsfield.setVisible(false);
                 }
             }
-           
+
         }
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Table',
         margin: '0 20 20 0',
         name: 'combo_table',
         allowBlank: true,
         hidden: true
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Display Field',
         margin: '0 20 20 0',
         name: 'displayfield',
         allowBlank: true,
         hidden: true
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Value Field',
         margin: '0 20 20 0',
         name: 'valuefield',
         allowBlank: true,
         hidden: true
-    },{
+    }, {
         xtype: 'textarea',
         fieldLabel: 'TPL Block',
         margin: '0 20 20 0',
         name: 'tpl_block',
         allowBlank: true,
         hidden: true
-    },{
+    }, {
         xtype: 'textfield',
         fieldLabel: 'Form Field',
         margin: '0 20 20 0',
         name: 'formfield',
         allowBlank: true,
         hidden: true
-    },{
-        xtype: 'textfield',
-        fieldLabel: 'Field Group(No spaces and its optional)',
+    },
+    {
+        xtype: 'textarea',
+        fieldLabel: 'Options',
         margin: '0 20 20 0',
-        name: 'group',
-        allowBlank: true
-    },{
-        xtype: 'textfield',
-        fieldLabel: 'Group Title (if added above)',
-        margin: '0 20 20 0',
-        name: 'group_title',
-        allowBlank: true
-    },{
+        name: 'options',
+        allowBlank: true,
+        hidden: true,
+        value: '[  {"label": "Label 1", "name": "label1_name"}, {"label": "Label 2", "name": "label2_name"} ]'
+    },
+    // {
+    //     xtype: 'textfield',
+    //     fieldLabel: 'Field Group(No spaces and its optional)',
+    //     margin: '0 20 20 0',
+    //     name: 'group',
+    //     allowBlank: true
+    // },{
+    //     xtype: 'textfield',
+    //     fieldLabel: 'Group Title (if added above)',
+    //     margin: '0 20 20 0',
+    //     name: 'group_title',
+    //     allowBlank: true
+    // },
+    {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Source Defination',
         margin: '0 20 20 0',
@@ -165,11 +187,11 @@ Ext.define('Admin.view.configurations.views.forms.FormFieldDesignerFrm', {
                             table_name: 'par_parameter_definations'
                         }
                     }
-                   },
-              isLoad: true
+                },
+                isLoad: true
             },
         }
-    },{
+    }, {
         xtype: 'checkbox',
         inputValue: 1,
         uncheckedValue: 0,
@@ -178,13 +200,13 @@ Ext.define('Admin.view.configurations.views.forms.FormFieldDesignerFrm', {
         name: 'is_enabled',
         allowBlank: true
     }],
-    dockedItems:[
+    dockedItems: [
         {
             xtype: 'toolbar',
             ui: 'footer',
             dock: 'bottom',
-            items:[
-                '->',{
+            items: [
+                '->', {
                     text: 'Save Details',
                     iconCls: 'x-fa fa-save',
                     action: 'save',

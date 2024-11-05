@@ -53,7 +53,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueTypeSelectForm", {
       items: [
         "->",
         {
-          text: "Raise",
+          text: "Initiate",
           iconCls: "x-fa fa-save",
           formBind: true,
           ui: "soft-blue",

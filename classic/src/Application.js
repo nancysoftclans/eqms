@@ -40,6 +40,7 @@ Ext.define('Admin.Application', {
             var navigationstr = Ext.getStore('navigationstr');
             navigationstr.load();
             setTimeDuration();
+            checkUserNewTasks(60000);
             setupTimers();
             refreshTimerEvent();
             // submitPlannedActivities();

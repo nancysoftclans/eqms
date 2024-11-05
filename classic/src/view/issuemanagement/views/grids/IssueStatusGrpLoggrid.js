@@ -22,7 +22,8 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueStatusGrpLoggrid', {
   tbar: [
       {
           xtype: 'textfield',
-          name: 'id'
+          name: 'id',
+          hidden: true
       }
   ],
 

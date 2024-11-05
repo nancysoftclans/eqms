@@ -22,7 +22,8 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueTypeLogGrid', {
     tbar: [
         {
             xtype: 'textfield',
-            name: 'id'
+            name: 'id',
+            hidden:true
         }
     ],
 
@@ -70,14 +71,9 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueTypeLogGrid', {
             var mainTabPnl = Ext.ComponentQuery.query('#contentPanel')[0], // Get the main panel
                 containerPnl = mainTabPnl.getActiveTab();
 
-            //  process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
-            //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
-            //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
-                //applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
                 id = grid.down('textfield[name=id]').getValue(),
             store.getProxy().extraParams = {
                 table_name: 'eqms_issue_types_logs',
-                //application_code: applicationCode,
                 ref_id : id
             };
         }

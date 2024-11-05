@@ -1978,6 +1978,12 @@ func_setDocumentGridStore: function(me){
         node_ref = record.get('node_ref'),
         application_code = record.get('application_code'),
         uploadeddocuments_id = record.get('uploadeddocuments_id');
+
+        if(item.up('grid')){
+           var grid = item.up('grid');
+        }else{
+           var grid  = Ext.ComponentQuery.query("#applicationdocuploadsgrid")[0]
+        }
         
         if(node_ref != ''){
 
@@ -2003,7 +2009,8 @@ functDownloadAppDocument:function(node_ref,download,application_code=null,upload
             params: {
                 node_ref: node_ref,
                 application_code:application_code,
-                uploadeddocuments_id:uploadeddocuments_id
+                uploadeddocuments_id:uploadeddocuments_id,
+                download:download
             },
             headers: {
                 'Authorization': 'Bearer ' + access_token,
@@ -2011,6 +2018,7 @@ functDownloadAppDocument:function(node_ref,download,application_code=null,upload
             },
             success: function (response) {
                 Ext.getBody().unmask();
+                grid.unmask();
           
                 var resp = Ext.JSON.decode(response.responseText),
                 success = resp.success;

@@ -42,7 +42,8 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
                 winTitle: 'Add Finding',
                 winWidth: '80%',
                 handler: 'showAddConfigParamWinFrm',
-                stores: '[]'
+                stores: '[]',
+                hidden: true
     },{
         xtype: "tbspacer",
         width: 100,
@@ -64,6 +65,15 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
             },
             isLoad: true
         },
+        beforeLoad: function () {
+            var store = this.getStore(),
+                grid = this.up('grid'),
+                application_code = grid.down('hiddenfield[name=application_code]').getValue();
+
+            store.getProxy().extraParams = {
+                application_code: application_code
+            };
+        }
     },
    
     bbar: [
@@ -88,8 +98,17 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
             //         };
             
             // },
+        //     beforeLoad: function () {
+        //     this.up('auditfindingsgrid').fireEvent('refresh', this);
+        // }
             beforeLoad: function () {
-            this.up('auditfindingsgrid').fireEvent('refresh', this);
+            var store = this.getStore(),
+                grid = this.up('grid'),
+                application_code = grid.down('hiddenfield[name=application_code]').getValue();
+
+            store.getProxy().extraParams = {
+                application_code: application_code
+            };
         }
         },
         '->',
@@ -104,9 +123,20 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
         xtype: 'gridcolumn',
         dataIndex: 'finding_id',
         text: 'ID',
-        flex: 1,
+        flex: 0.2,
         sortable: true
     },{
+        xtype: 'gridcolumn',
+        dataIndex: 'checklist_item',
+        text: 'Question',
+        flex: 2,
+        sortable: true,
+        renderer: function(value, metaData) {
+            metaData.tdAttr = 'data-qtip="' + Ext.String.htmlEncode(value) + '"';
+            return value;
+        }
+    },
+    {
         xtype: 'gridcolumn',
         dataIndex: 'finding_title',
         text: 'Title',
@@ -119,17 +149,17 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'finding_owner',
-        text: 'Owner',
+        dataIndex: 'complainant_name',
+        text: 'Issue Owner',
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'finding_status',
-        text: 'Status',
+        dataIndex: 'issue_status',
+        text: 'Issue Status',
         flex: 1
     },{
         xtype: 'gridcolumn',
-        dataIndex: 'raised_on',
+        dataIndex: 'raised_date',
         text: 'Date Raised',
         flex: 1
     },{
@@ -151,7 +181,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditFindingsGrid', {
                     tooltip: 'Edit Record',
                     action: 'edit',
                     childXtype: 'auditfindingsfrm',
-                    winTitle: 'Edit Audit Type',
+                    winTitle: 'Edit Findings',
                     winWidth: '80%',
                     handler: 'showEditAuditTypeConfigParamWinFrm',bind: {
             disabled: '{isReadOnly}'

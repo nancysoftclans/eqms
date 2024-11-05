@@ -13,7 +13,7 @@ Ext.define("Admin.view.issuemanagement.views.toolbars.IssueManagementTb", {
     {
       text: "Home",
       iconCls: "x-fa fa-home",
-      sec_dashboard:'issuemanagementdashboard',
+      sec_dashboard: 'issuemanagementdashboard',
       name: "issuemanagementHomeBtn",
       homeDashWrapper: '#issuemanagementwrapper'
     },
@@ -29,39 +29,40 @@ Ext.define("Admin.view.issuemanagement.views.toolbars.IssueManagementTb", {
     "->",
 
     {
+      hidden: true,
       text: "Workflow",
       iconCls: "x-fa fa-sitemap",
       menu: {
         xtype: "menu",
         items: [
-            {
-              text: "Customer Complaints And Appeals",
-              iconCls: "x-fa fa-check",
-              handler: "showIssueApplicationWorkflow",
-              wrapper_xtype: "issuemanagementwrapper",
-              app_type: 102,
-            },
-            {
-              text: "Corrective Actions",
-              iconCls: "x-fa fa-check",
-              handler: "showIssueApplicationWorkflow",
-              wrapper_xtype: "issuemanagementwrapper",
-              app_type: 102,
-            },
-            {
-              text: "Change Management",
-              iconCls: "x-fa fa-check",
-              handler: "showIssueApplicationWorkflow",
-              wrapper_xtype: "issuemanagementwrapper",
-              app_type: 102,
-            },
-            {
-              text: "Deviation",
-              iconCls: "x-fa fa-check",
-              handler: "showIssueApplicationWorkflow",
-              wrapper_xtype: "issuemanagementwrapper",
-              app_type: 102,
-            },
+          {
+            text: "Customer Complaints And Appeals",
+            iconCls: "x-fa fa-check",
+            handler: "showIssueApplicationWorkflow",
+            wrapper_xtype: "issuemanagementwrapper",
+            app_type: 102,
+          },
+          {
+            text: "Corrective Actions",
+            iconCls: "x-fa fa-check",
+            handler: "showIssueApplicationWorkflow",
+            wrapper_xtype: "issuemanagementwrapper",
+            app_type: 102,
+          },
+          {
+            text: "Change Management",
+            iconCls: "x-fa fa-check",
+            handler: "showIssueApplicationWorkflow",
+            wrapper_xtype: "issuemanagementwrapper",
+            app_type: 102,
+          },
+          {
+            text: "Deviation",
+            iconCls: "x-fa fa-check",
+            handler: "showIssueApplicationWorkflow",
+            wrapper_xtype: "issuemanagementwrapper",
+            app_type: 102,
+          },
         ],
       },
     },

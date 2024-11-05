@@ -12,6 +12,7 @@ class IssueManagementDocument extends Model
         'issue_id',
         'document_id',
         'type',
+        'upload_id',
         'is_enabled',
         'created_by',
         'altered_by'

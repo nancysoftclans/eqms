@@ -31,8 +31,8 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
       childXtype: "issueauditform",
       winTitle: "Select Audit",
       winWidth: "80%",
-      handler: "showAddConfigParamWinFrm",
-      stores: "[]",
+      stores: "[issuemanagementauditstr]",
+      storeID: "issuemanagementauditstr"
     },
   ],
   autoScroll: true,
@@ -49,7 +49,6 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
       },
       isLoad: true,
     },
-    // itemdblclick: "showAddConfigParamWinFrm",
   },
 
   bbar: [
@@ -94,16 +93,16 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
     },
     {
       xtype: "gridcolumn",
-      dataIndex: "",
+      dataIndex: "status",
       text: "Status",
       flex: 1,
     },
-    {
-      xtype: "gridcolumn",
-      dataIndex: "",
-      text: "Finding",
-      flex: 1,
-    },
+    // {
+    //   xtype: "gridcolumn",
+    //   dataIndex: "findings",
+    //   text: "Finding",
+    //   flex: 1,
+    // },
     {
       text: "Options",
       xtype: "widgetcolumn",
@@ -139,7 +138,9 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementAuditGrid", {
       onWidgetAttach: function (col, widget, rec) {
         var is_enabled = rec.get("is_enabled");
         if (is_enabled === 0 || is_enabled == 0) {
+          // widget.down("menu menuitem[action=enable]").setDisabled(false);
         } else {
+          // widget.down("menu menuitem[action=enable]").setDisabled(true);
         }
       },
     },

@@ -104,9 +104,6 @@ class DocumentManagementController extends Controller
                     case 'saveDocDefinationrequirement':
                         $action = 'saved document definition requirement';
                         break;
-                    case 'validateDocumentAppReceivingDetails':
-                        $action = 'submit application';
-                        break;
                     case 'saveDocumentRecommendationComments':
                         $action = 'saved comments';
                         break;                
@@ -552,7 +549,6 @@ class DocumentManagementController extends Controller
                 if ($res['success']) {
                 initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
 
-        
                 
 
                 } else {
@@ -1052,8 +1048,10 @@ class DocumentManagementController extends Controller
                 // ->leftJoin('tra_documentmanager_application as t4', 't2.document_requirement_id', 't4.id')
                 // ->leftJoin('par_document_types as t3', 't4.document_type_id', 't3.id')
                 ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
-                ->select(DB::raw("t2.*, t1.*,t1.initial_file_name as file_name, t2.remarks,t1.file_type, t2.uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by, case when (select count(id) from tra_application_uploadeddocuments q where q.application_code = t1.application_code) = 0 then false else true end leaf"))
+                ->select(DB::raw("t2.*, t1.*,t1.initial_file_name as file_name, t2.remarks,t1.file_type, t1.created_on as uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by, case when (select count(id) from tra_application_uploadeddocuments q where q.application_code = t1.application_code) = 0 then false else true end leaf"))
                 ->where('t1.application_code', $application_code);
+                // ->orderBy('t1.created_on', 'desc')
+                // ->limit(1);
             //->where('t4.is_enabled', 1);
             $results = $qry->get();
         } else {
@@ -1345,16 +1343,17 @@ class DocumentManagementController extends Controller
             $assessment_by = $req->assessment_by;
             $query_ref_id = $req->query_ref_id;
             $view_module_id = $req->view_module_id;
+            $checklist_item_id = $req->checklist_item_id;
             $zipFolderName = '';
             $parent_id = 0;
             if ($file == '') {
                 $file = $req->file('uploaded_doc');
             }
-
             DB::beginTransaction();
             $app_rootnode = getApplicationRootNode($application_code);
+
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
-            
+           
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
             $reg_serial = 0;
@@ -1380,7 +1379,25 @@ class DocumentManagementController extends Controller
                     }
 
                     //save application document details
-                    $doc_app_details = array(
+
+                    if($module_id == 29){
+                        $doc_app_details = array(
+                        'application_code' => $application_code,
+                        'document_requirement_id' => $document_requirement_id,
+                        'document_type_id' => $document_type_id,
+                        'uploaded_on' => Carbon::now(),
+                        'uploaded_by' => $user_id,
+                        'query_ref_id' => $query_ref_id,
+                        'created_on' => Carbon::now(),
+                        'created_by' => $user_id,
+                        'assessment_start_date' => $assessment_start_date,
+                        'assessment_end_date' => $assessment_end_date,
+                        'assessment_by' => $assessment_by,
+                        'reg_serial' => $reg_serial,
+                        'checklist_item_id' => $checklist_item_id
+                    );
+                    }else{
+                        $doc_app_details = array(
                         'application_code' => $application_code,
                         'document_requirement_id' => $document_requirement_id,
                         'document_type_id' => $document_type_id,
@@ -1394,35 +1411,42 @@ class DocumentManagementController extends Controller
                         'assessment_by' => $assessment_by,
                         'reg_serial' => $reg_serial
                     );
+                    }
+                    
                     $where = array('application_code' => $application_code);
                     $table_name = 'tra_application_documents';
 
-                    if (recordExists('tra_application_uploadeddocuments', $where)) {
-                        //dump revision
-                        $prev_file_data = DB::table('tra_application_uploadeddocuments')->where($where)->first();
-                        //delete the old copy
-                        deleteRecord('tra_application_uploadeddocuments', $where);
-                        //insert revision
+                    $wheres = array('id' => $record_id);
+
+                    if (recordExists('tra_application_uploadeddocuments', $wheres)) {
+                        $prev_file_data = DB::table('tra_application_uploadeddocuments')->where($wheres)->first();
                         $pre_file = (array)$prev_file_data;
+
+                        //dump revision
+                        //delete the old copy
+                        deleteRecord('tra_application_uploadeddocuments', $wheres);
+                        //insert revision
+                        
+                        
                         //unset uneeded copy data
-                        $original_file_id = $pre_file['id'];
-                        unset($pre_file['id']);
                         //count total versions
-                        $count = DB::table('tra_documents_prevversions')->where('original_file_id', $original_file_id)->count();
+                        $count = DB::table('tra_documents_prevversions')->where('original_file_id', $record_id)->count();
                         $version = $count + 1;
-                        $pre_file['original_file_id'] = $original_file_id;
+                        $pre_file['original_file_id'] = $record_id;
                         $pre_file['version'] = $version;
                         $pre_file['application_code'] = $application_code;
 
                         //set parent id for update
                         $parent_id = $pre_file['parent_id'];
 
-                        $rr = insertRecord('tra_documents_prevversions', $pre_file);
                         $where = array('id' => $prev_file_data->application_document_id);
+                        insertRecord('tra_documents_prevversions', $pre_file);
                         $res = updateRecord($table_name, $where, $doc_app_details);
+  
                     } else {
 
                         $res = insertRecord($table_name, $doc_app_details);
+
                     }
 
                     if (isset($res['success']) && $res['success'] == true) {
@@ -1440,7 +1464,10 @@ class DocumentManagementController extends Controller
                         $res = $this->uploadZipDocuments($file, $parent_id, $application_document_id, $document_requirement_id, $app_rootnode, $node_ref, $zipFolderName);
                     } else {
                         //upload doc
+
                         $res = $this->uploadDocument($file, $parent_id, $application_document_id, $document_requirement_id, $app_rootnode, $node_ref, $application_code);
+
+
                     }
                 } else {
                     $res = array(
@@ -1636,6 +1663,7 @@ class DocumentManagementController extends Controller
         //confirm extension if allowed dms_node_id
         $docextension_check = $this->validateDocumentExtension($extension, $document_requirement_id);
         $is_allowedextension = $docextension_check['is_allowedextension'];
+
         if (!$is_allowedextension) {
             $allowed_filetypes = $docextension_check['allowed_filetypes'];
             $res = array('success' => false, 'message' => 'Uploaded file should only contain the following allowed file formats :.' . $allowed_filetypes);
@@ -1644,12 +1672,13 @@ class DocumentManagementController extends Controller
             //$file->move($destination, $savedName);
             $document_path = $destination . $savedName;
 
-            //check if tje dpcument type has been mapped and not autoCreate the folder
+            //check if the document type has been mapped and not autoCreate the folder
             $document_requirement = getParameterItem('par_document_types', $document_requirement_id);
             //get the application root folder
 
             $uploadfile_name = $document_requirement . str_random(5) . '.' . $extension;
             $destination_node = $app_rootnode->node_ref;
+
             //upload to dms
             $response = dmsUploadNodeDocument($destination_node, $file_path, $uploadfile_name, $node_ref);
 
@@ -1706,6 +1735,7 @@ class DocumentManagementController extends Controller
 
 
             $app_rootnode = getApplicationRootNode($application_code);
+
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
@@ -2239,6 +2269,7 @@ public function getApplicationDocumentDownloadurl(Request $req)
             $application_code = $req->application_code;
             $uploadeddocuments_id = $req->uploadeddocuments_id;
             $node_ref = $req->node_ref;
+            $download = $req->download;
             $data = array(
                 'user_id' => $user_id,
                 'application_code' => $application_code,
@@ -2254,17 +2285,22 @@ public function getApplicationDocumentDownloadurl(Request $req)
                     'message' => 'Document Not Uploaded'
                 );
             } else {
+
+
                 if(validateIsNumeric($uploadeddocuments_id)){
-                    $record = DB::table('tra_application_uploadeddocuments')
+                    $record = DB::table('tra_documents_prevversions as t1')
                                 ->select('*')
-                                ->where('id',$uploadeddocuments_id)
+                                ->where('t1.id',$uploadeddocuments_id)
                                 ->first();
                 }
                 else{
-                    $record = DB::table('tra_application_uploadeddocuments')
+
+                        $record = DB::table('tra_application_uploadeddocuments')
                                 ->select('*')
                                 ->where('node_ref',$node_ref)
                                 ->first();
+
+
                     if(!$record){
                         //tc_meeting_uploaddocuments
                             $record = DB::table('tc_meeting_uploaddocuments')
@@ -2272,8 +2308,9 @@ public function getApplicationDocumentDownloadurl(Request $req)
                                 ->where('node_ref',$node_ref)
                                 ->first();
                     }
+                    
                 }
-                
+        
                 $file_type = $record->file_type;
 
 
@@ -2289,8 +2326,15 @@ public function getApplicationDocumentDownloadurl(Request $req)
                 $res = insertRecord('tra_uploadeddocuments_useraccess', $data, $user_id);
 
                 $document_versionid = $req->document_versionid;
-                $url = downloadDocumentUrl($node_ref, $document_versionid);
-        
+
+                if($download == 1){
+
+                    $url = downloadDocumentPreviewUrl($uploadeddocuments_id, $document_versionid);
+                }else{
+
+                    $url = downloadDocumentUrl($node_ref, $document_versionid);
+
+                }
 
                 // $res = array(
                 //     'success' => true,
@@ -2368,48 +2412,109 @@ public function getApplicationDocumentDownloadurl(Request $req)
 
 
 
+    // public function getApplicationDocumentPreviousVersions(Request $req)
+    // {
+    //     try {
+    //         $table_name = $req->table_name;
+
+    //         $original_file_id = $req->document_id;
+    //         $document_requirement_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_code');
+    //         $application_document_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_document_id');
+    //         $application_code = getSingleRecordColValue('tra_application_documents', ['id' => $application_document_id], 'application_code');
+    //         $doc_data = array(); //original_file_id
+    //         $i = 1;
+
+    //         // $doc_data = DB::table('tra_documents_prevversions as t1')
+    //         //         ->leftJoin('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
+    //         //          ->leftJoin('par_document_types as t3', 't2.document_type_id', '=', 't3.id')
+    //         //          ->leftJoin('users as t5', 't1.uploaded_by', '=', 't5.id')
+    //         //          ->select(DB::raw("t1.remarks,  t1.node_ref,t1.version as version_no, t2.name as document_type, t1.id,t1.initial_file_name,t1.file_name, t1.file_type,t1.uploaded_on,t5.email as uploaded_by ,t2.document_type_id,t3.name as document_type, t2.name as document_requirement"))
+    //         //         ->where('t1.application_code', $application_code)
+    //         //         ->get();
+
+    //             $doc_data = DB::table('tra_documents_prevversions as t1')
+    //             ->Join('tra_application_documents as t2', 't1.application_code', 't2.application_code')
+    //             // ->leftJoin('tra_documentmanager_application as t4', 't2.document_requirement_id', 't4.id')
+    //             // ->leftJoin('par_document_types as t3', 't4.document_type_id', 't3.id')
+    //             ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
+    //             ->select(DB::raw("t2.*, t1.*,t1.initial_file_name as file_name, t2.remarks,t1.file_type, t1.created_on as uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by, case when (select count(id) from tra_application_uploadeddocuments q where q.application_code = t1.application_code) = 0 then false else true end leaf"))
+    //             ->where('t1.application_code', $application_code)
+    //             // ->orderBy('t1.created_on', 'desc')
+    //             // ->limit(1);
+    //         //->where('t4.is_enabled', 1);
+    //         $res = $doc_data->get();
+
+
+
+    //        // $res = array('success' => true, 'results' => $res);
+    //     } catch (\Exception $exception) {
+    //         $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    //     } catch (\Throwable $throwable) {
+    //         $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    //     }
+    //     return response()->json($res);
+    // }
+
     public function getApplicationDocumentPreviousVersions(Request $req)
-    {
-        try {
-            $table_name = $req->table_name;
+{
+    try {
+        $original_file_id = $req->input('document_id');
+        
+        // Retrieve necessary data
+        $application_document_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_document_id');
+        $application_code = getSingleRecordColValue('tra_application_documents', ['id' => $application_document_id], 'application_code');
+        
+        // Fetch previous versions of the document
+        $doc_data = DB::table('tra_documents_prevversions as t1')
+            ->join('tra_application_documents as t2', 't1.application_code', '=', 't2.application_code')
+            ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
+            ->select(DB::raw("
+                t1.*, 
+                t1.id as uploadeddocuments_id,
+                t1.initial_file_name as file_name, 
+                t2.remarks, 
+                t1.file_type, 
+                t1.created_on as uploaded_on, 
+                decrypt(t5.first_name) as first_name,decrypt(t5.last_name) as last_name,
+                CASE 
+                    WHEN (SELECT COUNT(id) FROM tra_application_uploadeddocuments q WHERE q.application_code = t1.application_code) = 0 
+                    THEN false 
+                    ELSE true 
+                END as leaf
+            "))
+            ->where('t1.application_code', $application_code)
+            ->orderBy('t1.created_on', 'desc') // Optional: order by latest
+            ->get();
 
-            $original_file_id = $req->document_id;
-            $document_requirement_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_code');
-            $application_document_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_document_id');
-            $application_code = getSingleRecordColValue('tra_application_documents', ['id' => $application_document_id], 'application_code');
-            $doc_data = array(); //original_file_id
-            $i = 1;
-
-            // $doc_data = DB::table('tra_documents_prevversions as t1')
-            //         ->leftJoin('tra_documentmanager_application as t2', 't1.document_requirement_id', 't2.id')
-            //          ->leftJoin('par_document_types as t3', 't2.document_type_id', '=', 't3.id')
-            //          ->leftJoin('users as t5', 't1.uploaded_by', '=', 't5.id')
-            //          ->select(DB::raw("t1.remarks,  t1.node_ref,t1.version as version_no, t2.name as document_type, t1.id,t1.initial_file_name,t1.file_name, t1.file_type,t1.uploaded_on,t5.email as uploaded_by ,t2.document_type_id,t3.name as document_type, t2.name as document_requirement"))
-            //         ->where('t1.application_code', $application_code)
-            //         ->get();
-
-            $doc_data = DB::table('tra_documentmanager_application as t1')
-                ->leftJoin('tra_documentupload_requirements as t2', 't1.document_type_id', '=', 't2.id')
-                ->select(DB::raw("t2.name as document_type,t5.email as uploaded_by ,t1.is_mandatory ,t1.id as document_requirement_id, t1.document_type_id,t2.name as document_type, t1.name as document_requirement, t4.file_name,t1.version as version_no, t1.description as remarks,t4.node_ref,t4.file_type,t4.initial_file_name,t4.created_on as uploaded_on"))
-                // ->join('tra_documents_prevversions as t4', function ($join) {
-                //     $join->on("orin", "=", "t4.document_requirement_id");
-                // })
-                ->leftJoin('tra_application_uploadeddocuments as t4', 't1.application_code', '=', 't4.application_code')
-                ->leftJoin('users as t5', 't4.created_by', '=', 't5.id')
-
-                ->where(array('t1.application_code' => $document_requirement_id))
-                ->get();
-
-
-
-            $res = array('success' => true, 'results' => $doc_data);
-        } catch (\Exception $exception) {
-            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
-        } catch (\Throwable $throwable) {
-            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
-        }
-        return response()->json($res);
+            $results = convertStdClassObjToArray($doc_data);
+            $res = decryptArray($results);
+        
+        // Prepare successful response
+        $res = [
+            'success' => true, 
+            'results' => $res
+        ];
+    } catch (\Exception $exception) {
+        $res = sys_error_handler(
+            $exception->getMessage(), 
+            2, 
+            debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), 
+            explode('\\', __CLASS__), 
+            \Auth::user()->id
+        );
+    } catch (\Throwable $throwable) {
+        $res = sys_error_handler(
+            $throwable->getMessage(), 
+            2, 
+            debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), 
+            explode('\\', __CLASS__), 
+            \Auth::user()->id
+        );
     }
+    
+    return response()->json($res);
+}
+
     public function deleteSingleFile($file_id)
     {
         $table_name = 'tra_application_uploadeddocuments';
@@ -2691,19 +2796,15 @@ public function getApplicationDocumentDownloadurl(Request $req)
         }
 
         $fileReceived = $receiver->receive(); // receive file
-
         //get handler class
         $handler = $fileReceived->handler();
         //check if its the first chunk
         $currentChunk = $handler->getCurrentChunk();
 
-
         if ($currentChunk < 5) {
 
             //check if allowed
             $docextension_check = $this->validateDocumentExtension($fileReceived->getClientOriginalExtension(), $request->document_requirement_id);
-
-
             $is_allowedextension = $docextension_check['is_allowedextension'];
             if (!$is_allowedextension) {
                 $allowed_filetypes = $docextension_check['allowed_filetypes'];
@@ -2718,8 +2819,7 @@ public function getApplicationDocumentDownloadurl(Request $req)
 
             $file = $fileReceived->getFile(); // get file
 
-
-            // $extension = $file->getClientOriginalExtension();
+                        // $extension = $file->getClientOriginalExtension();
             // $fileName = str_replace('.'.$extension, '', $file->getClientOriginalName()); //file name without extenstion
             // $fileName .= '.' . $extension; // a unique file name
 

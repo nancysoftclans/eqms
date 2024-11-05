@@ -22,7 +22,8 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
     tbar: [
         {
             xtype: 'textfield',
-            name: 'id'
+            name: 'id',
+            hidden: true
         }
     ],
 
@@ -46,7 +47,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
         beforerender: {
             fn: 'setGridStore',
             config: {
-                storeId:'issuetypelogstore',
+                storeId:'documentlogstore',
                 proxy: {
                     api: {
                         read: 'documentmanagement/getDocumentLogs'

@@ -49,10 +49,15 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             margin: 5,
             xtype: 'textfield',
             allowBlank: false,
-            columnWidth: 0.5,
+            columnWidth: 0.33,
         },
         layout: 'column',
-        items:[ {
+        items:[{
+            xtype: 'textfield',
+            fieldLabel: 'Reference',
+            name: 'audit_reference',
+
+        }, {
             xtype: 'textfield',
             fieldLabel: 'Title',
             name: 'audit_title',
@@ -62,7 +67,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             xtype: 'textfield',
             fieldLabel: 'Audit Types',
             name: 'audit_type_name',
-            columnWidth: 0.40,
+            columnWidth: 0.23,
             readOnly: true
         },
         {
@@ -137,18 +142,18 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
         },
         {
             xtype: 'datefield',
-            labelAlign: 'top',
-            format: 'Y-m-d',
-            columnWidth: 0.5,
             name: 'audit_start_date',
+            labelAlign: 'top',
+            format: 'd F Y',
+            columnWidth: 0.5,
             fieldLabel: 'Start Date',
             allowBlank: false,
-            minValue: new Date(),
+            //minValue: new Date(),
         }, 
         {
             xtype: 'datefield',
             name: 'audit_end_date',  
-            format: 'Y-m-d',
+            format: 'd F Y',
             labelAlign: 'top',
             columnWidth: 0.5,
             allowBlank: false,
@@ -157,6 +162,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
         {
             xtype: 'timefield',
             name: 'start_time',
+            format: 'g:i a',
             fieldLabel: 'Start Time (UTC)',
             minValue: '6:00 AM',
             maxValue: '8:00 PM',
@@ -169,6 +175,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
         {
             xtype: 'timefield',
             name: 'end_time',
+            format: 'g:i a',
             fieldLabel: 'End Time (UTC)',
             minValue: '6:00 AM',
             maxValue: '8:00 PM',
