@@ -16,6 +16,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypeLogGrid', {
     //     ptype: 'cellediting',
     //     clicksToEdit: 1
     // }],
+    height: 600,
     
     itemId: 'audittypeloggrids',
 

@@ -32,4 +32,10 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::post('saveIssueManagementOrganisationalAreas', [IssueManagementController::class, 'saveIssueManagementOrganisationalAreas']);
     Route::get('getActivity', [IssueManagementController::class, 'getActivity']);
     Route::get('generateIssueReport', [IssueManagementController::class, 'generateIssueReport']);
+
+    Route::get('getIssueTypeLogs', [IssueManagementController::class, 'getIssueTypeLogs']);
+    Route::get('getIssueLogs', [IssueManagementController::class, 'getIssueLogs']);
+    Route::get('getIssueTypeCategoriesLogs', [IssueManagementController::class, 'getIssueTypeCategoriesLogs']);
+    Route::get('getIssueStatusGroupsLogs', [IssueManagementController::class, 'getIssueStatusGroupsLogs']);
+    Route::get('getIssueStatusesLogs', [IssueManagementController::class, 'getIssueStatusesLogs']);
 });

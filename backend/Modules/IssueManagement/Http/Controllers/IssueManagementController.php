@@ -98,6 +98,239 @@ class IssueManagementController extends Controller
         }
 
     }
+
+
+    public function getIssueTypeLogs(Request $request)
+    {
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
+
+                //get log entries
+                $logs = DB::table('eqms_issue_types_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->join('par_issue_type_categories as categories', 'logs.issue_type_category_id', '=', 'categories.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             'logs.ref_id', 
+                             'logs.title',
+                             'logs.action',
+                             'logs.description',
+                             'logs.status_group_id',
+                             'categories.title as issue_type_category_id',
+                             //'user.email as submitted_by',
+                             //'logs.is_enabled', 
+                             'logs.created_on')
+                //filter logs by id
+                
+                    ->where('logs.ref_id', '=', $ref_id)
+                    ->orderBy('logs.created_on', 'desc')
+                    ->get();
+            } else {
+               
+                $logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
+
+
+    public function getIssueLogs(Request $request)
+    {
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
+
+                //get log entries
+                $logs = DB::table('eqms_issue_management_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->join('wf_workflow_stages as workflow', 'logs.workflow_stage_id', '=', 'workflow.id')
+                    ->join('par_issue_statuses as status', 'logs.issue_status_id', '=', 'status.id')
+                    ->join('par_issue_types as types', 'logs.issue_type_id', '=', 'types.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             'logs.ref_id',
+                             'logs.application_code', 
+                             'workflow.name as workflow_stage_id',
+                             'logs.application_status_id',
+                             'status.title as issue_status_id',
+                             'logs.action',
+                             'types.title as issue_type_id',
+                             //'logs.is_enabled', 
+                             'logs.created_on')
+                //filter logs by id
+                
+                    ->where('logs.ref_id', '=', $ref_id)
+                    ->orderBy('logs.created_on', 'desc')
+                    ->get();
+            } else {
+               
+                $logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
+
+
+    public function getIssueTypeCategoriesLogs(Request $request)
+    {
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
+
+                //get log entries
+                $logs = DB::table('eqms_issue_types_categories_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             'logs.ref_id', 
+                             'logs.title',
+                             'logs.action',
+                             'user.email as submitted_by',
+                             //'logs.is_enabled', 
+                             'logs.created_on')
+                //filter logs by id
+                
+                    ->where('logs.ref_id', '=', $ref_id)
+                    ->orderBy('logs.created_on', 'desc')
+                    ->get();
+            } else {
+               
+                $logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
+
+
+    public function getIssueStatusesLogs(Request $request)
+    {
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
+
+                //get log entries
+                $logs = DB::table('eqms_issue_statuses_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->join('par_issue_states as state', 'logs.issue_state_id', '=', 'state.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             'logs.ref_id', 
+                             'logs.title',
+                             'logs.action',
+                             'state.title as issue_state_id',
+                             'user.email as submitted_by',
+                             //'logs.is_enabled', 
+                             'logs.created_on')
+                //filter logs by id
+                
+                    ->where('logs.ref_id', '=', $ref_id)
+                    ->orderBy('logs.created_on', 'desc')
+                    ->get();
+            } else {
+               
+                $logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
+
+
+    public function getIssueStatusGroupsLogs(Request $request)
+    {
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+           //check if application code is present
+            if ($ref_id) {
+
+                //get log entries
+                $logs = DB::table('eqms_issue_status_groups_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             'logs.ref_id', 
+                             'logs.title',
+                             'logs.action',
+                             //'logs.is_enabled', 
+                             'logs.created_on')
+                //filter logs by id
+                
+                    ->where('logs.ref_id', '=', $ref_id)
+                    ->orderBy('logs.created_on', 'desc')
+                    ->get();
+            } else {
+               
+                $logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
+
+
     public function saveIssueDetails(Request $request)
     {
         $application_id = $request->input('application_id');

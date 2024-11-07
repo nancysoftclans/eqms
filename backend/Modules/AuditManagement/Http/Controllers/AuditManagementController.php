@@ -93,7 +93,7 @@ class AuditManagementController extends Controller
                         }
                         break;
                     case 'deleteConfigRecord':
-                        $action = "deleted configurations record";
+                        $action = "deleted record";
                         break;
                     case 'saveAuditFinding':
                         if ($id){
@@ -161,7 +161,7 @@ class AuditManagementController extends Controller
     }
 
 
-    // public function ActionLog($method, $request, $res)
+    // public function ActionLog($method, $request)
     // {
     //     $user_id = \Auth::user()->id;
     //     $module_id = $request->input('module_id');
@@ -264,7 +264,8 @@ class AuditManagementController extends Controller
 
     public function saveAuditType(Request $req) {
 
-
+        //$this-> ActionLog('saveAuditType', $req);
+        
           try {
              DB::beginTransaction();
             $user_id = \Auth::user()->id;
@@ -442,11 +443,6 @@ class AuditManagementController extends Controller
                 ->orderBy('created_on', 'desc') // order by created_on
                 ->get();
 
-                // $audit_data = DB::table('eqms_audit_management_logs as t1')
-                //                 ->leftJoin('eqms_workflow_management as t2', 't1.user_id', '=', 't2.user_id')
-                //                 ->select('t1.*', 't1.finding_title', 't1.id as finding_id', 't2.name as finding_type', 't3.title', 't3.created_on as raised_date', 't3.complainant_name', 't4.title as issue_status')
-                //                 ->where('t1.application_code', $application_code)
-                //                 ->get();
             } else {
                
                 $logs = collect([]);
@@ -795,8 +791,6 @@ class AuditManagementController extends Controller
                 'message' => $throwable->getMessage()
             );
         }
-        //log
-        //$this->auditManagementLog(__FUNCTION__, $request);
         return \response()->json($res);
     }
 

@@ -123,7 +123,7 @@ class ConfigurationsController extends Controller
                             'created_on' => Carbon::now(),
                         );
                         break;
-                        case 'par_document_types':
+                        case 'par_qms_documents_types':
                             $table_name = 'eqms_document_type_logs';
                             $table_data = array(
                                 'name' => $name,

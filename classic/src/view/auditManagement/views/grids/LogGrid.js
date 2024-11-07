@@ -10,6 +10,7 @@ Ext.define('Admin.view.auditManagement.views.grids.LogGrid', {
     //     clicksToEdit: 1
     // }],
 
+    height: 600,
     features: [{
         ftype: 'searching',
         minChars: 2,

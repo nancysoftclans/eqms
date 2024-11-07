@@ -101,27 +101,27 @@ class WorkflowController extends Controller
                             
                         $action = 'Application submission';
                         break;
-                    case 'saveEditedConfigCommonData':
+                    // case 'saveEditedConfigCommonData':
 
-                        $action = 'saved edited configuration common data';
-                        break;
-                    case 'deleteConfigRecord':
-                        $action = 'deleted configuration record';
-                        break;
-                    case 'saveDocumentTypes':
-                        $action = 'saved document types';
-                        break;
-                    case 'navigatorFolder':
-                        $action = 'saved navigator folder';
-                        break;
-                    default:
-                        break;
+                    //     $action = 'saved edited configuration common data';
+                    //     break;
+                    // case 'deleteConfigRecord':
+                    //     $action = 'deleted configuration record';
+                    //     break;
+                    // case 'saveDocumentTypes':
+                    //     $action = 'saved document types';
+                    //     break;
+                    // case 'navigatorFolder':
+                    //     $action = 'saved navigator folder';
+                    //     break;
+                    // default:
+                    //     break;
                 }
 
                 $table_data = null;
 
-                switch ($table) {
-                    case 'tra_documentmanager_application':
+                switch ($module_id) {
+                    case '26':
                         $table_name = 'eqms_document_management_logs';
                         $table_data = array(
                             'user_id' => $user_id,
@@ -146,25 +146,25 @@ class WorkflowController extends Controller
                             'curr_stage_id' => $curr_stage_id
                         );
                     break;
-                    // case "tra_auditsmanager_application":
-                    //     $table_name = "eqms_audit_management_logs";
-                    //     $table_data = array(
-                    //         'user_id' => $this->user_id,
-                    //         'application_code' => $application_code,
-                    //         'action' => $action,
-                    //         'created_on' => Carbon::now(),
-                    //         'ref_id' => $id,
-                    //         'module_id' => $module_id,
-                    //         'sub_module_id' => $sub_module_id,
-                    //         'process_id' => $process_id,
-                    //         'audit_type_id' => $audit_type_id,
-                    //         'current_stage_name' => $current_stage_name,
-                    //         'application_status' => $application_status,
-                    //         'curr_stage_id' => $curr_stage_id,
-                    //         'application_status_id' => $application_status_id,
-                    //         'responsible_user' => $responsible_user,
-                    //         'submitted_by' => $this->user_id,
-                    //     );
+                    case "29":
+                        $table_name = "eqms_audit_management_logs";
+                        $table_data = array(
+                            'user_id' => $this->user_id,
+                            'application_code' => $application_code,
+                            'action' => $action,
+                            'created_on' => Carbon::now(),
+                            'ref_id' => $id,
+                            'module_id' => $module_id,
+                            'sub_module_id' => $sub_module_id,
+                            'process_id' => $process_id,
+                            'audit_type_id' => $audit_type_id,
+                            'current_stage_name' => $current_stage_name,
+                            'application_status' => $application_status,
+                            'curr_stage_id' => $curr_stage_id,
+                            'application_status_id' => $application_status_id,
+                            'responsible_user' => $responsible_user,
+                            'submitted_by' => $this->user_id,
+                        );
                 }
 
                 if ($table_data) {

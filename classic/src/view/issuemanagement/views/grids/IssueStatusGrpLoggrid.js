@@ -17,7 +17,7 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueStatusGrpLoggrid', {
   //     ptype: 'cellediting',
   //     clicksToEdit: 1
   // }],
-
+  height: 600,
 
   tbar: [
       {

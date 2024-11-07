@@ -17,7 +17,7 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueTypeLogGrid', {
     //     ptype: 'cellediting',
     //     clicksToEdit: 1
     // }],
-
+    height: 600,
 
     tbar: [
         {
@@ -113,13 +113,13 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueTypeLogGrid', {
         flex: 1,
         sortable: true
     },
-    {
-        xtype: 'gridcolumn',
-        dataIndex: 'status_group_id',
-        text: 'status group id',
-        flex: 1,
-        sortable: true
-    },
+    // {
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'status_group_id',
+    //     text: 'status group id',
+    //     flex: 1,
+    //     sortable: true
+    // },
     {
         xtype: 'gridcolumn',
         dataIndex: 'issue_type_category_id',

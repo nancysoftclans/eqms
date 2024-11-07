@@ -2836,8 +2836,7 @@ static function convertArrayToString($array){
     }
 
     static function checkNotificationEnabled($user_id){
-        $is_notifications_enabled = getSingleRecordColValue('users',array('id'=>$user_id), 'is_notifications_enabled', "");
-        // dd($is_notifications_enabled);
+        $is_notifications_enabled = getSingleRecordColValue('users',array('id'=>$user_id), 'is_notifications_enabled');
         return validateIsNumeric($is_notifications_enabled) ? true : false;
     }
 
