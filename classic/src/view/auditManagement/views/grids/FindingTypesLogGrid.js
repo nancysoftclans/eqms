@@ -68,7 +68,7 @@ Ext.define('Admin.view.auditManagement.views.grids.FindingTypeLogGrid', {
             var mainTabPnl = Ext.ComponentQuery.query('#contentPanel')[0], // Get the main panel
                 containerPnl = mainTabPnl.getActiveTab();
             var formdata = Ext.ComponentQuery.query('#NewAuditDetails')[0];
-            console.log(formdata)
+         
              var refId = grid.down('textfield[name=id]').getValue();
             store.getProxy().extraParams = {
                 table_name: 'par_finding_types_logs',

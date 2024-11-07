@@ -101,21 +101,7 @@ class WorkflowController extends Controller
                             
                         $action = 'Application submission';
                         break;
-                    // case 'saveEditedConfigCommonData':
-
-                    //     $action = 'saved edited configuration common data';
-                    //     break;
-                    // case 'deleteConfigRecord':
-                    //     $action = 'deleted configuration record';
-                    //     break;
-                    // case 'saveDocumentTypes':
-                    //     $action = 'saved document types';
-                    //     break;
-                    // case 'navigatorFolder':
-                    //     $action = 'saved navigator folder';
-                    //     break;
-                    // default:
-                    //     break;
+                    
                 }
 
                 $table_data = null;

@@ -297,12 +297,12 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                     'Authorization': 'Bearer ' + access_token
                 },
                 success: function (form, action) {
-                    console.log("Server response:", action.response.responseText);
+                    //console.log("Server response:", action.response.responseText);
                     var response = Ext.decode(action.response.responseText),
                         success = response.success;
                         message = response.message;
                         id = response.record_id;
-                        console.log(id);
+                        //console.log(id);
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                         store.removeAll();
@@ -317,7 +317,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                 failure: function (form, action) {
                     var resp = action.result;
 
-                    console.log(resp);
+                    //console.log(resp);
                     toastr.error(resp.message, 'Failure Response');
                 },
             });

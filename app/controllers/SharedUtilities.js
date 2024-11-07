@@ -2839,7 +2839,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                     
                             var refId = record.get('id');
                             var logGrid = Ext.widget(childXtype);
-                            console.log(logGrid);
                             
                             // Set reference ID in the log grid
                             logGrid.down('textfield[name=id]').setValue(refId);

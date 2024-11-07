@@ -89,7 +89,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     //logGrid.setHeight(650);
     // var logGrid = Ext.ComponentQuery.query('#audittypeloggrids')[0];
     var logGrid = Ext.widget(childXtype);
-    console.log(logGrid);
+    
     logGrid.down('textfield[name=id]').setValue(refId);
 
     funcShowCustomizableWindow(winTitle, winWidth, logGrid, 'customizablewindow');

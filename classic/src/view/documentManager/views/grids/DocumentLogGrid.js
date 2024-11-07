@@ -18,7 +18,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
     //     clicksToEdit: 1
     // }],
 
-
+    height: 600,
     tbar: [
         {
             xtype: 'textfield',
@@ -75,7 +75,6 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
             //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
             //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
                 applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
-                console.log(applicationCode);
                 //id = grid.down('textfield[name=id]').getValue(),
             store.getProxy().extraParams = {
                 table_name: 'eqms_document_management_logs',

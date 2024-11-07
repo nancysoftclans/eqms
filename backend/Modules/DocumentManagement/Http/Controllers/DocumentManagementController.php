@@ -147,6 +147,76 @@ class DocumentManagementController extends Controller
     }
 
 
+    // private function ActionLog($method, $request, $res)
+    // {
+    //     $this->user_id = \Auth::user()->id;
+
+    //     $method = $request->route()->getActionMethod();
+
+    //     $req = $request;                
+    //     $table_name = 'eqms_document_management_logs';
+    //     $user_id = $this->user_id;
+    //     $application_code = $request->input('application_code') ?? $req->input('application_code') ?? null;
+    //     $module_id = $request->input('module_id');
+    //     $sub_module_id = $request->input('sub_module_id');
+    //     $workflow_stage_id = $request->input('workflow_stage_id');
+    //     $stage_category_id = $request->input('stage_category_id');
+    //     $application_status_id = $request->input('application-status_id');
+    //     $doc_title = $request->input('doc_title');
+    //     $document_type_id = $request->input('documentn_type_id');
+    //     $doc_version = $request->input('doc_version');
+    //     $owner_type_id = $request->input('owner_type_id');
+    //     $owner_user_id = $request->input('owner_user_id');
+    //     $owner_group_id = $request->input('owner_group_id');
+    //     $doc_description = $request->input('doc_description');
+    //     $navigator_name = $request->input('navigator_name');
+    //     $navigator_folder_id = $request->input('navigator_folder_id');
+    //     $id = $res['record_id'];
+
+    //     $created_on = Carbon::now();
+
+    //     $action = '';
+
+    //     switch ($method) {
+    //         case 'saveDocDefinationrequirement':
+    //             $action = 'saved document definition requirement';
+    //             break;
+    //         case 'saveDocumentRecommendationComments':
+    //             $action = 'saved comments';
+    //             break;                
+    //         default:
+    //             break;
+    //     }
+
+        
+    //     if($action != '')
+    //     {
+    //         $table_data = array(
+    //             'user_id' => $user_id,
+    //             'application_code' => $application_code,
+    //             'action' => $action,
+    //             'created_on' => $created_on,
+    //             'module_id' => $module_id,
+    //             'sub_module_id' => $sub_module_id,
+    //             'workflow_stage_id' => $workflow_stage_id,
+    //             'stage_category_id' => $stage_category_id,
+    //             'application_status_id' => $application_status_id,
+    //             'doc_title' => $doc_title,
+    //             'document_type_id' => $document_type_id,
+    //             'doc_version' => $doc_version,
+    //             'owner_type_id' => $owner_type_id,
+    //             'owner_user_id' => $owner_user_id,
+    //             'owner_group_id' => $owner_group_id,
+    //             'doc_description' => $doc_description,
+    //             'navigator_name' => $navigator_name,
+    //             'navigator_folder_id' => $navigator_folder_id,
+    //         );
+
+            
+    //         DB::table($table_name)->insert($table_data);
+    //     } 
+    // }
+
 
     public function getDocumentTypeLogs(Request $request) {
         //Capture input values

@@ -70,7 +70,6 @@ Ext.define('Admin.view.issuemanagement.views.grids.LogGrid', {
 
             var  refId = grid.down('textfield[name=id]').getValue();
              //var grid = this.up('grid'),
-            console.log(refId);
 
             store.getProxy().extraParams = {
                 table_name: 'eqms_issue_management_logs',

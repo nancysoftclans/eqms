@@ -100,6 +100,68 @@ class IssueManagementController extends Controller
     }
 
 
+    //  private function ActionLog($method, $request, $res)
+    // {
+    //     $this->user_id = Auth::user()->id;
+
+    //             $method = $request->route()->getActionMethod();
+                
+    //             $req = $request;                
+    //             $table_name = 'eqms_issue_management_logs';
+    //             $user_id = $this->user_id;
+    //             $application_code = $request->input('application_code') ?? $req->input('application_code') ?? null;
+    //             $workflow_stage_id = $request->input('workflow_stage_id');
+    //             $module_id = $request->input('module_id');
+    //             $sub_module_id = $request->input('sub_module_id');
+    //             $application_status_id = $request->input('application_status-id');
+    //             $issue_status_id = $request->input('issue_status_id');
+    //             $issue_type_id = $request->input('issue_type_id');
+    //             $created_on = Carbon::now();
+    //             //$id = $request->input('id');
+    //             $id = $res['record_id'];
+
+    //             $action = '';
+    //             switch ($method) {
+    //                 case 'saveIssueDetails':
+    //                     $action = 'Saved issue details';
+    //                     break;
+    //                 case 'submitIssueManagementApplication':
+    //                     $action = 'submitted issue management application';
+    //                     break;
+    //                 case 'saveIssueManagementDocuments':
+    //                     $action = 'saved issue management documents';
+    //                     break;
+    //                 case 'saveIssueManagementRelatedIssues':
+    //                     $action = 'saved issue management related issues';
+    //                     break;
+    //                 case 'saveIssueManagementAudits':
+    //                     $action = 'saved issue management audits';
+    //                     break;
+    //                 default:
+    //                     break;
+    //             }
+
+                
+    //             if ($action != ''){
+    //                 $table_data = array(
+    //                     'user_id' => $user_id,
+    //                     'application_code' => $application_code,
+    //                     'action' => $action,
+    //                     'ref_id' => $id,
+    //                     'workflow_stage_id' => $workflow_stage_id,
+    //                     'module_id' => $module_id,
+    //                     'sub_module_id' => $sub_module_id,
+    //                     'application_status_id' => $application_status_id,
+    //                     'issue_status_id' => $issue_status_id,
+    //                     'issue_type_id' => $issue_type_id,
+    //                     'created_on' => $created_on,
+    //                 );
+    
+    //                 DB::table($table_name)->insert($table_data);
+    //             }
+    // }
+
+
     public function getIssueTypeLogs(Request $request)
     {
         try {

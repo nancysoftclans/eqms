@@ -18,7 +18,7 @@ Ext.define('Admin.view.auditManagement.views.grids.DocumentTypeLogGrid', {
     // }],
     
     itemId: 'documenttypeloggrids',
-
+    height: 600,
     features: [{
         ftype: 'searching',
         minChars: 2,
@@ -36,7 +36,8 @@ Ext.define('Admin.view.auditManagement.views.grids.DocumentTypeLogGrid', {
     },
     {
         xtype: 'textfield',
-        name: "id"
+        name: "id",
+        hidden:true
 
     }],
 
@@ -72,7 +73,6 @@ Ext.define('Admin.view.auditManagement.views.grids.DocumentTypeLogGrid', {
                 containerPnl = mainTabPnl.getActiveTab();
              var  refId = grid.down('textfield[name=id]').getValue();
              //var grid = this.up('grid'),
-             console.log(refId);
 
             store.getProxy().extraParams = {
                 table_name: 'eqms_document_type_logs',
