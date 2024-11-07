@@ -16,26 +16,26 @@ class IssueTypesSeederTableSeeder extends Seeder
     {
         $seeder=array(
             array(
-                'name'=>'Customer Complaints And Appeals',
+                'title'=>'Customer Complaints And Appeals',
                 'description'=>'Customer Complaints And Appeals'
             ),
             array(
-                'name'=>'Corrective Actions',
+                'title'=>'Corrective Actions',
                 'description'=>'Corrective Actions'
             ),
             array(
-                'name'=>'Change Management',
+                'title'=>'Change Management',
                 'description'=>'Change Management'
             ),
             array(
-                'name'=>'Deviation',
+                'title'=>'Deviation',
                 'description'=>'Deviation'
             )
         );
-        // update or insert depending on the name
+        // update or insert depending on the title
         foreach($seeder as $seed){
             DB::table('par_issue_types')->updateOrInsert(
-                ['name'=>$seed['name']],
+                ['title'=>$seed['title']],
                 $seed
             );
         }

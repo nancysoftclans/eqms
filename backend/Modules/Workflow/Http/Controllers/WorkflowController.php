@@ -176,6 +176,7 @@ class WorkflowController extends Controller
         }
 
         $this->base_url = url('/');
+
     }
 
     public function index()
@@ -1817,6 +1818,7 @@ class WorkflowController extends Controller
                 'results' => $results,
                 'message' => returnMessage($results)
             );
+
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         } catch (\Throwable $throwable) {
@@ -1824,52 +1826,47 @@ class WorkflowController extends Controller
         }
         return \response()->json($res);
     }
-    public function getProcessApplicableChecklistItems(Request $request)
-    {
-        $checklist_type = $request->input('checklist_type');
-        $checklist_category_id = $request->input('checklist_category_id');
-        $application_code = $request->input('application_code');
-        $is_previous = $request->input('is_previous');
-        $process_id = $request->input('process_id');
-        $workflow_stage = $request->input('workflow_stage');
-        $query_id = $request->input('query_id');
-        $pass_status = $request->pass_status;
-        $is_auditor = $request->is_auditor;
-        $is_structured = $request->is_structured;
-        $filter = $request->input('filter');
-        $submission_id = 0;
-        //check for previously added checklist
 
+    public function getProcessApplicableChecklistItems(Request $request){
+    $checklist_type = $request->input('checklist_type');
+    $checklist_category_id = $request->input('checklist_category_id');
+    $application_code = $request->input('application_code');
+    $is_previous = $request->input('is_previous');
+    $process_id = $request->input('process_id');
+    $workflow_stage = $request->input('workflow_stage');
+    $query_id = $request->input('query_id');
+    $pass_status = $request->pass_status;
+    $is_auditor = $request->is_auditor;
+    $is_structured = $request->is_structured;
+    $filter = $request->input('filter');
+    $submission_id = 0;
 
-        if (validateIsNumeric($query_id)) {
-            $query_data = DB::table('tra_application_query_reftracker')->where('id', $query_id)->first();
-            $checklist_category_id = $query_data->checklist_category_id;
-            $application_code = $query_data->application_code;
-            $workflow_stage = $query_data->workflow_stage_id;
-            $process_id = $query_data->process_id;
-        }
+        // Check for previously added checklist
+
         $submission_details = getLastApplicationSubmissionDetails($application_code);
         if ($submission_details['success']) {
             $submission_details = $submission_details['results'];
             $submission_id = $submission_details->id;
         }
-        $where = array(
+
+        $where = [
             'process_id' => $process_id
-            //'stage_id' => $workflow_stage
-        );
+        ];
+
         if (validateIsNumeric($workflow_stage)) {
             $where['stage_id'] = $workflow_stage;
         }
 
-        $whereClauses = array();
+        $whereClauses = [];
         $filter_string = '';
+
         if (isset($filter)) {
             $filters = json_decode($filter);
             if ($filters != NULL) {
                 foreach ($filters as $filter) {
                     switch ($filter->property) {
                         case 'name':
-                            $whereClauses[] = "t1.name ilike '%" . ($filter->value) . "%'";
+                            $whereClauses[] = "t1.name ILIKE '%" . ($filter->value) . "%'";
                             break;
                         case 'pass_status':
                             $whereClauses[] = "t2.pass_status = '" . ($filter->value) . "'";
@@ -1885,153 +1882,34 @@ class WorkflowController extends Controller
                 $filter_string = implode(' AND ', $whereClauses);
             }
         }
+
         if (validateIsNumeric($pass_status)) {
             $whereClauses[] = "t2.pass_status = '" . ($pass_status) . "'";
         }
+
         try {
-            //module_id, sub_module_id and section_id
+            // Retrieve module and section IDs
             $where2 = DB::table('wf_processes')
                 ->select('module_id', 'sub_module_id', 'section_id')
                 ->where('id', $process_id)
                 ->first();
 
-
             $where2 = convertStdClassObjToArray($where2);
 
             $module_id = $where2['module_id'];
+            $sub_module_id = $where2['sub_module_id'];
             $section_id = $where2['section_id'];
-            // if($module_id == 4){
-            //     $module_id = $where2['module_id'];
-            //     $sub_module_id = $where2['sub_module_id'];
-            //     $section_id = $where2['section_id'];
-            //     $where2 = array('module_id'=>$module_id);
-            // }
-            if ($module_id == 2) {
-                if ($section_id == 2) {
-                    $module_id = $where2['module_id'];
-                    $sub_module_id = $where2['sub_module_id'];
-                    $section_id = $where2['section_id'];
-                    $premise_type_id = $where2['premise_type_id'];
-                } else {
-                    $module_id = $where2['module_id'];
-                    $sub_module_id = $where2['sub_module_id'];
-                    $section_id = $where2['section_id'];
-                    unset($where2['premise_type_id']);
-                }
-            }
-            if ($module_id == 1) {
-                if ($section_id == 3) {
-                    $module_id = $where2['module_id'];
-                    $sub_module_id = $where2['sub_module_id'];
-                    $section_id = $where2['section_id'];
-                    $product_type_id = $where2['product_type_id'];
-                }
-                // else if($section_id == 2){
-                //  $whereProductType = DB::table('tra_product_information as t1')
-                //     ->join('tra_product_applications as t2', 't1.id', 't2.product_id')
-                //      ->select('t1.product_type_id','t1.is_b_listed')
-                //      ->where('t2.application_code', $application_code)
-                //      ->first();
-                //  $whereProductType = convertStdClassObjToArray($whereProductType);
-                //  $module_id = $where2['module_id'];
-                //  $sub_module_id = $where2['sub_module_id'];
-                //  $section_id = $where2['section_id'];
-                //  $product_type_id = $whereProductType['product_type_id'];
-                //  $where2['product_type_id'] = $product_type_id;
-                // } 
-                else {
-                    $module_id = $where2['module_id'];
-                    $sub_module_id = $where2['sub_module_id'];
-                    $section_id = $where2['section_id'];
-                    unset($where2['product_type_id']);
-                }
-            } else {
-                $module_id = $where2['module_id'];
-                $sub_module_id = $where2['sub_module_id'];
-                $section_id = $where2['section_id'];
-            }
-            //get applicable checklist categories
 
-            if ($sub_module_id == 7) {
-                $product_id = getSingleRecordColValue('tra_product_applications', ['application_code' => $application_code], 'product_id');
-                $product_type = getSingleRecordColValue('tra_product_information', ['id' => $product_id], 'product_type_id');
-                $is_b_listed = getSingleRecordColValue('tra_product_information', ['id' => $product_id], 'is_b_listed');
-                //b listed condition
-                if (validateIsNumeric($is_b_listed)) {
-                    $checklist_categories = [19];
-                } else {
-                    switch ($product_type) {
-                        case 7: //small molecules
-                            // code...
-                            $checklist_categories = [20];
-                            break;
-                        case 8: //Biologicals
-                            // code...
-                            $checklist_categories = [18];
-                            break;
-                        case 8999999999: //B lIsted
-                            // code...
-                            $checklist_categories = [19];
-                            break;
-                        //vet
-                        case 10: //pharm / small mole
-                            // code...
-                            $checklist_categories = [21];
-                            break;
-                        case 11: //Biological
-                            // code...
-                            $checklist_categories = [23];
-                            break;
-                        case 12: //comps
-                            // code...
-                            $checklist_categories = [22];
-                            break;
-                        default:
-                            $qry1 = DB::table('tra_proc_applicable_checklists')
-                                ->select('checklist_category_id')
-                                ->where($where);
+            // Get applicable checklist categories
+            $qry1 = DB::table('tra_proc_applicable_checklists')
+                ->select('checklist_category_id')
+                ->where($where);
 
-                            $checklist_categories = $qry1->get();
-                            $checklist_categories = convertStdClassObjToArray($checklist_categories);
-                            $checklist_categories = convertAssArrayToSimpleArray($checklist_categories, 'checklist_category_id');
-                    }
-                }
-            } else {
-                $qry1 = DB::table('tra_proc_applicable_checklists')
-                    ->select('checklist_category_id')
-                    ->where($where);
+            $checklist_categories = $qry1->get();
+            $checklist_categories = convertStdClassObjToArray($checklist_categories);
+            $checklist_categories = convertAssArrayToSimpleArray($checklist_categories, 'checklist_category_id');
 
-                $checklist_categories = $qry1->get();
-                $checklist_categories = convertStdClassObjToArray($checklist_categories);
-                $checklist_categories = convertAssArrayToSimpleArray($checklist_categories, 'checklist_category_id');
-            }
-
-            //get applicable checklist types
-            //check if already done
-            $added_categories = DB::table('par_checklist_items as t1')
-                ->join('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
-
-                    if (isset($query_id) && $query_id != '') {
-                        $join->on('t2.checklist_item_id', '=', 't1.id')
-                            ->where('t2.application_code', $application_code);
-                    } else if (validateIsNumeric($is_auditor)) {
-                        $join->on('t2.checklist_item_id', '=', 't1.id')
-                            ->where('t2.application_code', $application_code);
-                    } else {
-                        $join->on('t2.checklist_item_id', '=', 't1.id')
-                            // ->where('t2.submission_id', $submission_id)
-                            ->where('t2.application_code', $application_code);
-                    }
-                })
-                ->join('par_checklist_types as t3', 't1.checklist_type_id', 't3.id')
-                ->select('t3.checklist_category_id')
-                ->groupBy('t3.checklist_category_id')
-                ->get();
-            foreach ($added_categories as $category) {
-                //    $checklist_categories[] = $category->checklist_category_id;
-
-            }
-
+            // Get applicable checklist types
             $qry2 = DB::table('par_checklist_types as t1')
                 ->select('t1.id')
                 ->where($where2)
@@ -2040,11 +1918,9 @@ class WorkflowController extends Controller
             $checklist_types = convertStdClassObjToArray($checklist_types);
             $checklist_types = convertAssArrayToSimpleArray($checklist_types, 'id');
 
-            // dd($checklist_types);
-
+            // Main query
             $qry = DB::table('par_checklist_items as t1')
                 ->leftJoin('tra_checklistitems_responses as t2', function ($join) use ($application_code, $query_id, $submission_id, $is_auditor) {
-
                     if (isset($query_id) && $query_id != '') {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
                             ->where('t2.application_code', $application_code);
@@ -2053,24 +1929,37 @@ class WorkflowController extends Controller
                             ->where('t2.application_code', $application_code);
                     } else {
                         $join->on('t2.checklist_item_id', '=', 't1.id')
-                            // ->where('t2.submission_id', $submission_id)
                             ->where('t2.application_code', $application_code);
                     }
                 })
                 ->leftJoin('tra_checklistitems_queries as t4', function ($join) use ($query_id) {
                     $join->on('t4.checklist_item_id', '=', 't1.id')
                         ->where('t4.query_id', $query_id);
-                })
+                }) 
                 ->join('par_checklist_types as t3', 't1.checklist_type_id', '=', 't3.id')
                 ->join('par_checklist_categories as t5', 't3.checklist_category_id', '=', 't5.id')
-                ->select(DB::raw("t1.*,t1.id as checklist_item_id,t1.serial_no as order_no, t2.id as item_resp_id,t2.pass_status, t2.comment,t2.observation, t2.auditor_comment, t3.name as checklist_type, t2.auditorpass_status, t2.risk_type_remarks, $module_id as module_id, $sub_module_id as sub_module_id,  t4.query, t4.query_response, CASE WHEN t2.risk_type is Null THEN t1.risk_type ELSE t2.risk_type end risk_type"))
+
+                ->leftJoin('par_audit_findings as t6', function ($join) use ($application_code) {
+                    $join->on('t1.id', '=', 't6.checklist_item_id')
+                        ->where('t6.application_code', '=', $application_code);
+                })
+                ->leftJoin('tra_application_documents as t7', 't1.id', '=', 't7.checklist_item_id')
+                ->leftJoin('tra_application_uploadeddocuments as t8', function ($join) use ($application_code) {
+                    $join->on('t7.id', '=', 't8.application_document_id')
+                        ->where('t7.application_code', '=', $application_code);
+                })
+                ->select(DB::raw("t1.*, t1.id as checklist_item_id, t1.serial_no as order_no, 
+                              t2.id as item_resp_id, t2.pass_status, t2.comment, t2.observation, 
+                              t2.auditor_comment, t3.name as checklist_type, 
+                              t2.auditorpass_status, t2.risk_type_remarks, 
+                              $module_id as module_id, $sub_module_id as sub_module_id,  
+                              t4.query, t4.query_response, 
+                              CASE WHEN t2.risk_type IS NULL THEN t1.risk_type ELSE t2.risk_type END as risk_type,
+                              COUNT(t6.checklist_item_id) as findings, t8.initial_file_name as evidence, t8.node_ref"))
                 ->where('t1.is_enabled', 1)
+                ->groupBy('t1.id', 't1.serial_no', 't2.id', 't3.name', 't4.query', 't4.query_response', 't5.id')
                 ->orderBy('t1.serial_no', 'ASC');
 
-            /*----------------------------------------------------
-                 For unstructured queries they adopt
-                 1. checklist type 102
-            ------------------------------------------------------*/
             if (validateIsNumeric($query_id)) {
                 $qry->where('t4.query_id', $query_id);
             }
@@ -2087,31 +1976,34 @@ class WorkflowController extends Controller
                     $qry->where('t2.pass_status', $pass_status);
                 }
             }
+
             if ($filter_string != '') {
                 $qry->whereRaw($filter_string);
             }
 
-            //is_structured
             $qry->orderBy('t1.order_no', 'ASC');
             $results = $qry->get();
-            $res = array(
+
+            $res = [
                 'success' => true,
                 'results' => $results,
                 'message' => returnMessage($results)
-            );
+            ];
         } catch (\Exception $exception) {
-            $res = array(
+            $res = [
                 'success' => true,
                 'message' => $exception->getMessage()
-            );
+            ];
         } catch (\Throwable $throwable) {
-            $res = array(
+            $res = [
                 'success' => true,
                 'message' => $throwable->getMessage()
-            );
+            ];
         }
+
         return \response()->json($res);
     }
+
 
     public function getApplicableChecklistItemsHistory(Request $request)
     {
@@ -2900,20 +2792,20 @@ class WorkflowController extends Controller
             $this->processNormalApplicationSubmission($request);
         } else if ($module_id == 28) { //Issue Management Applications
             $data = $this->processNormalApplicationSubmission($request);
-            
+
             $submission_data = $data['results'];
             $application_code = $submission_data['application_code'];
-            $current_stage =$submission_data['current_stage'];
+            $current_stage = $submission_data['current_stage'];
             $issue_status = IssueStatus::from('par_issue_statuses as is')->join('wf_workflow_stages as ws', 'is.id', 'ws.issue_status_id')
-            ->where('ws.id', $current_stage)->first();
+                ->where('ws.id', $current_stage)->first();
             $date_closed = null;
             if ($issue_status->title == 'Closed') {
                 $date_closed = Carbon::now();
-            }else{
+            } else {
                 $date_closed = null;
             }
             $IssueManagement = IssueManagement::where('application_code', $application_code)->first();
-            
+
             if ($IssueManagement) {
                 $IssueManagement->fill([
                     'issue_status_id' => $issue_status->issue_status_id,
@@ -3192,7 +3084,7 @@ class WorkflowController extends Controller
             }
 
             $res = $this->updateApplicationSubmission($request, $application_details, $application_status_id);
-            
+
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
             echo json_encode($res);

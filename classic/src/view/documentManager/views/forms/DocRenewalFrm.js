@@ -75,7 +75,7 @@
                     pageSize: 10000,
                     proxy: {
                         extraParams: {
-                            table_name: 'par_document_types'
+                            table_name: 'par_qms_documents_types'
                         }
                     }
                 },

@@ -24,9 +24,23 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueQualityReviewPnl", {
       },
     },
     {
+      xtype: "issueactionplangrid",
+      autoScroll: true,
+      title: "Action Plan",
+    },
+    {
+      xtype: "issuechecklistgrid",
+      autoScroll: true,
+      title: "Checklist",
+    },
+    {
       title: "Associated Items",
       xtype: 'tabpanel',
       items: [
+        {
+          xtype: "issuemanagementorgareasgrid",
+          title: "Organisational Areas",
+        },
         {
           xtype: "issuemanagementdocgrid",
           title: "Associated Documents",
@@ -40,6 +54,11 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueQualityReviewPnl", {
           title: " Associated Audits",
         }
       ],
+    },
+    {
+      xtype: "issueactivitygrid",
+      autoScroll: true,
+      title: "Activity",
     },
     {
       xtype: "hiddenfield",

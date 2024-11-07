@@ -11,7 +11,7 @@ Ext.define('Admin.view.auditManagement.views.panels.CalenderPnl', {
 
     layout: 'fit',
     items: [{
-        xtype: 'calendar',
+        //xtype: 'calendar',
         views: {
             day: {
                 startTime: 6,

@@ -21,6 +21,7 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::get('getIssueProcessDetails', [IssueManagementController::class, 'getIssueProcessDetails']);
     Route::resource('issue_status_groups', 'IssueStatusGroupsController');
     Route::resource('issue_types', 'IssueTypeController');
+    Route::resource('issue_action_plans', 'IssueManagementActionPlanController');
     Route::get('getIssueManagementDocuments', [IssueManagementController::class, 'getIssueManagementDocuments']);
     Route::post('saveIssueManagementDocuments', [IssueManagementController::class, 'saveIssueManagementDocuments']);
     Route::get('getIssueManagementRelatedIssues', [IssueManagementController::class, 'getIssueManagementRelatedIssues']);
@@ -35,4 +36,8 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::get('getIssueStatusGroupsLogs', [IssueManagementController::class,'getIssueStatusGroupsLogs']);
     Route::get('getIssueTypeCategoriesLogs', [IssueManagementController::class,'getIssueTypeCategoriesLogs']);
     Route::get('getIssueStatusesLogs', [IssueManagementController::class,'getIssueStatusesLogs']);
+    Route::get('getIssueManagementOrganisationalAreas', [IssueManagementController::class, 'getIssueManagementOrganisationalAreas']);
+    Route::post('saveIssueManagementOrganisationalAreas', [IssueManagementController::class, 'saveIssueManagementOrganisationalAreas']);
+    Route::get('getActivity', [IssueManagementController::class, 'getActivity']);
+    Route::get('generateIssueReport', [IssueManagementController::class, 'generateIssueReport']);
 });

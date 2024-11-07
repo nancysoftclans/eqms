@@ -334,6 +334,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             form = Ext.widget(childXtype),
             storeArray = eval(item.stores),
             arrayLength = storeArray.length;
+            
         if (arrayLength > 0) {
             me.fireEvent('refreshStores', storeArray);
         }
@@ -416,11 +417,11 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
 
     },
 
-    onSelectAssociatedIssueApplication: function (grid, record) {
+    // onSelectAssociatedIssueApplication: function (grid, record) {
 
-        this.fireEvent('onAssociatedIssueGridClick', record, grid);
+    //     this.fireEvent('onAssociatedIssueGridClick', record, grid);
 
-    },
+    // },
     setCompStore: function (obj, options) {
         this.fireEvent('setCompStore', obj, options);
     },
@@ -433,10 +434,12 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             win = form.up('window'),
             storeID = btn.storeID,
             store = Ext.getStore(storeID),
-            frm = form.getForm(), 
+            frm = form.getForm(),
+            checklist_store = Ext.getStore('applicationpaymentsstr'), 
             activePanel = Ext.ComponentQuery.query("#wizardpnl")[0];
             applicationCode= activePanel.down('hiddenfield[name=active_application_code]').getValue();
-            //console.log(applicationCode);
+
+        
         if (frm.isValid()) {
             frm.submit({
                 url: url,
@@ -454,6 +457,10 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                         store.removeAll();
                         store.load();
                         win.close();
+
+                        if(checklist_store){
+                            checklist_store.load();
+                        }
                     } else {
                         toastr.error(message, 'Failure Response');
                     }
@@ -472,5 +479,117 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
 
         this.fireEvent('showRAuditApplicationSubmissionWin', btn);
     },
+
+    showAddChecklistItemConfigParamWinFrm: function (btn) {
+        //if (this.fireEvent('checkFullAccess') || this.fireEvent('checkWriteUpdate')) {
+        var me = this,
+            childXtype = btn.childXtype,
+            winTitle=btn.winTitle,
+            winWidth=btn.winWidth,
+            child = Ext.widget(childXtype),
+            storeArray = eval(btn.stores),
+            grid = btn.up('grid'),
+            checklist_type_id = grid.down('hiddenfield[name=checklist_type_id]').getValue(),
+            checklist_category_id = grid.down('hiddenfield[name=checklist_category_id]').getValue(),
+            arrayLength = storeArray.length;
+        if (arrayLength > 0) {
+            me.fireEvent('refreshStores', storeArray);
+        }
+        child.down('combo[name=checklist_type_id]').setValue(checklist_type_id);
+        child.down('combo[name=checklist_category_id]').setValue(checklist_category_id);
+        funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
+        /* } else {
+             toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
+             return false;
+         }*/
+    },
+
+    previewUploadedDocument: function (item) {
+    var btn = item.up('button'),
+        download = item.download,
+        record = btn.getWidgetRecord(),
+        node_ref = record.get('node_ref'),
+        application_code = record.get('application_code'),
+        uploadeddocuments_id = record.get('uploadeddocuments_id');
+
+        if(item.up('grid')){
+           var grid = item.up('grid');
+        }else{
+           var grid  = Ext.ComponentQuery.query("#applicationdocuploadsgrid")[0]
+        }
+        
+        if(node_ref != ''){
+
+            this.functDownloadAppDocument(node_ref,download,application_code,uploadeddocuments_id, grid);
+        }
+        else{
+            toastr.error('Document Not Uploaded', 'Failure Response');
+        }
+        
+
+},
+
+functDownloadAppDocument:function(node_ref,download,application_code=null,uploadeddocuments_id=null, grid=''){
+        //get the document path 
+        if(grid != ''){
+
+            grid.mask('Document Preview..');
+        }
+      
+        Ext.Ajax.request({
+            url: 'documentmanagement/getApplicationDocumentDownloadurl',
+            method: 'GET',
+            params: {
+                node_ref: node_ref,
+                application_code:application_code,
+                uploadeddocuments_id:uploadeddocuments_id,
+                download:download
+            },
+            headers: {
+                'Authorization': 'Bearer ' + access_token,
+                'X-CSRF-Token': token
+            },
+            success: function (response) {
+                Ext.getBody().unmask();
+                grid.unmask();
+          
+                var resp = Ext.JSON.decode(response.responseText),
+                success = resp.success;
+                document_url = resp.document_url;
+                filename = resp.filename;
+                if (success == true || success === true) {
+                    var a = document.createElement("a");
+                    a.href = document_url; 
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    toastr.error(resp.message, 'Failure Response');
+                }
+                   
+                    
+            },
+            failure: function (response) {
+                var resp = Ext.JSON.decode(response.responseText),
+                    message = resp.message;
+                toastr.error(message, 'Failure Response');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Ext.getBody().unmask();
+                toastr.error('Error downloading data: ' + errorThrown, 'Error Response');
+            }
+        });
+
+
+},
+generateAuditReport: function (item) {
+        var record = item.getWidgetRecord(),
+            application_code = record.get('application_code');
+            module_id = record.get('module_id');
+            sub_module_id = record.get('sub_module_id');
+        this.fireEvent('generateAuditReport', application_code,module_id,sub_module_id);
+    },
+
    
 })

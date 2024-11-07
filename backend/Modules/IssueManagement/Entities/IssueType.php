@@ -19,7 +19,10 @@ class IssueType extends Model
         'issue_type_category_id',
         'is_enabled',
         'created_by',
-        'altered_by'
+        'altered_by',
+        'is_checklist_tied',
+        'checklist_category_id',
+        'has_action_plan'
     ];
 
     public $timestamps = false;

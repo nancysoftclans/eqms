@@ -162,7 +162,20 @@ Ext.define('Admin.view.configurations.views.grids.FormTypeFieldsGrid', {
         dataIndex: 'order_no',
         text: 'Order',
         flex: 1
-    },{
+    },
+    {
+        xtype: 'gridcolumn',
+        dataIndex: 'group',
+        text: 'Group',
+        flex: 1
+    },
+    {
+        xtype: 'gridcolumn',
+        dataIndex: 'group_title',
+        text: 'Group Title',
+        flex: 1
+    },
+    {
         text: 'Options',
         xtype: 'widgetcolumn',
         width: 90,

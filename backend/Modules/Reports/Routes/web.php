@@ -70,5 +70,6 @@ Route::group(['prefix' => 'reports'], function() {
     // Route::get('printRequestForAdditionalInformation', [SummaryReportController::class, 'printRequestForAdditionalInformation']);
     Route::get('printAdministrativeSubmissionResponses', [ReportsController::class, 'printAdministrativeSubmissionResponses']);
     Route::get('generateDocumentPermit', [ReportsController::class, 'generateDocumentPermit']);
+    Route::get('generateAuditReport', [ReportsController::class, 'generateAuditReport']);
     
     });

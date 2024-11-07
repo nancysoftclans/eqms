@@ -12,12 +12,12 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     preserveScrollOnReload: true,
     enableTextSelection: true,
     emptyText: "Nothing to display",
-    // getRowClass: function (record, rowIndex, rowParams, store) {
-    //   var is_enabled = record.get("is_enabled");
-    //   if (is_enabled == 0 || is_enabled === 0) {
-    //     return "invalid-row";
-    //   }
-    // },
+    getRowClass: function (record, rowIndex, rowParams, store) {
+      var is_enabled = record.get("is_enabled");
+      if (is_enabled == 0 || is_enabled === 0) {
+        return "invalid-row";
+      }
+    },
   },
   tbar: [
     {
@@ -26,6 +26,23 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
     },
     {
       xtype: "exportbtn",
+      menu: {
+        defaults: {
+          handler: 'exportTo'
+        },
+        items: [{
+          text: 'Excel',
+          cfg: {
+            type: 'excel07',
+            ext: 'xlsx'
+          }
+        }, {
+          text: 'CSV',
+          cfg: {
+            type: 'csv'
+          }
+        }]
+      }
     },
     {
       xtype: "tbspacer",
@@ -91,6 +108,10 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
         proxy: {
           url: "issuemanagement/getIssueManagementDetails",
         },
+        sorters: [{
+          property: 'raised_date',
+          direction: 'DESC'
+        }]
       },
       isLoad: true,
     },
@@ -209,26 +230,23 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
               storeID: "issuemanagementstr",
               action_url: "configurations/deleteConfigRecord",
               action: "actual_delete",
-              handler: 'doDeleteConfigWidgetParam',
+              handler: 'doDeleteIssueManagement',
               bind: {
                 disabled: '{hideDeleteButton}'
-              }
-              
+              },
+              hidden: true
             },
             {
-              text: 'Logs',
-                iconCls: 'x-fa fa-list',
-                tooltip: 'View Logs',
-                action: 'logs',
-                childXtype: 'issueloggrid',
-                winTitle: 'Logs',
-                winWidth: '100%',
-                handler: 'showLogConfigwin',
-                // bind: {
-                //     disabled: '{isReadOnly}'
-                // },
-                stores: '[]'
-            }
+              text: "Issue Report",
+              iconCls: "x-fa fa-certificate",
+              tooltip: "Issue Report",
+              table_name: "tra_submissions",
+              storeID: "issuemanagementstr",
+              action_url: "issuemanagement/generateIssueReport",
+              action: "issue_report",
+              handler: 'generateIssueReport',
+              hidden: true
+            },
           ],
         },
       },
@@ -237,9 +255,14 @@ Ext.define("Admin.view.issuemanagement.views.grids.IssueManagementGrid", {
         if (issue_status === 1) {
           widget.down('menu menuitem[action=actual_delete]').setHidden(false);
         }
-        else {
+        if (issue_status === 8) {
           widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+          widget.down('menu menuitem[action=issue_report]').setHidden(false);
         }
+        // else {
+        //   widget.down('menu menuitem[action=actual_delete]').setHidden(true);
+        //   widget.down('menu menuitem[action=issue_report]').setHidden(true);
+        // }
       }
     },
   ],

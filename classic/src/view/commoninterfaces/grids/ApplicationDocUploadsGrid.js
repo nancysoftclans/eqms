@@ -24,6 +24,7 @@ Ext.define('Admin.view.commoninterfaces.grids.ApplicationDocUploadsGrid', {
             }
         }
     },
+    itemId: 'applicationdocuploadsgrid',
     tbar: [{
         xtype: 'hiddenfield',
         name: 'process_id'

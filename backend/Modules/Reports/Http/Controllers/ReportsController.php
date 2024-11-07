@@ -12,6 +12,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 use Modules\Reports\Providers\PdfProvider;
 use Modules\Reports\Providers\PdfLettersProvider;
+use Modules\Reports\Providers\AuditReportProvider;
 use Modules\Reports\Traits\ReportsTrait;
 use \Mpdf\Mpdf as mPDF;
 use DateTime;
@@ -9860,4 +9861,334 @@ public function printAdministrativeSubmissionResponses(Request $req)
 
 
 }
+
+	public function generateAuditReport(Request $req)
+{
+    try {
+        // Retrieve the application code from the request
+        $application_code = $req->input('application_code');
+
+        // Query to fetch the records
+        $audit_records = DB::table('tra_auditsmanager_application as t1')
+            ->join('par_qms_audit_types as t7', 't1.audit_type_id', 't7.id')
+            ->join('users as t8', 't1.applicant_id', 't8.id')
+            ->join('par_system_statuses as t9', 't1.application_status_id', 't9.id')
+           // ->join('tra_issue_management_related_issues as t13', 't11.id', 't13.related_id')
+            ->select(
+            	 DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"),
+            		't1.application_code', 't1.tracking_no as audit_id', 't1.audit_reference', 't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't1.audit_summary', 't7.name as audit_type', 't9.name as status')  	
+            ->where('t1.application_code', $application_code)
+            ->get();
+
+        // Convert the result into an array
+         $records = convertStdClassObjToArray($audit_records);
+         $records = decryptArray($records);
+
+
+        $status_records = DB::table('tra_checklistitems_responses as t1')
+            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+            ->join('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')      
+            ->leftJoin('par_checklist_status as t4', function ($join) {
+                    $join->on('t1.pass_status', '=', 't4.id')
+                        ->where('t1.checklist_item_id', '=', 't3.id');
+                }) 
+            ->select(
+            		't1.pass_status')  	
+            ->where('t1.application_code', $application_code)
+            ->get();
+
+            $status_records = convertStdClassObjToArray($status_records);
+         	$status_records = decryptArray($status_records);
+
+     
+        $comment_records = DB::table('tra_checklistitems_responses as t1')
+            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+            ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')   
+            ->select(
+            		't2.application_code', 't2.tracking_no as audit_id', 't2.audit_reference', 't2.audit_title', 't2.audit_start_date', 't2.audit_end_date', 't1.comment')  	
+            ->where('t1.application_code', $application_code)
+            ->groupBy('t1.checklist_item_id')
+            ->get();
+
+            $comment_records = convertStdClassObjToArray($comment_records);
+         	$comment_records = decryptArray($comment_records);
+
+
+        $evidence_records = DB::table('tra_application_documents as t1')
+            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+            ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
+            ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code){
+                    $join->on('t1.id', '=', 't4.application_document_id')
+                        ->where('t4.application_code', '=', $application_code);
+                }) 
+            ->select(
+            		't4.initial_file_name')  	
+            ->where('t1.application_code', $application_code)
+            ->whereNotNull('t1.checklist_item_id')
+            ->groupBy('t1.checklist_item_id')
+            ->get();
+
+            $evidence_records = convertStdClassObjToArray($evidence_records);
+         	$evidence_records = decryptArray($evidence_records);
+
+  		$findings = DB::table('par_audit_findings as t1')
+            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+            ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
+            ->select(
+            		 DB::raw('COUNT(t1.id) as total_findings'))	
+            ->where('t1.application_code', $application_code)
+            ->get();
+
+            $findings = convertStdClassObjToArray($findings);
+         	$findings = decryptArray($findings);
+
+
+        $issue_raised_against_findings_record = DB::table('par_audit_findings as t1')
+            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+            ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
+            ->leftjoin('tra_issue_management_applications as t4', 't1.issue_id', 't4.id') 
+            ->leftjoin('par_finding_types as t5', 't1.finding_type_id', 't5.id')
+            ->leftjoin('par_system_statuses as t6', 't2.application_status_id', 't6.id')
+            ->leftJoin('par_issue_types as t7', 't4.issue_type_id', 't7.id')
+            ->leftjoin('users as t8', 't4.created_by', 't8.id')
+            ->leftJoin('par_issue_statuses as t9', 't4.application_status_id', 't9.id')
+            ->select('t1.id as finding_id', 't1.finding_title', 't2.created_on', 't2.dola as completed_on', 't2.audit_summary as description', 't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
+            	DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"), 't9.title as issue_status')	
+            ->where('t1.application_code', $application_code)
+            ->get();
+
+            $issue_raised_against_findings_record = convertStdClassObjToArray($issue_raised_against_findings_record);
+         	$issue_raised_against_findings_record = decryptArray($issue_raised_against_findings_record);
+        
+        // Check if there are any records returned
+        // if (empty($records)) {
+        //     return response()->json(['success' => false, 'message' => 'No records found for the given application code']);
+        // }
+
+
+			
+
+			// $cleanedComments = array_map(function($comment) {
+			//     // Remove unnecessary spaces and then convert newlines to <br> tags
+			//     return nl2br(trim($comment));
+			// }, array_column($comment_records, 'comment'));
+
+	$cleanedComments = array_map(function($comment, $index) {
+    // Remove unnecessary spaces and convert newlines to <br> tags
+    	return ($index + 1) . '. ' . nl2br(trim($comment));
+	}, array_column($comment_records, 'comment'), array_keys($comment_records));
+
+	$Evidence = array_map(function($comment, $index) {
+    // Remove unnecessary spaces and convert newlines to <br> tags
+    	return ($index + 1) . '. ' . nl2br(trim($comment));
+	}, array_column($evidence_records, 'initial_file_name'), array_keys($evidence_records));
+
+			//$comments = array_column($comment_records, 'comment');
+			$commentsWithBreaks = implode('<br>', $cleanedComments);
+			$EvidenceWithBreaks = implode('<br>', $Evidence);
+
+
+        // Initialize the PDF provider
+        $pdf = new AuditReportProvider();
+        $pdf->AddPage();
+        $pdf->SetFont('Times', '', 12);
+        
+        $pdf->setImportHeader($records[0]['audit_id'],$issue_raised_against_findings_record[0]['issue_id']);
+
+
+	// function checkPageBreak($pdf, $contentHeight) {
+	//     // Use a hardcoded value for top margin if necessary
+	//     $topMargin = 20; // Adjust as needed
+	//     if ($pdf->GetY() + $contentHeight > $pdf->GetPageHeight() - $topMargin) {
+	//         $pdf->AddPage();
+	//     }
+	// }
+		//$rowHeight = 20;
+        // Add an image centered above the header text
+	
+        // $logo = getcwd() . '/resources/images/logo.jpg';
+		// $logo = str_replace('\\', '/', $logo);
+        // $pdf->Image($logo,85,25,43,19); // Adjust position and size as necessary
+        // // Set the position for the header text
+        // $pdf->SetY(42); // Adjust vertical position after image
+
+        // // Define page width for alignment calculations
+        // $pageWidth = $pdf->GetPageWidth();
+
+        // // Left-aligned header text
+        // $pdf->SetX(10);
+        // $pdf->Cell(0, 10, 'BOMRA/'. $records[0]['audit_id'], 0, 0, 'L');
+
+        // // Center-aligned header text
+        // $pdf->SetX(($pageWidth / 2) - (80)); // Adjust X position to center text (50 is approximate width of the text block)
+        // $pdf->Cell(0, 10, 'Botswana Medicines Regulatory Authority', 0, 0, 'C');
+        
+        // // Center-aligned second line of header text
+        // $pdf->SetX(($pageWidth / 2) - (80)); // Adjust X position to center text
+        // $pdf->Cell(0, 20, 'Internal Audit Report', 0, 0, 'C');
+
+        // // Right-aligned header text
+        // $pdf->SetX($pageWidth - 90); // Adjust X position for right-aligned text (90 is approximate width of the text block)
+        // $pdf->Cell(0, 10, 'Issue No. '. $records[0]['issue_no'], 0, 0, 'R');
+
+        // // Add some space before the content starts
+        // $pdf->Ln(30);
+    
+
+         // Start building HTML content
+
+
+    foreach ($records as $record) {  
+             
+        $html = '<h3></h3>';
+		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse; page-break-inside: avoid;">';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit ID</th><td>' . htmlspecialchars($record['audit_id']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Type</th><td>' . htmlspecialchars($record['audit_type']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Reference</th><td>' . htmlspecialchars($record['audit_reference']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td>' . htmlspecialchars($record['audit_title']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Owner</th><td>' . htmlspecialchars($record['first_name']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td>' . htmlspecialchars($record['status']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Start Date</th><td>' . htmlspecialchars($record['audit_start_date']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">End Date</th><td>' . htmlspecialchars($record['audit_end_date']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Summary & Scope</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '</tr>';
+		$html .= '</table>';
+	}
+
+
+
+		$html .= '<h3></h3>';
+		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse; page-break-inside: avoid;">';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Function Audited:</th><td>' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Standard:</th><td>' . htmlspecialchars('') . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Criteria:</th><td>' . htmlspecialchars('') . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Objectives:</th><td>' . htmlspecialchars('') . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Additional Auditor:</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+		$html .= '</tr>';
+		$html .= '</table>';
+		
+
+		$html .= '<br><br>';
+
+		$html .= '<h3 style="margin: 0; padding: 0; border-bottom: 1px solid gray;">Questionnaire</h3>';
+		$html .= '<div style="margin-bottom: 600px;"></div>'; 
+		//$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse; page-break-inside: avoid;">';
+		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+		$html .= '<tr style="background-color: #d3d3d3;">';
+		$html .= '<th>Question</th>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<td>';
+		$html .= 'Fulfilled <input type="checkbox" /> Not Fulfilled <input type="checkbox" /> N/A <input type="checkbox" />';
+		$html .= '</td>';
+		$html .= '</tr>';
+		$html .= '<tr style="background-color: #d3d3d3;">';
+		$html .= '<th>Note</th>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<td style="text-align: justify;"> ' . ($commentsWithBreaks) . ' </td>';
+		$html .= '</tr>';
+		$html .= '<tr style="background-color: #d3d3d3;">';
+		$html .= '<th>Evidence</th>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<td style="border-bottom: 1px solid gray;"> ' . ($EvidenceWithBreaks) . ' </td>'; // Optional: Add a bottom border for the last cell
+		$html .= '</tr>';
+		$html .= '</table>';
+
+
+		$html .= '<br></br>';
+
+		$html .= '<h3 style="margin: 0, padding: 0; border-bottom: 1px solid gray;">Findings</h3>';
+		$html .= '<div style="margin-bottom: 600px;"></div>'; 
+		$html .= '<p style="font-weight:bold;">Total number of findings: <span style="font-weight:normal;">' . htmlspecialchars($findings[0]['total_findings']) . '</span></p>';
+
+		$html .= '<br></br>';
+
+
+
+	foreach($issue_raised_against_findings_record as $finding_record){
+		$html .= '<h3></h3>';
+		$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%">';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Finding ID</th><td>' . htmlspecialchars($finding_record['finding_id']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Type</th><td>' . htmlspecialchars($finding_record['finding_type']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td colspan="3">' . htmlspecialchars($finding_record['finding_title']) . '</td>';  
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Raised Against</th><td colspan="3">' . htmlspecialchars($record['audit_id']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td colspan="3">' . htmlspecialchars($record['status']) . '</td>';
+		$html .= '</tr>';
+
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Created</th><td>' . htmlspecialchars($record['audit_start_date']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Completed</th><td colspan="3">' . htmlspecialchars($record['audit_end_date']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Result</th><td colspan="3">' . htmlspecialchars($record['audit_summary']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold;">Related Issue</th><td colspan="3">' . htmlspecialchars($finding_record['related_issue']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Issue ID</th><td>' . htmlspecialchars($finding_record['issue_id']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Type</th><td colspan="3">' . htmlspecialchars($finding_record['issue_type']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Title</th><td colspan="3">' . htmlspecialchars($finding_record['title']) . '</td>';
+		$html .= '</tr>';
+		$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Owner</th><td>' . htmlspecialchars($finding_record['first_name']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Status</th><td colspan="3">' . htmlspecialchars($finding_record['raised_against_status']) . '</td>';
+		$html .= '</tr>';
+			$html .= '<tr>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Raised</th><td>' . htmlspecialchars($finding_record['issue_raised']) . '</td>';
+		$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Closed</th><td colspan="3">' . htmlspecialchars($finding_record['date_closed']) . '</td>';
+		$html .= '</tr>';
+		$html .= '</table>';
+	
 }
+
+        $pdf->writeHTML($html, true, false, true, false, '');
+
+        // Output the PDF as a downloadable file
+        return response()->stream(
+            function () use ($pdf) {
+                $pdf->Output('Audit_Report.pdf', 'I'); // 'I' for inline display in browser
+            },
+            200,
+            [
+                'Content-Type' => 'application/pdf',
+                'Content-Disposition' => 'inline; filename="Audit_Report.pdf"',
+            ]
+        );
+
+    } catch (\Exception $exception) {
+        $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        return response()->json($res);
+    } catch (\Throwable $throwable) {
+        $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        return response()->json($res);
+    }
+}
+	
+}
+

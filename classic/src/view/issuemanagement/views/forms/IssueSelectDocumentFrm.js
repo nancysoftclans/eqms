@@ -66,7 +66,7 @@ Ext.define("Admin.view.issuemanagement.views.forms.IssueSelectDocumentFrm", {
           growMax: 100,
           queryMode: "local",
           valueField: "id",
-          displayField: "doc_title",
+          displayField: "reference_no",
           columnWidth: 1,
           listeners: {
             beforerender: {

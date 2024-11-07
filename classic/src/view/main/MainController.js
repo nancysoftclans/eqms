@@ -355,6 +355,18 @@ Ext.define("Admin.view.main.MainController", {
       store.load();
     }
   },
+  setGridTreeStore: function (me, options) {
+    var config = options.config,
+      isLoad = options.isLoad,
+      toolbar = me.down("pagingtoolbar"),
+      store = Ext.create("Admin.store.abstract.AbstractTreeStr", config);
+    me.setStore(store);
+    toolbar.setStore(store);
+    if (isLoad === true || isLoad == true) {
+      store.removeAll();
+      store.load();
+    }
+  },
   Logout: function () {
     Ext.Ajax.request({
       url: base_url + "auth/logout",

@@ -2937,12 +2937,12 @@ class ConfigurationsController extends Controller
                     ->select('t22.column_width', 't33.id', 't33.displayfield', 't33.valuefield', 
                     't33.combo_table', 't33.form_field_type_id', 't33.field_name', 
                     't33.def_id', 't33.formfield', 't33.tpl_block', 't22.is_hidden', 
-                    't33.label', 't33.group', 't33.group_title', 't22.is_enabled', 
+                    't33.label', 't22.group', 't22.group_title', 't22.is_enabled', 
                     't22.is_mandatory', 't22.is_readOnly', 't2.has_relation', 
                     't2.bind_column', 't3.field_name as child_combo', 
                     't4.field_name as parent_combo', 't5.name as xtype',
                      't2.id as is_parent', 't6.other_logic', 
-                     't6.has_logic', 't22.default_value', 't22.order_no');
+                     't6.has_logic', 't22.default_value', 't22.order_no', 't33.options');
                 $qry->orderBy('t22.order_no', 'ASC');
                 //$qry->unique('t33.id');
 

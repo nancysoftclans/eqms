@@ -9,6 +9,10 @@ use App\Helpers\ReportsHelper;
 use App\Helpers\EmailHelper;
 use App\Helpers\IntegrationHelper;
 
+
+$con = env('DB_CONNECTION');
+$col = env('DB_CONNECTION');
+
 if (!function_exists('funcEncrypt')) {
     function funcEncrypt($plainText)
     {
@@ -38,7 +42,7 @@ if (!function_exists('getDecryptFunParams')) {
 
 
 if (!function_exists('getParameterItgenems')) {
-    function getParameterItems($table_name, $filter, $con = 'mysql')
+    function getParameterItems($table_name, $filter, $con)
     {
         return DbHelper::getParameterItems($table_name, $filter, $con);
     }
@@ -200,7 +204,7 @@ if (!function_exists('insertRecordNoTransaction')) {
 }
 
 if (!function_exists('insertRecord')) {
-    function insertRecord($table_name, $table_data, $user_id = null, $con = 'mysql')
+    function insertRecord($table_name, $table_data, $user_id = null, $con)
     {
 
         return DbHelper::insertRecord($table_name, $table_data, $user_id, $con);
@@ -219,7 +223,7 @@ if(!function_exists('sendMailFromNotification')){
     }
 }
 if (!function_exists('updateRecord')) {
-    function updateRecord($table_name, $where, $table_data, $user_id=null, $con = 'mysql')
+    function updateRecord($table_name, $where, $table_data, $user_id=null, $con)
     {
         return DbHelper::updateRecord($table_name, $where, $table_data, $user_id, $con);
     }
@@ -233,14 +237,14 @@ if (!function_exists('updateRecordNoTransaction')) {
 }
 
 if (!function_exists('deleteRecord')) {
-    function deleteRecord($table_name, $where_data, $user_id = null, $con = 'mysql')
+    function deleteRecord($table_name, $where_data, $user_id = null, $con)
     {
         return DbHelper::deleteRecord($table_name, $where_data, $user_id, $con);
     }
 }
 
 if (!function_exists('deleteRecordNoTransaction')) {
-    function deleteRecordNoTransaction($table_name, $previous_data, $where_data, $user_id, $con = 'mysql')
+    function deleteRecordNoTransaction($table_name, $previous_data, $where_data, $user_id, $con)
     {
         return DbHelper::deleteRecordNoTransaction($table_name, $previous_data, $where_data, $user_id, $con);
     }
@@ -289,14 +293,14 @@ if (!function_exists('decryptSimpleArray')) {
 }
 
 if (!function_exists('recordExists')) {
-    function recordExists($table_name, $where, $con = 'mysql')
+    function recordExists($table_name, $where, $con)
     {
         return DbHelper::recordExists($table_name, $where, $con);
     }
 }
 
 if (!function_exists('getPreviousRecords')) {
-    function getPreviousRecords($table_name, $where, $con = 'mysql')
+    function getPreviousRecords($table_name, $where, $con)
     {
         return DbHelper::getPreviousRecords($table_name, $where, $con);
     }
@@ -388,14 +392,14 @@ if (!function_exists('converter22')) {
 }
 
 if (!function_exists('getSingleRecord')) {
-    function getSingleRecord($table, $where,$col='mysql')
+    function getSingleRecord($table, $where,$col)
     {
         return DbHelper::getSingleRecord($table, $where,$col);
     }
 }
 
 if (!function_exists('getSingleRecordColValue')) {
-    function getSingleRecordColValue($table, $where, $col, $con = 'mysql')
+    function getSingleRecordColValue($table, $where, $col, $con)
     {
         return DbHelper::getSingleRecordColValue($table, $where, $col, $con);
     }
@@ -530,7 +534,7 @@ if (!function_exists('formatBytes')) {
 }
 
 if (!function_exists('generateApplicationCode')) {
-    function generateApplicationCode($module_id, $table_name, $con='mysql')
+    function generateApplicationCode($module_id, $table_name, $con)
     {
         return UtilityHelper::generateApplicationCode($module_id, $table_name, $con);
     }
@@ -579,7 +583,7 @@ if (!function_exists('getApplicationPaymentsRunningBalance')) {
 }
 
 if (!function_exists('getTableData')) {
-    function getTableData($table_name, $where,$col='mysql')
+    function getTableData($table_name, $where,$col)
     {
         return DbHelper::getTableData($table_name, $where,$col);
     }
@@ -920,6 +924,14 @@ if (!function_exists('downloadDocumentUrl')) {
 
     }
 }
+
+if (!function_exists('downloadDocumentPreviewUrl')) {
+    function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id = null)
+    {
+        return DMSHelper::downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id);
+
+    }
+}
 if (!function_exists('dmsGetNodePreviousVersions')) {
     function dmsGetNodePreviousVersions($node_ref, $version_ref = null)
     {
@@ -928,7 +940,7 @@ if (!function_exists('dmsGetNodePreviousVersions')) {
     }
 }
 if (!function_exists('getApplicationSubModuleNodeDetails')) {
-    function getApplicationSubModuleNodeDetails($section_id, $module_id, $sub_module_id, $user_id, $con = 'mysql')
+    function getApplicationSubModuleNodeDetails($section_id, $module_id, $sub_module_id, $user_id, $con)
     {
         return DMSHelper::getApplicationSubModuleNodeDetails($section_id, $module_id, $sub_module_id, $user_id, $con);
 
@@ -949,7 +961,7 @@ if (!function_exists('getDocumentTypeRootNode')) {
     }
 }
 if (!function_exists('saveApplicationDocumentNodedetails')) {
-    function saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, $tracking_no, $reference_no, $dms_node_id, $user, $con = 'mysql')
+    function saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, $tracking_no, $reference_no, $dms_node_id, $user, $con)
     {
         return DMSHelper::saveApplicationDocumentNodedetails($module_id, $sub_module_id, $application_code, $tracking_no, $reference_no, $dms_node_id, $user, $con);
 
@@ -1110,7 +1122,7 @@ if (!function_exists('getPermitExpiryDate')) {
     }
 }
 if (!function_exists('getParameterItem')) {
-    function getParameterItem($table_name, $record_id, $con = 'mysql')
+    function getParameterItem($table_name, $record_id, $con)
     {
         return DbHelper::getParameterItem($table_name, $record_id, $con);
     }
@@ -1462,7 +1474,7 @@ if (!function_exists('getTraderEmail')) {
 }
 //new
 if (!function_exists('insertMultipleRecords')) {
-    function insertMultipleRecords($table_name, $table_data, $user_id = null, $con = 'mysql')
+    function insertMultipleRecords($table_name, $table_data, $user_id = null, $con)
     {
 
         return DbHelper::insertMultipleRecords($table_name, $table_data, $user_id, $con);
