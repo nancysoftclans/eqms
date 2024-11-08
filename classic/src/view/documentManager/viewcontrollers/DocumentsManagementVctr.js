@@ -500,7 +500,7 @@ showEditConfigParamWinFrm: function (item) {
         if (qmsdoclistfrm.isValid()) {
              // console.log(process_id, moduleId, submodule_id, applicationCode);
             qmsdoclistfrm.submit({
-                url: 'qualitydocumentcontrol/'+action_url,
+                url: 'documentmanagement/'+action_url,
                 waitMsg: 'Please wait...',
                 params: {
                     module_id: moduleId,
@@ -575,7 +575,7 @@ showEditConfigParamWinFrm: function (item) {
   
         if (qmsdoclistfrm.isValid()) {
             qmsdoclistfrm.submit({
-                url: 'qualitydocumentcontrol/'+action_url,
+                url: 'documentmanagement/'+action_url,
                 waitMsg: 'Please wait...',
                 params: {
                     module_id: moduleId,
@@ -651,7 +651,7 @@ showEditConfigParamWinFrm: function (item) {
         if (qmsdoclistfrm.isValid()) {
              // console.log(process_id, moduleId, submodule_id, applicationCode);
             qmsdoclistfrm.submit({
-                url: 'qualitydocumentcontrol/'+action_url,
+                url: 'documentmanagement/'+action_url,
                 waitMsg: 'Please wait...',
                 params: {
                     module_id: moduleId,
@@ -728,7 +728,7 @@ showEditConfigParamWinFrm: function (item) {
         if (qmsdoclistfrm.isValid()) {
              // console.log(process_id, moduleId, submodule_id, applicationCode);
             qmsdoclistfrm.submit({
-                url: 'qualitydocumentcontrol/'+action_url,
+                url: 'documentmanagement/'+action_url,
                 waitMsg: 'Please wait...',
                 params: {
                     module_id: moduleId,
@@ -805,7 +805,7 @@ showEditConfigParamWinFrm: function (item) {
         if (qmsdoclistfrm.isValid()) {
              // console.log(process_id, moduleId, submodule_id, applicationCode);
             qmsdoclistfrm.submit({
-                url: 'qualitydocumentcontrol/'+action_url,
+                url: 'documentmanagement/'+action_url,
                 waitMsg: 'Please wait...',
                 params: {
                     module_id: moduleId,

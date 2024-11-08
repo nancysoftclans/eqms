@@ -68,7 +68,7 @@ Ext.define('Admin.view.documentManager.views.grids.LiveDocumentsGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-                        read: 'qualitydocumentcontrol/getlivedocumentDetails'
+                        read: 'documentmanagement/getlivedocumentDetails'
                     },
                 },
             },

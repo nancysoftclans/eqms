@@ -66,7 +66,7 @@ Ext.define('Admin.view.documentManager.views.grids.ApplicationDocPreviewNavigato
                 storeId: 'applicationDocumentsUploadsStr',
                 proxy: {
                     api: {
-                         read: 'qualitydocumentcontrol/onLoadApplicationDocumentsUploads'
+                         read: 'documentmanagement/onLoadApplicationDocumentsUploads'
                     },
                 }
             },

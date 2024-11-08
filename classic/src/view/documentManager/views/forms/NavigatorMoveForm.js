@@ -78,7 +78,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorMoveForm',{
                 config: {
                     pageSize: 10000,
                     proxy: {
-                        url: 'qualitydocumentcontrol/navigatorMoveFolder',
+                        url: 'documentmanagement/navigatorMoveFolder',
                         extraParams: {
                           //  table_name: 'par_qms_documents_types'
                         }

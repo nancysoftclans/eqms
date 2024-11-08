@@ -179,7 +179,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-                        read: 'qualitydocumentcontrol/getNavigatorDetails'
+                        read: 'documentmanagement/getNavigatorDetails'
                     },
                 },
             },

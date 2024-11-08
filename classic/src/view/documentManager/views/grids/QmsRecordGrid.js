@@ -67,7 +67,7 @@ Ext.define('Admin.view.documentManager.views.grids.QmsRecordGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-                        read: 'qualitydocumentcontrol/getqmsrequirementDetails'
+                        read: 'documentmanagement/getqmsrequirementDetails'
                     },
                 },
             },
