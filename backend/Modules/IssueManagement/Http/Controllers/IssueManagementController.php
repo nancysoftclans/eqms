@@ -82,13 +82,13 @@ class IssueManagementController extends Controller
                     ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
                     ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
                 if ($IssueManagement) {
+                    $ref_number = $IssueManagement->reference_no;
+                    initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                     $res = array(
                         "success" => true,
                         "message" => 'Data Updated Successfully!!',
                         "results" => $IssueManagement
                     );
-                    $ref_number = $IssueManagement->reference_no;
-                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                 }
             } else {
                 $applications_table = 'tra_issue_management_applications';
@@ -158,12 +158,13 @@ class IssueManagementController extends Controller
                         ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
                         ->where('t1.submission_id', $res['record_id'])->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
 
+                    initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+
                     $res = array(
                         "success" => true,
                         "message" => 'Data Saved Successfully!!',
                         "results" => $IssueManagement
                     );
-                    // initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                 }
             }
         } catch (\Exception $exception) {
@@ -203,7 +204,8 @@ class IssueManagementController extends Controller
                     't1.id as active_application_id',
                     't1.workflow_stage_id',
                     't1.id as issue_id',
-                    DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
+                    't6.first_name',
+                    't6.last_name'
                 );
             if (validateIsNumeric($issue_type_id)) {
                 $qry->where('t1.issue_type_id', $issue_type_id);
@@ -251,7 +253,8 @@ class IssueManagementController extends Controller
                     't5.title as issue_status',
                     't1.id as active_application_id',
                     't2.current_stage as workflow_stage_id',
-                    DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
+                    't6.first_name',
+                    't6.last_name'
                 )
                 ->where('t1.id', $active_application_id)
                 ->first();
@@ -442,7 +445,8 @@ class IssueManagementController extends Controller
                     't2.creation_date as raised_date',
                     't3.title as issue_status',
                     't4.title as issue_type',
-                    DB::raw("decrypt(t5.first_name) as first_name,decrypt(t5.last_name) as last_name")
+                    't5.first_name',
+                    't5.last_name'
                 )
                 ->get();
             $results = convertStdClassObjToArray($qry);
@@ -699,7 +703,8 @@ class IssueManagementController extends Controller
                     't5.title as issue_status',
                     't1.id as active_application_id',
                     't2.current_stage as workflow_stage_id',
-                    DB::raw("decrypt(t6.first_name) as first_name,decrypt(t6.last_name) as last_name")
+                    't6.first_name',
+                    't6.last_name'
                 )
                 ->where('t1.application_code', $application_code)
                 ->get();

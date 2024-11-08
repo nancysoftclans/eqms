@@ -100,7 +100,7 @@ return [
             'sslmode' => 'prefer',
         ],
         'audit_db' => [
-            'driver' => 'mysql',
+            'driver' => env('AUDIT_CONNECTION', 'mysql'),
             'host' =>  env('AUDIT_HOST', ''),
             'port' =>  env('AUDIT_PORT', ''),
             'database' =>  env('AUDIT_DATABASE', 'bomra_audit'),
