@@ -48,6 +48,6 @@ class CreateParDocumentTypesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('par_document_types');
+        Schema::dropIfExists('par_qms_documents_types');
     }
 }

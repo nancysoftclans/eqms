@@ -176,7 +176,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorSelectFolderGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-                        read: 'documentmanagement/getNavigatorDetails'
+                        read: 'qualitydocumentcontrol/getNavigatorDetails'
                     },
                 },
             },

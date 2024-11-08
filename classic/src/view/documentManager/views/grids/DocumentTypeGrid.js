@@ -182,7 +182,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-                        read: 'documentmanagement/getdoctypesDetails'
+                        read: 'qualitydocumentcontrol/getdoctypesDetails'
                     },
                 },
             },

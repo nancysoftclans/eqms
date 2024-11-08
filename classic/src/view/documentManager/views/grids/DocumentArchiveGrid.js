@@ -68,7 +68,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentArchiveGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-                        read: 'documentmanagement/getArchivedDocdDetails'
+                        read: 'qualitydocumentcontrol/getArchivedDocdDetails'
                     },
                 },
             },

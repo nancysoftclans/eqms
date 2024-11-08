@@ -1,6 +1,6 @@
-Ext.define('Admin.view.documentManager.viewcontrollers.DocumentsManagementVctr', {
+Ext.define('Admin.view.qualityDocumentManager.viewcontrollers.QualityDocumentsManagementVctr', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.documentsManagementvctr',
+    alias: 'controller.qualityDocumentsManagementvctr',
 
     ///the export option
     requires: [
