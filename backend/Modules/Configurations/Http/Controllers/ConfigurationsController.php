@@ -50,6 +50,8 @@ class ConfigurationsController extends Controller
                 $disposition_instructions = $request->input('disposition_instructions');
                 $owner_user_id = $request->input('owner_user_id');
                 $owner_group_id = $request->input('owner_group_id');
+                // $has_parent_level = $request->input('has_parent_level');
+                // $has_restiction_id = $request->input('has_restriction_id');
 
 
                 $action = '';
@@ -140,6 +142,20 @@ class ConfigurationsController extends Controller
                                 'created_on' => Carbon::now(),
                             );
                             break;
+                            // case 'par_navigator_folders':
+                            //     $table_name = 'eqms_navigator_folder_logs';
+                            //     $table_data = array(
+                            //         'name' => $name,
+                            //         'ref_id' => $id,
+                            //         'has_parent_level' => $has_parent_level,
+                            //         'has_retriction_id' => $has_restiction_id,
+                            //         'user_id' => $this->user_id,
+                            //         'is_enabled' => $is_enabled,
+                            //         'submitted_by' => $this->user_id,
+                            //         'action' => $action,
+                            //         'created_on' => Carbon::now(),
+                            //     );
+                            //     break;
                     default:
                         break;
                 }

@@ -352,7 +352,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 //     iconCls: 'x-fa fa-list',
                 //     tooltip: 'View Logs',
                 //     action: 'logs',
-                //     childXtype: 'documentLoggrid',
+                //     childXtype: 'navLoggrid',
                 //     winTitle: 'Logs',
                 //     winWidth: '100%',
                 //     handler: 'showLogConfigwin',
