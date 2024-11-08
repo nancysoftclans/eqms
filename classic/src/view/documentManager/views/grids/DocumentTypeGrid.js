@@ -402,7 +402,21 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentTypeGrid', {
             disabled: '{isReadOnly}'
         },
                     handler: 'doDeleteConfigWidgetParam'
-                }
+                },
+                {
+                    text: 'Logs',
+                    iconCls: 'x-fa fa-list',
+                    tooltip: 'View Logs',
+                    action: 'logs',
+                    childXtype: 'documenttypeloggrid',
+                    winTitle: 'Logs',
+                    winWidth: '100%',
+                    handler: 'showLogConfigwinWidget',
+                    // bind: {
+                    //     disabled: '{isReadOnly}'
+                    // },
+                    stores: '[]'
+                },
                 ]
             }
         }, onWidgetAttach: function (col, widget, rec) {

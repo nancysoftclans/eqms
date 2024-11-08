@@ -168,6 +168,20 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentSubmissionPnl', {
                 margin: 5
             },
             items: [
+                {
+                    text: 'Logs',
+                    iconCls: 'x-fa fa-list',
+                    tooltip: 'View Logs',
+                    action: 'logs',
+                    childXtype: 'documentLoggrid',
+                    winTitle: 'Logs',
+                    winWidth: '100%',
+                    handler: 'showLogConfigwin',
+                    // bind: {
+                    //     disabled: '{isReadOnly}'
+                    // },
+                    stores: '[]'
+                },
                 '->', 
                 // {
                 //     text: 'Preview & documents Permit Details',

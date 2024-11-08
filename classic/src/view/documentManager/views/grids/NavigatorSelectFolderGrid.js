@@ -323,7 +323,21 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorSelectFolderGrid', {
             disabled: '{isReadOnly}'
         },
                     handler: 'doDeleteConfigWidgetParam'
-                }
+                },
+                // {
+                //     text: 'Logs',
+                //     iconCls: 'x-fa fa-list',
+                //     tooltip: 'View Logs',
+                //     action: 'logs',
+                //     childXtype: 'navLoggrid',
+                //     winTitle: 'Logs',
+                //     winWidth: '100%',
+                //     handler: 'showLogConfigwin',
+                //     // bind: {
+                //     //     disabled: '{isReadOnly}'
+                //     // },
+                //     stores: '[]'
+                // },
                 ]
             }
         }, onWidgetAttach: function (col, widget, rec) {

@@ -96,6 +96,8 @@ Route::post('saveDocumentRepositoryStructure', [DmsConfigurationsController::cla
     Route::post('dmsUpdateAccountPassword', [DmsConfigurationsController::class, 'dmsUpdateAccountPassword']);
     Route::get('getArchivedDocdDetails', [DmsConfigurationsController::class, 'getArchivedDocdDetails']);
     Route::get('getqmsrequirementDetails', [DmsConfigurationsController::class, 'getqmsrequirementDetails']);
+    Route::get('getDocumentLogs', [DocumentManagementController::class, 'getDocumentLogs']);
+    Route::get('getDocumentTypeLogs', [DocumentManagementController::class, 'getDocumentTypeLogs']);
    
 
     });

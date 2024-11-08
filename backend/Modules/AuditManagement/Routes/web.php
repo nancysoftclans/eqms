@@ -26,6 +26,12 @@ Route::group(['prefix' => 'auditManagement', 'middleware' => ['auth:api', 'web']
     Route::get('getAuditManagementDetails',[AuditManagementController::class,'getAuditManagementDetails']);
     Route::get('getAuditFindings', [AuditManagementController::class, 'getAuditFindings']);
     Route::get('prepapreAuditApplicationReceiving', [AuditManagementController::class, 'prepapreAuditApplicationReceiving']);
+
+    
+    Route::get('getAuditLogs', [AuditManagementController::class,'getAuditLogs']);
+    //Route::post('getAuditLogs', [AuditManagementController::class,'getAuditlogs']);
+    Route::get('getAuditTypeLogs', [AuditManagementController::class, 'getAuditTypeLogs']);
+    Route::get('getFindingTypeLogs', [AuditManagementController::class,'getFindingTypeLogs']);
     
     // Route::get('/getAuditTypeMetaData',[AuditManagementController::class, 'getAuditTypeMetaData'])
 

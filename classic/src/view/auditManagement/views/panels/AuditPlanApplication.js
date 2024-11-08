@@ -22,5 +22,6 @@ Ext.define('Admin.view.documentManager.views.panels.AuditPlanApplication', {
             xtype: 'auditManagementDashTb',
             region: 'south'
         }
+        
     ]
 });

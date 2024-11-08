@@ -13,6 +13,8 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
     //     'Ext.grid.*',
     //     'Ext.tree.*'
     // ],
+
+    
     plugins: [{
         ptype: 'cellediting',
         clicksToEdit: 1
@@ -56,7 +58,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
                 proxy: {
                     api: {
                         read: 'auditManagement/getAuditTypes'
-                    },
+                    }
                 },
             },
             isLoad: true
@@ -94,7 +96,8 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
             iconCls: 'x-fa fa-save',
             handler: 'updateSystemNavigationAccessRoles'
         }],
-    columns: [{
+    columns: [
+        {
         xtype: 'gridcolumn',
         dataIndex: 'code',
         text: 'Code',
@@ -143,7 +146,8 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
             disabled: '{isReadOnly}'
         },
                     stores: '[]'
-                }, {
+                },
+                 {
                     text: 'Disable',
                     iconCls: 'x-fa fa-repeat',
                     table_name: 'par_qms_audit_types',
@@ -181,6 +185,20 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
             disabled: '{isReadOnly}'
         },
                     handler: 'doDeleteConfigWidgetParam'
+                },
+                {
+                    text: 'Logs',
+                    iconCls: 'x-fa fa-list',
+                    tooltip: 'View Logs',
+                    action: 'logs',
+                    childXtype: 'audittypeloggrid',
+                    winTitle: 'Logs',
+                    winWidth: '100%',
+                    handler: 'showLogConfigwin',
+                    // bind: {
+                    //     disabled: '{isReadOnly}'
+                    // },
+                    stores: '[]'
                 }
                 ]
             }
@@ -194,6 +212,6 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypesGrid', {
                 widget.down('menu menuitem[action=soft_delete]').setDisabled(false);
             }
         }
-    
-    }]
+    }
+]
 })

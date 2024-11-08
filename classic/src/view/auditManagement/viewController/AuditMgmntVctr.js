@@ -76,6 +76,13 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
         // console.log(btn);
     },
 
+    //*remove after correct implement 
+    // getAuditLogsClick:function(){
+    //     var logWindow = Ext.create('Admin.view.auditManagement.views.panels.panel');
+    //     logWindow.show();
+        
+    // },
+
     saveNewAuditPlanDetails:function(btn){
        var wizard = btn.wizardpnl,
              wizardPnl = btn.up(wizard),
@@ -224,6 +231,54 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
         funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
        
     },
+
+    //show log window
+    showLogGridwin: function(btn){
+        var me = this,
+            childXtype = btn.childXtype,
+            winTitle = btn.winTitle,
+            winWidth= btn.winWidth,
+            child = Ext.widget(childXtype);
+        if (btn.has_params){
+            var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
+            child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
+        }
+        //child.setHeight('600');
+
+
+
+        funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
+    },
+
+    showLogConfigwin: function(btn) {
+        
+        var button = btn.up('button'),
+        grid = button.up('grid'),
+        record = button.getWidgetRecord(),
+        
+        childXtype = btn.childXtype,
+         winWidth='100%',
+         winTitle="logs",
+    //     form = Ext.widget(childXtype),
+        storeArray = eval(btn.stores),
+        arrayLength = storeArray.length;
+    if (arrayLength > 0) {
+        me.fireEvent('refreshStores', storeArray);
+    }
+     var refId = record.get('id');
+     
+    // logGrid.loadRecord(refId);
+    //logGrid.setHeight(650);
+   // var logGrid = Ext.ComponentQuery.query('#audittypeloggrids')[0];
+    var logGrid = Ext.widget(childXtype);
+    //console.log(logGrid);
+    logGrid.down('textfield[name=id]').setValue(refId);
+
+    funcShowCustomizableWindow(winTitle, winWidth, logGrid, 'customizablewindow');
+     
+     },
+ 
+
     doCreateConfigParamWin: function (btn) {
         var me = this,
             url = btn.action_url,
@@ -242,14 +297,19 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                     'Authorization': 'Bearer ' + access_token
                 },
                 success: function (form, action) {
+                    //console.log("Server response:", action.response.responseText);
                     var response = Ext.decode(action.response.responseText),
-                        success = response.success,
+                        success = response.success;
                         message = response.message;
+                        id = response.record_id;
+                        //console.log(id);
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                         store.removeAll();
                         store.load();
                         win.close();
+                        var logGrid = Ext.widget('audittypeloggrid');
+                        //logGrid.down('textfield[name=id]').setValue(id);
                     } else {
                         toastr.error(message, 'Failure Response');
                     }
@@ -257,9 +317,9 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                 failure: function (form, action) {
                     var resp = action.result;
 
-                    console.log(resp);
+                    //console.log(resp);
                     toastr.error(resp.message, 'Failure Response');
-                }
+                },
             });
         }
     },
