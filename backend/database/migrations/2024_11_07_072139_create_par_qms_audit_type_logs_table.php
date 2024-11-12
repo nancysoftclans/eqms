@@ -23,7 +23,7 @@ class CreateParQmsAuditTypeLogsTable extends Migration
             $table->text('name')->nullable();
             $table->text('prefix')->nullable();
             $table->integer('is_enabled')->nullable();
-            $table->integer('submitted_by');
+            $table->integer('submitted_by')->nullable();
             $table->timestamps();
         });
     }

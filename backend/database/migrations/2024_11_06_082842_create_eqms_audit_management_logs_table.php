@@ -16,20 +16,20 @@ class CreateEqmsAuditManagementLogsTable extends Migration
         Schema::create('eqms_audit_management_logs', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
-            $table->integer('application_code');
+            $table->integer('application_code')->nullable();
             $table->text('action');
             $table->timestamp('created_on')->useCurrent();
-            $table->integer('ref_id');
-            $table->integer('module_id');
-            $table->integer('sub_module_id');
-            $table->integer('process_id');
-            $table->integer('audit_type_id');
-            $table->integer('submitted_by');
-            $table->text('current_stage_name');
-            $table->text('application_status');
-            $table->integer('curr_stage_id');
-            $table->integer('application_status_id');
-            $table->text('responsible_user');
+            $table->integer('ref_id')->nullable();
+            $table->integer('module_id')->nullable();
+            $table->integer('sub_module_id')->nullable();
+            $table->integer('process_id')->nullable();
+            $table->integer('audit_type_id')->nullable();
+            $table->integer('submitted_by')->nullable();
+            $table->text('current_stage_name')->nullable();
+            $table->text('application_status')->nullable();
+            $table->integer('curr_stage_id')->nullable();
+            $table->integer('application_status_id')->nullable();
+            $table->text('responsible_user')->nullable();
             $table->timestamps();
         });
     }

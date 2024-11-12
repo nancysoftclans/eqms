@@ -28,7 +28,7 @@ class CreateEqmsDocumentTypeLogsTable extends Migration
             $table->integer('owner_user_id')->nullable();
             $table->integer('owner_group_id')->nullable();
             $table->integer('is_enabled')->nullable();
-            $table->integer('submitted_by');
+            $table->integer('submitted_by')->nullable();
             $table->timestamps();
         });
     }

@@ -33,7 +33,7 @@ class CreateEqmsDocumentManagementLogsTable extends Migration
             $table->text('navigator_name')->nullable();
             $table->integer('navigator_folder_id')->nullable();
             $table->text('current_stage_name')->nullable();
-            $table->text('application-status')->nullable();
+            $table->text('application_status')->nullable();
             $table->integer('curr_stage_id')->nullable();
             $table->text('doc_title')->nullable();
             $table->timestamps();

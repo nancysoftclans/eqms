@@ -25,7 +25,7 @@ class CreateEqmsIssueTypesLogsTable extends Migration
             $table->integer('status_group_id')->nullable();
             $table->integer('issue_type_category_id')->nullable();
             $table->integer('is_enabled')->nullable();
-            $table->integer('submitted_by');
+            $table->integer('submitted_by')->nullable();
             $table->timestamps();
         });
     }
