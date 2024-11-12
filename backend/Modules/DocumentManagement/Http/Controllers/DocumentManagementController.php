@@ -223,7 +223,6 @@ class DocumentManagementController extends Controller
         try {
             //$application_code = $request->input('application_code');
             $ref_id = $request->input('ref_id');
-           //check if application code is present
             if ($ref_id) {
 
                 //get log entries
@@ -282,7 +281,6 @@ class DocumentManagementController extends Controller
         try {
             $application_code = $request->input('application_code');
             //$ref_id = $request->input('ref_id');
-           //check if application code is present
             if ($application_code) {
 
                 //get log entries

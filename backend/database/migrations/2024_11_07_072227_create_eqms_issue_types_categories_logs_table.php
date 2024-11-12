@@ -21,7 +21,7 @@ class CreateEqmsIssueTypesCategoriesLogsTable extends Migration
             $table->timestamp('created_on')->useCurrent();
             $table->text('title')->nullable();
             $table->integer('is_enabled')->nullable();
-            $table->integer('submitted_by');
+            $table->integer('submitted_by')->nullable();
             $table->timestamps();
         });
     }
