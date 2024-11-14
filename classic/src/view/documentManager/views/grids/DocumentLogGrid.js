@@ -129,6 +129,20 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
     },
     {
         xtype: 'gridcolumn',
+        dataIndex: 'current_stage_name',
+        text: 'Current Stage',
+        flex: 1,
+        sortable: true
+    },
+    {
+        xtype: 'gridcolumn',
+        dataIndex: 'application_status',
+        text: 'Application Status',
+        flex: 1,
+        sortable: true
+    },
+    {
+        xtype: 'gridcolumn',
         dataIndex: 'owner_type_id',
         text: 'Owner',
         flex: 1,

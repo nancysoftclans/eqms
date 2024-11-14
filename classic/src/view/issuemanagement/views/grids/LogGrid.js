@@ -67,14 +67,15 @@ Ext.define('Admin.view.issuemanagement.views.grids.LogGrid', {
 
             var mainTabPnl = Ext.ComponentQuery.query('#contentPanel')[0], // Get the main panel
                 containerPnl = mainTabPnl.getActiveTab();
+                applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
 
             var  refId = grid.down('textfield[name=id]').getValue();
              //var grid = this.up('grid'),
 
             store.getProxy().extraParams = {
                 table_name: 'eqms_issue_management_logs',
-
-                ref_id:refId
+                application_code:applicationCode
+                //ref_id:refId
             };
         }
     }],
@@ -113,24 +114,31 @@ Ext.define('Admin.view.issuemanagement.views.grids.LogGrid', {
         flex: 1,
         sortable: true
     },
+    // {
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'workflow_stage_id',
+    //     text: 'Workflow stage',
+    //     flex: 1,
+    //     sortable: true
+    // },
     {
         xtype: 'gridcolumn',
-        dataIndex: 'workflow_stage_id',
-        text: 'Workflow stage',
+        dataIndex: 'process_name',
+        text: 'Process Name',
         flex: 1,
         sortable: true
     },
     {
         xtype: 'gridcolumn',
-        dataIndex: 'application_status_id',
-        text: 'Application status',
+        dataIndex: 'current_stage_name',
+        text: 'Current Stage',
         flex: 1,
         sortable: true
     },
     {
         xtype: 'gridcolumn',
-        dataIndex: 'issue_status_id',
-        text: 'Issue Status',
+        dataIndex: 'next_stage',
+        text: 'Next Stage',
         flex: 1,
         sortable: true
     },
@@ -138,6 +146,13 @@ Ext.define('Admin.view.issuemanagement.views.grids.LogGrid', {
         xtype: 'gridcolumn',
         dataIndex: 'issue_type_id',
         text: 'Issue Type',
+        flex: 1,
+        sortable: true
+    },
+    {
+        xtype: 'gridcolumn',
+        dataIndex: 'responsible_user',
+        text: 'Responsible User',
         flex: 1,
         sortable: true
     }, {

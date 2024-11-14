@@ -285,15 +285,17 @@ class DocumentManagementController extends Controller
 
                 //get log entries
                 $logs = DB::table('eqms_document_management_logs as logs')
-                    ->join('users as user', 'logs.user_id', '=', 'user.id')//perform a join to users table to get username
-                    ->join('wf_workflow_stages as workflow', 'logs.workflow_stage_id', '=', 'workflow.id')
-                    ->join('par_owner_type as ownertype', 'logs.owner_type_id', '=', 'ownertype.id')
-                    ->join('par_groups as group', 'logs.owner_group_id', '=', 'group.id')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->leftJoin('wf_workflow_stages as workflow', 'logs.workflow_stage_id', '=', 'workflow.id')
+                    ->leftJoin('par_owner_type as ownertype', 'logs.owner_type_id', '=', 'ownertype.id')
+                    ->leftJoin('par_groups as group', 'logs.owner_group_id', '=', 'group.id')
                     ->select('logs.id as log_id', 
                              'user.email as user_name',
                              'logs.user_id', 
                              'logs.application_code', 
                              'logs.action',
+                             'logs.current_stage_name',
+                             'logs.application_status',
                              'workflow.name as workflow_stage_id',
                              'ownertype.name as owner_type_id',
                              'group.name as owner_group_id',

@@ -212,21 +212,25 @@ class IssueManagementController extends Controller
     public function getIssueLogs(Request $request)
     {
         try {
-            //$application_code = $request->input('application_code');
-            $ref_id = $request->input('ref_id');
-            if ($ref_id) {
+            $application_code = $request->input('application_code');
+            //$ref_id = $request->input('ref_id');
+            if ($application_code) {
 
                 //get log entries
                 $logs = DB::table('eqms_issue_management_logs as logs')
                     ->join('users as user', 'logs.user_id', '=', 'user.id')
-                    ->join('wf_workflow_stages as workflow', 'logs.workflow_stage_id', '=', 'workflow.id')
-                    ->join('par_issue_statuses as status', 'logs.issue_status_id', '=', 'status.id')
-                    ->join('par_issue_types as types', 'logs.issue_type_id', '=', 'types.id')
+                    ->leftJoin('wf_workflow_stages as workflow', 'logs.next_stage', '=', 'workflow.id')
+                    ->leftJoin('par_issue_statuses as status', 'logs.issue_status_id', '=', 'status.id')
+                    ->leftJoin('par_issue_types as types', 'logs.issue_type_id', '=', 'types.id')
                     ->select('logs.id as log_id', 
                              'user.email as user_name',
                              'logs.user_id', 
                              'logs.ref_id',
-                             'logs.application_code', 
+                             'logs.application_code',
+                             'logs.process_name',
+                             'logs.current_stage_name',
+                             'user.email as responsible_user', 
+                             'workflow.name as next_stage',
                              'workflow.name as workflow_stage_id',
                              'logs.application_status_id',
                              'status.title as issue_status_id',
@@ -236,7 +240,7 @@ class IssueManagementController extends Controller
                              'logs.created_on')
                 //filter logs by id
                 
-                    ->where('logs.ref_id', '=', $ref_id)
+                    ->where('logs.application_code', '=', $application_code)
                     ->orderBy('logs.created_on', 'desc')
                     ->get();
             } else {
