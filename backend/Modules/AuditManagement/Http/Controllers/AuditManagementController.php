@@ -53,16 +53,10 @@ class AuditManagementController extends Controller
                 $name = $request->input('name');
                 $prefix = $request->input('prefix');
                 $is_enabled = $request->input('is_enabled');
-
-                //$record_id = $request->query('record_id');
-                //$record_id = $request->header('Record-ID'); 
-
-                //$id = $record_id;
                 $method = $request->route()->getActionMethod();
+                // $post_data = $request->post();
 
                 $action = '';
-                $id = $request->input('id');
-                $name = $request->input('name');
                
                 switch ($method) {
                     case 'saveAuditType':
@@ -75,9 +69,6 @@ class AuditManagementController extends Controller
                         
                         break;
                     case 'saveNewAuditPlanDetails':
-                        $post_data = $request->post();
-                        $table = $post_data['table_name'];
-                        $id = $post_data['id'];
                         if ($id){
                             $action = 'updated audit plan details';
                         } else {
@@ -121,7 +112,6 @@ class AuditManagementController extends Controller
                         break;
                     case "tra_auditsmanager_application":
                         $table_name = "eqms_audit_management_logs";
-                        $table_data = $post_data;
                         $table_data = array(
                             'user_id' => $this->user_id,
                             'application_code' => $application_code,

@@ -92,6 +92,9 @@ class WorkflowController extends Controller
                 $navigator_name = $request->input('navigator_name');
                 $navigator_folder_id = $request->input('navigator_folder_id');
                 $audit_type_id = $request->input('audit_type_id');
+                $process_name = $request->input('process_name');
+                $next_stage = $request->input('next_stage');
+
 
 
                 $action = '';
@@ -130,6 +133,26 @@ class WorkflowController extends Controller
                             'current_stage_name' => $current_stage_name,
                             'application_status' => $application_status,
                             'curr_stage_id' => $curr_stage_id
+                        );
+                    break;
+                    case '28':
+                        $table_name = 'eqms_issue_management_logs';
+                        $table_data = array(
+                            'user_id' => $user_id,
+                            'application_code' => $application_code,
+                            'action' => $action,
+                            'ref_id' => $id,
+                            'workflow_stage_id' => $workflow_stage_id,
+                            'module_id' => $module_id,
+                            'sub_module_id' => $sub_module_id,
+                            'application_status_id' => $application_status_id,
+                            'process_name' =>$process_name,
+                            'current_stage_name'=>$current_stage_name,
+                            'responsible_user'=>$responsible_user,
+                            'next_stage'=>$next_stage,
+                            // 'issue_status_id' => $issue_status_id,
+                            // 'issue_type_id' => $issue_type_id,
+                            'created_on' => $created_on,
                         );
                     break;
                     case "29":

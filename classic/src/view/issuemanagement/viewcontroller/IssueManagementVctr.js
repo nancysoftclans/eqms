@@ -60,7 +60,7 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
             var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
             child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
         }
-        child.setHeight('600');
+        //child.setHeight('600');
 
 
 

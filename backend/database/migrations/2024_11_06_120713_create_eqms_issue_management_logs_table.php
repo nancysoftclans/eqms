@@ -26,6 +26,10 @@ class CreateEqmsIssueManagementLogsTable extends Migration
             $table->integer('application_status_id')->nullable();
             $table->integer('issue_status_id')->nullable();
             $table->integer('issue_type_id')->nullable();
+            $table->text('process_name')->nullable();
+            $table->text('current_stage_name')->nullable();
+            $table->integer('next_stage')->nullable();
+
             $table->timestamps();
         });
     }
