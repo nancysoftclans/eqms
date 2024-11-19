@@ -3180,6 +3180,10 @@ class WorkflowController extends Controller
             $has_technicalmeeting_notification = $action_details->has_technicalmeeting_notification;
             $technicalmeetinemail_msg_id = $action_details->technicalmeetinemail_msg_id;
 
+
+            $has_qms_notification = $action_details->has_qms_notification;
+            $qms_msg_id = $action_details->qms_msg_id;
+
             $has_preminsp_notification = $action_details->has_preminsp_notification;
             $preminspmail_msg_id = $action_details->preminspmail_msg_id;
             $has_email_notification = $action_details->has_email_notification;

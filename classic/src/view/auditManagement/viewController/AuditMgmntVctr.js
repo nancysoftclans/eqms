@@ -25,9 +25,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
     },
 
     onSelectAuditType:function(grid ,record) {
-        console.log(grid) 
-        console.log(record);  
-        
+            
        var me = this,
            data = record.data
     },
@@ -160,9 +158,6 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
        //record_id = record.get('id')
        panelObject = Ext.widget(btn.panelXtype),
        frm = panelObject.down('form');
-
-       console.log(panelObject);
-       console.log(frm);
 
 
        frm.loadRecord(record);

@@ -15,7 +15,7 @@ Ext.define('Admin.view.documentManager.views.dashboards.LiveDocumentCreationApps
             value: 105
         },
       {
-            xtype: 'livedocumentsgrid',
+            xtype: 'renewaldocumentsgrid',
             region: 'center',
             title: 'Active Tasks',
             margin: 2

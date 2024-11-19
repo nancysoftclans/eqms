@@ -205,6 +205,12 @@ Ext.define('Admin.view.documentManager.viewcontrollers.DocumentsManagementVctr',
         var application_type = btn.app_type;
         this.fireEvent('onInitiateQmsRecordApplication', application_type, btn);
     },
+
+       onInitiateLiveDocumentApplication: function (btn) {
+        var application_type = btn.app_type;
+        this.fireEvent('onViewLiveDocumentDetails', application_type, btn);
+    },
+
     doCreateConfigParam: function (btn) {
         var me = this,
             action_url = btn.action_url,
@@ -444,11 +450,11 @@ showEditConfigParamWinFrm: function (item) {
 
     },
 
-    onViewLiveDocumentApplication: function (grid, record) {
+    // onViewLiveDocumentApplication: function (grid, record) {
 
-        this.fireEvent('viewLiveDocumentDetails', record);
+    //     this.fireEvent('viewLiveDocumentDetails', record);
 
-    },
+    // },
 
     getDocumentReleaseRecommendationDetails: function (btn) {
         this.fireEvent('getDocumentReleaseRecommendationDetails', btn);
@@ -1192,13 +1198,6 @@ showEditConfigParamWinFrm: function (item) {
        var store = Ext.getStore('system_submodulesStr');
         store.removeAll();
         store.load({})
-    },
-
-    onInitiateLiveDocumentApplication: function (btn) {
-        //onInitiateLiveDocumentApplication
-        var application_type = btn.renewal;
-        var submodule_id = btn.app_type;
-        this.fireEvent('onViewLiveDocumentDetails', application_type, submodule_id);
     }
 
 //     onViewDocumentDetails: function (item) {

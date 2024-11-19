@@ -17,6 +17,10 @@ Ext.define('Admin.view.documentManager.views.panels.LiveDocuments',  {
         {
             xtype: 'livedocumentapplicationwrapper',
             region: 'center'
+        },
+        {
+            xtype: 'documentrenewtb',
+            region: 'south'
         }
     ]
 });

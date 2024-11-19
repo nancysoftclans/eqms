@@ -227,6 +227,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                         disabled: '{atBeginning}'
                     },
                     wizard:'documentapplicationreceivingwizard',
+                    hidden: true,
                     handler: 'onPrevCardClick'
                 },{
                     text: 'Save Details',
@@ -282,6 +283,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentApplicationReceiving
                     iconCls: 'fa fa-arrow-right',
                     iconAlign: 'right',
                     max_step:1,
+                    hidden: true,
                     bind: {
                         disabled: '{atEnd}'
                     },wizard:'documentapplicationreceivingwizard',

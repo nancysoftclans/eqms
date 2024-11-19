@@ -502,6 +502,15 @@ class DocumentManagementController extends Controller
 
                 if (recordExists($applications_table, $where_app)) {
 
+                    if($request->input('workflow_stage_id') == 13){
+
+                        $app_data = array(
+
+                         'application_status_id' => 1
+
+                        );
+                    }
+
                     $apps_tableData = getTableData($applications_table, $where_app);
                   
                     $app_details = getPreviousRecords($applications_table, $where_app);
@@ -529,6 +538,32 @@ class DocumentManagementController extends Controller
                    $res['document_number'] = $app_details[0]['document_number'];
                    $res['created_on'] = $app_details[0]['created_on'];
                    $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
+
+                   if($request->input('workflow_stage_id') == 13){
+
+                        $submission_params = array(
+                            'application_id' => $app_details[0]['id'],
+                            'process_id' => $app_details[0]['process_id'],
+                            'application_code' => $application_code,
+                            'reference_no' => $app_details[0]['tracking_no'],
+                            'tracking_no' => $app_details[0]['tracking_no'],
+                            'usr_from' => $user_id,
+                            'usr_to' => $user_id,
+                            'previous_stage' => $workflow_stage_id,
+                            'current_stage' => $workflow_stage_id,
+                            'module_id' => $module_id,
+                            'sub_module_id' => $sub_module_id,
+                            'application_status_id' => 1,
+                            'urgency' => 1,
+                            'remarks' => 'Initial Renewal',
+                            'date_received' => Carbon::now(),
+                            'created_on' => Carbon::now(),
+                            'created_by' => $user_id
+                        );
+
+
+                        $res = insertRecord('tra_submissions', $submission_params, $user_id);
+                    }
 
                 if ($res['success']) {
                     initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
@@ -2164,6 +2199,7 @@ class DocumentManagementController extends Controller
                 );
                 // validateDocumentUploadSubmission($where);
                 $res = array('success' => true, 'message' => 'validated');
+
             }
             //check for the invoice generation
 

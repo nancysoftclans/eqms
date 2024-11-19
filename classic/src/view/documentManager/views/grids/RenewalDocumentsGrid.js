@@ -1,7 +1,7 @@
-Ext.define('Admin.view.documentManager.views.grids.LiveDocumentsGrid', {
+Ext.define('Admin.view.documentManager.views.grids.RenewalDocumentsGrid', {
     extend: 'Ext.grid.Panel',
-    xtype: 'livedocumentsgrid',
-    itemId: 'livedocumentsgrid',
+    xtype: 'renewaldocumentsgrid',
+    itemId: 'renewaldocumentsgrid',
     controller: 'documentsManagementvctr',
     useArrows: true,
     rootVisible: false,
@@ -68,13 +68,14 @@ Ext.define('Admin.view.documentManager.views.grids.LiveDocumentsGrid', {
                 storeId: 'docdefinationrequirementstr',
                 proxy: {
                     api: {
-                        read: 'documentmanagement/getlivedocumentDetails'
+                        read: 'documentmanagement/getrenewaldocumentDetails'
                     },
                 },
             },
             isLoad: true
         },
        // itemdblclick: 'onViewLiveDocumentApplication'
+        itemdblclick: 'onViewDocumentApplication'
     },
    
     bbar: [

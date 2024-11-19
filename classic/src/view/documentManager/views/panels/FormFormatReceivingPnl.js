@@ -219,6 +219,7 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                     ui: 'soft-blue',
                     iconCls: 'fa fa-arrow-left',
                     max_step:1,
+                    hidden: true,
                     bind: {
                         disabled: '{atBeginning}'
                     },
@@ -278,6 +279,7 @@ Ext.define('Admin.view.documentManager.views.panels.FormFormatReceivingPnl',{
                     iconCls: 'fa fa-arrow-right',
                     iconAlign: 'right',
                     max_step:1,
+                    hidden: true,
                     bind: {
                         disabled: '{atEnd}'
                     },wizard:'formformatreceivingpnl',
