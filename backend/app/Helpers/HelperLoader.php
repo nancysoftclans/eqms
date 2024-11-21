@@ -48,9 +48,9 @@ if (!function_exists('getParameterItgenems')) {
     }
 }
 if (!function_exists('saveSingleInvoiceDetailstoIntergration')) {
-    function saveSingleInvoiceDetailstoIntergration($invoice_id,$application_code,$paying_currency_id,$paying_exchange_rate,$user_id,$zone_id)
+    function saveSingleInvoiceDetailstoIntergration($invoice_id, $application_code, $paying_currency_id, $paying_exchange_rate, $user_id, $zone_id)
     {
-        return UtilityHelper::saveSingleInvoiceDetailstoIntergration($invoice_id,$application_code,$paying_currency_id,$paying_exchange_rate,$user_id,$zone_id);
+        return UtilityHelper::saveSingleInvoiceDetailstoIntergration($invoice_id, $application_code, $paying_currency_id, $paying_exchange_rate, $user_id, $zone_id);
     }
 }
 if (!function_exists('convert_number_to_words')) {
@@ -67,17 +67,17 @@ if (!function_exists('convertArrayToString')) {
 }
 
 if (!function_exists('validateIfHasInvoiceGenerate')) {
-    function validateIfHasInvoiceGenerate($application_code,$applicationfeetype_id)
+    function validateIfHasInvoiceGenerate($application_code, $applicationfeetype_id)
     {
-        return UtilityHelper::validateIfHasInvoiceGenerate($application_code,$applicationfeetype_id);
+        return UtilityHelper::validateIfHasInvoiceGenerate($application_code, $applicationfeetype_id);
     }
 }
 
 
 if (!function_exists('generateProductQueryletter')) {
-    function generateProductQueryletter($application_code,$file_path = null)
+    function generateProductQueryletter($application_code, $file_path = null)
     {
-        return UtilityHelper::generateProductQueryletter($application_code,$file_path = null);
+        return UtilityHelper::generateProductQueryletter($application_code, $file_path = null);
     }
 }
 if (!function_exists('sendQueryNotification')) {
@@ -176,9 +176,9 @@ if (!function_exists('getfile_extension')) {
     }
 }
 if (!function_exists('funcSaveProvisionalRejectionDetails')) {
-    function funcSaveProvisionalRejectionDetails($request,$permit_id,$decision_id,$application_id, $application_code,$user_id)
+    function funcSaveProvisionalRejectionDetails($request, $permit_id, $decision_id, $application_id, $application_code, $user_id)
     {
-        return UtilityHelper::funcSaveProvisionalRejectionDetails($request,$permit_id,$decision_id,$application_id, $application_code,$user_id);
+        return UtilityHelper::funcSaveProvisionalRejectionDetails($request, $permit_id, $decision_id, $application_id, $application_code, $user_id);
     }
 }
 
@@ -210,20 +210,22 @@ if (!function_exists('insertRecord')) {
         return DbHelper::insertRecord($table_name, $table_data, $user_id, $con);
     }
 }
-if(!function_exists('sendMailNotification')){
-    function sendMailNotification($trader_name, $to,$subject,$message,$cc=null,$bcc=null,$attachement=null,$attachement_name = null,$template_id =null, $vars=null) {
-         return EmailHelper::sendMailNotification($trader_name, $to,$subject,$message,$cc,$bcc,$attachement,$attachement_name,$template_id, $vars);
+if (!function_exists('sendMailNotification')) {
+    function sendMailNotification($trader_name, $to, $subject, $message, $cc = null, $bcc = null, $attachement = null, $attachement_name = null, $template_id = null, $vars = null)
+    {
+        return EmailHelper::sendMailNotification($trader_name, $to, $subject, $message, $cc, $bcc, $attachement, $attachement_name, $template_id, $vars);
 
     }
 }
-if(!function_exists('sendMailFromNotification')){
-    function sendMailFromNotification($trader_name, $to,$subject,$message, $sender, $carbon_copy=null){
-         return EmailHelper::sendMailFromNotification($trader_name, $to,$subject,$message, $sender, $carbon_copy);
+if (!function_exists('sendMailFromNotification')) {
+    function sendMailFromNotification($trader_name, $to, $subject, $message, $sender, $carbon_copy = null)
+    {
+        return EmailHelper::sendMailFromNotification($trader_name, $to, $subject, $message, $sender, $carbon_copy);
 
     }
 }
 if (!function_exists('updateRecord')) {
-    function updateRecord($table_name, $where, $table_data, $user_id=null, $con)
+    function updateRecord($table_name, $where, $table_data, $user_id = null, $con)
     {
         return DbHelper::updateRecord($table_name, $where, $table_data, $user_id, $con);
     }
@@ -251,7 +253,7 @@ if (!function_exists('deleteRecordNoTransaction')) {
 }
 
 if (!function_exists('softDeleteRecord')) {
-    function softDeleteRecord($table_name, $where_data, $user_id=null)
+    function softDeleteRecord($table_name, $where_data, $user_id = null)
     {
         return DbHelper::softDeleteRecord($table_name, $where_data, $user_id);
     }
@@ -392,9 +394,9 @@ if (!function_exists('converter22')) {
 }
 
 if (!function_exists('getSingleRecord')) {
-    function getSingleRecord($table, $where,$col)
+    function getSingleRecord($table, $where, $col)
     {
-        return DbHelper::getSingleRecord($table, $where,$col);
+        return DbHelper::getSingleRecord($table, $where, $col);
     }
 }
 
@@ -576,16 +578,16 @@ if (!function_exists('generateReceiptNo')) {
 }
 
 if (!function_exists('getApplicationPaymentsRunningBalance')) {
-    function getApplicationPaymentsRunningBalance( $application_code, $invoice_id)
+    function getApplicationPaymentsRunningBalance($application_code, $invoice_id)
     {
-        return UtilityHelper::getApplicationPaymentsRunningBalance( $application_code, $invoice_id);
+        return UtilityHelper::getApplicationPaymentsRunningBalance($application_code, $invoice_id);
     }
 }
 
 if (!function_exists('getTableData')) {
-    function getTableData($table_name, $where,$col)
+    function getTableData($table_name, $where, $col)
     {
-        return DbHelper::getTableData($table_name, $where,$col);
+        return DbHelper::getTableData($table_name, $where, $col);
     }
 }
 
@@ -604,9 +606,9 @@ if (!function_exists('getPermitSignatorySignature')) {
 }
 
 if (!function_exists('generatePremisePermitNo')) {
-    function generatePremisePermitNo($zone_id, $section_id, $table_name, $user_id, $ref_id,$sub_module_id)
+    function generatePremisePermitNo($zone_id, $section_id, $table_name, $user_id, $ref_id, $sub_module_id)
     {
-        return UtilityHelper::generatePremisePermitNo($zone_id, $section_id, $table_name, $user_id, $ref_id,$sub_module_id);
+        return UtilityHelper::generatePremisePermitNo($zone_id, $section_id, $table_name, $user_id, $ref_id, $sub_module_id);
     }
 }
 
@@ -1185,9 +1187,9 @@ if (!function_exists('generateProductsSubRefNumber')) {
 }
 //genLaboratoryReference_number($req->section_id, $req->zone_id, $req->sample_category_id,$req->laboratory_id,$req->device_type_id);
 if (!function_exists('genLaboratoryReference_number')) {
-    function genLaboratoryReference_number($section_id, $zone_id, $sample_category_id, $laboratory_id, $device_type_id, $user_id,$sample_type_id)
+    function genLaboratoryReference_number($section_id, $zone_id, $sample_category_id, $laboratory_id, $device_type_id, $user_id, $sample_type_id)
     {
-        return UtilityHelper::genLaboratoryReference_number($section_id, $zone_id, $sample_category_id, $laboratory_id, $device_type_id, $user_id,$sample_type_id);
+        return UtilityHelper::genLaboratoryReference_number($section_id, $zone_id, $sample_category_id, $laboratory_id, $device_type_id, $user_id, $sample_type_id);
     }
 }
 
@@ -1198,9 +1200,9 @@ if (!function_exists('updatePortalParams')) {
     }
 }
 if (!function_exists('getPortalApplicationWorkFlowStageSubmissionDetailsGeneric')) {
-    function getPortalApplicationWorkFlowStageSubmissionDetailsGeneric($module_id,$sub_module_id,$section_id,$prodclass_category_id)
+    function getPortalApplicationWorkFlowStageSubmissionDetailsGeneric($module_id, $sub_module_id, $section_id, $prodclass_category_id)
     {
-        DbHelper::getPortalApplicationWorkFlowStageSubmissionDetailsGeneric($module_id,$sub_module_id,$section_id,$prodclass_category_id);
+        DbHelper::getPortalApplicationWorkFlowStageSubmissionDetailsGeneric($module_id, $sub_module_id, $section_id, $prodclass_category_id);
     }
 }
 if (!function_exists('getAllUsersOnActingGroups')) {
@@ -1216,9 +1218,9 @@ if (!function_exists('convertArrayToString')) {
     }
 }
 if (!function_exists('onlineApplicationNotificationMail')) {
-    function onlineApplicationNotificationMail($template_id, $email, $vars = array(),$identification_no=null)
+    function onlineApplicationNotificationMail($template_id, $email, $vars = array(), $identification_no = null)
     {
-        EmailHelper::onlineApplicationNotificationMail($template_id, $email, $vars,$identification_no);
+        EmailHelper::onlineApplicationNotificationMail($template_id, $email, $vars, $identification_no);
     }
 }
 
@@ -1289,10 +1291,10 @@ if (!function_exists('applicationPermitEmail')) {
 }
 
 if (!function_exists('getInvoiceDetails')) {
-    function getInvoiceDetails($module_id, $application_id,$application_code = '')
+    function getInvoiceDetails($module_id, $application_id, $application_code = '')
     {
         $reportsHelper = new ReportsHelper();
-        return $reportsHelper->getInvoiceDetails($module_id, $application_id,$application_code);
+        return $reportsHelper->getInvoiceDetails($module_id, $application_id, $application_code);
     }
 }
 
@@ -1420,9 +1422,9 @@ if (!function_exists('applicationExpiryNotificationMail')) {
     }
 }
 if (!function_exists('number_to_alpha')) {
-    function number_to_alpha($num,$code)
+    function number_to_alpha($num, $code)
     {
-        return UtilityHelper::number_to_alpha($num,$code);
+        return UtilityHelper::number_to_alpha($num, $code);
     }
 }
 if (!function_exists('toUpperCase')) {
@@ -1438,11 +1440,12 @@ if (!function_exists('exportDatatoExcel')) {
     }
 }
 if (!function_exists('sys_error_handler')) {
-    function sys_error_handler($error='', $level=1, $me=[], $class_array=[], $user_id=null)
+    function sys_error_handler($error = '', $level = 1, $me = [], $class_array = [], $user_id = null)
     {
         return DbHelper::sys_error_handler($error, $level, $me, $class_array, $user_id);
     }
-}if (!function_exists('getLastApplicationSubmissionDetails')) {
+}
+if (!function_exists('getLastApplicationSubmissionDetails')) {
     function getLastApplicationSubmissionDetails($application_code)
     {
         return DbHelper::getLastApplicationSubmissionDetails($application_code);
@@ -1494,9 +1497,9 @@ if (!function_exists('getRegistrationSerial')) {
     }
 }
 if (!function_exists('sendInvitationMail')) {
-    function sendInvitationMail($template_id, $participantEmail,$vars)
+    function sendInvitationMail($template_id, $participantEmail, $vars)
     {
-        return EmailHelper::sendInvitationMail($template_id, $participantEmail,$vars);
+        return EmailHelper::sendInvitationMail($template_id, $participantEmail, $vars);
     }
 }
 if (!function_exists('array_flatten')) {
