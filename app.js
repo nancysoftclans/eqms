@@ -712,7 +712,7 @@ function showWorkflowSubmissionWin(document_id, application_code, table_name, fo
                 message = resp.message,
                 success = resp.success;
             if (success || success == true || success === true) {
-                var results = resp.results,
+                var results = resp.results,        
                     tracking_no = results.tracking_no,
                     ref_no = results.reference_no,
                     title = ref_no;

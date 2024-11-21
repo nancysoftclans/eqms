@@ -16,6 +16,7 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypeLogGrid', {
     //     ptype: 'cellediting',
     //     clicksToEdit: 1
     // }],
+    height: 600,
     
     itemId: 'audittypeloggrids',
 
@@ -72,20 +73,12 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditTypeLogGrid', {
             var mainTabPnl = Ext.ComponentQuery.query('#contentPanel')[0], // Get the main panel
                 containerPnl = mainTabPnl.getActiveTab();
             var formdata = Ext.ComponentQuery.query('#NewAuditDetails')[0];
-            console.log(formdata)
-                //console.log(containerPnl);
-            //  process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
-            //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
-            //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
-               // refId = containerPnl.down('hiddenfield[name=id]').getValue();
+          
+                
              var  refId = grid.down('textfield[name=id]').getValue();
              //var grid = this.up('grid'),
-             console.log(refId);
-
-                //applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
             store.getProxy().extraParams = {
                 //table_name: 'eqms_audit_management_logs',
-                //application_code: applicationCode,
                 ref_id:refId
             };
         }

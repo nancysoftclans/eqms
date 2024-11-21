@@ -39,10 +39,10 @@ Ext.define('Admin.view.documentManager.views.grids.LiveDocumentsGrid', {
         }
     },
     tbar: [
-       {
-                    xtype: 'panel',
-                    html: '<h2>Double Click To Renew Document</h2>'
-                },
+       // {
+       //              xtype: 'panel',
+       //              html: '<h2>Double Click To Renew Document</h2>'
+       //          },
     {
       xtype: "tbspacer",
       hidden: true,
@@ -74,7 +74,7 @@ Ext.define('Admin.view.documentManager.views.grids.LiveDocumentsGrid', {
             },
             isLoad: true
         },
-        itemdblclick: 'onViewLiveDocumentApplication'
+       // itemdblclick: 'onViewLiveDocumentApplication'
     },
    
     bbar: [
@@ -214,49 +214,49 @@ Ext.define('Admin.view.documentManager.views.grids.LiveDocumentsGrid', {
             return "NO";
         }
     },
-    {
-        text: 'Options',
-        xtype: 'widgetcolumn',
-        width: 90,
-        widget: {
-            width: 75,
-            textAlign: 'left',
-            xtype: 'splitbutton',
-            iconCls: 'x-fa fa-th-list',
-            ui: 'gray',
-            menu: {
-                xtype: 'menu',
-                items: [{
-                    text: 'Renew Document',
-                    iconCls: 'x-fa fa-edit',
-                    //tooltip: 'Edit Record',
-                    // action: 'edit',
-                    // childXtype: 'docdefinationrequirementfrm',
-                    //winTitle: 'Dcouments requirements Defination',
-                    //winWidth: '40%',
-                    // handler: 'showEditConfigParamWinFrm',
-                    // stores: '[]'
-                    handler:'onInitiateLiveDocumentApplication',
-                    app_type: 101,
-                    renewal: 1
-                },
-                // {
-                //     text: 'Logs',
-                //     iconCls: 'x-fa fa-list',
-                //     tooltip: 'View Logs',
-                //     action: 'logs',
-                //     childXtype: 'audittypeloggrid',
-                //     winTitle: 'Logs',
-                //     winWidth: '100%',
-                //     handler: 'showLogConfigwin',
-                //     // bind: {
-                //     //     disabled: '{isReadOnly}'
-                //     // },
-                //     stores: '[]'
-                // },
-                ]
-            }
-        }
-    }
+    // {
+    //     text: 'Options',
+    //     xtype: 'widgetcolumn',
+    //     width: 90,
+    //     widget: {
+    //         width: 75,
+    //         textAlign: 'left',
+    //         xtype: 'splitbutton',
+    //         iconCls: 'x-fa fa-th-list',
+    //         ui: 'gray',
+    //         menu: {
+    //             xtype: 'menu',
+    //             items: [{
+    //                 text: 'Renew Document',
+    //                 iconCls: 'x-fa fa-edit',
+    //                 //tooltip: 'Edit Record',
+    //                 // action: 'edit',
+    //                 // childXtype: 'docdefinationrequirementfrm',
+    //                 //winTitle: 'Dcouments requirements Defination',
+    //                 //winWidth: '40%',
+    //                 // handler: 'showEditConfigParamWinFrm',
+    //                 // stores: '[]'
+    //                 handler:'onInitiateLiveDocumentApplication',
+    //                 app_type: 105,
+    //                 renewal: 1
+    //             },
+    //             // {
+    //             //     text: 'Logs',
+    //             //     iconCls: 'x-fa fa-list',
+    //             //     tooltip: 'View Logs',
+    //             //     action: 'logs',
+    //             //     childXtype: 'audittypeloggrid',
+    //             //     winTitle: 'Logs',
+    //             //     winWidth: '100%',
+    //             //     handler: 'showLogConfigwin',
+    //             //     // bind: {
+    //             //     //     disabled: '{isReadOnly}'
+    //             //     // },
+    //             //     stores: '[]'
+    //             // },
+    //             ]
+    //         }
+    //     }
+    // }
     ]
 });

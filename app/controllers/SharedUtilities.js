@@ -146,6 +146,12 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       click: "uploadApplicationEvidence",
       afterrender: "initializeResumableUploadEvidennce",
     },
+    "docrenewalfrm button[action=search_document]": {
+      click: "showNavigatorSelectionList",
+    },
+    livedocumentsgrid: {
+      itemdblclick: "onDocumentSelectionListDblClick",
+    },
     
   },
   listen: {
@@ -162,7 +168,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         getDocumentReleaseRecommendationDetails: "getDocumentReleaseRecommendationDetails",    
         viewNavigatorDocDetails: "onViewNavigatorDocDetails", 
         onInitiateLiveDocumentApplication: "onInitiateLiveDocumentApplication",
-        viewLiveDocumentDetails: "onViewLiveDocumentDetails",
+        onViewLiveDocumentDetails: "onViewLiveDocumentDetails",
         downloadsopTemplate: "downloadsopTemplate",
         downloadFormFormat: "downloadFormFormat",
         downloadlogdatabasesTemplate: "downloadlogdatabasesTemplate",
@@ -604,6 +610,54 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
 
     //load the stores
   },
+
+
+  onViewLiveDocumentDetails: function (sub_module_id, btn) {
+    Ext.getBody().mask("Loading Please wait...");
+    var me = this,
+      is_dataammendment_request = btn.is_dataammendment_request,
+      mainTabPanel = me.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      dashboardWrapper = activeTab.down("#livedocumentapplicationwrapper"),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
+
+    workflow_details = getInitialDocumentCreationWorkflowDetails(
+      module_id,
+      sub_module_id,
+      is_dataammendment_request,
+      ""
+    );
+
+
+    if (!workflow_details) {
+      Ext.getBody().unmask();
+      toastr.warning(
+        "Problem encountered while fetching workflow details-->Possibly workflow not set!!",
+        "Warning Response"
+      );
+      return false;
+    }
+    dashboardWrapper.removeAll();
+    var workflowContainer = Ext.widget(workflow_details.viewtype);
+    workflowContainer.down("displayfield[name=process_name]").setValue(workflow_details.processName);
+    workflowContainer.down("displayfield[name=workflow_stage]").setValue(workflow_details.initialStageName);
+    workflowContainer.down("displayfield[name=application_status]").setValue(workflow_details.initialStageName);
+    workflowContainer.down("hiddenfield[name=process_id]").setValue(workflow_details.processId);
+    workflowContainer.down("hiddenfield[name=workflow_stage_id]").setValue(workflow_details.initialStageId);
+    workflowContainer.down("hiddenfield[name=module_id]").setValue(module_id);
+    workflowContainer.down("hiddenfield[name=sub_module_id]").setValue(sub_module_id);
+    workflowContainer.down("hiddenfield[name=application_status_id]").setValue(workflow_details.initialStageId);
+
+
+    dashboardWrapper.add(workflowContainer);
+
+    Ext.Function.defer(function () {
+      Ext.getBody().unmask();
+    }, 300);
+
+    //load the stores
+  },
+
 
   onInitiateQmsRecordApplication: function (sub_module_id, btn) {
     Ext.getBody().mask("Loading Please wait...");
@@ -1660,8 +1714,11 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     if(activeTab.down("qmsdoclistfrm")){
       var applicantFrm = activeTab.down("qmsdoclistfrm"),
        document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
-    }else{
+    }else if(activeTab.down("soptemplatedoclistfrm")){
       var applicantFrm = activeTab.down("soptemplatedoclistfrm"),
+       document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
+    }else{
+      var applicantFrm = activeTab.down("docrenewalfrm"),
        document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
 
     }
@@ -1987,18 +2044,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       winTitle = btn.winTitle,
       winWidth = btn.winWidth,
       mainTabPanel = me.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
       activeTab = mainTabPanel.getActiveTab();
 
-    if (activeTab.down("hiddenfield[name=section_id]")) {
-      section_id = activeTab.down("hiddenfield[name=section_id]").getValue();
-    }
-    if (activeTab.down("hiddenfield[name=active_application_code]")) {
-      section_id = activeTab
-        .down("hiddenfield[name=active_application_code]")
-        .getValue();
-    }
-    gmp_type_id = 0;
     var childObject = Ext.widget(childXtype);
     childObject.setHeight(450);
 
@@ -2048,6 +2095,46 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       win.close();
     }, 200);
   },
+
+
+  onDocumentSelectionListDblClick: function (
+    view,
+    record,
+    item,
+    index,
+    e,
+    eOpts
+  ) {
+    var me = this,
+      grid = view.grid,
+      folder_id = record.get("id"),
+      applicationCode = record.get("application_code"),
+      trackingNo = record.get("tracking_no"),
+      win = grid.up("window"),
+      mainTabPanel = me.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      mask = new Ext.LoadMask({
+        msg: "Please wait...",
+        target: win,
+      });
+    mask.show();
+
+    console.log(record);
+    var docrenewalfrm = activeTab.down("docrenewalfrm");
+    activeTab.down("hiddenfield[name=active_application_code]").setValue(applicationCode);
+    activeTab.down("displayfield[name=tracking_no]").setValue(trackingNo);
+
+       docrenewalfrm.loadRecord(record);
+    var docgrid = Ext.getStore('applicationDocumentsUploadsStr');
+       //docgrid=Ext.ComponentQuery.query("#docuploadsgrid")[0];
+       docgrid.load();
+   
+    Ext.Function.defer(function () {
+      mask.hide();
+      win.close();
+    }, 200);
+  },
+
    AddGeneralComment: function (argument) {
         var form = Ext.widget('applicationcommentsFrm');
         funcShowCustomizableWindow('Application Recommendation', '50%', form, 'customizablewindow');
@@ -2166,85 +2253,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     //load the stores
   },
 
-  onViewLiveDocumentDetails: function (record) {
-    Ext.getBody().mask("Please wait...");
-    var me = this,
-      mainTabPanel = me.getMainTabPanel(),
-      activeTab = mainTabPanel.getActiveTab(),
-      process_id = record.get("process_id"),
-      workflow_stage_id = record.get("workflow_stage_id"),
-      workflow_stage = record.get("workflow_stage"),
-      ref_no = record.get("reference_no"),
-      tracking_no = record.get("tracking_no"),
-      isGeneral = record.get("is_general"),
-      view_id = record.get("view_id"),
-      html_id = record.get("destination_html_id"),
-      renewal = '',
-      module_id = 26,
-      sub_module_id = 105,
-      application_type = 1,
-      title_suffix = ref_no;
-
-
-    workflow_details = getInitialLiveDocumentCreationWorkflowDetails(
-      module_id,
-      sub_module_id,
-    );
-    if (!workflow_details || workflow_details.length < 1) {
-      Ext.getBody().unmask();
-      toastr.warning(
-        "Problem encountered while fetching workflow details-->Possibly workflow not set!!",
-        "Warning Response"
-      );
-      return false;
-    }
-    if (!ref_no || ref_no == "" || ref_no == null) {
-      title_suffix = tracking_no;
-    }
-
-    var tab = mainTabPanel.getComponent(view_id),
-      title = workflow_stage + "-" + title_suffix;
-    title = workflow_stage; //+ '-' + title_suffix;
-    if (isGeneral && (isGeneral == 1 || isGeneral === 1)) {
-      title = workflow_stage;
-      view_id = view_id + Math.floor(Math.random() * 100015);
-    }
-    if (!tab) {
-      //
-      var newTab = Ext.widget(workflow_details.viewtype, {
-        title: "Document Renewal",
-        id: view_id,
-        closable: true,
-      });
-
-      //updates the access control on the interface to be rendered.
-      //me.updateVisibilityAccess(newTab, workflow_stage_id);
-      me.updateVisibilityAccess(newTab, workflow_stage_id);
-      //prepare the interface and populates it accordingly
-      me.prepareApplicationBaseDetails(newTab, record);
-      mainTabPanel.add(newTab);
-      var sub_module_id = record.get("sub_module_id");
-      // if(sub_module_id == 8 && newTab.down('button[name=save_btn]')){
-      //     newTab.getViewModel().set('isReadOnly', true);
-      //     newTab.down('button[name=save_btn]').action_url = 'saveRenAltProductReceivingBaseDetails';
-      // }
-      // if(sub_module_id == 9 && newTab.down('button[name=save_btn]')){
-      //     newTab.getViewModel().set('isReadOnly', true);
-      //     newTab.down('button[name=save_btn]').action_url = 'saveRenAltProductReceivingBaseDetails';
-      // }
-      var lastTab = mainTabPanel.items.length - 1;
-      mainTabPanel.setActiveTab(lastTab);
-    } else {
-      me.prepareApplicationBaseDetails(tab, record);
-      mainTabPanel.setActiveTab(tab);
-    }
-
-    Ext.Function.defer(function () {
-      Ext.getBody().unmask();
-      me.updateSubmissionsTable(record, "isRead");
-    }, 300);
-  },
-
+ 
   prepareSOPTemplateApplication: function (pnl) {
     Ext.getBody().mask("Please wait...");
     var me = this,
@@ -2839,7 +2848,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                     
                             var refId = record.get('id');
                             var logGrid = Ext.widget(childXtype);
-                            console.log(logGrid);
                             
                             // Set reference ID in the log grid
                             logGrid.down('textfield[name=id]').setValue(refId);

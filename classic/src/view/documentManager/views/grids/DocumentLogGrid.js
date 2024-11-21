@@ -18,11 +18,12 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
     //     clicksToEdit: 1
     // }],
 
-
+    height: 600,
     tbar: [
         {
             xtype: 'textfield',
-            name: 'id'
+            name: 'id',
+            hidden: true
         }
     ],
 
@@ -46,7 +47,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
         beforerender: {
             fn: 'setGridStore',
             config: {
-                storeId:'issuetypelogstore',
+                storeId:'documentlogstore',
                 proxy: {
                     api: {
                         read: 'documentmanagement/getDocumentLogs'
@@ -74,7 +75,6 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
             //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
             //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
                 applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
-                console.log(applicationCode);
                 //id = grid.down('textfield[name=id]').getValue(),
             store.getProxy().extraParams = {
                 table_name: 'eqms_document_management_logs',
@@ -124,6 +124,20 @@ Ext.define('Admin.view.documentManager.views.grids.DocumentLogGrid', {
         xtype: 'gridcolumn',
         dataIndex: 'workflow_stage_id',
         text: 'Workflow stage',
+        flex: 1,
+        sortable: true
+    },
+    {
+        xtype: 'gridcolumn',
+        dataIndex: 'current_stage_name',
+        text: 'Current Stage',
+        flex: 1,
+        sortable: true
+    },
+    {
+        xtype: 'gridcolumn',
+        dataIndex: 'application_status',
+        text: 'Application Status',
         flex: 1,
         sortable: true
     },

@@ -18,5 +18,5 @@
     "Integration": true,
     "IssueManagement": true,
     "AuditManagement": true,
-    "GBT": true
+    "QualityDocumentControl": true
 }

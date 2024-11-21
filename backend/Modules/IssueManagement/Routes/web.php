@@ -28,16 +28,14 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::post('saveIssueManagementRelatedIssues', [IssueManagementController::class, 'saveIssueManagementRelatedIssues']);
     Route::get('getIssueManagementAudits', [IssueManagementController::class, 'getIssueManagementAudits']);
     Route::post('saveIssueManagementAudits', [IssueManagementController::class, 'saveIssueManagementAudits']);
-    Route::get('test', [IssueManagementController::class, 'test']);
-
-    Route::get('getIssueLogs', [IssueManagementController::class,'getIssueLogs']);
-    Route::post('getIssueLogs', [IssueManagementController::class,'getIssueLogs']);
-    Route::get('getIssueTypeLogs', [IssueManagementController::class,'getIssueTypeLogs']);
-    Route::get('getIssueStatusGroupsLogs', [IssueManagementController::class,'getIssueStatusGroupsLogs']);
-    Route::get('getIssueTypeCategoriesLogs', [IssueManagementController::class,'getIssueTypeCategoriesLogs']);
-    Route::get('getIssueStatusesLogs', [IssueManagementController::class,'getIssueStatusesLogs']);
     Route::get('getIssueManagementOrganisationalAreas', [IssueManagementController::class, 'getIssueManagementOrganisationalAreas']);
     Route::post('saveIssueManagementOrganisationalAreas', [IssueManagementController::class, 'saveIssueManagementOrganisationalAreas']);
     Route::get('getActivity', [IssueManagementController::class, 'getActivity']);
     Route::get('generateIssueReport', [IssueManagementController::class, 'generateIssueReport']);
+
+    Route::get('getIssueTypeLogs', [IssueManagementController::class, 'getIssueTypeLogs']);
+    Route::get('getIssueLogs', [IssueManagementController::class, 'getIssueLogs']);
+    Route::get('getIssueTypeCategoriesLogs', [IssueManagementController::class, 'getIssueTypeCategoriesLogs']);
+    Route::get('getIssueStatusGroupsLogs', [IssueManagementController::class, 'getIssueStatusGroupsLogs']);
+    Route::get('getIssueStatusesLogs', [IssueManagementController::class, 'getIssueStatusesLogs']);
 });

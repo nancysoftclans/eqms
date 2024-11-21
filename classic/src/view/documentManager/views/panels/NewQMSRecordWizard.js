@@ -224,6 +224,7 @@ Ext.define('Admin.view.documentManager.views.panels.NewQMSRecordWizard', {
                     iconCls: 'fa fa-arrow-left',
                     max_step:1,
                     name: 'prev',
+                    hidden: true,
                     bind: {
                         disabled: '{atBeginning}'
                     },
@@ -285,6 +286,7 @@ Ext.define('Admin.view.documentManager.views.panels.NewQMSRecordWizard', {
                     iconCls: 'fa fa-arrow-right',
                     iconAlign: 'right',
                     max_step:1,
+                    hidden: true,
                     bind: {
                         disabled: '{atEnd}'
                     },wizard:'newqmsrecordwizard',

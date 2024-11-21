@@ -18,7 +18,7 @@ Ext.define('Admin.view.auditManagement.views.grids.DocumentTypeLogGrid', {
     // }],
     
     itemId: 'documenttypeloggrids',
-
+    height: 600,
     features: [{
         ftype: 'searching',
         minChars: 2,
@@ -36,7 +36,8 @@ Ext.define('Admin.view.auditManagement.views.grids.DocumentTypeLogGrid', {
     },
     {
         xtype: 'textfield',
-        name: "id"
+        name: "id",
+        hidden:true
 
     }],
 
@@ -44,7 +45,7 @@ Ext.define('Admin.view.auditManagement.views.grids.DocumentTypeLogGrid', {
         beforerender: {
             fn: 'setGridStore',
             config: {
-                storeId: 'audittypestore',
+                storeId: 'doctypestore',
                 proxy: {
                     api: {
                         read: 'documentmanagement/getDocumentTypeLogs'  
@@ -70,21 +71,11 @@ Ext.define('Admin.view.auditManagement.views.grids.DocumentTypeLogGrid', {
 
             var mainTabPnl = Ext.ComponentQuery.query('#contentPanel')[0], // Get the main panel
                 containerPnl = mainTabPnl.getActiveTab();
-            //var formdata = Ext.ComponentQuery.query('#NewAuditDetails')[0];
-            //console.log(formdata)
-                //console.log(containerPnl);
-            //  process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
-            //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
-            //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
-               // refId = containerPnl.down('hiddenfield[name=id]').getValue();
              var  refId = grid.down('textfield[name=id]').getValue();
              //var grid = this.up('grid'),
-             console.log(refId);
 
-                //applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
             store.getProxy().extraParams = {
                 table_name: 'eqms_document_type_logs',
-                //application_code: applicationCode,
                 ref_id:refId
             };
         }
@@ -167,27 +158,6 @@ Ext.define('Admin.view.auditManagement.views.grids.DocumentTypeLogGrid', {
         flex: 1,
         sortable: true
     },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'application_status',
-    //     text: 'Status',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'curr_stage_id',
-    //     text: 'Stage id',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'application_status_id',
-    //     text: 'Status id',
-    //     flex: 1,
-    //     sortable: true
-    // },
     {
         xtype: 'gridcolumn',
         dataIndex: 'submitted_by',

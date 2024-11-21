@@ -17,12 +17,13 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueTypeLogGrid', {
     //     ptype: 'cellediting',
     //     clicksToEdit: 1
     // }],
-
+    height: 600,
 
     tbar: [
         {
             xtype: 'textfield',
-            name: 'id'
+            name: 'id',
+            hidden:true
         }
     ],
 
@@ -70,14 +71,9 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueTypeLogGrid', {
             var mainTabPnl = Ext.ComponentQuery.query('#contentPanel')[0], // Get the main panel
                 containerPnl = mainTabPnl.getActiveTab();
 
-            //  process_id = containerPnl.down('hiddenfield[name=process_id]').getValue(),
-            //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
-            //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
-                //applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
                 id = grid.down('textfield[name=id]').getValue(),
             store.getProxy().extraParams = {
                 table_name: 'eqms_issue_types_logs',
-                //application_code: applicationCode,
                 ref_id : id
             };
         }
@@ -117,13 +113,13 @@ Ext.define('Admin.view.issuemanagement.views.grids.IssueTypeLogGrid', {
         flex: 1,
         sortable: true
     },
-    {
-        xtype: 'gridcolumn',
-        dataIndex: 'status_group_id',
-        text: 'status group id',
-        flex: 1,
-        sortable: true
-    },
+    // {
+    //     xtype: 'gridcolumn',
+    //     dataIndex: 'status_group_id',
+    //     text: 'status group id',
+    //     flex: 1,
+    //     sortable: true
+    // },
     {
         xtype: 'gridcolumn',
         dataIndex: 'issue_type_category_id',

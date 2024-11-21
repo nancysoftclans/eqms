@@ -344,6 +344,59 @@ Ext.define('Admin.view.workflowmanagement.views.forms.WorkflowActionsFrm', {
         }
     },{
         xtype: 'combo', anyMatch: true,
+        name: 'has_qms_notification',
+        store: 'confirmationstr',
+        valueField: 'id',
+        displayField: 'name',
+        queryMode: 'local',
+        forceSelection: true,
+        fieldLabel: 'Has QMS Notification?',
+        value: 2,
+        listeners: {
+            change: function (cbo, newVal) {
+                var form = cbo.up('form'),
+                    emailCbo = form.down('combo[name=qms_msg_id]');
+                if (newVal == 1 || newVal === 1) {
+                    emailCbo.reset();
+                    emailCbo.allowBlank = false;
+                    emailCbo.validate();
+                    emailCbo.setVisible(true);
+                } else {
+                    emailCbo.reset();
+                    emailCbo.allowBlank = true;
+                    emailCbo.validate();
+                    emailCbo.setVisible(false);
+                }
+            }
+        }
+    },{
+        xtype: 'combo', anyMatch: true,
+        name: 'qms_msg_id',
+        valueField: 'id',
+        displayField: 'description',
+        queryMode: 'local',
+        forceSelection: true,
+        allowBlank: true,
+        hidden: true,
+        anyMatch: true,
+        fieldLabel: 'QMS Email Message',
+        listeners: {
+            beforerender: {
+                fn: 'setWorkflowCombosStore',
+                config: {
+                    pageSize: 1000,
+                     proxy: {
+                        url: 'configurations/getConfigParamFromTable',
+                        extraParams: {
+                            table_name: 'par_email_messages_templates'
+                        }
+                    }
+                },
+                isLoad: true
+            }
+        }
+    },{
+        xtype: 'combo', anyMatch: true,
         name: 'has_preminsp_notification',
         store: 'confirmationstr',
         valueField: 'id',

@@ -25,9 +25,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
     },
 
     onSelectAuditType:function(grid ,record) {
-        console.log(grid) 
-        console.log(record);  
-        
+            
        var me = this,
            data = record.data
     },
@@ -161,9 +159,6 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
        panelObject = Ext.widget(btn.panelXtype),
        frm = panelObject.down('form');
 
-       console.log(panelObject);
-       console.log(frm);
-
 
        frm.loadRecord(record);
       
@@ -243,7 +238,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
             child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
         }
-        child.setHeight('600');
+        //child.setHeight('600');
 
 
 
@@ -271,7 +266,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
     //logGrid.setHeight(650);
    // var logGrid = Ext.ComponentQuery.query('#audittypeloggrids')[0];
     var logGrid = Ext.widget(childXtype);
-    console.log(logGrid);
+    //console.log(logGrid);
     logGrid.down('textfield[name=id]').setValue(refId);
 
     funcShowCustomizableWindow(winTitle, winWidth, logGrid, 'customizablewindow');
@@ -297,12 +292,12 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                     'Authorization': 'Bearer ' + access_token
                 },
                 success: function (form, action) {
-                    console.log("Server response:", action.response.responseText);
+                    //console.log("Server response:", action.response.responseText);
                     var response = Ext.decode(action.response.responseText),
                         success = response.success;
                         message = response.message;
                         id = response.record_id;
-                        console.log(id);
+                        //console.log(id);
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                         store.removeAll();
@@ -317,7 +312,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                 failure: function (form, action) {
                     var resp = action.result;
 
-                    console.log(resp);
+                    //console.log(resp);
                     toastr.error(resp.message, 'Failure Response');
                 },
             });

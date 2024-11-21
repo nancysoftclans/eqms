@@ -17,12 +17,13 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
     //     ptype: 'cellediting',
     //     clicksToEdit: 1
     // }],
-
+    height: 600,
 
     tbar: [
         {
             xtype: 'textfield',
-            name: 'id'
+            name: 'id',
+            hidden: true
         }
     ],
 
@@ -46,7 +47,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
         beforerender: {
             fn: 'setGridStore',
             config: {
-                storeId:'issuetypelogstore',
+                storeId:'docrenewlogstore',
                 proxy: {
                     api: {
                         read: 'documentmanagement/getDocumentLogs'
@@ -74,7 +75,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
             //     moduleId = containerPnl.down('hiddenfield[name=module_id]').getValue(),
             //     submodule_id = containerPnl.down('hiddenfield[name=sub_module_id]').getValue(),
                 applicationCode = containerPnl.down('hiddenfield[name=active_application_code]').getValue();
-                console.log(applicationCode);
+            
                 //id = grid.down('textfield[name=id]').getValue(),
             store.getProxy().extraParams = {
                 table_name: 'eqms_document_management_logs',
@@ -85,20 +86,7 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
     }],
 
     columns: [
-    //     {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'title',
-    //     text: 'Title',
-    //     flex: 1,
-    //     sortable: true
-    // },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'description',
-    //     text: 'Description',
-    //     flex: 1,
-    //     sortable: true
-    // },
+   
     {
         xtype: 'gridcolumn',
         dataIndex: 'user_name',
@@ -120,13 +108,6 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
         flex: 1,
         sortable: true
     },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'status_group_id',
-    //     text: 'status group id',
-    //     flex: 1,
-    //     sortable: true
-    // },
     {
         xtype: 'gridcolumn',
         dataIndex: 'submitted_by',
@@ -134,13 +115,6 @@ Ext.define('Admin.view.documentManager.views.grids.DocRenewLogGrid', {
         flex: 1,
         sortable: true
     },
-    // {
-    //     xtype: 'gridcolumn',
-    //     dataIndex: 'is_enabled',
-    //     text: 'is enabled',
-    //     flex: 1,
-    //     sortable: true
-    // },
     {
         xtype: 'gridcolumn',
         dataIndex: 'created_on',

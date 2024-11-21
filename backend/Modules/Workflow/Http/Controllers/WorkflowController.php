@@ -68,7 +68,6 @@ class WorkflowController extends Controller
                 }
                 $this->user_id = Auth::user()->id;
                 $method = $request->route()->getActionMethod();
-                $inputTable = $request->input('table_name');
                 $module_id = $request->input('module_id');
                 $sub_module_id = $request->input('sub_module_id');
                 $curr_stage_id = $request->input('curr_stage_id');
@@ -92,6 +91,10 @@ class WorkflowController extends Controller
                 $doc_description = $request->input('doc_description');
                 $navigator_name = $request->input('navigator_name');
                 $navigator_folder_id = $request->input('navigator_folder_id');
+                $audit_type_id = $request->input('audit_type_id');
+                $process_name = $request->input('process_name');
+                $next_stage = $request->input('next_stage');
+
 
 
                 $action = '';
@@ -99,29 +102,15 @@ class WorkflowController extends Controller
                 switch ($method) {
                     case 'handleApplicationSubmission':
                             
-                        $action = 'Submit application';
+                        $action = 'Application submission';
                         break;
-                    case 'saveEditedConfigCommonData':
-
-                        $action = 'saved edited configuration common data';
-                        break;
-                    case 'deleteConfigRecord':
-                        $action = 'deleted configuration record';
-                        break;
-                    case 'saveDocumentTypes':
-                        $action = 'saved document types';
-                        break;
-                    case 'navigatorFolder':
-                        $action = 'saved navigator folder';
-                        break;
-                    default:
-                        break;
+                    
                 }
 
                 $table_data = null;
 
-                switch ($table) {
-                    case 'tra_documentmanager_application':
+                switch ($module_id) {
+                    case '26':
                         $table_name = 'eqms_document_management_logs';
                         $table_data = array(
                             'user_id' => $user_id,
@@ -145,30 +134,49 @@ class WorkflowController extends Controller
                             'application_status' => $application_status,
                             'curr_stage_id' => $curr_stage_id
                         );
+                    break;
+                    case '28':
+                        $table_name = 'eqms_issue_management_logs';
+                        $table_data = array(
+                            'user_id' => $user_id,
+                            'application_code' => $application_code,
+                            'action' => $action,
+                            'ref_id' => $id,
+                            'workflow_stage_id' => $workflow_stage_id,
+                            'module_id' => $module_id,
+                            'sub_module_id' => $sub_module_id,
+                            'application_status_id' => $application_status_id,
+                            'process_name' =>$process_name,
+                            'current_stage_name'=>$current_stage_name,
+                            'responsible_user'=>$responsible_user,
+                            'next_stage'=>$next_stage,
+                            // 'issue_status_id' => $issue_status_id,
+                            // 'issue_type_id' => $issue_type_id,
+                            'created_on' => $created_on,
+                        );
+                    break;
+                    case "29":
+                        $table_name = "eqms_audit_management_logs";
+                        $table_data = array(
+                            'user_id' => $this->user_id,
+                            'application_code' => $application_code,
+                            'action' => $action,
+                            'created_on' => Carbon::now(),
+                            'ref_id' => $id,
+                            'module_id' => $module_id,
+                            'sub_module_id' => $sub_module_id,
+                            'process_id' => $process_id,
+                            'audit_type_id' => $audit_type_id,
+                            'current_stage_name' => $current_stage_name,
+                            'application_status' => $application_status,
+                            'curr_stage_id' => $curr_stage_id,
+                            'application_status_id' => $application_status_id,
+                            'responsible_user' => $responsible_user,
+                            'submitted_by' => $this->user_id,
+                        );
                 }
 
                 if ($table_data) {
-                    //$dbtable = $table_name;
-                    //$user_id = $this->user_id;
-                    //$application_code = $request->input('application_code') ?? null;
-                    //$created_on = Carbon::now();
-                
-                    // $table_data = array(
-                    //     'user_id' => $user_id,
-                    //     'application_code' => $application_code,
-                    //     'module_id'=>$module_id,
-                    //     'sub_module_id'=>$sub_module_id,
-                    //     'action' => $action,
-                    //     'curr_stage_id' => $curr_stage_id,
-                    //     'current_stage_name' => $current_stage_name,
-                    //     'application_status' => $application_status,
-                    //     'application_status_id' => $application_status_id,
-                    //     'responsible_user' => $responsible_user,
-                    //     'process_id' => $process_id,
-                    //     'submitted_by' => $user_id,
-                    //     'created_on' => $created_on,
-                    // );
-                    // Insert to the database
                     DB::table($table_name)->insert($table_data);
                 }              
                 return $next($request);
@@ -3194,6 +3202,10 @@ class WorkflowController extends Controller
             //meeting inivitation
             $has_technicalmeeting_notification = $action_details->has_technicalmeeting_notification;
             $technicalmeetinemail_msg_id = $action_details->technicalmeetinemail_msg_id;
+
+
+            $has_qms_notification = $action_details->has_qms_notification;
+            $qms_msg_id = $action_details->qms_msg_id;
 
             $has_preminsp_notification = $action_details->has_preminsp_notification;
             $preminspmail_msg_id = $action_details->preminspmail_msg_id;
