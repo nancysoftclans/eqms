@@ -17,6 +17,7 @@ Ext.define('Admin.view.auditManagement.views.dashboard.AuditMgmntDashCnt', {
         {
             xtype: 'auditManagementDashTb',
             region: 'south'
-        }
+        },
+       
     ]
 });

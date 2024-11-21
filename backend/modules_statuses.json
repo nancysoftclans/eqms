@@ -17,5 +17,6 @@
     "Onlineservices": true,
     "Integration": true,
     "IssueManagement": true,
-    "AuditManagement": true
+    "AuditManagement": true,
+    "QualityDocumentControl": true
 }

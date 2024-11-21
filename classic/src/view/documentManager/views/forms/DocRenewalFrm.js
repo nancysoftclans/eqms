@@ -19,6 +19,7 @@
     },
     frame: true,
     bodyPadding: 8,
+    itemId: 'docrenewalfrm',
     items: [
     {
         xtype: 'hiddenfield',
@@ -57,8 +58,23 @@
         xtype: 'textfield',
         fieldLabel: 'Document Title',
         margin: '0 20 20 0',
+        columnWidth: 0.23,
         name: 'doc_title'
-    },{
+    }, {
+                    xtype: 'button',
+                    iconCls: 'x-fa fa-search',
+                    columnWidth: 0.1,
+                    tooltip: 'Search',
+                    action: 'search_document',
+                    childXtype: 'livedocumentsgrid',
+                    winTitle: 'Select Document',
+                    winWidth: '90%',
+                    margin: '30 20 20 0',
+                    text: 'Select Doc',
+                    bind: {
+                        disabled: '{isReadOnly}'
+                    }
+                },{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Document Type',
         margin: '0 20 20 0',

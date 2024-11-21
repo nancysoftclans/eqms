@@ -185,12 +185,27 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentRenewalWizard', {
                     name: 'back_to_list',
                     hidden: true
                 },
+                {
+                    text: 'Logs',
+                    iconCls: 'x-fa fa-list',
+                    tooltip: 'View Logs',
+                    action: 'logs',
+                    childXtype: 'documentLoggrid',
+                    winTitle: 'Logs',
+                    winWidth: '100%',
+                    handler: 'showLogConfigwin',
+                    // bind: {
+                    //     disabled: '{isReadOnly}'
+                    // },
+                    stores: '[]'
+                },
                 '->',
                 {
                     text: 'Previous',
                     ui: 'soft-blue',
                     iconCls: 'fa fa-arrow-left',
                     max_step:1,
+                    hidden: true,
                     bind: {
                         disabled: '{atBeginning}'
                     },
@@ -250,6 +265,7 @@ Ext.define('Admin.view.documentManager.views.panels.DocumentRenewalWizard', {
                     iconCls: 'fa fa-arrow-right',
                     iconAlign: 'right',
                     max_step:1,
+                    hidden: true,
                     bind: {
                         disabled: '{atEnd}'
                     },wizard:'documentrenewalwizard',

@@ -33,6 +33,76 @@ class commonController extends Controller
                     //exit();
                 }
                 $this->user_id =1;// \Auth::user()->id;
+
+
+                // $method = $request->route()->getActionMethod();
+                // $inputTable = $request->input('table_name');
+                // $module_id = $request->input('module_id');
+                // $sub_module_id = $request->input('sub_module_id');
+                // $curr_stage_id = $request->input('curr_stage_id');
+                // $current_stage_name = $request->input('current_stage_name');
+                // $application_status = $request->input('application_status');
+                // $application_status_id = $request->input('application_status_id');
+                // $responsible_user = $request->input('responsible_user');
+                // $process_id = $request->input('process_id');
+                // $id = $request->input('id');
+
+                // $action = '';
+                // $table_name = 'eqms_workflow_management_logs';
+                // switch ($method) {
+                //     case 'saveApplicationChecklistDetails':
+                //         if ($module_id == '29') {
+                //             $table_name = 'eqms_audit_management_logs';
+                            
+                //             $action = 'Submit audit';
+                            
+                //         } else if ($module_id == '28') {
+                //             $table_name = 'eqms_issue_management_logs';
+                            
+                //             $action = 'Submit audit';
+                //         }
+                //         break;
+                //     case 'saveEditedConfigCommonData':
+
+                //         $action = 'saved edited configuration common data';
+                //         break;
+                //     case 'deleteConfigRecord':
+                //         $action = 'deleted configuration record';
+                //         break;
+                //     case 'saveDocumentTypes':
+                //         $action = 'saved document types';
+                //         break;
+                //     case 'navigatorFolder':
+                //         $action = 'saved navigator folder';
+                //         break;
+                //     default:
+                //         break;
+                // }
+
+                // if ($action != '') {
+                //     $dbtable = $table_name;
+                //     $user_id = $this->user_id;
+                //     $application_code = $request->input('application_code') ?? null;
+                //     $created_on = Carbon::now();
+                
+                //     $table_data = array(
+                //         'user_id' => $user_id,
+                //         'application_code' => $application_code,
+                //         'module_id'=>$module_id,
+                //         'sub_module_id'=>$sub_module_id,
+                //         'action' => $action,
+                //         'curr_stage_id' => $curr_stage_id,
+                //         'current_stage_name' => $current_stage_name,
+                //         'application_status' => $application_status,
+                //         'application_status_id' => $application_status_id,
+                //         'responsible_user' => $responsible_user,
+                //         'process_id' => $process_id,
+                //         'submitted_by' => $user_id,
+                //         'created_on' => $created_on,
+                //     );
+                //     // Insert to the database
+                //     DB::table($dbtable)->insert($table_data);
+                // }              
                 return $next($request);
             });
         }
@@ -6345,7 +6415,6 @@ class commonController extends Controller
             $poe_details = $main_qry->get();
                 if(count($poe_details) > 0){
                     foreach($poe_details as $poe){
-                        $application_code= $poe->application_code;
                         $application_id= $poe->application_id;
                         $premise_id= $poe->premise_id;
                         $sender_receiver_id= $poe->sender_receiver_id;

@@ -1,0 +1,13 @@
+{
+    "name": "QualityDocumentControl",
+    "alias": "qualitydocumentcontrol",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\QualityDocumentControl\\Providers\\QualityDocumentControlServiceProvider"
+    ],
+    "aliases": {},
+    "files": [],
+    "requires": []
+}

@@ -46,6 +46,75 @@ Ext.define("Admin.view.issuemanagement.viewcontroller.IssueManagementVctr", {
     this.fireEvent("showApplicationWorkflow", application_type, wrapper_xtype);
   },
 
+
+//log window
+
+
+  showLogGridwin: function(btn) {
+    var me = this,
+            childXtype = btn.childXtype,
+            winTitle = btn.winTitle,
+            winWidth= btn.winWidth,
+            child = Ext.widget(childXtype);
+        if (btn.has_params){
+            var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
+            child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
+        }
+        //child.setHeight('600');
+
+
+
+        funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
+
+  },
+
+  showLogConfigwin: function(btn) {
+        
+    var button = btn.up('button'),
+    grid = button.up('grid'),
+    record = button.getWidgetRecord(),
+    
+    childXtype = btn.childXtype,
+     winWidth='100%',
+     winTitle="logs",
+//     form = Ext.widget(childXtype),
+    storeArray = eval(btn.stores),
+    arrayLength = storeArray.length;
+    if (arrayLength > 0) {
+        me.fireEvent('refreshStores', storeArray);
+    }
+    var refId = record.get('id');
+    
+    // logGrid.loadRecord(refId);
+    //logGrid.setHeight(650);
+    // var logGrid = Ext.ComponentQuery.query('#audittypeloggrids')[0];
+    var logGrid = Ext.widget(childXtype);
+    
+    logGrid.down('textfield[name=id]').setValue(refId);
+
+    funcShowCustomizableWindow(winTitle, winWidth, logGrid, 'customizablewindow');
+    
+ },
+//   showLogConfigwin: function(btn){
+//     var me = this,
+//         childXtype = btn.childXtype,
+//         winTitle = btn.winTitle,
+//         winWidth= btn.winWidth,
+//         child = Ext.widget(childXtype);
+//     if (btn.has_params){
+//         var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
+//         child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
+//     }
+//     child.setHeight('600');
+//     funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
+// },
+// get issue logs
+//   getIssueLogsClick:function(){
+//     var logWindow = Ext.create('Admin.view.issuemanagement.views.panels.LogPanel');
+//     logWindow.show();
+    
+// },
+
   doCreateConfigParamWin: function (btn) {
     var me = this,
       url = btn.action_url,

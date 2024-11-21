@@ -13,7 +13,7 @@ class CreateParDocumentTypesTable extends Migration
      */
     public function up()
     {
-        Schema::create('par_document_types', function (Blueprint $table) {
+        Schema::create('par_qms_documents_types', function (Blueprint $table) {
             $table->id();
             $table->string('name')->default('0');
             $table->string('property_ids')->nullable()->default('0');

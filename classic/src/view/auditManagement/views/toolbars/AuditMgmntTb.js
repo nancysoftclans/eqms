@@ -23,6 +23,6 @@ Ext.define('Admin.view.auditManagement.views.toolbars.AuditMgmntTb.js', {
             iconCls: 'x-fa fa-plus-square',
             handler: 'onInitiateAuditPlan',
             app_type: 103
-        },
+        }
     ]
 });

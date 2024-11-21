@@ -74,10 +74,257 @@ class DocumentManagementController extends Controller
                     exit();
                 }
                 $this->user_id = \Auth::user()->id;
+
+                $method = $request->route()->getActionMethod();
+
+                $req = $request;                
+                $table_name = 'eqms_document_management_logs';
+                $user_id = $this->user_id;
+                $application_code = $request->input('application_code') ?? $req->input('application_code') ?? null;
+                $module_id = $request->input('module_id');
+                $sub_module_id = $request->input('sub_module_id');
+                $workflow_stage_id = $request->input('workflow_stage_id');
+                $stage_category_id = $request->input('stage_category_id');
+                $application_status_id = $request->input('application-status_id');
+                $doc_title = $request->input('doc_title');
+                $document_type_id = $request->input('documentn_type_id');
+                $doc_version = $request->input('doc_version');
+                $owner_type_id = $request->input('owner_type_id');
+                $owner_user_id = $request->input('owner_user_id');
+                $owner_group_id = $request->input('owner_group_id');
+                $doc_description = $request->input('doc_description');
+                $navigator_name = $request->input('navigator_name');
+                $navigator_folder_id = $request->input('navigator_folder_id');
+
+                $created_on = Carbon::now();
+
+                $action = '';
+
+                switch ($method) {
+                    case 'saveDocDefinationrequirement':
+                        $action = 'saved document definition requirement';
+                        break;
+                    case 'saveDocumentRecommendationComments':
+                        $action = 'saved comments';
+                        break;                
+                    default:
+                        break;
+                }
+
+                
+                if($action != '')
+                {
+                    $table_data = array(
+                        'user_id' => $user_id,
+                        'application_code' => $application_code,
+                        'action' => $action,
+                        'created_on' => $created_on,
+                        'module_id' => $module_id,
+                        'sub_module_id' => $sub_module_id,
+                        'workflow_stage_id' => $workflow_stage_id,
+                        'stage_category_id' => $stage_category_id,
+                        'application_status_id' => $application_status_id,
+                        'doc_title' => $doc_title,
+                        'document_type_id' => $document_type_id,
+                        'doc_version' => $doc_version,
+                        'owner_type_id' => $owner_type_id,
+                        'owner_user_id' => $owner_user_id,
+                        'owner_group_id' => $owner_group_id,
+                        'doc_description' => $doc_description,
+                        'navigator_name' => $navigator_name,
+                        'navigator_folder_id' => $navigator_folder_id,
+                    );
+    
+                    
+                    DB::table($table_name)->insert($table_data);
+                }
+                
+                
+                
                 return $next($request);
             });
         }
     }
+
+
+    // private function ActionLog($method, $request, $res)
+    // {
+    //     $this->user_id = \Auth::user()->id;
+
+    //     $method = $request->route()->getActionMethod();
+
+    //     $req = $request;                
+    //     $table_name = 'eqms_document_management_logs';
+    //     $user_id = $this->user_id;
+    //     $application_code = $request->input('application_code') ?? $req->input('application_code') ?? null;
+    //     $module_id = $request->input('module_id');
+    //     $sub_module_id = $request->input('sub_module_id');
+    //     $workflow_stage_id = $request->input('workflow_stage_id');
+    //     $stage_category_id = $request->input('stage_category_id');
+    //     $application_status_id = $request->input('application-status_id');
+    //     $doc_title = $request->input('doc_title');
+    //     $document_type_id = $request->input('documentn_type_id');
+    //     $doc_version = $request->input('doc_version');
+    //     $owner_type_id = $request->input('owner_type_id');
+    //     $owner_user_id = $request->input('owner_user_id');
+    //     $owner_group_id = $request->input('owner_group_id');
+    //     $doc_description = $request->input('doc_description');
+    //     $navigator_name = $request->input('navigator_name');
+    //     $navigator_folder_id = $request->input('navigator_folder_id');
+    //     $id = $res['record_id'];
+
+    //     $created_on = Carbon::now();
+
+    //     $action = '';
+
+    //     switch ($method) {
+    //         case 'saveDocDefinationrequirement':
+    //             $action = 'saved document definition requirement';
+    //             break;
+    //         case 'saveDocumentRecommendationComments':
+    //             $action = 'saved comments';
+    //             break;                
+    //         default:
+    //             break;
+    //     }
+
+        
+    //     if($action != '')
+    //     {
+    //         $table_data = array(
+    //             'user_id' => $user_id,
+    //             'application_code' => $application_code,
+    //             'action' => $action,
+    //             'created_on' => $created_on,
+    //             'module_id' => $module_id,
+    //             'sub_module_id' => $sub_module_id,
+    //             'workflow_stage_id' => $workflow_stage_id,
+    //             'stage_category_id' => $stage_category_id,
+    //             'application_status_id' => $application_status_id,
+    //             'doc_title' => $doc_title,
+    //             'document_type_id' => $document_type_id,
+    //             'doc_version' => $doc_version,
+    //             'owner_type_id' => $owner_type_id,
+    //             'owner_user_id' => $owner_user_id,
+    //             'owner_group_id' => $owner_group_id,
+    //             'doc_description' => $doc_description,
+    //             'navigator_name' => $navigator_name,
+    //             'navigator_folder_id' => $navigator_folder_id,
+    //         );
+
+            
+    //         DB::table($table_name)->insert($table_data);
+    //     } 
+    // }
+
+
+    public function getDocumentTypeLogs(Request $request) {
+        //Capture input values
+        try {
+            //$application_code = $request->input('application_code');
+            $ref_id = $request->input('ref_id');
+            if ($ref_id) {
+
+                //get log entries
+                $logs = DB::table('eqms_document_type_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->join('users as owner_user', 'logs.owner_user_id', '=', 'owner_user.id')
+                    ->join('par_groups as groups', 'logs.owner_group_id', '=', 'groups.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'owner_user.email as owner',
+                             'groups.name as group',
+                             'logs.user_id', 
+                             'logs.ref_id', 
+                             'logs.action',
+                             'logs.name',
+                             'logs.review_period',
+                             'logs.expiry_period',
+                             'logs.disposition_instructions',
+                             'logs.review_instructions',
+                             'logs.owner_user_id',
+                             'logs.owner_group_id',
+                             //'logs.issue_state_id',
+                             //'logs.description',
+                             //'logs.form_id',
+                             //'logs.status_group_id',
+                             //'logs.issue_type_category_id',
+                             'user.email as submitted_by',
+                             //'logs.is_enabled', 
+                             'logs.created_on')
+                //filter logs by id
+                
+                    ->where('logs.ref_id', '=', $ref_id)
+                    ->orderBy('logs.created_on', 'desc')
+                    ->get();
+            } else {
+               
+                $logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
+
+
+    public function getDocumentLogs(Request $request) {
+        //Capture input values
+        try {
+            $application_code = $request->input('application_code');
+            //$ref_id = $request->input('ref_id');
+            if ($application_code) {
+
+                //get log entries
+                $logs = DB::table('eqms_document_management_logs as logs')
+                    ->join('users as user', 'logs.user_id', '=', 'user.id')
+                    ->leftJoin('wf_workflow_stages as workflow', 'logs.workflow_stage_id', '=', 'workflow.id')
+                    ->leftJoin('par_owner_type as ownertype', 'logs.owner_type_id', '=', 'ownertype.id')
+                    ->leftJoin('par_groups as group', 'logs.owner_group_id', '=', 'group.id')
+                    ->select('logs.id as log_id', 
+                             'user.email as user_name',
+                             'logs.user_id', 
+                             'logs.application_code', 
+                             'logs.action',
+                             'logs.current_stage_name',
+                             'logs.application_status',
+                             'workflow.name as workflow_stage_id',
+                             'ownertype.name as owner_type_id',
+                             'group.name as owner_group_id',
+                             'logs.doc_description',
+                             'logs.navigator_name',
+                             'user.email as submitted_by',
+                             'logs.created_on')
+                
+                    ->where('logs.application_code', '=', $application_code)
+                    ->orderBy('logs.created_on', 'desc')
+                    ->get();
+            } else {
+               
+                $logs = collect([]);
+            }
+    
+            $res = [
+                'success' => true,
+                'results' => $logs,
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+        }
+    
+        return response()->json($res);
+    }
+
 
     public function getProcessApplicableDocTypes(Request $req)
     {
@@ -257,6 +504,15 @@ class DocumentManagementController extends Controller
 
                 if (recordExists($applications_table, $where_app)) {
 
+                    if($request->input('workflow_stage_id') == 13){
+
+                        $app_data = array(
+
+                         'application_status_id' => 1
+
+                        );
+                    }
+
                     $apps_tableData = getTableData($applications_table, $where_app);
                   
                     $app_details = getPreviousRecords($applications_table, $where_app);
@@ -284,6 +540,32 @@ class DocumentManagementController extends Controller
                    $res['document_number'] = $app_details[0]['document_number'];
                    $res['created_on'] = $app_details[0]['created_on'];
                    $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
+
+                   if($request->input('workflow_stage_id') == 13){
+
+                        $submission_params = array(
+                            'application_id' => $app_details[0]['id'],
+                            'process_id' => $app_details[0]['process_id'],
+                            'application_code' => $application_code,
+                            'reference_no' => $app_details[0]['tracking_no'],
+                            'tracking_no' => $app_details[0]['tracking_no'],
+                            'usr_from' => $user_id,
+                            'usr_to' => $user_id,
+                            'previous_stage' => $workflow_stage_id,
+                            'current_stage' => $workflow_stage_id,
+                            'module_id' => $module_id,
+                            'sub_module_id' => $sub_module_id,
+                            'application_status_id' => 1,
+                            'urgency' => 1,
+                            'remarks' => 'Initial Renewal',
+                            'date_received' => Carbon::now(),
+                            'created_on' => Carbon::now(),
+                            'created_by' => $user_id
+                        );
+
+
+                        $res = insertRecord('tra_submissions', $submission_params, $user_id);
+                    }
 
                 if ($res['success']) {
                     initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
@@ -1919,6 +2201,7 @@ class DocumentManagementController extends Controller
                 );
                 // validateDocumentUploadSubmission($where);
                 $res = array('success' => true, 'message' => 'validated');
+
             }
             //check for the invoice generation
 

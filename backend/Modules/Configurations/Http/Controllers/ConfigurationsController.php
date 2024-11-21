@@ -34,10 +34,236 @@ class ConfigurationsController extends Controller
                     exit ();
                 }
                 $this->user_id = \Auth::user()->id;
+
+                $method = $request->route()->getActionMethod();
+                $module_id = $request->input('module_id');
+                $table = $request->input('table_name');
+                $id = $request->input('id');
+                $name = $request->input('name');
+                $is_enabled = $request->input('is_enabled');
+                $title = $request->input('title');
+                $issue_state_id = $request->input('issue_state_id');
+                $sub_module_id = $request->input('sub_module_id');
+                $review_period = $request->input('review_period');
+                $review_instructions = $request->input('review_instructions');
+                $expiry_period = $request->input('expiry_period');
+                $disposition_instructions = $request->input('disposition_instructions');
+                $owner_user_id = $request->input('owner_user_id');
+                $owner_group_id = $request->input('owner_group_id');
+                // $has_parent_level = $request->input('has_parent_level');
+                // $has_restiction_id = $request->input('has_restriction_id');
+
+                $action = '';
+                //$table_name = 'eqms_configurations_management_logs';
+                switch ($method) {
+                    case 'saveConfigCommonData':
+                        $action = 'Saved configuration data';
+                        break;
+                    case 'saveEditedConfigCommonData':
+                        $action = 'saved edited configuration common data';
+                        break;
+                    case 'deleteConfigRecord':
+                        $action = 'deleted configuration record';
+                        break;
+                    case 'saveDocumentTypes':
+                        if ($id){
+                            $action = 'Updated document types';
+                        } else {
+                            $action = 'saved document types';
+                        }
+                        break;
+                    case 'navigatorFolder':
+                        $action = 'saved navigator folder';
+                        break;
+                    default:
+                        break;
+                }
+
+                $table_data = null;
+                switch ($table) {
+                    case 'par_finding_types':
+                        $table_name = 'par_finding_types_logs';
+                        $table_data = array(
+                            'name' => $name,
+                            'ref_id' => $id,
+                            'user_id' => $this->user_id,
+                            'is_enabled' => $is_enabled,
+                            'submitted_by' => $this->user_id,
+                            'action' => $action,
+                            'created_on' => Carbon::now(),
+                        );
+                        break;
+                    case 'par_issue_type_categories':
+                        $table_name = 'eqms_issue_types_categories_logs';
+                        $table_data = array(
+                            'title' => $title,
+                            'ref_id' => $id,
+                            'user_id' => $this->user_id,
+                            'is_enabled' => $is_enabled,
+                            'submitted_by' => $this->user_id,
+                            'action' => $action,
+                            'created_on' => Carbon::now(),
+                        );
+                        break;
+                    case 'par_issue_statuses':
+                        $table_name = 'eqms_issue_statuses_logs';
+                        $table_data = array(
+                            'title' => $title,
+                            'ref_id' => $id,
+                            'issue_state_id' => $issue_state_id,
+                            'user_id' => $this->user_id,
+                            'is_enabled' => $is_enabled,
+                            'submitted_by' => $this->user_id,
+                            'action' => $action,
+                            'created_on' => Carbon::now(),
+                        );
+                        break;
+                        case 'par_qms_documents_types':
+                            $table_name = 'eqms_document_type_logs';
+                            $table_data = array(
+                                'name' => $name,
+                                'ref_id' => $id,
+                                'sub_module_id' => $sub_module_id,
+                                'review_period' => $review_period,
+                                'user_id' => $this->user_id,
+                                'is_enabled' => $is_enabled,
+                                'submitted_by' => $this->user_id,
+                                'action' => $action,
+                                'expiry_period' => $expiry_period,
+                                'disposition_instructions' => $disposition_instructions,
+                                'review_instructions' => $review_instructions,
+                                'owner_user_id' => $owner_user_id,
+                                'owner_group_id' =>$owner_group_id,
+                                'created_on' => Carbon::now(),
+                            );
+                            break;
+                            // case 'par_navigator_folders':
+                            //     $table_name = 'eqms_navigator_folder_logs';
+                            //     $table_data = array(
+                            //         'name' => $name,
+                            //         'ref_id' => $id,
+                            //         'has_parent_level' => $has_parent_level,
+                            //         'has_retriction_id' => $has_restiction_id,
+                            //         'user_id' => $this->user_id,
+                            //         'is_enabled' => $is_enabled,
+                            //         'submitted_by' => $this->user_id,
+                            //         'action' => $action,
+                            //         'created_on' => Carbon::now(),
+                            //     );
+                            //     break;
+                    default:
+                        break;
+                }
+
+                if ($table_data) {
+                    // Insert into the database
+                    DB::table($table_name)->insert($table_data);
+                }              
                 return $next($request);
             });
         }
     }
+
+
+
+    // private function ActionLog($method, $request, $res)
+    // {
+    //     $user_id = \Auth::user()->id;
+    //     $method = $request->route()->getActionMethod();
+    //     $table = $request->input('table_name');
+    //     $post_data = $request->post();
+
+    //             $action = '';
+    //             //$table_name = 'eqms_configurations_management_logs';
+    //             switch ($method) {
+    //                 case 'saveConfigCommonData':
+    //                     $action = 'Updated configuration data';
+    //                     break;
+    //                 case 'saveEditedConfigCommonData':
+    //                     $action = 'saved edited configuration common data';
+    //                     break;
+    //                 case 'deleteConfigRecord':
+    //                     $action = 'deleted configuration record';
+    //                     break;
+    //                 case 'saveDocumentTypes':
+    //                     $action = 'Updated document types';
+    //                     break;
+    //                 case 'navigatorFolder':
+    //                     $action = 'saved navigator folder';
+    //                     break;
+    //                 default:
+    //                     break;
+    //             }
+
+    //             $table_data = null;
+    //             switch ($table) {
+    //                 case 'par_finding_types':
+    //                     $table_name = 'par_finding_types_logs';
+    //                     $table_data = array(
+    //                         'name' => $post_data['name'],
+    //                         'ref_id' => $post_data['id'],
+    //                         'user_id' => $this->user_id,
+    //                         'is_enabled' => $post_data['is_enabled'],
+    //                         'submitted_by' => $this->user_id,
+    //                         'action' => $action,
+    //                         'created_on' => Carbon::now(),
+    //                     );
+    //                     break;
+    //                 case 'par_issue_type_categories':
+    //                     $table_name = 'eqms_issue_types_categories_logs';
+    //                     $table_data = array(
+    //                         'name' => $post_data['title'],         
+    //                         'ref_id' => $post_data['id'],           
+    //                         'user_id' => $this->user_id,
+    //                         'is_enabled' => $post_data['is_enabled'], 
+    //                         'submitted_by' => $this->user_id,
+    //                         'action' => $action, 
+    //                         'created_on' => Carbon::now(),
+    //                     );
+    //                     break;
+    //                 case 'par_issue_statuses':
+    //                     $table_name = 'eqms_issue_statuses_logs';
+    //                     $table_data = array(
+    //                         'title' => $post_data['title'],          
+    //                         'ref_id' => $post_data['id'],              
+    //                         'issue_state_id' => $post_data['issue_state_id'],
+    //                         'user_id' => $this->user_id,
+    //                         'is_enabled' => $post_data['is_enabled'], 
+    //                         'submitted_by' => $this->user_id,
+    //                         'action' => $action, 
+    //                         'created_on' => Carbon::now(),
+    //                     );
+                        
+    //                     break;
+    //                     case 'par_qms_documents_types':
+    //                         $table_name = 'eqms_document_type_logs';
+    //                         $table_data = array(
+    //                             'name' => $post_data['name'],                            
+    //                             'ref_id' => $post_data['id'],                            
+    //                             'sub_module_id' => $post_data['sub_module_id'],        
+    //                             'review_period' => $post_data['review_period'],         
+    //                             'user_id' => $this->user_id,
+    //                             'is_enabled' => $post_data['is_enabled'],                
+    //                             'submitted_by' => $this->user_id,
+    //                             'action' => $action,    
+    //                             'expiry_period' => $post_data['expiry_period'],          
+    //                             'disposition_instructions' => $post_data['disposition_instructions'], 
+    //                             'review_instructions' => $post_data['review_instructions'], 
+    //                             'owner_user_id' => $post_data['owner_user_id'],          
+    //                             'owner_group_id' => $post_data['owner_group_id'],       
+    //                             'created_on' => Carbon::now(),
+    //                         );
+                            
+    //                         break;
+    //                 default:
+    //                     break;
+    //             }
+    //             if ($table_data) {
+    //                 // Insert into the database
+    //                 DB::table($table_name)->insert($table_data);
+    //             } 
+    // }
+
 
     public function index()
     {
@@ -158,6 +384,7 @@ class ConfigurationsController extends Controller
 
                 $res = insertRecord($table_name, $table_data);
             }
+            //$this->ActionLog('saveConfigCommonData', $req, $res);
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 
@@ -2218,6 +2445,7 @@ class ConfigurationsController extends Controller
             'results' => $pure_array,
             'title' => $param->param_title,
             'table_name' => $param->table_name,
+            'ref_id'=> $param->id,
             'message' => 'All is well'
         );
         return response()->json($res);

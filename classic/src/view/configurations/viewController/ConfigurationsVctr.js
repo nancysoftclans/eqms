@@ -30,6 +30,23 @@ Ext.define('Admin.view.configurations.viewcontroller.ConfigurationsVctr', {
   setGridTreeStore: function (obj, options) {
         this.fireEvent('setGridTreeStore', obj, options);
     },
+
+
+    // show log window
+    showLogConfigwin: function(btn){
+        var me = this,
+            childXtype = btn.childXtype,
+            winTitle = btn.winTitle,
+            winWidth= btn.winWidth,
+            child = Ext.widget(childXtype);
+        if (btn.has_params){
+            var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
+            child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
+        }
+        child.setHeight('600');
+        funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
+    },
+
   showAddParticipantsGrid: function(item) {
           var me = this,
            btn = item.up('button'),

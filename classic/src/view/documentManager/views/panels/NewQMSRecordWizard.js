@@ -203,6 +203,20 @@ Ext.define('Admin.view.documentManager.views.panels.NewQMSRecordWizard', {
                     name: 'back_to_list',
                     hidden: true
                 },
+                {
+                    text: 'Logs',
+                    iconCls: 'x-fa fa-list',
+                    tooltip: 'View Logs',
+                    action: 'logs',
+                    childXtype: 'documentLoggrid',
+                    winTitle: 'Logs',
+                    winWidth: '100%',
+                    handler: 'showLogConfigwin',
+                    // bind: {
+                    //     disabled: '{isReadOnly}'
+                    // },
+                    stores: '[]'
+                },
                 '->',
                 {
                     text: 'Previous',
@@ -210,6 +224,7 @@ Ext.define('Admin.view.documentManager.views.panels.NewQMSRecordWizard', {
                     iconCls: 'fa fa-arrow-left',
                     max_step:1,
                     name: 'prev',
+                    hidden: true,
                     bind: {
                         disabled: '{atBeginning}'
                     },
@@ -271,6 +286,7 @@ Ext.define('Admin.view.documentManager.views.panels.NewQMSRecordWizard', {
                     iconCls: 'fa fa-arrow-right',
                     iconAlign: 'right',
                     max_step:1,
+                    hidden: true,
                     bind: {
                         disabled: '{atEnd}'
                     },wizard:'newqmsrecordwizard',

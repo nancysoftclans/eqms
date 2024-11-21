@@ -8,6 +8,54 @@ Ext.define('Admin.view.documentManager.viewcontrollers.DocumentsManagementVctr',
         'Ext.exporter.text.Html',
         'Ext.exporter.excel.Xlsx'
     ],
+
+
+    showLogConfigwin: function(btn){
+        var me = this,
+            childXtype = btn.childXtype,
+            winTitle = btn.winTitle,
+            winWidth= btn.winWidth,
+            
+            child = Ext.widget(childXtype);
+        if (btn.has_params){
+            var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
+            child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
+        }
+        //child.setHeight('600');
+        funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
+    },
+
+
+    showLogConfigwinWidget: function(btn) {
+        
+        var button = btn.up('button'),
+        grid = button.up('grid'),
+        record = button.getWidgetRecord(),
+        
+        childXtype = btn.childXtype,
+        child = Ext.widget(childXtype)
+         winWidth='100%',
+         winTitle="logs",
+         //child.setHeight('600');
+    //     form = Ext.widget(childXtype),
+        storeArray = eval(btn.stores),
+        arrayLength = storeArray.length;
+        if (arrayLength > 0) {
+            me.fireEvent('refreshStores', storeArray);
+        }
+        var refId = record.get('id');
+        
+        // logGrid.loadRecord(refId);
+        //logGrid.setHeight(650);
+        // var logGrid = Ext.ComponentQuery.query('#audittypeloggrids')[0];
+        var logGrid = Ext.widget(childXtype);
+        logGrid.down('textfield[name=id]').setValue(refId);
+    
+        funcShowCustomizableWindow(winTitle, winWidth, logGrid, 'customizablewindow');
+        
+     },
+
+
     onDocRequirementSelectionChange: function(selectable, selection) {
        
     },
@@ -157,6 +205,12 @@ Ext.define('Admin.view.documentManager.viewcontrollers.DocumentsManagementVctr',
         var application_type = btn.app_type;
         this.fireEvent('onInitiateQmsRecordApplication', application_type, btn);
     },
+
+       onInitiateLiveDocumentApplication: function (btn) {
+        var application_type = btn.app_type;
+        this.fireEvent('onViewLiveDocumentDetails', application_type, btn);
+    },
+
     doCreateConfigParam: function (btn) {
         var me = this,
             action_url = btn.action_url,
@@ -396,11 +450,11 @@ showEditConfigParamWinFrm: function (item) {
 
     },
 
-    onViewLiveDocumentApplication: function (grid, record) {
+    // onViewLiveDocumentApplication: function (grid, record) {
 
-        this.fireEvent('viewLiveDocumentDetails', record);
+    //     this.fireEvent('viewLiveDocumentDetails', record);
 
-    },
+    // },
 
     getDocumentReleaseRecommendationDetails: function (btn) {
         this.fireEvent('getDocumentReleaseRecommendationDetails', btn);
@@ -1144,13 +1198,6 @@ showEditConfigParamWinFrm: function (item) {
        var store = Ext.getStore('system_submodulesStr');
         store.removeAll();
         store.load({})
-    },
-
-    onInitiateLiveDocumentApplication: function (btn) {
-        //onInitiateLiveDocumentApplication
-        var application_type = btn.renewal;
-        var submodule_id = btn.app_type;
-        this.fireEvent('onViewLiveDocumentDetails', application_type, submodule_id);
     }
 
 //     onViewDocumentDetails: function (item) {

@@ -39,7 +39,7 @@ class DmsConfigurationsController extends Controller
     {
         try {
             $sop_id = $request->sop_id;
-            $results = DB::table('par_document_types as t1')
+            $results = DB::table('par_qms_documents_types as t1')
                 ->select('t1.*', 't2.name as master_sop', 't2.sop_no')
                 ->join('par_sop_masterlist as t2', 't1.sop_id', '=', 't2.id');
             
@@ -67,7 +67,7 @@ class DmsConfigurationsController extends Controller
             $results = DB::table('par_document_subtypes as t1')
                 ->select('t1.*', 't2.name as master_sop','t3.name as document_type', 't2.sop_no')
                 ->join('par_sop_masterlist as t2', 't1.sop_id', '=', 't2.id')
-                ->join('par_document_types as t3', 't1.document_type_id', '=', 't3.id')
+                ->join('par_qms_documents_types as t3', 't1.document_type_id', '=', 't3.id')
                 ->get();
 
             $res = array(
@@ -192,7 +192,7 @@ class DmsConfigurationsController extends Controller
  
     try {
      $results = DB::table('tra_documentrecords_application as t1')
-    ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+    ->leftJoin('par_qms_documents_types as t2', 't1.document_type_id', '=', 't2.id')
     ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
@@ -227,7 +227,7 @@ public function getdocdefinationrequirementDetails(Request $req)
  
     try {
      $results = DB::table('tra_documentmanager_application as t1')
-    ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+    ->leftJoin('par_qms_documents_types as t2', 't1.document_type_id', '=', 't2.id')
     ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
@@ -248,7 +248,9 @@ public function getdocdefinationrequirementDetails(Request $req)
         //   FROM tra_documentmanager_application t2
         //   WHERE t1.navigator_folder_id = t2.id) as navigator_name")
 
-    )->get();
+    )
+    ->where('t1.sub_module_id', '!=', 105)
+    ->get();
 
         $results = convertStdClassObjToArray($results);
         $res = decryptArray($results);
@@ -265,7 +267,7 @@ public function getArchivedDocdDetails(Request $req)
  
     try {
      $results = DB::table('tra_documentmanager_archive as t1')
-    ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+    ->leftJoin('par_qms_documents_types as t2', 't1.document_type_id', '=', 't2.id')
     ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
@@ -275,6 +277,7 @@ public function getArchivedDocdDetails(Request $req)
         DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
         't1.doc_title AS mtype',
         't2.name AS document_type',
+        't4.name AS workflow_stage',
         't6.name AS status',
         't5.name AS process_name',
         't7.name AS navigator_name',
@@ -299,7 +302,7 @@ public function getArchivedDocdDetails(Request $req)
  
     try {
      $results = DB::table('tra_documentmanager_application as t1')
-    ->leftJoin('par_document_types as t2', 't1.document_type_id', '=', 't2.id')
+    ->leftJoin('par_qms_documents_types as t2', 't1.document_type_id', '=', 't2.id')
     ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
     ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
     ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
@@ -318,7 +321,45 @@ public function getArchivedDocdDetails(Request $req)
         //   WHERE t1.navigator_folder_id = t2.id) as navigator_name")
 
     )
-     ->where('t1.application_status_id',4)
+     ->where('t1.application_status_id', 4)
+     ->get();
+
+        $results = convertStdClassObjToArray($results);
+        $res = decryptArray($results);
+    } catch (\Exception $exception) {
+        $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    } catch (\Throwable $throwable) {
+        $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
+    }
+    return $res;
+    }
+
+    public function getrenewaldocumentDetails(Request $req)
+    {
+ 
+    try {
+     $results = DB::table('tra_documentmanager_application as t1')
+    ->leftJoin('par_qms_documents_types as t2', 't1.document_type_id', '=', 't2.id')
+    ->leftJoin('users as t3', 't1.owner_user_id', '=', 't3.id')
+    ->leftJoin('wf_workflow_stages as t4', 't1.workflow_stage_id', '=', 't4.id')
+    ->leftJoin('wf_processes as t5', 't1.process_id', '=', 't5.id')
+    ->leftJoin('par_system_statuses as t6', 't1.application_status_id', '=', 't6.id')
+    ->leftJoin('par_navigator_folders as t7', 't1.navigator_folder_id', '=', 't7.id')
+    ->select(
+        DB::raw("decrypt(t3.first_name) as first_name,decrypt(t3.last_name) as last_name"),
+        't1.doc_title AS mtype',
+        't2.name AS document_type',
+        't4.name AS workflow_stage',
+        't6.name AS status',
+        't5.name AS process_name',
+        't7.name AS navigator_name',
+        't1.*',
+        // DB::raw("(SELECT t2.navigator_folder_name
+        //   FROM tra_documentmanager_application t2
+        //   WHERE t1.navigator_folder_id = t2.id) as navigator_name")
+
+    )
+     ->where('t1.sub_module_id',105)
      ->get();
 
         $results = convertStdClassObjToArray($results);
@@ -338,13 +379,13 @@ public function getArchivedDocdDetails(Request $req)
     $parent_id = $req->node;
 
     try {
-        $results = DB::table('par_document_types as t1')
+        $results = DB::table('par_qms_documents_types as t1')
             ->leftJoin('par_sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
             ->leftJoin('par_modules as t3', 't4.module_id', '=', 't3.id')
             ->leftJoin('par_confirmations as t9', 't1.has_parent_level', '=', 't9.id')
             ->select(
                 't1.*',
-                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_document_types q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
+                DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_qms_documents_types q WHERE q.docparent_id = t1.id) = 0 THEN TRUE ELSE FALSE END AS leaf"),
                 't1.name AS mtype',
                 't3.name AS module_name',
                 't4.name AS sub_module',
@@ -955,7 +996,7 @@ public function getArchivedDocdDetails(Request $req)
                     ->get();
                 if (!count($sql) > 0) {
                     $site_node_ref = $this->getSiteNodeRef($site_id, 'tra_dmsdocument_sites');
-                    $section_name = $this->getTableDataName($document_type_id, 'par_document_types');
+                    $section_name = $this->getTableDataName($document_type_id, 'par_qms_documents_types');
                     //create a node in the site 
                     $node_name = $section_name . ' Documents';
 
@@ -1334,7 +1375,7 @@ public function getArchivedDocdDetails(Request $req)
 
             $results = DB::table('tra_nonstructured_docdefination as t1')
                 ->join('tra_dmsdocument_sites as t2', 't1.dms_site_id', '=', 't2.id')
-                ->join('par_document_types as t3', 't1.document_type_id', '=', 't3.id')
+                ->join('par_qms_documents_types as t3', 't1.document_type_id', '=', 't3.id')
                 ->select('t1.*', 't2.name as site_name', 't2.node_ref as site_node_ref', 't3.name as document_type')
                 ->get();
             $res = array(
@@ -1449,7 +1490,7 @@ public function getArchivedDocdDetails(Request $req)
             $results = DB::table('tra_sectionsmodule_doctypedefination as t1')
                 ->join('modules as t3', 't1.module_id', '=', 't3.id')
                 ->join('sub_modules as t4', 't1.sub_module_id', '=', 't4.id')
-                ->join('par_document_types as t5', 't1.document_type_id', '=', 't5.id')
+                ->join('par_qms_documents_types as t5', 't1.document_type_id', '=', 't5.id')
                 ->select('t1.*', 't3.name as module_name', 't5.name  as document_type_name', 't4.name as submodule_name')
                 ->where(array('t1.doc_section_id' => $doc_section_id))
                 ->get();
