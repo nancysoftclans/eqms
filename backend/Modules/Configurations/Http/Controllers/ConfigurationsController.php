@@ -321,14 +321,14 @@ class ConfigurationsController extends Controller
                 //check if exists
                 $from_serial = $req->from_serial;
                 $to_serial = $req->to_serial;
-                if (recordExists('par_brims_report_application', ['id' => $from_serial])) {
+                if (recordExists('par_brims_report_application', ['id' => $from_serial],'')) {
                     return ['success' => false, 'message' => 'Reference not found please confirm the serial again'];
                 }
-                if (recordExists('par_brims_report_application', ['id' => $to_serial])) {
+                if (recordExists('par_brims_report_application', ['id' => $to_serial],'')) {
                     return ['success' => false, 'message' => 'Reference Already assaigned to another letter'];
                 }
                 //update
-                updateRecord('par_brims_report_application', ['id' => $from_serial], ['id' => $to_serial]);
+                updateRecord('par_brims_report_application', ['id' => $from_serial], ['id' => $to_serial],1,'');
 
                 //update
                 $table_data['action_by'] = $this->user_id;
@@ -337,7 +337,7 @@ class ConfigurationsController extends Controller
 
             //application code if its a variation save
             if (validateIsNumeric($is_variation) && validateIsNumeric($req->premise_id)) {
-                $application_code = getSingleRecordColValue('tra_premises_applications', ['premise_id' => $req->premise_id], 'application_code');
+                $application_code = getSingleRecordColValue('tra_premises_applications', ['premise_id' => $req->premise_id], 'application_code', '');
                 $post_data['application_code'] = $application_code;
             }
 
@@ -371,12 +371,12 @@ class ConfigurationsController extends Controller
             }
             if (validateIsNumeric($id)) {
 
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                 } else {
                     $res = "Update record not found";
                 }
@@ -452,16 +452,16 @@ class ConfigurationsController extends Controller
         $where = array('id' => $id);
 
         if (isset($id) && $id != "") {
-            if (recordExists($table_name, $where)) {
+            if (recordExists($table_name, $where, '')) {
                 unset($table_data['created_on']);
                 unset($table_data['created_by']);
                 $table_data['dola'] = Carbon::now();
                 $table_data['altered_by'] = $user_id;
-                $res = updateRecord($table_name, $where, $table_data);
+                $res = updateRecord($table_name, $where, $table_data, $user_id, '');
             }
         } else {
             $table_data['dola'] = Carbon::now();
-            $res = insertRecord($table_name, $table_data);
+            $res = insertRecord($table_name, $table_data, 1, '');
 
      
             $id = $res['record_id'];
@@ -523,17 +523,17 @@ class ConfigurationsController extends Controller
             //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
 
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
 
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                 }
             } else {
                 $table_data['dola'] = Carbon::now();
-                $res = insertRecord($table_name, $table_data);
+                $res = insertRecord($table_name, $table_data, 1, '');
 
                 //dd($res);
                 $id = $res['record_id'];
@@ -622,16 +622,16 @@ class ConfigurationsController extends Controller
                 'id' => $id
             );
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
 
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                 }
             } else {
-                $res = insertRecord($table_name, $table_data);
+                $res = insertRecord($table_name, $table_data, $user_id, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
@@ -2370,17 +2370,17 @@ class ConfigurationsController extends Controller
 
             $table_data['code'] = $code;
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                 } else {
                     dd('hew');
                 }
             } else {
-                $res = insertRecord($table_name, $table_data);
+                $res = insertRecord($table_name, $table_data, 1, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
@@ -2749,13 +2749,13 @@ class ConfigurationsController extends Controller
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data, 'portal_db');
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, 'portal_db');
                 } else {
                     $res = "Update record not found";
                 }
             } else {
 
-                $res = insertRecord($table_name, $table_data, 'portal_db');
+                $res = insertRecord($table_name, $table_data,1, 'portal_db');
             }
 
         } catch (\Exception $exception) {
@@ -2831,13 +2831,13 @@ class ConfigurationsController extends Controller
 
             if (validateIsNumeric($id)) {
 
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
 
-                    $res = updateRecord($table_name, $where, $table_data, $db_con);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, 1, $db_con);
                 } else {
                     $res = "Update record not found";
                 }
@@ -3133,17 +3133,17 @@ class ConfigurationsController extends Controller
 
             if (validateIsNumeric($id)) {
 
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data, $db_con);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, $db_con);
                 } else {
                     $res = "Update record not found";
                 }
             } else {
-                $res = insertRecord($table_name, $table_data);
+                $res = insertRecord($table_name, $table_data, 1, '');
                 // $db_con
             }
 
@@ -3266,15 +3266,15 @@ class ConfigurationsController extends Controller
             );
 
             if (isset($id) && $id != "") {
-                if (recordExists($param_def_table_name, $where)) {
+                if (recordExists($param_def_table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($param_def_table_name, $where, $table_data);
+                    $res = updateRecord($param_def_table_name, $where, $table_data, 1, '');
                 }
             } else {
-                $res = insertRecord($param_def_table_name, $table_data);
+                $res = insertRecord($param_def_table_name, $table_data, 1, '');
             }
 
             if ($res['success']) {
@@ -4231,7 +4231,7 @@ class ConfigurationsController extends Controller
 //                             unset($table_data['created_by']);
 //                             $table_data['dola'] = Carbon::now();
 //                             $table_data['altered_by'] = $user_id;
-//                             $res = updateRecord($table_name, $where, $table_data, $user_id);
+//                             $res = updateRecord($table_name, $where, $table_data, $user_id, '');, $user_id);
 
     //                         }
 //                     } else {
@@ -7528,17 +7528,17 @@ class ConfigurationsController extends Controller
             );
             //Updating Records
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     // DD('HERE');
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data, $user_id);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
 
                 }
             } else {
-                $res = insertRecord('par_meeting_groups', $table_data, $user_id);
+                $res = insertRecord('par_meeting_groups', $table_data, $user_id, '');
                 if (!isset($res['success']) || $res['success'] == false) {
                     return $res;
                 }
