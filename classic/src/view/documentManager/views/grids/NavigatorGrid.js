@@ -43,133 +43,6 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 winWidth: '40%',
                 handler: 'showAddConfigParamWinFrm',
                 stores: '[]'
-    },{
-                    xtype: 'panel',
-                    html: '<h2>Double Click Document To Preview</h2>'
-                },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Module',
-        name: 'module_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        allowBlank: false,
-        hidden: true,
-        width: 250,
-        labelWidth: 80,
-        queryMode: 'local',
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                        extraParams: {
-                            table_name: 'par_modules'
-                        }
-                    }
-                },
-                isLoad: true
-            },
-            change: function (cmbo, newVal) {
-                var grid = cmbo.up('#navigatorgrid'),
-                    subModuleStore = grid.down('combo[name=sub_module_id]').getStore();
-                    subModuleStore.removeAll();
-                    subModuleStore.load({params: {module_id: newVal}});
-
-                var store = this.up('#navigatorgrid').getStore();
-                store.reload();                 
-            }
-        }
-    }, {
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Sub Module',
-        name: 'sub_module_id',
-        valueField: 'id',
-        hidden: true,
-        displayField: 'name',
-        forceSelection: true,
-        width: 250,
-        allowBlank: false,
-        labelWidth: 80,
-        queryMode: 'local',
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                        url: 'workflow/getSystemSubModules',
-                        extraParams: {
-                           table_name: 'par_sub_modules'
-                        }
-                    }
-                },
-                isLoad: false
-            },
-            change: function (cmbo, newVal) {
-               var store = this.up('#navigatorgrid').getStore();
-                store.reload();
-            }
-        }
-    }, {
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Section',
-        name: 'section_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        hidden: true,
-        allowBlank: false,
-        queryMode: 'local',
-        width: 250,
-        labelWidth: 80,
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                        extraParams: {
-                            table_name: 'par_sections'
-                        }
-                    }
-                },
-                isLoad: true
-            },change: function (cmbo, newVal) {
-               var store = this.up('#navigatorgrid').getStore();
-                store.reload();
-            }
-        }
-    },{
-        xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Premise Type',
-        name: 'premise_type_id',
-        valueField: 'id',
-        displayField: 'name',
-        forceSelection: true,
-        allowBlank: false,
-        hidden: true,
-        queryMode: 'local',
-        width: 250,
-        labelWidth: 80,
-        listeners: {
-            afterrender: {
-                fn: 'setCompStore',
-                config: {
-                    pageSize: 10000,
-                    proxy: {
-                        extraParams: {
-                            table_name: 'par_premises_types'
-                        }
-                    }
-                },
-                isLoad: true
-            },change: function (cmbo, newVal) {
-               var store = this.up('#navigatorgrid').getStore();
-                store.reload();
-            }
-        }
     }],
     autoScroll: true,
     listeners: {
@@ -185,8 +58,8 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             },
             isLoad: true
         },
+
         itemdblclick: 'onViewDocumentDetails'
-        //itemdblclick: 'onViewDocumentApplication'
     },
    
     bbar: [
@@ -207,7 +80,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 var grid = this.up('treepanel'),
                     store= this.getStore();
                     store.getProxy().extraParams = {
-                        table_name:'par_navigator_folders'
+                        table_name:'tra_documentmanager_application'
                     };
             
             },
@@ -230,15 +103,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
         xtype: 'gridcolumn',
         dataIndex: 'doc_id',
         text: 'ID',
-        flex: 1,
-        renderer: function (value, metaData) {
-            if (value === null || value === '') {
-                metaData.tdStyle = 'color:grey;';
-                return '<i> - </i>';
-            }else {
-                return value;
-            }
-        }
+        flex: 1
     },{
         xtype: 'gridcolumn',
         dataIndex: 'attachments',
@@ -265,16 +130,6 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
             menu: {
                 xtype: 'menu',
                 items: [{
-                    name: 'addfields',
-                    text: 'Add Fields',
-                    tooltip: 'Add Fields',
-                    hidden: true,
-                    iconCls: 'x-fa fa-plus',
-                    childXtype: 'documenttypefieldgrid',
-                    winTitle: 'Form Type Fields',
-                    winWidth: '70%',
-                    handler: 'AddFormTypeFields'
-                },{
                     text: 'Edit',
                     iconCls: 'x-fa fa-edit',
                     tooltip: 'Edit Record',
@@ -282,17 +137,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     childXtype: 'navigatorform',
                     winTitle: 'Edit Document Type',
                     winWidth: '40%',
-                    handler: 'showEditConfigParamWinFrm',bind: {
-            disabled: '{isReadOnly}'
-        }},{
-                    text: 'Preview Document',
-                    iconCls: 'x-fa fa-edit',
-                    tooltip: 'Preview Document',
-                    //action: 'edit',
-                    childXtype: 'documentsviewpnl',
-                    winTitle: 'Edit Document Type',
-                    winWidth: '40%',
-                    handler: 'onViewDocumentDetails',bind: {
+                    handler: 'showEditNavigatorConfigParamWinFrm',bind: {
             disabled: '{isReadOnly}'
         },
                     stores: '[]'
@@ -301,6 +146,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     iconCls: 'x-fa fa-edit',
                     tooltip: 'Copy/Move',
                     action: 'move',
+                    hidden: true,
                     childXtype: 'navigatormoveform',
                     winTitle: 'Copy/Move',
                     winWidth: '40%',
@@ -312,7 +158,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     text: 'Disable',
                     iconCls: 'x-fa fa-repeat',
                     hidden: true,
-                    table_name: 'par_qms_documents_types',
+                    table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/softDeleteConfigRecord',
                     action: 'soft_delete',bind: {
@@ -324,7 +170,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     iconCls: 'x-fa fa-trash',
                     tooltip: 'Delete Record',
                     hidden: true,
-                    table_name: 'par_qms_documents_types',
+                    table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/deleteConfigRecord',  
                     action: 'actual_delete',bind: {
@@ -338,7 +184,7 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                     iconCls: 'x-fa fa-undo',
                     tooltip: 'Enable Record',
                     hidden: true,
-                    table_name: 'par_qms_documents_types',
+                    table_name: 'par_document_types',
                     storeID: 'formCategoryStr',
                     action_url: 'configurations/undoConfigSoftDeletes',
                     action: 'enable',
@@ -373,6 +219,77 @@ Ext.define('Admin.view.documentManager.views.grids.NavigatorGrid', {
                 widget.down('menu menuitem[action=soft_delete]').setDisabled(false);
             }
         }
-  
+    // {
+    //     text: 'Options',
+    //     xtype: 'widgetcolumn',
+    //     width: 90,
+    //     widget: {
+    //         width: 75,
+    //         textAlign: 'left',
+    //         xtype: 'splitbutton',
+    //         iconCls: 'x-fa fa-th-list',
+    //         ui: 'gray',
+    //         menu: {
+    //             xtype: 'menu',
+    //             items: [{
+    //                 text: 'Edit',
+    //                 iconCls: 'x-fa fa-edit',
+    //                 tooltip: 'Edit Record',
+    //                 action: 'edit',
+    //                 childXtype: 'docdefinationrequirementfrm',
+    //                 winTitle: 'Dcouments requirements Defination',
+    //                 winWidth: '40%',
+    //                 handler: 'showEditConfigParamWinFrm',
+    //                 stores: '[]'
+    //             }, {
+    //                 text: 'Disable',
+    //                 iconCls: 'x-fa fa-trash-o',
+    //                 tooltip: 'Delete Record',
+    //                 table_name: 'tra_documentupload_requirements',
+    //                 storeId: 'docdefinationrequirementstr',
+    //                 action_url: 'configurations/softDeleteConfigRecord',
+    //                 action: 'soft_delete',
+    //                 handler: 'doDeleteConfigWidgetParam'
+    //             }, {
+    //                 text: 'Delete',
+    //                 iconCls: 'x-fa fa-trash',
+    //                 tooltip: 'Delete Record',
+    //                 table_name: 'tra_documentupload_requirements',
+    //                 storeId: 'docdefinationrequirementstr',
+    //                 action_url: 'configurations/deleteConfigRecord',
+    //                 action: 'actual_delete',
+    //                 handler: 'doDeleteConfigWidgetParam',
+    //                 // hidden: Admin.global.GlobalVars.checkForProcessVisibility('actual_delete')
+    //             }, {
+    //                 text: 'Enable',
+    //                 iconCls: 'x-fa fa-undo',
+    //                 tooltip: 'Enable Record',
+    //                 table_name: 'tra_documentupload_requirements',
+    //                 storeId: 'docdefinationrequirementstr',
+    //                 action_url: 'configurations/undoWorkflowSoftDeletes',
+    //                 action: 'enable',
+    //                 disabled: true,
+    //                 handler: 'doDeleteConfigWidgetParam'
+    //             }, {
+    //                 text: 'Download Template',
+    //                 iconCls: 'x-fa fa-undo',
+    //                 tooltip: 'Download Template',
+    //                 table_name: 'tra_documentupload_requirements',
+    //                 action_url: 'configurations/undoWorkflowSoftDeletes',
+    //                 handler: 'downloadDocumentRequirementTemplate'
+    //             }
+    //             ]
+    //         }
+    //     }, onWidgetAttach: function (col, widget, rec) {
+    //         var is_enabled = rec.get('is_enabled');
+    //         if (is_enabled === 0 || is_enabled == 0) {
+    //             widget.down('menu menuitem[action=enable]').setDisabled(false);
+    //             widget.down('menu menuitem[action=soft_delete]').setDisabled(true);
+    //         } else {
+    //             widget.down('menu menuitem[action=enable]').setDisabled(true);
+    //             widget.down('menu menuitem[action=soft_delete]').setDisabled(false);
+    //         }
+    //     }
+    // }
     }]
 });

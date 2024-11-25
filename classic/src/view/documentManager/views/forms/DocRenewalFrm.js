@@ -102,7 +102,8 @@
         xtype: 'textfield',
         fieldLabel: 'Version',
         margin: '0 20 20 0',
-        name: 'doc_version'
+        name: 'doc_version',
+        readOnly: true
     },{
             xtype: 'combo',
             queryMode: 'local',

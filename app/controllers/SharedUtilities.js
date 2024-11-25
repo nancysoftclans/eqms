@@ -776,6 +776,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       activeTab.down("button[name=add_upload]").setHidden(true);
     }
 
+    if(sub_module_id == 105){
+      activeTab.down("button[name=add_upload]").setHidden(true);
+    }
+
     store.getProxy().extraParams = {
       application_code: application_code,
       // table_name: table_name,
@@ -1442,6 +1446,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
       stage_category_id = activeTab.down("hiddenfield[name=stage_category_id]").getValue();
 
+  
     if (application_code) {
       Ext.Ajax.request({
         method: "GET",

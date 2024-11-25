@@ -1523,6 +1523,7 @@ class DocumentManagementController extends Controller
 
                     $wheres = array('id' => $record_id);
 
+
                     if (recordExists('tra_application_uploadeddocuments', $wheres)) {
                         $prev_file_data = DB::table('tra_application_uploadeddocuments')->where($wheres)->first();
                         $pre_file = (array)$prev_file_data;

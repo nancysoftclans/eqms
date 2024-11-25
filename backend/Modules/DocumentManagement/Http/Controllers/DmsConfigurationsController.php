@@ -324,6 +324,20 @@ public function getArchivedDocdDetails(Request $req)
      ->where('t1.application_status_id', 4)
      ->get();
 
+     // $docVersions = [];
+
+     //   foreach ($results as $item) {
+     //    $docVersions[] = ($item->doc_version);
+     //    }
+
+     //  $docVersions = array_map(function ($version) {
+     //        return $version + 1;
+     //    }, $docVersions);
+     foreach ($results as $item) {
+            $item->doc_version = (float) $item->doc_version + 1;
+        }
+
+
         $results = convertStdClassObjToArray($results);
         $res = decryptArray($results);
     } catch (\Exception $exception) {
@@ -446,6 +460,7 @@ public function getArchivedDocdDetails(Request $req)
                        't1.name AS navigator_name',
                         't1.id',
                         't1.id AS navigator_folder_id',
+                        't1.*',
                         't2.application_code',
                         't2.module_id',
                         't2.sub_module_id',
@@ -471,6 +486,7 @@ public function getArchivedDocdDetails(Request $req)
                     't2.doc_version AS navigator_version', 
                     't1.dola',
                     't1.id AS navigator_folder_id',
+                    't1.*',
                     't3.id AS doc_id',
                     't3.application_code',
                     't2.module_id',
@@ -500,6 +516,7 @@ public function getArchivedDocdDetails(Request $req)
                        't1.name AS navigator_name',
                         't1.id',
                         't1.id AS navigator_folder_id',
+                        't1.*',
                         't3.id AS T3ID',
                         't2.application_code',
                         't2.module_id',

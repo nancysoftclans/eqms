@@ -128,6 +128,7 @@ Ext.define('Admin.view.documentManager.views.grids.LiveDocumentsGrid', {
         xtype: 'gridcolumn',
         dataIndex: 'doc_version',
         text: 'Version',
+        hidden: true,
         flex: 1
     },{
         xtype: 'gridcolumn',

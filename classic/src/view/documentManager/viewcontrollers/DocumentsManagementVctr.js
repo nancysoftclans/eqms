@@ -436,6 +436,55 @@ showEditConfigParamWinFrm: function (item) {
          }*/
     },
 
+    showEditNavigatorConfigParamWinFrm: function (item) {
+        //if (this.fireEvent('checkFullAccess') || this.fireEvent('checkWriteUpdate')) {
+        var me = this,
+            btn = item.up('button'),
+            record = btn.getWidgetRecord(),
+            childXtype = item.childXtype,
+            winTitle=item.winTitle,
+            winWidth=item.winWidth,
+            form = Ext.widget(childXtype),
+            storeArray = eval(item.stores),
+            arrayLength = storeArray.length;
+        if (arrayLength > 0) {
+            me.fireEvent('refreshStores', storeArray);
+        }
+        form.loadRecord(record);
+
+        // const property_ids_array = JSON.parse(record.get('property_ids'));
+
+        // console.log(property_ids_array);
+        // form.down("tagfield[name=property_ids]").setValue(property_ids_array);
+
+        form.on('afterrender', function() {
+        try {
+            const owner_user_id = record.get('owner_user_id');
+            const owner_group_id = record.get('owner_group_id');
+
+        
+               if (owner_user_id) {
+                    const owner_user_id_array = JSON.parse(owner_user_id);
+                    form.down("tagfield[name=owner_user_id]").setValue(owner_user_id_array);
+                }
+
+                if (owner_group_id) {
+                    const owner_group_id_array = JSON.parse(owner_group_id);
+                    form.down("tagfield[name=owner_group_id]").setValue(owner_group_id_array);
+                }
+
+        } catch (e) {
+            console.error('Error parsing owner_user_id or owner_group_id :', e);
+        }
+        });
+        form.setHeight(650);
+        funcShowCustomizableWindow(winTitle, winWidth, form, 'customizablewindow');
+        /* } else {
+             toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
+             return false;
+         }*/
+    },
+
 
     onViewDocumentDetails: function (grid, record) {
 
