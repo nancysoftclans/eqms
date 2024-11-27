@@ -780,6 +780,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       activeTab.down("button[name=add_upload]").setHidden(true);
     }
 
+    if(sub_module_id == 108){
+      activeTab.down("button[name=process_submission_btn]").setVisible(false);
+    }
+
     store.getProxy().extraParams = {
       application_code: application_code,
       // table_name: table_name,
@@ -1375,6 +1379,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
       stage_category_id = activeTab.down("hiddenfield[name=stage_category_id]").getValue();
 
+      if(sub_module_id == 108){
+        activeTab.down("button[name=process_submission_btn]").setVisible(false);
+      }
+
     if (application_code) {
       Ext.Ajax.request({
         method: "GET",
@@ -1411,6 +1419,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                 activeTab.down("textfield[name=recommendation_id]").setVisible(false);
                 activeTab.down("textfield[name=approval_id]").setVisible(false);
                 activeTab.down("button[name=add_upload]").setHidden(false);
+
+            if(sub_module_id == 108){
+              activeTab.down("button[name=process_submission_btn]").setVisible(false);
+            }
           
           } else {
             toastr.error(message, "Failure Response");

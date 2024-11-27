@@ -53,7 +53,33 @@
             columnWidth: 0.33,
         },
         layout: 'column',
-        items:[{
+        items:[
+
+        {
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Template Type',
+        margin: '0 20 20 0',
+        name: 'template_id',
+        valueField: 'id',
+        displayField: 'name',
+        forceSelection: true,
+        allowBlank: false,
+        queryMode: 'local',
+        listeners: {
+            afterrender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 10000,
+                    proxy: {
+                        extraParams: {
+                            table_name: 'qms_template_types'
+                        }
+                    }
+                },
+                isLoad: true
+            }
+        }
+    },{
         xtype: 'textfield',
         fieldLabel: 'Document Title',
         margin: '0 20 20 0',
