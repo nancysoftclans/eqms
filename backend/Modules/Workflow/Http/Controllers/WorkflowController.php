@@ -2969,9 +2969,91 @@ class WorkflowController extends Controller
         $is_inspection_submission = $request->input('is_inspection_submission');
         $user_id = $this->user_id;
         DB::beginTransaction();
+
+        $action_details = $this->getApplicationWorkflowActionDetails($action);
+         $has_qms_notification = $action_details->has_qms_notification;
+         $qms_msg_id = $action_details->qms_msg_id;
         try {
             //get application_details
             //notify submission
+
+            if ($has_qms_notification == 1) {
+                if($module_id == 26){
+                $application_details = DB::table('tra_documentmanager_application')
+                    ->where('application_code', $application_code)
+                    ->get();
+                }    
+                //get the emails
+
+            
+            foreach($application_details as $application_detail){
+
+                if (validateIsNumeric($application_detail->application_code)) {
+                    $app_description = '';
+                    $application_code = $application_detail->application_code;                   
+
+                    //var_dump($meeting_details);exit;
+                    $revieweremail = $this->getQMSAssignmentEmail($application_code);
+
+                    $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
+
+                    $vars = array(
+                         '{module_name}' => $module_name
+                    );
+                    //check for the external users and
+                    sendTemplatedApplicationNotificationEmail($qms_msg_id, $revieweremail, $vars);
+
+                
+                    $assignedEmails = explode(';', $revieweremail);
+                    foreach ($assignedEmails as $assignedEmail) {
+                     sendInvitationMail($qms_msg_id, $assignedEmail, $vars);
+                    }
+
+                    // //send an email to the rest of the users
+                    // $records = DB::table('tc_meeting_participants')
+                    //     ->select('*')
+                    //     ->where(array('meeting_id' => $meeting_id))
+                    //     ->whereNull($user_id)
+                    //     ->get();
+
+
+                    // if ($records) {
+
+                    //     foreach ($records as $rec) {
+
+                    //         $user_id = $rec->user_id;
+                    //         $email_address = $rec->email;
+                    //         $participant_id = $rec->id;
+                    //         //print_r($user_id);
+
+                    //         /*if(!validateIsNumeric($user_id)){
+
+                    //             $participant_id = $rec->id;
+                    //             //users details
+                    //             $table_data = array(
+                    //                 'first_name' => $rec->participant_name,
+                    //                 'mobile' => $rec->phone,
+                    //                 'phone' => $rec->phone,
+                    //                 'user_category_id' => 2
+                    //             );
+                    //             $this->createExternalUserAccountDetails($table_data,$email_address,$participant_id,$vars);
+                    //         }*/ //endif
+
+                    //         $table_data = array(
+                    //             'first_name' => $rec->participant_name,
+                    //             'mobile' => $rec->phone,
+                    //             'phone' => $rec->phone,
+                    //             'user_category_id' => 2
+                    //         );
+                    //         $this->createExternalUserAccountDetails($table_data, $email_address, $participant_id, $vars);
+                    //     } //endforeach
+                    // } //endif
+
+                }
+            }
+
+        }
+
 
             if (validateIsNumeric($request->responsible_user)) {
                 $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name', '');
@@ -3204,8 +3286,7 @@ class WorkflowController extends Controller
             $technicalmeetinemail_msg_id = $action_details->technicalmeetinemail_msg_id;
 
 
-            $has_qms_notification = $action_details->has_qms_notification;
-            $qms_msg_id = $action_details->qms_msg_id;
+           
 
             $has_preminsp_notification = $action_details->has_preminsp_notification;
             $preminspmail_msg_id = $action_details->preminspmail_msg_id;
@@ -3719,6 +3800,26 @@ class WorkflowController extends Controller
         $inspectors_email = implode(';', $inspectors_email);
         return $inspectors_email;
     }
+
+    public function getQMSAssignmentEmail($application_code)
+    {
+        $qms_email = array();
+        $records = DB::table('tra_documentmanager_application as t1')
+            ->join('tra_submissions as t2', 't1.application_code', 't2.application_code')
+            ->join('users as t3', 't2.usr_to', 't3.id')
+            ->select(DB::raw("decrypt(t3.email) as email"))
+            ->where(array('t1.application_code' => $application_code))
+            ->groupBy('t2.id')
+            ->get();
+        if ($records) {
+            foreach ($records as $rec) {
+                $qms_email[] = $rec->email;
+            }
+        }
+        $qms_email = implode(';', $qms_email);
+        return $qms_email;
+    }
+
     public function getMeetingAttendantsEmails($application_code)
     {
         $meeting_attendantsemail = array();
@@ -3738,6 +3839,7 @@ class WorkflowController extends Controller
         $meeting_attendantsemail = implode(';', $meeting_attendantsemail);
         return $meeting_attendantsemail;
     }
+
     public function getApplicationInspEvaUsers($application_code)
     {
         $record = DB::table('tra_submissions as t1')

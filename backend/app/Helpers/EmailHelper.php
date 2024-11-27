@@ -17,6 +17,8 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\ForgotPassword;
 use Illuminate\Support\Carbon;
+use Spatie\CalendarLinks\Link;
+
 
 class EmailHelper
 {
@@ -267,11 +269,9 @@ class EmailHelper
         $template_info = self::getEmailTemplateInfo($template_id, $vars);
         $subject = $template_info->subject;
         $message = $template_info->body;
-        //dd($message);
         //email notofications job creation
         $emailJob = (new GenericSendEmailJob($email, $subject, $message))->delay(Carbon::now()->addSeconds(2));
         dispatch($emailJob);
-
 
     }
     //mails for expiry notification
@@ -288,35 +288,34 @@ class EmailHelper
 
 
     }
-    static function sendInvitationMail($template_id, $participantEmail, $vars)
-    {
-        $date = Carbon::parse($vars['{date_requested}']);
-        $time = Carbon::parse($vars['{meeting_time}']);
-        $from = Carbon::createFromFormat('Y-m-d H:i', $date->format('Y-m-d') . $time->format('H:i'));
-        $to = Carbon::createFromFormat('Y-m-d H:i', $date->format('Y-m-d') . $time->format('H:i'));
+    static function sendInvitationMail($template_id, $assignedEmail,$vars){
+        $date = Carbon::parse('2024-11-25'); // Hardcoded date
+        $time = Carbon::parse('14:30'); 
+        $from =  Carbon::createFromFormat('Y-m-d H:i',$date->format('Y-m-d').$time->format('H:i'));
+        $to =  Carbon::createFromFormat('Y-m-d H:i',$date->format('Y-m-d').$time->format('H:i'));
         $template_info = self::getEmailTemplateInfo($template_id, $vars);
         $subject = $template_info->subject;
         $body = $template_info->body;
         $data = array(
             'subject' => $subject,
             'email_content' => $body,
-            'trader_name' => 'mwangi',
-            'from_email' => 'me@gmail.com',
-            'to' => $participantEmail,
-            'title' => $subject,
+            'trader_name' => 'qms',
+            'from_email'=>'qms@gmail.com',
+            'to'=>$assignedEmail,
+            'title'=>$subject,
             'start_date' => $from
         );
         // $link = Link::create($vars['{meeting_name}'], $from, $to)
         //     ->description($vars['{app_description}'])
         //     ->address($vars['{meeting_venue}']);
-
-
-        // // $emailJob = (new GenericSendEmailJob($participantEmail, $subject, $message))->attachData($link->ics(), 'invite.ics', [
+            
+         
+        // // $emailJob = (new GenericSendEmailJob($assignedEmail, $subject, $message))->attachData($link->ics(), 'invite.ics', [
         //         //     'mime' => 'text/calendar;charset=UTF-8;method=REQUEST',
         //         // ])->delay(Carbon::now()->addSeconds(2));
-        //  Mail::send('emailnotification', $data, function($message)use ($participantEmail, $subject, $body, $link) {
-
-        //          $message->to($participantEmail, 'RUN')
+        //  Mail::send('emailnotification', $data, function($message)use ($assignedEmail, $subject, $body, $link) {
+            
+        //          $message->to($assignedEmail, 'RUN')
         //                 ->subject($subject);
         //          $message->attach($link->ics(), [
         //             'as'=> 'invite.ics',
@@ -382,19 +381,31 @@ class EmailHelper
 
 
         $link = Link::create('Sebastian’s birthday', $from, $to)
-            ->description('Cookies & cocktails!')
-            ->address('Kruikstraat 22, 2018 Antwerpen');
-        //create file
-        $filename = "invite.ics";
-        file_put_contents($filename, $link->ics());
-        //send
-        Mail::send('emailnotification', $data, function ($message) use ($participantEmail, $subject, $body, $link, $filename) {
+    ->description('Cookies & cocktails!')
+    ->address('Kruikstraat 22, 2018 Antwerpen');
 
-            $message->to($participantEmail)
-                ->subject($link->webOutlook());
-            $message->attach($link->webOutlook(), array('as' => 'schedule.ics', 'mime' => 'data:text charset=utf8'));
-        });
-    }
+        // Ensure the filename is defined correctly
+        $filename = 'invite.ics';
+
+        // Create the file with the ICS content
+        file_put_contents($filename, $link->ics());
+
+        // Now, use the file for attaching it to the email
+        // Mail::send('emailnotification', $data, function($message) use ($assignedEmail, $subject, $body, $link, $filename) {
+        //     $message->to($assignedEmail)
+        //         ->subject($subject);
+        //     $message->attach($filename, ['mime' => 'text/calendar']);
+        // });
+
+        Mail::send('emailnotification', $data, function($message) use ($assignedEmail, $subject, $body, $link, $filename) {
+    // Make sure $assignedEmail is correctly passed here
+    $message->to($assignedEmail)
+        ->subject($subject)
+        ->attach($filename, ['mime' => 'text/calendar']);
+});
+
+
+     }
     static function notifyGroupUsers($template_id, $workflow_stage_id, $vars)
     {
         $template_info = self::getEmailTemplateInfo($template_id, $vars);

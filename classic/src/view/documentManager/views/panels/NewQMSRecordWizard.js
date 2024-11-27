@@ -38,7 +38,14 @@ Ext.define('Admin.view.documentManager.views.panels.NewQMSRecordWizard', {
                     'color': 'green',
                     'font-weight': 'bold',
                     'font-size': '10px'
-                }
+                },
+                renderer: function (value) {
+                        if (!value) return '';
+                        const date = new Date(value);
+                        // Format date as YYYY/MM/DD
+                        const formattedDate = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+                        return formattedDate;
+                    }
             },'->',  {
                 xtype: 'displayfield',
                 name: 'process_name',

@@ -1493,9 +1493,9 @@ if (!function_exists('getRegistrationSerial')) {
     }
 }
 if (!function_exists('sendInvitationMail')) {
-    function sendInvitationMail($template_id, $participantEmail, $vars)
+    function sendInvitationMail($template_id, $assignedEmail,$vars)
     {
-        return EmailHelper::sendInvitationMail($template_id, $participantEmail, $vars);
+        return EmailHelper::sendInvitationMail($template_id, $assignedEmail,$vars);
     }
 }
 if (!function_exists('array_flatten')) {

@@ -159,49 +159,58 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
             }
             
         },{
-        xtype: 'combo', 
+        xtype: 'tagfield',
         fieldLabel: 'Owner User',
-        name: 'owner_user_id',
-        valueField: 'id',
         margin: '0 20 20 0',
-        displayField: `fullname`,
-        forceSelection: true,
+        name: 'owner_user_id',
         allowBlank: true,
+        forceSelection: true,
+        filterPickList: true,
+        encodeSubmitValue: true,
         hidden: true,
+        emptyText: 'Select User',
+        growMax: 100,
         queryMode: 'local',
+        valueField: 'id',
+        displayField: 'fullname',
         listeners: {
-            afterrender: {
+            beforerender: {
                 fn: 'setCompStore',
                 config: {
-                    pageSize: 10000,
+                    pageSize: 1000,
                     proxy: {
                         url: 'usermanagement/documentOwner',
                         extraParams: {
-                            //table_name: 'par_user_roles'
+                            //table_name: 'par_document_extensionstypes'
                         }
                     }
                 },
                 isLoad: true
             }
         }
-    },{
-        xtype: 'combo', anyMatch: true,
+    },
+    {
+        xtype: 'tagfield',
         fieldLabel: 'Owner Group',
-        name: 'owner_group_id',
-        valueField: 'id',
-        displayField: `name`,
         margin: '0 20 20 0',
-        forceSelection: true,
+        name: 'owner_group_id',
         allowBlank: true,
+        forceSelection: true,
+        filterPickList: true,
+        encodeSubmitValue: true,
         hidden: true,
+        emptyText: 'Select Group',
+        growMax: 100,
         queryMode: 'local',
+        valueField: 'id',
+        displayField: 'name',
         listeners: {
-            afterrender: {
+            beforerender: {
                 fn: 'setCompStore',
                 config: {
-                    pageSize: 10000,
+                    pageSize: 1000,
                     proxy: {
-                        //url: 'usermanagement/documentOwner',
+                      //  url: 'usermanagement/documentOwner',
                         extraParams: {
                             table_name: 'par_groups'
                         }
@@ -210,7 +219,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
                 isLoad: true
             }
         }
-    },]
+    }]
  },],
     dockedItems:[
         {
