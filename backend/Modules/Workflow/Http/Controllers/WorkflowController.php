@@ -549,7 +549,7 @@ class WorkflowController extends Controller
             if ($table_name == 'wf_workflows') {
                 $res = $this->deleteWorkflowMappingRecord($record_id);
             } else {
-                $res = deleteRecord($table_name, $where);
+                $res = deleteRecord($table_name, $where, $this->user_id, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
@@ -2920,7 +2920,7 @@ class WorkflowController extends Controller
                 $update_data = array('onlinesubmission_status_id' => $onlinesubmission_status_id, 'date_received' => Carbon::now(), 'altered_by' => $user_id, 'dola' => Carbon::now());
 
                 updateRecord('tra_onlinesubmissions', $where, $update_data, $user_id, '');
-                // deleteRecord('tra_onlinesubmissions', $previous_data, $where, $user_id);
+                // deleteRecord('tra_onlinesubmissions', $previous_data, $where, $user_id, '');
 
             }
         }
@@ -4530,7 +4530,7 @@ class WorkflowController extends Controller
                 echo json_encode($prev_data);
                 exit();
             }
-            $delete_res = deleteRecord($table_name, $prev_data['results'], $where, $user_id);
+            $delete_res = deleteRecord($table_name, $prev_data['results'], $user_id, '');
             if ($delete_res['success'] == false) {
                 DB::rollBack();
                 echo json_encode($delete_res);
@@ -6696,7 +6696,7 @@ class WorkflowController extends Controller
             );
 
             //delete transitions
-            $res = deleteRecord('wf_workflow_transitions', $where);
+            $res = deleteRecord('wf_workflow_transitions', $where, $this->user_id, '');
             // if(!$res['success']){
             //     DB::rollback();
             //     return $res;
@@ -6706,26 +6706,26 @@ class WorkflowController extends Controller
             foreach ($stages as $stage) {
                 $stage_id = $stage->id;
                 //delete Actions
-                $res = deleteRecord('wf_workflow_actions', ['stage_id' => $stage_id]);
+                $res = deleteRecord('wf_workflow_actions', ['stage_id' => $stage_id], $this->user_id, '');
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
                 //delete stage to group mapping
-                $res = deleteRecord('wf_stages_groups', ['stage_id' => $stage_id]);
+                $res = deleteRecord('wf_stages_groups', ['stage_id' => $stage_id], $this->user_id, '');
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
                 //delete Stage
-                $res = deleteRecord('wf_workflow_stages', ['id' => $stage_id]);
+                $res = deleteRecord('wf_workflow_stages', ['id' => $stage_id], $this->user_id, '');
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
             }
             //wf to menu mapping
-            $res = deleteRecord('wf_menu_workflows', $where);
+            $res = deleteRecord('wf_menu_workflows', $where, $this->user_id, '');
             // if(!$res['success']){
             //     DB::rollback();
             //     return $res;
@@ -6733,7 +6733,7 @@ class WorkflowController extends Controller
             //may delete processes inheriting the workflow
 
             //delete workflow
-            $res = deleteRecord('wf_workflows', ['id' => $workflow_id]);
+            $res = deleteRecord('wf_workflows', ['id' => $workflow_id], $this->user_id, '');
 
             if (!$res['success']) {
                 DB::rollback();
