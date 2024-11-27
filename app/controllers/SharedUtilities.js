@@ -129,7 +129,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     "soptemplatedoclistfrm button[action=search_navigator]": {
       click: "showNavigatorSelectionList",
     },
-  
+
     "button[name=upload_file_btn]": {
       click: "uploadApplicationFile",
       afterrender: "initializeResumableUpload",
@@ -152,7 +152,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     livedocumentsgrid: {
       itemdblclick: "onDocumentSelectionListDblClick",
     },
-    
+
   },
   listen: {
     controller: {
@@ -164,9 +164,9 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         deleteRecord: "deleteRecordByID",
         onInitiateDocumentApplication: "onInitiateDocumentApplication",
         onInitiateQmsRecordApplication: "onInitiateQmsRecordApplication",
-        showReceivingApplicationSubmissionWin:"showReceivingApplicationSubmissionWin",
-        getDocumentReleaseRecommendationDetails: "getDocumentReleaseRecommendationDetails",    
-        viewNavigatorDocDetails: "onViewNavigatorDocDetails", 
+        showReceivingApplicationSubmissionWin: "showReceivingApplicationSubmissionWin",
+        getDocumentReleaseRecommendationDetails: "getDocumentReleaseRecommendationDetails",
+        viewNavigatorDocDetails: "onViewNavigatorDocDetails",
         onInitiateLiveDocumentApplication: "onInitiateLiveDocumentApplication",
         onViewLiveDocumentDetails: "onViewLiveDocumentDetails",
         downloadsopTemplate: "downloadsopTemplate",
@@ -199,7 +199,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       dashboardWrapper.add({ xtype: sec_dashboard });
     }
   },
- 
+
   setGridTreeStore: function (me, options) {
     var config = options.config,
       isLoad = options.isLoad,
@@ -495,9 +495,11 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       .setValue(application_status);
     tab.down("displayfield[name=tracking_no]").setValue(tracking_no);
     tab.down("hiddenfield[name=application_code]").setValue(application_code);
-    tab.down('displayfield[name=reference_no]').setValue(reference_no);
+    if (tab.down('displayfield[name=reference_no]')) {
+      tab.down('displayfield[name=reference_no]').setValue(reference_no);
+    }
   },
-   updateSubmissionsTable: function (record, update_type) {
+  updateSubmissionsTable: function (record, update_type) {
     var application_id = record.get("active_application_id"),
       application_code = record.get("application_code"),
       current_stage = record.get("workflow_stage_id");
@@ -776,7 +778,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       activeTab.down("button[name=add_upload]").setHidden(true);
     }
 
-    if(sub_module_id == 105){
+    if (sub_module_id == 105) {
       activeTab.down("button[name=add_upload]").setHidden(true);
     }
 
@@ -793,35 +795,35 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   },
   refreshApplicationDocPreviewNavigatorGrid: function (pnl) {
     var me = this,
-        store = me.store,
-        previewPnl = pnl.down('applicationdocpreviewnavigatorgrid'); // Correctly reference the grid within the panel
+      store = me.store,
+      previewPnl = pnl.down('applicationdocpreviewnavigatorgrid'); // Correctly reference the grid within the panel
 
     if (!previewPnl) {
-        console.error("Error: previewPnl not found. Ensure 'applicationdocpreviewnavigatorgrid' exists within the panel.");
-        return;
+      console.error("Error: previewPnl not found. Ensure 'applicationdocpreviewnavigatorgrid' exists within the panel.");
+      return;
     }
 
     var application_code = pnl.down("hiddenfield[name=application_code]").getValue(),
-        module_id = pnl.down("hiddenfield[name=module_id]").getValue(),
-        sub_module_id = pnl.down("hiddenfield[name=sub_module_id]").getValue(),
-        workflow_stage = pnl.down("hiddenfield[name=workflow_stage_id]").getValue();
+      module_id = pnl.down("hiddenfield[name=module_id]").getValue(),
+      sub_module_id = pnl.down("hiddenfield[name=sub_module_id]").getValue(),
+      workflow_stage = pnl.down("hiddenfield[name=workflow_stage_id]").getValue();
 
     if (!application_code || !module_id || !sub_module_id || !workflow_stage) {
-        console.error("Error: One or more hidden fields not found within the panel.");
-        return;
+      console.error("Error: One or more hidden fields not found within the panel.");
+      return;
     }
 
     store.getProxy().extraParams = {
-        application_code: application_code,
-        module_id: module_id,
-        sub_module_id: sub_module_id,
-        workflow_stage: workflow_stage
+      application_code: application_code,
+      module_id: module_id,
+      sub_module_id: sub_module_id,
+      workflow_stage: workflow_stage
     };
 
     store.load(); // Load the store with the new parameters
-},
+  },
   showApplicationDocUploadWin: function (btn) {
-  var mainTabPanel = this.getMainTabPanel(),
+    var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
       section_id = activeTab.down("hiddenfield[name=section_id]").getValue(),
@@ -856,7 +858,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       grid = activeTab.down("applicationdocuploadsgrid"),
       // grid = activeTab.down('docuploadsgrid'),
@@ -866,7 +868,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
-      
+
     activeTab.down("textfield[name=recommendation_id]").setVisible(false);
     activeTab.down("textfield[name=approval_id]").setVisible(true);
     activeTab.down("button[name=add_upload]").setHidden(true);
@@ -920,7 +922,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("soptemplatedoclistfrm"),
       grid = activeTab.down("soptemplatedocuploadgrid"),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
@@ -929,7 +931,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       reference_no = activeTab.down("displayfield[name=reference_no]").getValue(),
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue();
 
-      
+
     activeTab.down("textfield[name=recommendation_id]").setVisible(false);
     activeTab.down("textfield[name=approval_id]").setVisible(true);
     activeTab.down("button[name=add_upload]").setHidden(true);
@@ -983,7 +985,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       grid = activeTab.down("docuploadsgrid"),
       // grid = activeTab.down('docuploadsgrid'),
@@ -1046,7 +1048,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("soptemplatedoclistfrm"),
       grid = activeTab.down("soptemplategrid"),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
@@ -1109,7 +1111,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       grid = activeTab.down("docuploadsgrid"),
       // grid = activeTab.down('docuploadsgrid'),
@@ -1141,7 +1143,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             grid.down("button[name=add_upload]").setHidden(true);
             grid.down("textfield[name=recommendation_id]").setHidden(true);
             grid.down("textfield[name=approval_id]").setHidden(true);
-      
+
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -1167,7 +1169,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      grid = Ext.widget("applicationdocuploadsgrid"),
+    grid = Ext.widget("applicationdocuploadsgrid"),
       application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       grid = activeTab.down("docreleasegrid"),
@@ -1232,7 +1234,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("soptemplatedoclistfrm"),
       grid = activeTab.down("docreleasegrid"),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
@@ -1294,7 +1296,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
@@ -1333,14 +1335,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             activeTab.down('displayfield[name=created_on]').setValue(results.created_on);
             qmsdoclistfrm.down("textfield[name=navigator_name]").setValue(results.navigator_name);
 
-          
-                activeTab.down("button[name=recommendation]").setVisible(false);
-                activeTab.down("button[name=approval]").setVisible(false);
-                activeTab.down("textfield[name=recommendation_id]").setVisible(false);
-                activeTab.down("textfield[name=approval_id]").setVisible(false);
-                activeTab.down("button[name=add_upload]").setHidden(false);
-                activeTab.down("button[name=process_submission_btn]").setHidden(true);
-          
+
+            activeTab.down("button[name=recommendation]").setVisible(false);
+            activeTab.down("button[name=approval]").setVisible(false);
+            activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+            activeTab.down("textfield[name=approval_id]").setVisible(false);
+            activeTab.down("button[name=add_upload]").setHidden(false);
+            activeTab.down("button[name=process_submission_btn]").setHidden(true);
+
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -1366,7 +1368,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("qmsdoclistfrm"),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
@@ -1405,13 +1407,13 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             activeTab.down('displayfield[name=created_on]').setValue(results.created_on);
             qmsdoclistfrm.down("textfield[name=navigator_name]").setValue(results.navigator_name);
 
-          
-                activeTab.down("button[name=recommendation]").setVisible(false);
-                activeTab.down("button[name=approval]").setVisible(false);
-                activeTab.down("textfield[name=recommendation_id]").setVisible(false);
-                activeTab.down("textfield[name=approval_id]").setVisible(false);
-                activeTab.down("button[name=add_upload]").setHidden(false);
-          
+
+            activeTab.down("button[name=recommendation]").setVisible(false);
+            activeTab.down("button[name=approval]").setVisible(false);
+            activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+            activeTab.down("textfield[name=approval_id]").setVisible(false);
+            activeTab.down("button[name=add_upload]").setHidden(false);
+
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -1437,7 +1439,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       qmsdoclistfrm = activeTab.down("docrenewalfrm"),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
@@ -1446,7 +1448,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
       stage_category_id = activeTab.down("hiddenfield[name=stage_category_id]").getValue();
 
-  
+
     if (application_code) {
       Ext.Ajax.request({
         method: "GET",
@@ -1475,12 +1477,12 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             activeTab.down("displayfield[name=tracking_no]").setValue(results.tracking_no);
             qmsdoclistfrm.down("textfield[name=navigator_name]").setValue(results.navigator_name);
 
-                activeTab.down("button[name=recommendation]").setVisible(false);
-                activeTab.down("button[name=approval]").setVisible(false);
-                activeTab.down("textfield[name=recommendation_id]").setVisible(false);
-                activeTab.down("textfield[name=approval_id]").setVisible(false);
-                activeTab.down("button[name=add_upload]").setHidden(false);
-          
+            activeTab.down("button[name=recommendation]").setVisible(false);
+            activeTab.down("button[name=approval]").setVisible(false);
+            activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+            activeTab.down("textfield[name=approval_id]").setVisible(false);
+            activeTab.down("button[name=add_upload]").setHidden(false);
+
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -1502,133 +1504,133 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     }
   },
 
-   uploadApplicationFile: function (btn) {
-        var me = this,
-            form = btn.up('form'),
-            win = form.up('window'),
-            frm = form.getForm(),
-            formValues = form.getValues(),
-            storeID = btn.storeID,
-            mainTabPanel = this.getMainTabPanel(),
-            activeTab = mainTabPanel.getActiveTab(),
-            module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
-            uploads_store = Ext.getStore(storeID),
-            resumable = btn.resumable,
-            progressBar = btn.progressBar;
-        if(resumable != ''){
-            //add parameters
-            resumable.opts.query.id=formValues.id;
-            resumable.opts.query.application_id=formValues.application_id;
-            resumable.opts.query.application_code=formValues.application_code;
-            resumable.opts.query.process_id=formValues.process_id;
-            resumable.opts.query.section_id=formValues.section_id;
-            resumable.opts.query.module_id=formValues.module_id;
-            resumable.opts.query.sub_module_id=formValues.sub_module_id;
-            resumable.opts.query.workflow_stage_id=formValues.workflow_stage_id;
-            resumable.opts.query.document_type_id=formValues.document_type_id;
-            resumable.opts.query.prodclass_category_id=formValues.prodclass_category_id;
-            resumable.opts.query.importexport_permittype_id=formValues.importexport_permittype_id;
-            resumable.opts.query.premise_type_id=formValues.premise_type_id;
-            resumable.opts.query.query_ref_id=formValues.query_ref_id;
-            resumable.opts.query.node_ref=formValues.node_ref;
-            resumable.opts.query.doctype_id=formValues.doctype_id;
-            resumable.opts.query.document_requirement_id=formValues.document_requirement_id;
-            resumable.opts.query.assessment_by=formValues.assessment_by;
-            resumable.opts.query.assessment_start_date=formValues.assessment_start_date;
-            resumable.opts.query.assessment_end_date=formValues.assessment_end_date;
-            resumable.opts.query.description=formValues.description;
-           
-            funcShowCustomizableWindow("Upload Progress", '20%', progressBar, 'customizablewindow', btn);
-            resumable.upload();
-        }else{
-             toastr.error('Please select a file/document to upload!', 'Missing File');
-        }
-    },initializeResumableUpload: function(btn){
-        var me = this,
-            mainTabPanel = this.getMainTabPanel(),
-            activeTab = mainTabPanel.getActiveTab(),
-            form = btn.up('form'),
-            win = form.up('window'),
-            rec = form.getValues(),
-            id = rec.application_id,
-            application_id = rec.application_id,
-            module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
-            uploads_store = Ext.getStore('applicationDocumentsUploadsStr'),
-            progressBar = Ext.widget('progress');
-        // let browseFile = $('#browseFile');
-        let resumable = new Resumable({
-            target: 'documentmanagement/resumableuploadApplicationDocumentFile',
-            query:{
-                _token:token,
-                view_module_id: module_id,
-                id: id,
-                application_id: application_id,
-                application_code: '',
-                process_id: '',
-                section_id: '',
-                module_id: '',
-                sub_module_id: '',
-                workflow_stage_id: '',
-                document_type_id: '',
-                prodclass_category_id: '',
-                importexport_permittype_id: '',
-                premise_type_id: '',
-                query_ref_id: '',
-                node_ref: '',
-                doctype_id: '',
-                document_requirement_id: '',
-                assessment_by: '',
-                assessment_start_date: '',
-                assessment_end_date: '',
-                description: ''
-            } ,
-            fileType: [],
-            chunkSize: 10*1024*1024, // 10mbs
-            headers: {
-                'Authorization': 'Bearer ' + access_token,
-                'Accept' : 'application/json'
-            },
-            testChunks: false,
-            throttleProgressCallbacks: 1,
-        });
-        // console.log(browseFile);
-        resumable.assignBrowse(document.getElementById('browseButton'));
+  uploadApplicationFile: function (btn) {
+    var me = this,
+      form = btn.up('form'),
+      win = form.up('window'),
+      frm = form.getForm(),
+      formValues = form.getValues(),
+      storeID = btn.storeID,
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
+      uploads_store = Ext.getStore(storeID),
+      resumable = btn.resumable,
+      progressBar = btn.progressBar;
+    if (resumable != '') {
+      //add parameters
+      resumable.opts.query.id = formValues.id;
+      resumable.opts.query.application_id = formValues.application_id;
+      resumable.opts.query.application_code = formValues.application_code;
+      resumable.opts.query.process_id = formValues.process_id;
+      resumable.opts.query.section_id = formValues.section_id;
+      resumable.opts.query.module_id = formValues.module_id;
+      resumable.opts.query.sub_module_id = formValues.sub_module_id;
+      resumable.opts.query.workflow_stage_id = formValues.workflow_stage_id;
+      resumable.opts.query.document_type_id = formValues.document_type_id;
+      resumable.opts.query.prodclass_category_id = formValues.prodclass_category_id;
+      resumable.opts.query.importexport_permittype_id = formValues.importexport_permittype_id;
+      resumable.opts.query.premise_type_id = formValues.premise_type_id;
+      resumable.opts.query.query_ref_id = formValues.query_ref_id;
+      resumable.opts.query.node_ref = formValues.node_ref;
+      resumable.opts.query.doctype_id = formValues.doctype_id;
+      resumable.opts.query.document_requirement_id = formValues.document_requirement_id;
+      resumable.opts.query.assessment_by = formValues.assessment_by;
+      resumable.opts.query.assessment_start_date = formValues.assessment_start_date;
+      resumable.opts.query.assessment_end_date = formValues.assessment_end_date;
+      resumable.opts.query.description = formValues.description;
 
-        resumable.on('fileAdded', function (file) { // trigger when file picked
-            document.getElementById('fileName').value = file.relativePath;
-            btn.resumable = resumable;
-            btn.progressBar = progressBar;
-            //resumable.upload() // to actually start uploading.
-        });
+      funcShowCustomizableWindow("Upload Progress", '20%', progressBar, 'customizablewindow', btn);
+      resumable.upload();
+    } else {
+      toastr.error('Please select a file/document to upload!', 'Missing File');
+    }
+  }, initializeResumableUpload: function (btn) {
+    var me = this,
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      form = btn.up('form'),
+      win = form.up('window'),
+      rec = form.getValues(),
+      id = rec.application_id,
+      application_id = rec.application_id,
+      module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
+      uploads_store = Ext.getStore('applicationDocumentsUploadsStr'),
+      progressBar = Ext.widget('progress');
+    // let browseFile = $('#browseFile');
+    let resumable = new Resumable({
+      target: 'documentmanagement/resumableuploadApplicationDocumentFile',
+      query: {
+        _token: token,
+        view_module_id: module_id,
+        id: id,
+        application_id: application_id,
+        application_code: '',
+        process_id: '',
+        section_id: '',
+        module_id: '',
+        sub_module_id: '',
+        workflow_stage_id: '',
+        document_type_id: '',
+        prodclass_category_id: '',
+        importexport_permittype_id: '',
+        premise_type_id: '',
+        query_ref_id: '',
+        node_ref: '',
+        doctype_id: '',
+        document_requirement_id: '',
+        assessment_by: '',
+        assessment_start_date: '',
+        assessment_end_date: '',
+        description: ''
+      },
+      fileType: [],
+      chunkSize: 10 * 1024 * 1024, // 10mbs
+      headers: {
+        'Authorization': 'Bearer ' + access_token,
+        'Accept': 'application/json'
+      },
+      testChunks: false,
+      throttleProgressCallbacks: 1,
+    });
+    // console.log(browseFile);
+    resumable.assignBrowse(document.getElementById('browseButton'));
 
-        resumable.on('fileProgress', function (file) { // trigger when file progress update
-            me.updateProgress(Math.floor(file.progress() * 100), progressBar);
-        });
+    resumable.on('fileAdded', function (file) { // trigger when file picked
+      document.getElementById('fileName').value = file.relativePath;
+      btn.resumable = resumable;
+      btn.progressBar = progressBar;
+      //resumable.upload() // to actually start uploading.
+    });
 
-        resumable.on('fileSuccess', function (file, response) { // trigger when file upload complete
-            response = JSON.parse(response);
-            console.log(uploads_store);
-            uploads_store.load();
-            success = response.success;
-            if(success == true){
-                toastr.success("Uploaded Successfully", 'Success Response');
-                uploads_store.load();
-            }else{
-                toastr.error(response.message+ " If problem persist contact system admin", 'Failure Response!!');
-            }
-            progressBar.up('window').close();
-            win.close();
-            delete resumable;
-        });
+    resumable.on('fileProgress', function (file) { // trigger when file progress update
+      me.updateProgress(Math.floor(file.progress() * 100), progressBar);
+    });
 
-        resumable.on('fileError', function (file, response) { // trigger when there is any error
-            progressBar.up('window').close();
-            res = JSON.parse(response);
-            uploads_store.load();
-            win.close();
-            toastr.error(res.message+ " If problem persist contact system admin", 'Failure Response!!');
-        });
-    },
+    resumable.on('fileSuccess', function (file, response) { // trigger when file upload complete
+      response = JSON.parse(response);
+      console.log(uploads_store);
+      uploads_store.load();
+      success = response.success;
+      if (success == true) {
+        toastr.success("Uploaded Successfully", 'Success Response');
+        uploads_store.load();
+      } else {
+        toastr.error(response.message + " If problem persist contact system admin", 'Failure Response!!');
+      }
+      progressBar.up('window').close();
+      win.close();
+      delete resumable;
+    });
+
+    resumable.on('fileError', function (file, response) { // trigger when there is any error
+      progressBar.up('window').close();
+      res = JSON.parse(response);
+      uploads_store.load();
+      win.close();
+      toastr.error(res.message + " If problem persist contact system admin", 'Failure Response!!');
+    });
+  },
   showReceivingApplicationSubmissionWin: function (btn) {
     Ext.getBody().mask("Please wait...");
     var mainTabPanel = this.getMainTabPanel(),
@@ -1649,7 +1651,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       validateHasDocuments = validateHasUploadedDocumentsDetils(application_code);
 
     if (!validateHasDocuments) {
-      toastr.error(  
+      toastr.error(
         "Response: Please Upload the required documents to proceed."
       );
       Ext.getBody().unmask();
@@ -1680,7 +1682,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                 // value: hasQueries
               },
             ];
-            showWorkflowSubmissionWin(document_id, application_code, table_name,"workflowsubmissionsreceivingfrm",
+            showWorkflowSubmissionWin(document_id, application_code, table_name, "workflowsubmissionsreceivingfrm",
               winWidth,
               storeID,
               extraParams,
@@ -1716,18 +1718,18 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab();
 
-    if(activeTab.down("qmsdoclistfrm")){
+    if (activeTab.down("qmsdoclistfrm")) {
       var applicantFrm = activeTab.down("qmsdoclistfrm"),
-       document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
-    }else if(activeTab.down("soptemplatedoclistfrm")){
+        document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
+    } else if (activeTab.down("soptemplatedoclistfrm")) {
       var applicantFrm = activeTab.down("soptemplatedoclistfrm"),
-       document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
-    }else{
+        document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
+    } else {
       var applicantFrm = activeTab.down("docrenewalfrm"),
-       document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
+        document_id = applicantFrm.down("combo[name=document_type_id]").getValue();
 
     }
- 
+
     if (!document_id) {
       toastr.warning("Please Save Application Details!!", "Warning Response");
       return false;
@@ -1791,96 +1793,96 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   // },
 
   saveDocumentReviewRecommendationDetails: function (btn) {
-  var me = this,
-    mainTabPanel = me.getMainTabPanel(),
-    activeTab = mainTabPanel.getActiveTab(),
-    form = btn.up("form"),
-    decision_id = form.down("combo[name=decision_id]").getValue(),
-    module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
-    sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
-    application_code = activeTab.down("hiddenfield[name=application_code]").getValue(),
-    frm = form.getForm(),
-    win = form.up("window"),
-    action_url = "documentmanagement/saveDocumentApplicationApprovalDetails";
+    var me = this,
+      mainTabPanel = me.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      form = btn.up("form"),
+      decision_id = form.down("combo[name=decision_id]").getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+      sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
+      application_code = activeTab.down("hiddenfield[name=application_code]").getValue(),
+      frm = form.getForm(),
+      win = form.up("window"),
+      action_url = "documentmanagement/saveDocumentApplicationApprovalDetails";
 
-  if (activeTab.down("docuploadsgrid")) {
-    var grid = activeTab.down("docuploadsgrid");
-  } else {
-    var grid = activeTab.down("soptemplatedocuploadgrid");
-  }
+    if (activeTab.down("docuploadsgrid")) {
+      var grid = activeTab.down("docuploadsgrid");
+    } else {
+      var grid = activeTab.down("soptemplatedocuploadgrid");
+    }
 
-  // Check if decision_id is 3
-  if (decision_id == 3) {
-    // Show confirmation popup
-    Ext.Msg.confirm('Confirmation', 'Rejecting this document will automatically ERASE its content from the system. Are you sure you want to delete this record?', function (btn) {
-      if (btn === 'yes') {
-        // Proceed to delete the record
-        Ext.Ajax.request({
-          url: 'documentmanagement/deleteDocumentRecord', 
-          method: 'POST',
-          params: {
-            sub_module_id: sub_module_id,
-            decision_id: decision_id,
-            application_code: application_code
-          },
+    // Check if decision_id is 3
+    if (decision_id == 3) {
+      // Show confirmation popup
+      Ext.Msg.confirm('Confirmation', 'Rejecting this document will automatically ERASE its content from the system. Are you sure you want to delete this record?', function (btn) {
+        if (btn === 'yes') {
+          // Proceed to delete the record
+          Ext.Ajax.request({
+            url: 'documentmanagement/deleteDocumentRecord',
+            method: 'POST',
+            params: {
+              sub_module_id: sub_module_id,
+              decision_id: decision_id,
+              application_code: application_code
+            },
+            headers: {
+              Authorization: "Bearer " + access_token,
+              "X-CSRF-Token": token,
+            },
+            success: function (response) {
+              var resp = Ext.decode(response.responseText),
+                success = resp.success,
+                message = resp.message;
+              if (success == true || success === true) {
+                grid.getStore().reload(); // Reload the grid store
+                win.close();
+                activeTab.close();
+                toastr.success(message, "Success Response");
+              } else {
+                toastr.error(message, "Failure Response");
+              }
+            },
+            failure: function (response) {
+              var resp = Ext.decode(response.responseText);
+              toastr.error(resp.message, "Failure Response");
+            }
+          });
+        }
+      });
+    } else {
+      // Proceed with the form submission
+      if (frm.isValid()) {
+        frm.submit({
+          url: action_url,
           headers: {
             Authorization: "Bearer " + access_token,
             "X-CSRF-Token": token,
           },
-          success: function (response) {
-            var resp = Ext.decode(response.responseText),
-              success = resp.success,
-              message = resp.message;
+          params: {
+            sub_module_id: sub_module_id
+          },
+          waitMsg: "Please wait...",
+          success: function (fm, action) {
+            var response = Ext.decode(action.response.responseText),
+              success = response.success,
+              message = response.message,
+              approval = response.results;
             if (success == true || success === true) {
-              grid.getStore().reload(); // Reload the grid store
-              win.close();
-              activeTab.close();
               toastr.success(message, "Success Response");
+              grid.down("textfield[name=approval_id]").setValue(approval);
+              win.close();
             } else {
               toastr.error(message, "Failure Response");
             }
           },
-          failure: function (response) {
-            var resp = Ext.decode(response.responseText);
+          failure: function (fm, action) {
+            var resp = action.result;
             toastr.error(resp.message, "Failure Response");
-          }
+          },
         });
       }
-    });
-  } else {
-    // Proceed with the form submission
-    if (frm.isValid()) {
-      frm.submit({
-        url: action_url,
-        headers: {
-          Authorization: "Bearer " + access_token,
-          "X-CSRF-Token": token,
-        },
-        params: {
-          sub_module_id: sub_module_id
-        },
-        waitMsg: "Please wait...",
-        success: function (fm, action) {
-          var response = Ext.decode(action.response.responseText),
-            success = response.success,
-            message = response.message,
-            approval = response.results;
-          if (success == true || success === true) {
-            toastr.success(message, "Success Response");
-            grid.down("textfield[name=approval_id]").setValue(approval);
-            win.close();
-          } else {
-            toastr.error(message, "Failure Response");
-          }
-        },
-        failure: function (fm, action) {
-          var resp = action.result;
-          toastr.error(resp.message, "Failure Response");
-        },
-      });
     }
-  }
-},
+  },
 
   saveApplicationApprovalDetails: function (btn) {
     var me = this,
@@ -2088,10 +2090,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     var qmsdoclistfrm = activeTab.down("qmsdoclistfrm");
     var soptemplatedoclistfrm = activeTab.down("soptemplatedoclistfrm");
 
-    if(qmsdoclistfrm){
-       qmsdoclistfrm.loadRecord(record);
-    }else{
-      soptemplatedoclistfrm.loadRecord(record);      
+    if (qmsdoclistfrm) {
+      qmsdoclistfrm.loadRecord(record);
+    } else {
+      soptemplatedoclistfrm.loadRecord(record);
     }
 
 
@@ -2129,21 +2131,21 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     activeTab.down("hiddenfield[name=active_application_code]").setValue(applicationCode);
     activeTab.down("displayfield[name=tracking_no]").setValue(trackingNo);
 
-       docrenewalfrm.loadRecord(record);
+    docrenewalfrm.loadRecord(record);
     var docgrid = Ext.getStore('applicationDocumentsUploadsStr');
-       //docgrid=Ext.ComponentQuery.query("#docuploadsgrid")[0];
-       docgrid.load();
-   
+    //docgrid=Ext.ComponentQuery.query("#docuploadsgrid")[0];
+    docgrid.load();
+
     Ext.Function.defer(function () {
       mask.hide();
       win.close();
     }, 200);
   },
 
-   AddGeneralComment: function (argument) {
-        var form = Ext.widget('applicationcommentsFrm');
-        funcShowCustomizableWindow('Application Recommendation', '50%', form, 'customizablewindow');
-    },
+  AddGeneralComment: function (argument) {
+    var form = Ext.widget('applicationcommentsFrm');
+    funcShowCustomizableWindow('Application Recommendation', '50%', form, 'customizablewindow');
+  },
 
   onViewNavigatorDocDetails: function (record) {
     Ext.getBody().mask("Please wait...");
@@ -2167,7 +2169,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       toastr.warning(
         "Warning Response",
         "You're attempting to open a folder, drop the folder down to open a document!!"
-        
+
       );
       return false;
     }
@@ -2183,7 +2185,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       view_id = view_id + Math.floor(Math.random() * 100015);
     }
     if (!tab) {
-   // Assuming this method returns the main tab panel
+      // Assuming this method returns the main tab panel
       viewtype = "documentsviewpnl";
       //
       var newTab = Ext.widget(viewtype, {
@@ -2199,7 +2201,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       me.prepareApplicationBaseDetails(newTab, record);
       mainTabPanel.add(newTab);
       var sub_module_id = record.get("sub_module_id");
-    
+
       var lastTab = mainTabPanel.items.length - 1;
       mainTabPanel.setActiveTab(lastTab);
     } else {
@@ -2258,12 +2260,12 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     //load the stores
   },
 
- 
+
   prepareSOPTemplateApplication: function (pnl) {
     Ext.getBody().mask("Please wait...");
     var me = this,
       activeTab = pnl;
-      application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
+    application_status_id = activeTab.down("hiddenfield[name=application_status_id]").getValue(),
       soptemplatedoclistfrm = activeTab.down("soptemplatedoclistfrm"),
       grid = activeTab.down("soptemplategrid"),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
@@ -2319,55 +2321,55 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       Ext.getBody().unmask();
     }
   },
-      downloadsopTemplate:function(module_id){
-                var action_url = 'documentmanagement/downloadsopTemplate?module_id=' + module_id;
-               // print_report(action_url);
-                this.print_report(action_url, function() {
-                  setTimeout(function() {
-                     window.close();
-                  }, 5); 
-                });
+  downloadsopTemplate: function (module_id) {
+    var action_url = 'documentmanagement/downloadsopTemplate?module_id=' + module_id;
+    // print_report(action_url);
+    this.print_report(action_url, function () {
+      setTimeout(function () {
+        window.close();
+      }, 5);
+    });
 
-    },
+  },
 
-    downloadFormFormat:function(module_id){
-                var action_url = 'documentmanagement/downloadFormFormat?module_id=' + module_id;
-               //print_report(action_url);
-               this.print_report(action_url, function() {
-                  setTimeout(function() {
-                     window.close();
-                  }, 5); 
-                });
+  downloadFormFormat: function (module_id) {
+    var action_url = 'documentmanagement/downloadFormFormat?module_id=' + module_id;
+    //print_report(action_url);
+    this.print_report(action_url, function () {
+      setTimeout(function () {
+        window.close();
+      }, 5);
+    });
 
-    },
+  },
 
-    downloadlogdatabasesTemplate:function(module_id){
-                var action_url = 'documentmanagement/downloadlogdatabasesTemplate?module_id=' + module_id;
-               //print_report(action_url);
-               this.print_report(action_url, function() {
-                  setTimeout(function() {
-                     window.close();
-                  }, 5); 
-                });
+  downloadlogdatabasesTemplate: function (module_id) {
+    var action_url = 'documentmanagement/downloadlogdatabasesTemplate?module_id=' + module_id;
+    //print_report(action_url);
+    this.print_report(action_url, function () {
+      setTimeout(function () {
+        window.close();
+      }, 5);
+    });
 
-    },
+  },
 
-     print_report(action_url, callback) {
+  print_report(action_url, callback) {
     var printWindow = window.open(action_url, 'Print', 'width=800,height=600');
-    printWindow.onload = function() {
-        printWindow.print();
-        var checkPrintComplete = setInterval(function() {
-            if (printWindow.closed) {
-                clearInterval(checkPrintComplete);
-                if (callback) {
-                    callback();
-                }
-            }
-        }, 100);
+    printWindow.onload = function () {
+      printWindow.print();
+      var checkPrintComplete = setInterval(function () {
+        if (printWindow.closed) {
+          clearInterval(checkPrintComplete);
+          if (callback) {
+            callback();
+          }
+        }
+      }, 100);
     };
-},
+  },
 
-    saveApplicationComment: function (btn) {
+  saveApplicationComment: function (btn) {
     var mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
@@ -2378,11 +2380,11 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       store = Ext.getStore(btn.storeID),
       win = formPnl.up("window");
 
-      if(activeTab.down("docuploadsgrid")){
-       var grid = activeTab.down("docuploadsgrid");
-      }else{
-       var grid = activeTab.down("soptemplatedocuploadgrid");
-      }
+    if (activeTab.down("docuploadsgrid")) {
+      var grid = activeTab.down("docuploadsgrid");
+    } else {
+      var grid = activeTab.down("soptemplatedocuploadgrid");
+    }
 
     if (frm.isValid()) {
       frm.submit({
@@ -2397,12 +2399,12 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
           var response = Ext.decode(action.response.responseText),
             success = response.success,
             message = response.message;
-            reccomendation = response.results;
+          reccomendation = response.results;
           if (success == true || success === true) {
             toastr.success(message, "Success Response");
             grid.down("textfield[name=recommendation_id]").setValue(reccomendation);
             win.close();
-            
+
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -2414,7 +2416,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       });
     }
   },
-   showApplicationDocUploadWinGeneric: function (
+  showApplicationDocUploadWinGeneric: function (
     btn,
     section_id,
     module_id,
@@ -2471,7 +2473,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       },
     });
   },
-   uploadExcelFile: function (btn) {
+  uploadExcelFile: function (btn) {
     var me = this,
       form = btn.up("form"),
       win = form.up("window"),
@@ -2530,7 +2532,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       testChunks: false,
       throttleProgressCallbacks: 1,
     });
-    
+
     resumable.assignBrowse(document.getElementById("browseButton"));
 
     resumable.on("fileAdded", function (file) {
@@ -2586,7 +2588,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   renderParameterMenu: function (parameter_id) {
     var def_id = parameter_id,
       contentPnl = this.getMainTabPanel();
-      console.log("def id = " + def_id);
+    console.log("def id = " + def_id);
     Ext.getBody().mask("Loading...");
     //check if tab item is currently open
     if (contentPnl.getComponent("item_id" + def_id)) {
@@ -2613,16 +2615,16 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         success: function (response) {
           //var savedRecordId = resp.id; // The id returned from the server after saving
 
-            // Find the hidden field and set the new id
+          // Find the hidden field and set the new id
           //form.down('hiddenfield[name=id]').setValue(savedRecordId);
           var resp = Ext.JSON.decode(response.responseText),
             success = resp.success,
             message = resp.message,
             result = resp.results,
             title = resp.title;
-            ref_id = resp.ref_id;
+          ref_id = resp.ref_id;
           table_name = resp.table_name;
-        
+
           if (success == true || success === true) {
             var panel = Ext.create("Ext.panel.Panel", {
               viewModel: "configurationsvm",
@@ -2674,7 +2676,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                 },
                 {
                   xtype: "hiddenfield",
-                  name:"id",
+                  name: "id",
                   value: id,
                   fieldLabel: 'id',
                   allowBlank: true
@@ -2706,7 +2708,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                     var grid = this.up("grid"),
                       store = grid.getStore(),
                       def_id = grid.down("hiddenfield[name=def_id]").getValue();
-                      //id = grid.down("hiddenfield[name=id]").getValue();
+                    //id = grid.down("hiddenfield[name=id]").getValue();
 
                     var store = this.getStore();
                     store.getProxy().extraParams = {
@@ -2823,49 +2825,49 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
                           //childXtype: 'findingtypeloggrid',
                           winTitle: 'Logs',
                           winWidth: '100%',
-                          handler: function(btn) {
+                          handler: function (btn) {
                             var button = btn.up('button'),
-                                grid = button.up('grid'),
-                                record = button.getWidgetRecord(),
-                                def_id = grid.down("hiddenfield[name=def_id]").getValue();
-                                //def_id = record.get('def_id') || btn.def_id,
-                                //childXtype = btn.childXtype,
-                                winWidth = '100%',
-                                winTitle = "logs",
-                                storeArray = eval(btn.stores),
-                                arrayLength = storeArray.length;
+                              grid = button.up('grid'),
+                              record = button.getWidgetRecord(),
+                              def_id = grid.down("hiddenfield[name=def_id]").getValue();
+                            //def_id = record.get('def_id') || btn.def_id,
+                            //childXtype = btn.childXtype,
+                            winWidth = '100%',
+                              winTitle = "logs",
+                              storeArray = eval(btn.stores),
+                              arrayLength = storeArray.length;
 
                             var childXtype;
                             if (def_id === '175') {
-                                childXtype = 'issueTypeCategoriesLoggrid';
+                              childXtype = 'issueTypeCategoriesLoggrid';
                             } else if (def_id === '172') {
-                                childXtype = 'issueStatusLoggrid';
-                            } else if (def_id === '176'){
-                                childXtype = 'findingtypeloggrid';
+                              childXtype = 'issueStatusLoggrid';
+                            } else if (def_id === '176') {
+                              childXtype = 'findingtypeloggrid';
                             } else {
-                                childXtype = 'defaultLogGrid';
+                              childXtype = 'defaultLogGrid';
                             }
-                    
+
                             // Refresh stores if there are any
                             if (arrayLength > 0) {
-                                this.fireEvent('refreshStores', storeArray);
+                              this.fireEvent('refreshStores', storeArray);
                             }
-                    
+
                             var refId = record.get('id');
                             var logGrid = Ext.widget(childXtype);
-                            
+
                             // Set reference ID in the log grid
                             logGrid.down('textfield[name=id]').setValue(refId);
-                    
+
                             // Show window with customizable settings
                             funcShowCustomizableWindow(winTitle, winWidth, logGrid, 'customizablewindow');
-                        },
-                    
+                          },
+
                           // bind: {
                           //     disabled: '{isReadOnly}'
                           // },
                           stores: '[]'
-                      }
+                        }
                       ],
                     },
                   },
@@ -2939,7 +2941,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       });
     }
   },
-  deleteRecordByID: function (id, table_name, storeID, url, method = null,is_variation = "") {
+  deleteRecordByID: function (id, table_name, storeID, url, method = null, is_variation = "") {
     var me = this,
       store = Ext.getStore(storeID);
     Ext.MessageBox.confirm(
@@ -2998,7 +3000,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     );
   },
 
-   refreshAuditChecklistItemsGrid: function (me) {
+  refreshAuditChecklistItemsGrid: function (me) {
     var store = me.getStore(),
       mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
@@ -3042,7 +3044,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       resumable = btn.resumable,
       progressBar = btn.progressBar;
 
-     
+
     if (resumable != "") {
       //add parameters
       resumable.opts.query.id = formValues.id;
@@ -3127,7 +3129,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         description: "",
         checklist_item_id: "",
 
-        
+
       },
       fileType: [],
       chunkSize: 10 * 1024 * 1024, // 10mbs
@@ -3156,13 +3158,13 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     resumable.on("fileSuccess", function (file, response) {
       // trigger when file upload complete
       response = JSON.parse(response);
-       uploads_store.load();
+      uploads_store.load();
       success = response.success;
       if (success == true) {
         toastr.success("Uploaded Successfully", "Success Response");
-         uploads_store.load();
-        if(module_id ==  28){
-          
+        uploads_store.load();
+        if (module_id == 28) {
+
         }
       } else {
         toastr.error(
@@ -3224,7 +3226,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   //           resumable.opts.query.assessment_end_date=formValues.assessment_end_date;
   //           resumable.opts.query.description=formValues.description;
   //           resumable.opts.query.checklist_item_id = formValues.checklist_item_id;
-           
+
   //           funcShowCustomizableWindow("Upload Progress", '20%', progressBar, 'customizablewindow', btn);
   //           resumable.upload();
   //       }else{
@@ -3317,6 +3319,6 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
   //           toastr.error(res.message+ " If problem persist contact system admin", 'Failure Response!!');
   //       });
   //   },
-  
-  
+
+
 });
