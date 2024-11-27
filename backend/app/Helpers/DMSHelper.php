@@ -1163,7 +1163,7 @@ class DMSHelper
     $ticket = $auth_resp['ticket'];
 
     // Get document name
-    $file_name = getSingleRecordColValue('tra_application_uploadeddocuments', ['node_ref' => $node_ref], 'initial_file_name');
+    $file_name = getSingleRecordColValue('tra_application_uploadeddocuments', ['node_ref' => $node_ref], 'initial_file_name', '');
     
     // DMS URL
     $server_address = Config('constants.dms.dms_url');
@@ -1183,8 +1183,8 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
     $ticket = $auth_resp['ticket'];
 
     // Get document name
-    $file_name = getSingleRecordColValue('tra_documents_prevversions', ['id' => $uploadeddocuments_id], 'initial_file_name');
-    $node_ref = getSingleRecordColValue('tra_documents_prevversions', ['id' => $uploadeddocuments_id], 'node_ref');
+    $file_name = getSingleRecordColValue('tra_documents_prevversions', ['id' => $uploadeddocuments_id], 'initial_file_name', '');
+    $node_ref = getSingleRecordColValue('tra_documents_prevversions', ['id' => $uploadeddocuments_id], 'node_ref', '');
     
     // DMS URL
     $server_address = Config('constants.dms.dms_url');
@@ -1233,14 +1233,14 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
             //root site node ref
             $table_name = 'tra_sections_docdefination';
             $where_section = array('dms_site_id' => $root_site_id);
-            $record = getPreviousRecords($table_name, $where_section);
+            $record = getPreviousRecords($table_name, $where_section, '');
             
             if (count($record['results']) > 0) {
                 $section_node_ref = $record['results']['0']['node_ref'];
                 $doc_section_id = $record['results']['0']['id'];
             } else {
                 //create a node and save informaiton
-                $site_node_ref = getSingleRecordColValue('tra_dmsdocument_sites', array('id' => 2), 'node_ref');
+                $site_node_ref = getSingleRecordColValue('tra_dmsdocument_sites', array('id' => 2), 'node_ref', '');
                 $table_data = array('dms_site_id' => $root_site_id);
                 $section_id = '';
                 $resp = self::funcCreatApplicationNode($table_name, $where_section, $section_id, 'par_sections', $site_node_ref, $table_data, $user_id);
@@ -1251,7 +1251,7 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
             $table_name = 'tra_sectionsmodule_docdefination';
             if(validateIsNumeric($doc_section_id)){
                 $where_module = array('module_id' => $module_id, 'doc_section_id' => $doc_section_id);
-                $record = getPreviousRecords($table_name, $where_module);
+                $record = getPreviousRecords($table_name, $where_module, '');
             }else{
                 $record = ['results'=>[]];
             }
@@ -1271,7 +1271,7 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
 
             $table_name = 'tra_sectionssubmodule_docdefination';
             $where_submodule = array('sub_module_id' => $sub_module_id, 'doc_module_id' => $doc_module_id);
-            $record = getPreviousRecords($table_name, $where_submodule);
+            $record = getPreviousRecords($table_name, $where_submodule, '');
 
 
             if (count($record['results']) > 0) {
@@ -1295,7 +1295,7 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
 
     static function funcCreatApplicationNode($table_name, $where_state, $variable_id, $table_variable, $site_node_ref, $table_data, $user_id)
     {
-        $variable_name = getSingleRecordColValue($table_variable, array('id' => $variable_id), 'name');
+        $variable_name = getSingleRecordColValue($table_variable, array('id' => $variable_id), 'name', '');
         $node_name = strtoupper(str_replace(' ', '', $variable_name));
 		$node_name = str_replace(":","-",$node_name);
 			$node_name = str_replace("*","-",$node_name);
@@ -1443,9 +1443,9 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
                     //save the details to the tra_application_documentstypedefination
                     $dmsapp_data = array(
                         'node_ref' => $dms_node_id);
-                    if (recordExists($reference_table_name, $where)) {
+                    if (recordExists($reference_table_name, $where, '')) {
 
-                        $previous_data = getPreviousRecords($reference_table_name, $where);
+                        $previous_data = getPreviousRecords($reference_table_name, $where, '');
                         $previous_data = $previous_data['results'];
                         $res = updateRecord($reference_table_name, $previous_data, $where, $dmsapp_data, $user_id);
 
@@ -1486,7 +1486,7 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
     static function initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id)
     {
         //check if node exists tra_application_documentsdefination
-        $exists = recordExists('tra_application_documentsdefination', ['application_code'=>$application_code]);
+        $exists = recordExists('tra_application_documentsdefination', ['application_code'=>$application_code], '');
         if(!$exists){
             $dms_node_details = self::getApplicationSubModuleNodeDetails($module_id, $sub_module_id, $user_id);
 

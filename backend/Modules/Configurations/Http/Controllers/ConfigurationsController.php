@@ -3013,7 +3013,7 @@ class ConfigurationsController extends Controller
             }
 
 
-            $form_category_id = getSingleRecordColValue('par_form_categories', $where, 'id');
+            $form_category_id = getSingleRecordColValue('par_form_categories', $where, 'id', '');
 
             if (validateIsnumeric($form_category_id)) {
                 $qry = DB::table('par_formtype_fields as t22')
@@ -3362,7 +3362,7 @@ class ConfigurationsController extends Controller
             $results['param_name'] = $param->param_name;
             $results['table_name'] = $param->table_name;
             $results['no_joins'] = $param->no_joins;
-            $results['db_con_name'] = getSingleRecordColValue('par_connections', ['id' => $param->connection_id], 'config');
+            $results['db_con_name'] = getSingleRecordColValue('par_connections', ['id' => $param->connection_id], 'config', '');
 
             $res = array(
                 'success' => true,
@@ -3569,7 +3569,7 @@ class ConfigurationsController extends Controller
                 'sub_module_id' => $sub_module_id,
                 'section_id' => $section_id
             );
-            $process_id = getSingleRecordColValue('wf_processes', $where, 'id');
+            $process_id = getSingleRecordColValue('wf_processes', $where, 'id', '');
             //get applicable document types
             $qry1 = DB::table('tra_proc_applicable_doctypes')
                 ->select('doctype_id');
@@ -3688,7 +3688,7 @@ class ConfigurationsController extends Controller
             $workflow_stage = $stage_details->id;
             $where['stage_id'] = $workflow_stage;
         }
-        $stage_category_id = getSingleRecordColValue('wf_workflow_stages', ['id' => $workflow_stage], 'stage_category_id');
+        $stage_category_id = getSingleRecordColValue('wf_workflow_stages', ['id' => $workflow_stage], 'stage_category_id', '');
         try {
             if ($sub_module_id == 7) {
                 if ($section_id == 2 || $section_id == 3) {
@@ -4165,8 +4165,8 @@ class ConfigurationsController extends Controller
                     $master[$i]['sub_categories'][$j]['name'] = $sub_cat->name;
 
                     //add data for sub
-                    $master[$i]['sub_categories'][$j]['workspace_value'] = getSingleRecordColValue('par_ct_assessment_category_details', ['sub_category_id' => $sub_cat->id, 'active_application_code' => $application_code], 'workspace');
-                    $master[$i]['sub_categories'][$j]['comment_value'] = getSingleRecordColValue('par_ct_assessment_category_details', ['sub_category_id' => $sub_cat->id, 'active_application_code' => $application_code], 'comment');
+                    $master[$i]['sub_categories'][$j]['workspace_value'] = getSingleRecordColValue('par_ct_assessment_category_details', ['sub_category_id' => $sub_cat->id, 'active_application_code' => $application_code], 'workspace', '');
+                    $master[$i]['sub_categories'][$j]['comment_value'] = getSingleRecordColValue('par_ct_assessment_category_details', ['sub_category_id' => $sub_cat->id, 'active_application_code' => $application_code], 'comment', '');
 
                     if ($items->isEmpty()) {
                         $master[$i]['sub_categories'][$j]['items'] = [];
@@ -4177,10 +4177,10 @@ class ConfigurationsController extends Controller
                     foreach ($items as $item) {
                         if ($item->is_checklist == 1) {
                             $master[$i]['sub_categories'][$j]['items'][$k]['is_checklist'] = 1;
-                            $master[$i]['sub_categories'][$j]['items'][$k]['item_value'] = getSingleRecordColValue('par_ct_assessment_items_details', ['item_id' => $item->id, 'active_application_code' => $application_code], 'itemcheck');
+                            $master[$i]['sub_categories'][$j]['items'][$k]['item_value'] = getSingleRecordColValue('par_ct_assessment_items_details', ['item_id' => $item->id, 'active_application_code' => $application_code], 'itemcheck', '');
                         } else {
                             $master[$i]['sub_categories'][$j]['items'][$k]['is_checklist'] = 0;
-                            $master[$i]['sub_categories'][$j]['items'][$k]['item_value'] = getSingleRecordColValue('par_ct_assessment_items_details', ['item_id' => $item->id, 'active_application_code' => $application_code], 'item');
+                            $master[$i]['sub_categories'][$j]['items'][$k]['item_value'] = getSingleRecordColValue('par_ct_assessment_items_details', ['item_id' => $item->id, 'active_application_code' => $application_code], 'item', '');
                         }
                         $master[$i]['sub_categories'][$j]['items'][$k]['name'] = $item->name;
                         $master[$i]['sub_categories'][$j]['items'][$k]['id'] = $item->id;
@@ -4398,9 +4398,9 @@ class ConfigurationsController extends Controller
             $results = $qry->get();
             if (isset($results)) {
                 foreach ($results as $rec) {
-                    $module_name = getSingleRecordColValue('par_modules', array('id' => $rec->module_id), 'name');
-                    $sub_module_name = getSingleRecordColValue('par_sub_modules', array('id' => $rec->sub_module_id), 'name');
-                    $section_name = getSingleRecordColValue('par_sections', array('id' => $rec->section_id), 'name');
+                    $module_name = getSingleRecordColValue('par_modules', array('id' => $rec->module_id), 'name', '');
+                    $sub_module_name = getSingleRecordColValue('par_sub_modules', array('id' => $rec->sub_module_id), 'name', '');
+                    $section_name = getSingleRecordColValue('par_sections', array('id' => $rec->section_id), 'name', '');
                     $data[] = array(
                         'id' => $rec->id,
                         'application_code' => $rec->application_code,
