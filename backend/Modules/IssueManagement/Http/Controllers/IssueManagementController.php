@@ -443,11 +443,11 @@ class IssueManagementController extends Controller
                 }
             } else {
                 $applications_table = 'tra_issue_management_applications';
-                $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');
-                $zone_code = getSingleRecordColValue('par_zones', array('id' => $zone_id), 'zone_code');
-                $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');
-                $application_code = generateApplicationCode($sub_module_id, $applications_table);
-                $ref_id = getSingleRecordColValue('tra_submodule_referenceformats', array('sub_module_id' => $sub_module_id, 'module_id' => $module_id, 'reference_type_id' => 1), 'reference_format_id');
+                $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code', '');
+                $zone_code = getSingleRecordColValue('par_zones', array('id' => $zone_id), 'zone_code', '');
+                $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code', '');
+                $application_code = generateApplicationCode($sub_module_id, $applications_table, '');
+                $ref_id = getSingleRecordColValue('tra_submodule_referenceformats', array('sub_module_id' => $sub_module_id, 'module_id' => $module_id, 'reference_type_id' => 1), 'reference_format_id', '');
 
                 $codes_array = array(
                     'zone_code' => $zone_code,
@@ -487,7 +487,7 @@ class IssueManagementController extends Controller
                     'created_by' => $user_id,
                     'section_id' => $section_id
                 );
-                $res = insertRecord('tra_submissions', $submission_params);
+                $res = insertRecord('tra_submissions', $submission_params, $user_id, '');
 
                 $IssueManagement = new IssueManagement();
                 $issue_data['creation_date'] = $creationDateString->format('Y-m-d');

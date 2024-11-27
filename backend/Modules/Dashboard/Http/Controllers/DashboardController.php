@@ -113,7 +113,7 @@ class DashboardController extends Controller
                 ->leftJoin('par_sub_modules as t13', 't1.sub_module_id', '=', 't13.id')
                 ->select(DB::raw("t1.*, t1.current_stage as workflow_stage_id,t13.name as sub_module,  t1.application_id as active_application_id, t2.name as process_name,t4.is_receipting_stage,t1.application_status_id,
                     t3.name as prev_stage, if(t4.is_receipting_stage=1,concat(t4.name,' :',t5.name), t4.name ) as workflow_stage,t4.is_general,t5.name as application_status,t6.name as urgencyName,t6.name as urgency_name,
-                    CONCAT_WS(' ',decrypt(t7.first_name),decrypt(t7.last_name)) as from_user,CONCAT_WS(' ',decrypt(t8.first_name),decrypt(t8.last_name)) as to_user,
+                    t7.first_name as from_first_name, t7.last_name as from_last_name, t8.first_name as to_first_name, t8.last_name as to_last_name,
                      
                     if(t1.module_id= 2, t12.name , t9.name) as applicant_name,t12.name as premises_name, '' as sample_analysis_status"));
                 
@@ -183,7 +183,8 @@ class DashboardController extends Controller
             }
             //LIMS records 
            
-
+            $results = convertStdClassObjToArray($results);
+            $results = decryptArray($results);
             $res = array(
                 'success' => true,
                 'results' => $results,
@@ -250,7 +251,7 @@ class DashboardController extends Controller
                 ->leftJoin('wb_trader_account as t9', 't1.applicant_id', '=', 't9.id')
                 ->select(DB::raw("t1.*, t1.current_stage as workflow_stage_id, t1.application_id as active_application_id, t2.name as process_name,
                     t3.name as prev_stage, t4.name as workflow_stage,t5.name as application_status,t6.name as urgencyName,t6.name as urgency_name,
-                    CONCAT(decryptval(t7.first_name,".getDecryptFunParams()."),decryptval(t7.last_name,".getDecryptFunParams().")) as from_user,CONCAT(decryptval(t8.first_name,".getDecryptFunParams()."),decryptval(t8.last_name,".getDecryptFunParams().")) as to_user,
+                    t7.first_name as from_user,CONCAT(decryptval(t8.first_name,".getDecryptFunParams()."),decryptval(t8.last_name,".getDecryptFunParams().")) as to_user,
                     t9.name as applicant_name"))
                 ->where('isComplete', 0);
             if($is_internaluser){
