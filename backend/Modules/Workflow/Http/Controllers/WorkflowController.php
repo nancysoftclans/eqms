@@ -2971,8 +2971,8 @@ class WorkflowController extends Controller
         DB::beginTransaction();
 
         $action_details = $this->getApplicationWorkflowActionDetails($action);
-         $has_qms_notification = $action_details->has_qms_notification;
-         $qms_msg_id = $action_details->qms_msg_id;
+        $has_qms_notification = $action_details->has_qms_notification;
+        $qms_msg_id = $action_details->qms_msg_id;
         try {
             //get application_details
             //notify submission

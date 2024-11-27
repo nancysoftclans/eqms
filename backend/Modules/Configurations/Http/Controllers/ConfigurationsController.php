@@ -764,7 +764,7 @@ class ConfigurationsController extends Controller
             $where = array(
                 'id' => $record_id
             );
-            $res = deleteRecord($table_name, $where, $user_id);
+            $res = deleteRecord($table_name, $where, $user_id, '');
             if ($res['success']) {
                 if ($table_name == 'par_formfield_designs') {
                     DB::table('par_formfield_relations')->where('form_fielddesign_id', $record_id)->orWhere('parent_field_id', $record_id)->delete();
@@ -2963,7 +2963,7 @@ class ConfigurationsController extends Controller
                 $table_data = convertStdClassObjToArray($item);
                 $where = array('form_fielddesign_id' => $item->form_fielddesign_id, 'form_category_id' => $form_category_id);
                 //delete previous entries
-                deleteRecord($table_name, $where, $user_id);
+                deleteRecord($table_name, $where, $user_id, '');
                 if ($item->bind_column != '' || $item->parent_field_id > 0 || $item->has_logic != '') {
                     $table_data['form_category_id'] = $form_category_id;
                     $res = insertRecord($table_name, $table_data, $user_id);
