@@ -41,10 +41,10 @@ Ext.define('Admin.view.dashboard.views.charts.LineChart', {
             layout: 'fit',
             width: '100%',
             height: 350,
-            scrollable: 'x', // Enable horizontal scrolling
+            scrollable: 'x', 
             items: [{
                 xtype: 'cartesian',
-                width: '200%', // Set width to be larger than container to enable scrolling
+                width: '200%',
                 height: 300,
                 padding: '10',
                 insetPadding: '10 30 0 5',
@@ -142,9 +142,7 @@ Ext.define('Admin.view.dashboard.views.charts.LineChart', {
                             pageSize: 10000,
                             proxy: {
                                 url: 'dashboard/getDocumentAnalysis',
-                                // extraParams :{
-                                //     table_name:'wf_workflow_stages'
-                                // }
+                                
                             }
                         },
                         isLoad: true

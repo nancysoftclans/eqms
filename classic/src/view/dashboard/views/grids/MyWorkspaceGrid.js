@@ -63,10 +63,16 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         if (success && records.length > 0) {
                                             var data = records[0].data;
         
-                                            // Update components data
-                                            panel.down('#lasthourlogin').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.user_stats.loggedlasthour}</div>`);
-                                            panel.down('#totalusers').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.user_stats.totalUsers}</div>`);
-                                            panel.down('#groupedusers').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.user_stats.groupswithusers}</div>`);
+                                            panel.down('#lasthourlogin').setHtml(`<div 
+                                                style="font-size: 24px; 
+                                                color: #ffffff; 
+                                                padding: 10px 0;
+                                                background: #35baf6;
+                                                ">
+                                                ${data.user_stats.loggedlasthour}
+                                                </div>`);
+                                            panel.down('#totalusers').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.user_stats.totalUsers}</div>`);
+                                            panel.down('#groupedusers').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.user_stats.groupswithusers}</div>`);
                                         } else {
                                             console.error('Failed to load data from the store.');
                                         }
@@ -85,20 +91,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         xtype: 'container',
                                         flex: 1,
                                         padding: 15,
+                                        margin: '0 10 0 0', 
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Users Logged in in last 1 hour</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff; background:#35baf6">Users Logged in the last 1 hour</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'lasthourlogin',
-                                                html: '<div style="font-size: 24px; color: #666; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     },
@@ -106,20 +113,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         xtype: 'container',
                                         flex: 1,
                                         padding: 15,
+                                        margin: '0 10 0 0', 
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Total Users</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Total Users</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'totalusers',
-                                                html: '<div style="font-size: 24px; color: white; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     },
@@ -130,17 +138,17 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Groups with users</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Groups with users</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'groupedusers',
-                                                html: '<div style="font-size: 24px; color: white; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     },
@@ -186,7 +194,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                         },
 
                         //active users last 30 days
-                        items: [{ //each container resp card
+                        items: [{ 
                             
                             xtype: 'container',
                             margin: 10,
@@ -271,8 +279,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                         }],
                         listeners: {
                             afterrender: function (panel) {
-                                // Get the store instance (ensure the store is defined in your app)
-                                // var userStatsStore = Ext.getStore('userstatsstore'); // Replace with your actual store ID
+                                // var userStatsStore = Ext.getStore('userstatsstore'); 
                                 // var store = Ext.ComponentQuery.query('Admin.store.dashboard.UserStatsStr')[0];
                                 var store = Ext.create('Ext.data.Store', {
                                     model: 'Admin.model.dashboard.userStatsMdl',
@@ -285,8 +292,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         }
                                     }
                                 });
-                                console.log(store);
-                                // Load the store's data
+                                
                                 store.load({
                                     callback: function (records, operation, success) {
                                         if (success && records.length > 0) {
@@ -307,7 +313,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                                         break;
                                                     case 2: // Never Logged In
                                                         progressbar.setValue(data.user_stats.neverLoggedIn / data.user_stats.totalUsers);
-                                                        console.log(data.neverLoggedIn);
+                                                       
                                                         break;
                                                     case 3: // Licensed Users
                                                         progressbar.setValue(data.user_stats.activeusers / data.user_stats.totalUsers);
@@ -349,9 +355,8 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
 
                     listeners: {
                         afterrender: function (panel) {
-                            console.log('Panel rendered.');
                     
-                            // Create the store instance
+                       
                             var store = Ext.create('Ext.data.Store', {
                                 
                                 proxy: {
@@ -364,28 +369,15 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                 }
                             });
                     
-                            console.log('Store created:', store);
-                    
-                            // Load the store's data
+                         
                             store.load({
                                 callback: function (records, operation, success) {
-                                    console.log('Store loaded:', { records, success });
                     
                                     if (success && records.length > 0) {
                                         var data = records[0].data;
-                    
-                                        // Debugging the loaded data
-                                        console.log('Loaded data:', data);
-                    
-                                        // Locate the components by itemId
                                         var totalUsersComponent = panel.down('#totalUsersDisplay');
                                         var totalLicensesComponent = panel.down('#totalLicensesDisplay');
-                    
-                                        // Debugging the located components
-                                        console.log('Total Users Component:', totalUsersComponent);
-                                        console.log('Total Licenses Component:', totalLicensesComponent);
-                    
-                                        // Update the components if found
+            
                                         if (totalUsersComponent) {
                                             totalUsersComponent.setHtml(
                                                 `<div style="font-size: 24px; color: #3b82f6;padding:10px 0;">${data.user_stats.totalUsers}</div>`
@@ -396,7 +388,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                     
                                         if (totalLicensesComponent) {
                                             totalLicensesComponent.setHtml(
-                                                `<div style="font-size: 24px; color: #333;padding:10px 0;">${data.user_stats.activeusers}</div>` // Same value as totalUsers
+                                                `<div style="font-size: 24px; color: #333;padding:10px 0;">${data.user_stats.activeusers}</div>` 
                                             );
                                         } else {
                                             console.warn('Total Licenses component not found!');
@@ -465,9 +457,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                 }, {
                     listeners: {
                         afterrender: function(panel){
-                            console.log('Panel rendered.');
                     
-                            // Create the store instance
                             var store = Ext.create('Ext.data.Store', {
                                 
                                 proxy: {
@@ -480,35 +470,31 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                 }
                             });
                     
-                            console.log('Store created:', store);
                     
-                            // Load the store's data
                             store.load({
                                 callback: function (records, operation, success) {
-                                    console.log('Store loaded:', { records, success });
                     
                                     if (success && records.length > 0) {
                                         var data = records[0].data;
-                    
-                                        // Debugging the loaded data
-                                        console.log('Loaded data:', data);
+
                                         var progressbars = panel.query('progressbar');
                         
                                             
                                             Ext.Array.each(progressbars, function (progressbar, index) {
                                                 switch (index) {
-                                                    case 0: // Active Last 30 Days
+                                                    case 0: 
                                                     var percentage = data.document_analysis.released / data.document_analysis.total_documents
                                                         progressbar.setValue(percentage);
                                                         break;
                                                 }
                                             })
-                                        // Locate the components by itemId
+                                            
                                         var releasedversion = panel.down('#releasedversion');
-                                        console.log('released version:', releasedversion);
                                         if (releasedversion) {
                                             releasedversion.setHtml(
-                                                `<div style="font-size: 16px; text-align: left;">${data.document_analysis.released} Version (${(data.document_analysis.released/data.document_analysis.total_documents)*100}%)</div>`
+                                                `<div style="font-size: 16px; text-align: left;">
+                                                ${data.document_analysis.released} Version (${Math.round((data.document_analysis.released / data.document_analysis.total_documents) * 100)}%)
+                                                </div>`
                                             );
                                         } else {
                                             console.warn('released version component not found!');
@@ -549,9 +535,8 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                 }],
                 listeners: {
                     afterrender: function (panel) {
-                        // Set the custom style for the progress bar
                         panel.down('progressbar').setStyle({
-                            'background-color': '#e9ecef', // Background color for the bar
+                            'background-color': '#e9ecef', 
                             'border-radius': '10px',
                             'height': '20px',
                         });
@@ -605,14 +590,13 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         if (success && records.length > 0) {
                                             var data = records[0].data;
         
-                                            // Update components data
-                                            panel.down('#documentslive').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.documents_live}</div>`);
-                                            panel.down('#overduedocuments').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.overdue_documents}</div>`);
-                                            panel.down('#averagetime').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.average_acknowledgment_time} hours</div>`);
-                                            panel.down('#overduedocumenttasks').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.overdue_document_tasks}</div>`);
-                                            panel.down('#issued').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.issued_document_tasks}</div>`);
-                                            panel.down('#completed').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.completed_document_tasks}</div>`);
-                                            panel.down('#upcomingreviews').setHtml(`<div style="font-size: 24px; color: #666; padding: 10px 0;">${data.upcoming_document_reviews}</div>`);
+                                            panel.down('#documentslive').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.documents_live}</div>`);
+                                            panel.down('#overduedocuments').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.overdue_documents}</div>`);
+                                            panel.down('#averagetime').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.average_acknowledgment_time} hours</div>`);
+                                            panel.down('#overduedocumenttasks').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.overdue_document_tasks}</div>`);
+                                            panel.down('#issued').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.issued_document_tasks}</div>`);
+                                            panel.down('#completed').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.completed_document_tasks}</div>`);
+                                            panel.down('#upcomingreviews').setHtml(`<div style="font-size: 24px; color:#ffffff; padding: 10px 0;">${data.upcoming_document_reviews}</div>`);
                                         } else {
                                             console.error('Failed to load data from the store.');
                                         }
@@ -631,20 +615,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         xtype: 'container',
                                         flex: 1,
                                         padding: 15,
+                                        margin: '0 10 0 10', 
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Documents Live</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Documents Live</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'documentslive',
-                                                html: '<div style="font-size: 24px; color: #666; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     },
@@ -652,20 +637,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         xtype: 'container',
                                         flex: 1,
                                         padding: 15,
+                                        margin: '0 10 0 10', 
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Overdue Documents</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Overdue Documents</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'overduedocuments',
-                                                html: '<div style="font-size: 24px; color: white; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     },
@@ -673,20 +659,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         xtype: 'container',
                                         flex: 1,
                                         padding: 15,
+                                        margin: '0 10 0 10', 
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Overdue Document Tasks</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Overdue Document Tasks</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'overduedocumenttasks',
-                                                html: '<div style="font-size: 24px; color: white; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     },
@@ -697,7 +684,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Issued Document Tasks</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Issued Document Tasks</div>'
                                             },
                                             {
                                                 xtype: 'component',
@@ -707,7 +694,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     }
@@ -723,20 +710,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         xtype: 'container',
                                         flex: 1,
                                         padding: 15,
+                                        margin: '0 10 0 0', 
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Completed Document Tasks</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Completed Document Tasks</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'completed',
-                                                html: '<div style="font-size: 24px; color: white; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     },
@@ -744,20 +732,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         xtype: 'container',
                                         flex: 1,
                                         padding: 15,
+                                        margin: '0 10 0 0', 
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Upcoming Document Reviews</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Upcoming Document Reviews</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'upcomingreviews',
-                                                html: '<div style="font-size: 24px; color: white; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     },
@@ -765,20 +754,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         xtype: 'container',
                                         flex: 1,
                                         padding: 15,
+                                        margin: '0 0 0 0', 
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #666;">Average Time For Document Acknowledgement</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff;">Average Time For Document Acknowledgement</div>'
                                             },
                                             {
                                                 xtype: 'component',
                                                 itemId: 'averagetime',
-                                                html: '<div style="font-size: 24px; color: white; padding: 10px 0;">0</div>'
+                                                html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
                                         style: {
                                             'border': '1px solid #e9ecef',
-                                            //'background': '#3b82f6',
+                                            'background': '#35baf6',
                                             'border-radius': '5px',
                                         }
                                     }
@@ -820,11 +810,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                     
                     listeners: {
                         afterrender: function(panel){
-                            console.log('Panel rendered.');
-                    
-                            // Create the store instance
                             var store = Ext.create('Ext.data.Store', {
-                                //model: 'Admin.model.dashboard.userStatsMdl',
                                 proxy: {
                                     type: 'ajax',
                                     url: 'dashboard/getDashboardStats',
@@ -835,28 +821,29 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                 }
                             });
                     
-                            console.log('Store created:', store);
                     
-                            // Load the store's data
                             store.load({
                                 callback: function (records, operation, success) {
-                                    console.log('Store loaded:', { records, success });
                     
                                     if (success && records.length > 0) {
                                         var data = records[0].data;
-                    
-                                        // Debugging the loaded data
-                                        console.log('Loaded data:', data);
+
+                                        var progressbars = panel.query('progressbar');
                         
-                                        // Locate the components by itemId
+                                            
+                                            Ext.Array.each(progressbars, function (progressbar, index) {
+                                                switch (index) {
+                                                    case 0: 
+                                                    var percentage = data.tasks_by_document / data.total_tasks
+                                                        progressbar.setValue(percentage);
+                                                        break;
+                                                }
+                                            })
+                    
                                         var tasksissued = panel.down('#tasksissued');
                                         var taskscompleted = panel.down('#taskscompleted');
                     
-                                        // Debugging the located components
-                                        //console.log('released version:', releasedversion);
-                                        //console.log('Total Licenses Component:', totalLicensesComponent);
-                    
-                                        // Update the components if found
+                                
                                         if (tasksissued) {
                                             tasksissued.setHtml(
                                                 `<div style="font-size: 24px; color: #3b82f6;padding:10px 0;">${data.total_tasks}</div>`
@@ -911,28 +898,134 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                     }]
                 }, 
                 {
-                    items: [{
+                    items: [
+                        {
+                        listeners: {
+                            afterrender: function (panel) {
+                
+                                var store = Ext.create('Ext.data.Store', {
+                                    proxy: {
+                                        type: 'ajax',
+                                        url: 'dashboard/getDashboardStats',
+                                        reader: {
+                                            type: 'json',
+                                            rootProperty: 'data',
+                                        },
+                                    },
+                                });
+                
+                
+                                store.load({
+                                    callback: function (records, operation, success) {
+                
+                                        if (success && records.length > 0) {
+                                            var data = records[0].data;
+                
+                                            var progressbars = panel.up().query('progressbar');
+                
+                                            Ext.Array.each(progressbars, function (progressbar, index) {
+                                                switch (index) {
+                                                    case 0:
+                                                        var percentage = data.tasks_by_document / data.total_tasks;
+                                                        progressbar.setValue(percentage);
+                                                        // progressbar.setText(
+                                                        //     `${Math.round(percentage * 100)}% Completed`
+                                                        // ); // Optionally set progress text
+                                                        break;
+                                                    case 1:
+                                                        var percentage = data.tasks_by_issue / data.total_tasks;
+                                                        progressbar.setValue(percentage);
+                                                        // progressbar.setText(
+                                                        //     `${Math.round(percentage * 100)}% Completed`
+                                                        // ); // Optionally set progress text
+                                                        break;
+                                                    case 2:
+                                                        var percentage = data.tasks_by_audit / data.total_tasks;
+                                                        progressbar.setValue(percentage); 
+                                                        // progressbar.setText(
+                                                        //     `${Math.round(percentage * 100)}% Completed`
+                                                        // ); // Optionally set progress text
+                                                        break;
+
+                                                }
+                                            });
+
+                                            // var tasksbydocument = panel.down('#tasksbydocument');
+                                            // tasksbydocument.setText(
+                                            //     `<div style="font-size: 24px; color: #3b82f6;padding:10px 0;">${Math.round(percentage * 100)} % completed</div>`
+                                            // );
+                                        } else {
+                                            console.error('Failed to load data from the store.');
+                                        }
+                                    },
+                                });
+                            },
+                        }, 
+                    },
+                    {
                         xtype: 'component',
                         html: '<div style="font-size: 16px; text-align: left;">Tasks by Document</div>',
                         margin: '10 30 0',
+                        
                     },
                     {
                         xtype: 'progressbar',
-
+                        itemId: 'tasksbydocument',
                         text: '',
                         height: 20,
                         margin: '10 30 5',
-                        // padding: 5,
-                        // width: '80%',
                         flex: 1,
                         value: 0,
                         cls: 'cls-progress-bar',
                         style: {
-                            'border-radius': '5px'
-                        }
-                    }]
+                            'border-radius': '5px',
+                            
+                        },
+                    },
+                    {
+                        xtype: 'component',
+                        html: '<div style="font-size: 16px; text-align: left;">Tasks by Issue</div>',
+                        margin: '10 30 0',
+                        
+                    },
+                    {
+                        xtype: 'progressbar',
+                        itemId: 'tasksbyissue',
+                        text: '',
+                        height: 20,
+                        margin: '10 30 5',
+                        flex: 1,
+                        value: 0,
+                        cls: 'cls-progress-bar',
+                        style: {
+                            'border-radius': '5px',
+                        },
+                    },
+                    {
+                        xtype: 'component',
+                        html: '<div style="font-size: 16px; text-align: left;">Tasks by Audit</div>',
+                        margin: '10 30 0',
+                        
+                    },
+                    {
+                        xtype: 'progressbar',
+                        itemId: 'tasksbyaudit',
+                        text: '',
+                        height: 20,
+                        margin: '10 30 5',
+                        flex: 1,
+                        value: 0,
+                        cls: 'cls-progress-bar',
+                        style: {
+                            'border-radius': '5px',
+                        },
+                    },
 
-                }, {// tasks clearers
+                       
+                ],
+                },
+
+                {// tasks clearers
                     items: [{
                         xtype: 'container',
                         width: '100%',
@@ -961,9 +1054,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         config: {
                                             proxy: {
                                                 url: 'dashboard/getTopClearers',
-                                                // extraParams :{
-                                                //     table_name:'wf_workflow_stages'
-                                                // }
+                                    
                                             }
                                         },
                                         isLoad: true
@@ -1012,7 +1103,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         padding: '4 0 4 0',
                                         renderer: function (value, metaData, record) {
                                             var percentage = record.get('percentage') * 100;
-                                            return '<div class="display:flex;flex-direction:column;"><div class="font-size:14px;color:#444141;font-weight:600;">' + value + ' Tasks Completed (' + percentage + ' of all tasks)</div><div style="margin-top: 5px; background-color: #e9ecef; border-radius: 6px; height: 16px;"><div style="width: ' + percentage + '%; background-color: #3b82f6; border-radius: 6px; height: 100%;"></div></div></div>';
+                                            return '<div class="display:flex;flex-direction:column;"><div class="font-size:14px;color:#444141;font-weight:600;">' + value + ' Tasks Completed (' + (Math.round(percentage)) + '% of all tasks)</div><div style="margin-top: 5px; background-color: #e9ecef; border-radius: 6px; height: 16px;"><div style="width: ' + (Math.round(percentage)) + '%; background-color: #3b82f6; border-radius: 6px; height: 100%;"></div></div></div>';
                                         }
                                     },
                                     {
