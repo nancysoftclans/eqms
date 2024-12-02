@@ -14,6 +14,16 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
   onIntrayItemDblClick: function (view, record, item, index, e, eOpts) {
     this.fireEvent("viewApplicationDetails", record);
   },
+
+  onPreview: function () {
+    // if (Ext.isIE8) {
+    //     Ext.Msg.alert('Unsupported Operation', 'This operation requires a newer version of Internet Explorer.');
+    //     return;
+    // }
+    var chart = this.lookup('chart');
+    chart.preview();
+  },
+
   previewCorrespondence: function (btn) {
     var record = btn.getWidgetRecord(),
       store = btn.up("grid").getStore(),
