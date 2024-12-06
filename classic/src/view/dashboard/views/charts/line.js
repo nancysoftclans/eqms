@@ -71,6 +71,7 @@ Ext.define('Admin.view.dashboard.views.charts.line', {
                     strokeStyle: '#fff'
                 },
                 tooltip: {
+                    trackMouse: true,
                     renderer: function (tooltip, model, item) {
                         tooltip.setHtml(
                             `${model.get(item.field)} Documents waiting review`
@@ -121,6 +122,11 @@ Ext.define('Admin.view.dashboard.views.charts.line', {
                     store.getProxy().setExtraParams({ year: year });
                     store.load();
                 }
+            },
+            style: {
+                height: '25px',
+                width: '200px',
+                
             }
         },
         {
@@ -156,6 +162,10 @@ Ext.define('Admin.view.dashboard.views.charts.line', {
                     store.getProxy().setExtraParams({ month: month });
                     store.load();
                 }
+            },
+            style: {
+                height: '25px',
+                width: '200px',
             }
         },
         {
@@ -184,10 +194,14 @@ Ext.define('Admin.view.dashboard.views.charts.line', {
                     store.getProxy().setExtraParams({ day: day });
                     store.load();
                 }
+            },
+            style: {
+                height: '25px',
+                width: '200px',
             }
         },
         {
-            text: 'Clear Filters',
+            text: 'Clear',
             handler: function (btn) {
                 const panel = btn.up('panel');
                 const chart = panel.down('cartesian');
@@ -199,12 +213,33 @@ Ext.define('Admin.view.dashboard.views.charts.line', {
 
                 store.getProxy().setExtraParams({});
                 store.load();
+            },
+            style:{
+                height: '25px',
+                width: '100px',
+                backgroundColor: '#e44959',
+                color:'red'
             }
         },
         '->',
         {
-            text: 'Preview',
-            handler: 'onPreview'
+            xtype: 'button',
+            hidden: false,
+            text: 'Options',
+            menu: {
+                xtype: 'menu',
+                items: [
+                    {
+                        text: 'Bar',
+                        handler: 'DocumentChangeChartType'
+                            
+                    },
+                    {
+                        text: 'Preview',
+                        handler: 'onPreview'
+                    }
+                ]
+            }
         }
     ]
 });

@@ -9,6 +9,7 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
         'Ext.chart.axis.Numeric',
         'Ext.chart.interactions.PanZoom',
         'Ext.chart.series.Line',
+        'Ext.chart.series.Bar',  // Add Bar Series
         'Admin.store.dashboard.UserAnalysisStr'
     ],
     controller: 'dashboardvctr',
@@ -31,9 +32,6 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
             left: 40,
             right: 40
         },
-        // captions: {
-        //     title: 'User Analysis'
-        // },
         axes: [
             {
                 type: 'numeric',
@@ -50,7 +48,7 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
         ],
         series: [
             {
-                type: 'line',
+                type: 'line',  // Default chart type is Line
                 xField: 'date',
                 yField: 'uniqueUsers',
                 smooth: true,
@@ -62,10 +60,6 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                     radius: 4,
                     lineWidth: 2
                 },
-                // label: {
-                //     field: 'totalLogins',
-                //     display: 'over'
-                // },
                 highlight: {
                     fillStyle: '#000',
                     radius: 5,
@@ -73,9 +67,10 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                     strokeStyle: '#fff'
                 },
                 tooltip: {
+                    trackMouse: true,
                     renderer: function (tooltip, model, item) {
                         tooltip.setHtml(
-                            `Date: ${model.get('date')}<br>Logged in Users: ${model.get('uniqueUsers')}`
+                            `Logged in Users: ${model.get('uniqueUsers')}`
                         );
                     }
                 }
@@ -99,7 +94,7 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
         {
             xtype: 'combobox',
             fieldLabel: 'Select Year',
-            reference:'yearFilter',
+            reference: 'yearFilter',
             labelAlign: 'right',
             store: Ext.create('Ext.data.Store', {
                 fields: ['year'],
@@ -115,7 +110,6 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
             queryMode: 'local',
             displayField: 'year',
             valueField: 'year',
-            default:'2024',
             listeners: {
                 select: function (combo, record) {
                     const year = record.get('year');
@@ -125,7 +119,7 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                     store.load();
                 }
             },
-            style:{
+            style: {
                 height: '25px',
                 width: '200px',
             }
@@ -164,47 +158,26 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                     store.load();
                 }
             },
-            style:{
+            style: {
                 height: '25px',
                 width: '200px',
             }
         },
         {
             xtype: 'datefield',
-            fieldLabel: 'Start Date',
-            reference: 'startDateFilter',
+            fieldLabel: 'Select Day',
+            reference: 'dayFilter',
             labelAlign: 'right',
             format: 'Y-m-d',
             listeners: {
                 change: function (field, newValue) {
                     const chart = field.up('panel').down('cartesian');
                     const store = chart.getStore();
-                    const params = store.getProxy().getExtraParams();
-                    params.start_date = Ext.Date.format(newValue, 'Y-m-d');
+                    store.getProxy().setExtraParams({ day: Ext.Date.format(newValue, 'Y-m-d') });
                     store.load();
                 }
             },
-            style:{
-                height: '25px',
-                width: '200px',
-            }
-        },
-        {
-            xtype: 'datefield',
-            fieldLabel: 'End Date',
-            reference: 'endDateFilter',
-            labelAlign: 'right',
-            format: 'Y-m-d',
-            listeners: {
-                change: function (field, newValue) {
-                    const chart = field.up('panel').down('cartesian');
-                    const store = chart.getStore();
-                    const params = store.getProxy().getExtraParams();
-                    params.end_date = Ext.Date.format(newValue, 'Y-m-d');
-                    store.load();
-                }
-            },
-            style:{
+            style: {
                 height: '25px',
                 width: '200px',
             }
@@ -215,26 +188,39 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                 const panel = btn.up('panel');
                 const chart = panel.down('cartesian');
                 const store = chart.getStore();
-
-               
+    
                 panel.down('[reference=yearFilter]').reset();
                 panel.down('[reference=monthFilter]').reset();
-                panel.down('[reference=startDateFilter]').reset();
-                panel.down('[reference=endDateFilter]').reset();
-
+                panel.down('[reference=dayFilter]').reset();
+    
                 store.getProxy().setExtraParams({});
                 store.load();
             },
-            style:{
+            style: {
                 height: '25px',
                 width: '100px',
-                background: 'red'
+                background: '#e44959', 
             }
         },
         '->',
         {
-            text: 'Preview',
-            handler: 'onPreview'
+            xtype: 'button',
+            hidden: false,
+            text: 'Options',
+            menu: {
+                xtype: 'menu',
+                items: [
+                    {
+                        text: 'Bar',
+                        handler: 'changeChartType'
+                            
+                    },
+                    {
+                        text: 'Preview',
+                        handler: 'onPreview'
+                    }
+                ]
+            }
         }
     ]
 });

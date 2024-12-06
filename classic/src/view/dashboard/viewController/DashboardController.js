@@ -15,11 +15,145 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
     this.fireEvent("viewApplicationDetails", record);
   },
 
+
+  DocumentChangeChartType: function(){
+    var chart = this.lookup('chart');
+    const series = chart.getSeries()[0];
+    var menuItem = btn;
+    //var yField = chart.getyField();
+    //console.log(yField);
+    const currentType = series.type;
+    chart.getSeries().forEach(function (s) {
+      chart.removeSeries(s);
+    });
+    if (currentType === 'line') {
+      chart.addSeries({
+          type: 'bar',
+          xField: 'day',
+          yField: 'total_documents',
+          style: {
+              fillStyle: '#35baf6'
+          },
+          tooltip: {
+            trackMouse: true,
+            renderer: function (tooltip, model, item) {
+                tooltip.setHtml(
+                    `Logged in Users: ${model.get('uniqueUsers')}`
+                );
+            }
+        }
+        
+      });
+      menuItem.setText('Bar');
+  } else {
+      chart.addSeries({
+          type: 'line',
+          xField: 'day',
+          yField: 'total_documents',
+          smooth: true,
+          style: {
+              lineWidth: 2,
+              strokeStyle: '#999'
+          },
+          marker: {
+              radius: 4,
+              lineWidth: 2
+          },
+          highlight: {
+              fillStyle: '#000',
+              radius: 5,
+              lineWidth: 2,
+              strokeStyle: '#fff'
+          },
+          tooltip: {
+              renderer: function (tooltip, model) {
+                  tooltip.setHtml(
+                      `Documents waiting review: ${model.get('total_documents')}`
+                  );
+              }
+          }
+      });
+      menuItem.setText('Line');
+      
+  }
+  chart.redraw();
+  
+  },
+
+
+
+  changeChartType: function (btn) {
+    var chart = this.lookup('chart');
+    const series = chart.getSeries()[0];
+    const currentType = series.type;
+
+    // Access the menu item that triggered the handler
+    var menuItem = btn;
+
+    // Remove existing series
+    chart.getSeries().forEach(function (s) {
+        chart.removeSeries(s);
+    });
+
+    // Add the new series based on the current type
+    if (currentType === 'line') {
+        chart.addSeries({
+            type: 'bar',
+            xField: 'date',
+            yField: 'uniqueUsers',
+            style: {
+                fillStyle: '#35baf6'
+            },
+            tooltip: {
+                renderer: function (tooltip, model) {
+                    tooltip.setHtml(
+                        `Logged in Users: ${model.get('uniqueUsers')}`
+                    );
+                }
+            }
+        });
+        // Change the menu item text to 'Line'
+        menuItem.setText('Line');
+    } else {
+        chart.addSeries({
+            type: 'line',
+            xField: 'date',
+            yField: 'uniqueUsers',
+            smooth: true,
+            style: {
+                lineWidth: 2,
+                strokeStyle: '#999'
+            },
+            marker: {
+                radius: 4,
+                lineWidth: 2
+            },
+            highlight: {
+                fillStyle: '#000',
+                radius: 5,
+                lineWidth: 2,
+                strokeStyle: '#fff'
+            },
+            tooltip: {
+                renderer: function (tooltip, model) {
+                    tooltip.setHtml(
+                        `Logged in Users: ${model.get('uniqueUsers')}`
+                    );
+                }
+            }
+        });
+        // Change the menu item text to 'Bar'
+        menuItem.setText('Bar');
+    }
+
+    // Redraw the chart to apply changes
+    chart.redraw();
+},
+
+
+
   onPreview: function () {
-    // if (Ext.isIE8) {
-    //     Ext.Msg.alert('Unsupported Operation', 'This operation requires a newer version of Internet Explorer.');
-    //     return;
-    // }
+    
     var chart = this.lookup('chart');
     chart.preview();
   },

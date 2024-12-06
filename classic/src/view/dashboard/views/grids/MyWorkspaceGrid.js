@@ -21,8 +21,9 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
     bodyPadding: 5,
 
 
-    // requires: ['Admin.view.dashboard.views.charts.CustomProgressBar'],
+    //requires: ['Admin.view.dashboard.views.charts.CustomProgressBar'],
     items: [
+        
         {
             region: 'center',
             layout: 'hbox',
@@ -292,6 +293,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         }
                                     }
                                 });
+
                                 
                                 store.load({
                                     callback: function (records, operation, success) {
@@ -323,10 +325,32 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                         
                                             
                                             Ext.Array.each(progressbars, function (progressbar) {
-                                                progressbar.setStyle({
-                                                    'background-color': '#e9ecef',
-                                                    'border-radius': '5px',
-                                                });
+                                                var value = progressbar.getValue();
+
+                                                if(value < 0.3){
+                                                    color = 'red';
+                                                } else if( value <= 0.7){
+                                                    color = 'orange';
+                                                } else {
+                                                    color = 'green';
+                                                }
+                                                //var color = value < 0.3 ? 'red' : (value < 0.8 ? 'orange' : 'green');
+                                                if (progressbar && progressbar.bar) {
+                                                    var bar = progressbar.bar; 
+                                                    
+                                                        Ext.get(bar.dom).setStyle({
+                                                            'background-color': color,  
+                                                            'border-radius': '20px',   
+                                                            'height': '20px'          
+                                                        });
+                                                    
+                                                } else {
+                                                    console.error('Progress bar or its inner bar element is not available.');
+                                                }
+                                                // progressbar.setStyle({
+                                                //     'background-color': '#e9ecef',
+                                                //     'border-radius': '5px',
+                                                // });
                                             });
                                         } else {
                                             console.error('Failed to load data from the store.');
@@ -401,38 +425,147 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                         }
                     },
                     
-                    items: [{
+                    items: [
                         
-                        width: '100%',
-                        flex: 1,
-                        bodyPadding: 25,
-                        items: [{
-                            xtype: 'component',
-                            html: '<div style="font-size: 14px; color: #666;">Total Users</div>'
-                        }, {
-                            xtype: 'component',
-                            itemId: 'totalUsersDisplay',
-                            html: '<div style="font-size: 24px; color: #3b82f6;padding:10px 0;">0</div>'
-                        }],
-                        style: {
-                            'border-right': '1px solid #e9ecef'
+                        {
+                        
+                            width: '100%',
+                            flex: 1,
+                            bodyPadding: 25,
+                            items: [{
+                                xtype: 'component',
+                                html: '<div style="font-size: 14px; color: #666;">Total Users</div>'
+                            }, {
+                                xtype: 'component',
+                                itemId: 'totalUsersDisplay',
+                                html: '<div style="font-size: 24px; color: #3b82f6;padding:10px 0;">0</div>'
+                            }],
+                            style: {
+                                'border-right': '1px solid #e9ecef'
+                            },
                         },
+                        {
+                            width: '100%',
+                            flex: 1,
+                            bodyPadding: 25,
+                            items: [{
+                                xtype: 'component',
+                                html: '<div style="font-size: 14px; color: #666;">Total Licenses</div>'
+                            }, {
+                                xtype: 'component',
+                                itemId: 'totalLicensesDisplay',
+                                html: '<div style="font-size: 24px; color: #333;padding:10px 0;">0</div>'
+                            }]
+
+                        }
+                    
+                    ],
+
+                    
+                },
+                { // licenses details
+                    xtype: 'container',
+                    width: '100%',
+                    bodyPadding: 30,
+                    flex: 1,
+                    height: '100%',
+                    layout: {
+                        type: 'vbox',
+                        align: 'stretch',
+                    },
+                    style: {
+                        'text-align': 'center',
+                        'border-top': '1px solid #e9ecef'
+                    },
+
+                    listeners: {
+                        afterrender: function (panel) {
+                    
+                       
+                            var store = Ext.create('Ext.data.Store', {
+                                
+                                proxy: {
+                                    type: 'ajax',
+                                    url: 'dashboard/getDashboardStats',
+                                    reader: {
+                                        type: 'json',
+                                        rootProperty: 'data'
+                                    }
+                                }
+                            });
+                    
+                         
+                            store.load({
+                                callback: function (records, operation, success) {
+                    
+                                    if (success && records.length > 0) {
+                                        var data = records[0].data;
+                                        var totalUsersComponent = panel.down('#totalUsersDisplay');
+                                        var totalLicensesComponent = panel.down('#totalLicensesDisplay');
+            
+                                        if (totalUsersComponent) {
+                                            totalUsersComponent.setHtml(
+                                                `<div style="font-size: 24px; color: #3b82f6;padding:10px 0;">${data.user_stats.totalUsers}</div>`
+                                            );
+                                        } else {
+                                            console.warn('Total Users component not found!');
+                                        }
+                    
+                                        if (totalLicensesComponent) {
+                                            totalLicensesComponent.setHtml(
+                                                `<div style="font-size: 24px; color: #333;padding:10px 0;">${data.user_stats.activeusers}</div>` 
+                                            );
+                                        } else {
+                                            console.warn('Total Licenses component not found!');
+                                        }
+                                    } else {
+                                        console.error('Failed to load data from the store.');
+                                    }
+                                }
+                            });
+                        }
+                    },
+                    
+                    items: [
+                        {
+                        xtype: 'component',
+                        html: '<div style="font-size: 16px; text-align: left;">System Licenses</div>',
+                        margin: '4 30 0',
+                        padding: '10 0 10 10',
+                    }, 
+                    {
+                        xtype: 'progressbar',
+                        text: '',
+                        height: 20,
+                        margin: '10 30 10',
+                        // padding: 5,
+                        // width: '80%',
+                        flex: 1,
+                        value: 0,
+                        cls: 'cls-progress-bar'
                     },
                     {
-                        width: '100%',
+                        xtype: 'component',
+                        html: '<div style="font-size: 16px; text-align: left;">Document Licenses</div>',
+                        margin: '4 30 0',
+                        padding: '10 0 10 10',
+                    }, 
+                    {
+                        xtype: 'progressbar',
+                        text: '',
+                        height: 20,
+                        margin: '10 30 10',
+                        // padding: 5,
+                        // width: '80%',
                         flex: 1,
-                        bodyPadding: 25,
-                        items: [{
-                            xtype: 'component',
-                            html: '<div style="font-size: 14px; color: #666;">Total Licenses</div>'
-                        }, {
-                            xtype: 'component',
-                            itemId: 'totalLicensesDisplay',
-                            html: '<div style="font-size: 24px; color: #333;padding:10px 0;">0</div>'
-                        }]
+                        value: 0,
+                        cls: 'cls-progress-bar'
+                    }
+                ]
 
-                    }]
-                }]
+                    
+                }
+            ]
             }]
 
         }, 
@@ -456,10 +589,8 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                     padding: '0 0 10 0'
                 }, {
                     listeners: {
-                        afterrender: function(panel){
-                    
+                        afterrender: function (panel) {
                             var store = Ext.create('Ext.data.Store', {
-                                
                                 proxy: {
                                     type: 'ajax',
                                     url: 'dashboard/getDashboardStats',
@@ -470,44 +601,75 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                 }
                             });
                     
-                    
                             store.load({
                                 callback: function (records, operation, success) {
-                    
                                     if (success && records.length > 0) {
                                         var data = records[0].data;
-
-                                        var progressbars = panel.query('progressbar');
-                        
-                                            
-                                            Ext.Array.each(progressbars, function (progressbar, index) {
-                                                switch (index) {
-                                                    case 0: 
-                                                    var percentage = data.document_analysis.released / data.document_analysis.total_documents
-                                                        progressbar.setValue(percentage);
-                                                        break;
-                                                }
-                                            })
-                                            
-                                        var releasedversion = panel.down('#releasedversion');
-                                        if (releasedversion) {
-                                            releasedversion.setHtml(
-                                                `<div style="font-size: 16px; text-align: left;">
-                                                ${data.document_analysis.released} Version (${Math.round((data.document_analysis.released / data.document_analysis.total_documents) * 100)}%)
-                                                </div>`
-                                            );
-                                        } else {
-                                            console.warn('released version component not found!');
-                                        }
                     
+                                        // Retrieve progress bars from the panel
+                                        var progressbars = panel.query('progressbar');
+                    
+                                        Ext.Array.each(progressbars, function (progressbar, index) {
+                                            var percentage = 0;
+                    
+                                            switch (index) {
+                                                case 0: // Released documents
+                                                    percentage = data.document_analysis.released / data.document_analysis.total_documents;
+                                                    progressbar.setValue(percentage);
+                    
+                                                    var releasedVersion = panel.down('#releasedversion');
+                                                    if (releasedVersion) {
+                                                        releasedVersion.setHtml(
+                                                            `<div style="font-size: 16px; text-align: left;">
+                                                            ${data.document_analysis.released} Version (${Math.round(percentage * 100)}%)
+                                                            </div>`
+                                                        );
+                                                    } else {
+                                                        console.warn('Released version component not found!');
+                                                    }
+                                                    break;
+                    
+                                                case 1: // Refused documents
+                                                    percentage = data.refused / data.document_analysis.total_documents;
+                                                    progressbar.setValue(percentage);
+                    
+                                                    var refused = panel.down('#refused');
+                                                    if (refused) {
+                                                        refused.setHtml(
+                                                            `<div style="font-size: 16px; text-align: left;">
+                                                            ${data.refused} Version (${Math.round(percentage * 100)}%)
+                                                            </div>`
+                                                        );
+                                                    } else {
+                                                        console.warn('Refused component not found!');
+                                                    }
+                                                    break;
+                                            }
+                    
+                                            // Apply dynamic colors to the progress bar based on value
+                                            var color = percentage < 0.3 ? 'red' : percentage <= 0.7 ? 'orange' : 'green';
+                    
+                                            if (progressbar && progressbar.bar) {
+                                                var bar = progressbar.bar;
+                                                Ext.get(bar.dom).setStyle({
+                                                    'background-color': color,
+                                                    'border-radius': '20px',
+                                                    'height': '20px'
+                                                });
+                                            } else {
+                                                console.error('Progress bar or its inner bar element is not available.');
+                                            }
+                                        });
                                     } else {
                                         console.error('Failed to load data from the store.');
                                     }
                                 }
-                            })
+                            });
                         }
                     },
-                    items: [{
+                    
+                    items: [
+                        {
                         xtype: 'component',
                         html: '<div style="font-size: 16px; text-align: left;">Documents Released</div>',
                         margin: '4 30 0',
@@ -528,23 +690,101 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                         // width: '80%',
                         flex: 1,
                         value: 0,
-                        cls: 'cls-progress-bar'
-                    }
+                        cls: 'cls-progress-bar',
+                    },
+                    {
+                        xtype: 'component',
+                        html: '<div style="font-size: 16px; text-align: left;">Refused</div>',
+                        margin: '4 30 0',
+                        padding: '10 0 10 10',
+                    }, {
+                        xtype: 'component',
+                        itemId: 'refused',
+                        html: '<div style="font-size: 16px; text-align: left;">2 Versions (2%)</div>',
+                        margin: '4 30 0',
+                        padding: '0 10',
+                    },
+                    {
+                        xtype: 'progressbar',
+                        itemId: 'progress',
+                        text: '',
+                        height: 20,
+                        margin: '10 30 10',
+                        // padding: 5,
+                        // width: '80%',
+                        flex: 1,
+                        value: 0.81,
+                        cls: 'cls-progress-bar',
+                        
+                    },
+                    
+                    
                 ]
 
                 }],
                 listeners: {
                     afterrender: function (panel) {
-                        panel.down('progressbar').setStyle({
-                            'background-color': '#e9ecef', 
-                            'border-radius': '10px',
-                            'height': '20px',
+                        //var progressBar = panel.query('progressbar');
+                        var progressBars = panel.query('progressbar');
+                        Ext.Array.each(progressBars, function (progressBar) {
+                            var value = progressBar.getValue();
+
+                            if(value < 0.3){
+                                color = 'red';
+                            } else if( value <= 0.7){
+                                color = 'orange';
+                            } else {
+                                color = 'green';
+                            }
+                            //var color = value < 0.3 ? 'red' : (value < 0.8 ? 'orange' : 'green');
+                            if (progressBar && progressBar.bar) {
+                                var bar = progressBar.bar; 
+                                
+                                    Ext.get(bar.dom).setStyle({
+                                        'background-color': color,  
+                                        'border-radius': '20px',   
+                                        'height': '20px'          
+                                    });
+                                
+                            } else {
+                                console.error('Progress bar or its inner bar element is not available.');
+                            }
                         });
                     }
                 }
+                
+                
+                
+                // listeners: {
+                //     afterrender: function (panel) {
+                //         var progressBar = panel.down('progressbar');
+                //         if (progressBar) {
+                //             progressBar.getEl().down('.x-progressbar-bar').setStyle({
+                //                 'background-color': 'red', // Change bar color
+                //                 'border-radius': '20px',  // Rounded corners
+                //                 'height': '20px',         // Adjust height if needed
+                //             });
+                //         }
+                //         // panel.down('progressbar').down('x-progressbar-inner').setStyle({
+                //         //     'background': 'red',
+                //         //     'border-radius': '20px',
+                //         //     'height': '20px',
+                            
+                //         // });
+                //         // // panel.down('progressbar').setStyle({
+                //         // //     'backgroundColor': 'green',  // Color of the changing bar
+                //         // // });
+                //         // var bar = Ext.ComponentQuery.query('#progress')[0]; 
+                //         // bar.setStyle({
+                //         //     'background-color': 'green',  // Color of the changing bar
+                //         // });
+                //         // bar
+                        
+                //     }
+                // }
 
             }]
-        },
+        },  
 
 
 
@@ -592,7 +832,27 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
         
                                             panel.down('#documentslive').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.documents_live}</div>`);
                                             panel.down('#overduedocuments').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.overdue_documents}</div>`);
-                                            panel.down('#averagetime').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.average_acknowledgment_time} hours</div>`);
+
+                                            var time = data.average_acknowledgment_time;
+                                            if (time < 60) {
+                                                label = 'seconds';
+                                            } else if (time < 3600) {
+                                                label = 'minutes';
+                                                time = Math.floor(time / 60); 
+                                            } else if (time < 86400) {
+                                                label = 'hours';
+                                                time = Math.floor(time / 3600);
+                                            } else {
+                                                label = 'days';
+                                                time = Math.floor(time / 86400); 
+                                            }
+                                            
+                                            panel.down('#averagetime').setHtml(`
+                                                <div style="font-size: 24px; color: #ffffff; padding: 10px 0;">
+                                                    ${time} ${label}
+                                                </div>
+                                            `);
+
                                             panel.down('#overduedocumenttasks').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.overdue_document_tasks}</div>`);
                                             panel.down('#issued').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.issued_document_tasks}</div>`);
                                             panel.down('#completed').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.completed_document_tasks}</div>`);
@@ -837,8 +1097,9 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                                     var percentage = data.tasks_by_document / data.total_tasks
                                                         progressbar.setValue(percentage);
                                                         break;
-                                                }
-                                            })
+                                                };
+                                                
+                                            });
                     
                                         var tasksissued = panel.down('#tasksissued');
                                         var taskscompleted = panel.down('#taskscompleted');
@@ -902,7 +1163,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                         {
                         listeners: {
                             afterrender: function (panel) {
-                
+                                
                                 var store = Ext.create('Ext.data.Store', {
                                     proxy: {
                                         type: 'ajax',
@@ -948,6 +1209,29 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                                         break;
 
                                                 }
+
+                                                var value = progressbar.getValue();
+
+                                                        if(value < 0.3){
+                                                            color = 'red';
+                                                        } else if( value <= 0.7){
+                                                            color = 'orange';
+                                                        } else {
+                                                            color = 'green';
+                                                        }
+                                                        //var color = value < 0.3 ? 'red' : (value < 0.8 ? 'orange' : 'green');
+                                                        if (progressbar && progressbar.bar) {
+                                                            var bar = progressbar.bar; 
+                                                            
+                                                                Ext.get(bar.dom).setStyle({
+                                                                    'background-color': color,  
+                                                                    'border-radius': '20px',   
+                                                                    'height': '20px'          
+                                                                });
+                                                            
+                                                        } else {
+                                                            console.error('Progress bar or its inner bar element is not available.');
+                                                        }
                                             });
 
                                             // var tasksbydocument = panel.down('#tasksbydocument');
@@ -982,44 +1266,44 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                             
                         },
                     },
-                    {
-                        xtype: 'component',
-                        html: '<div style="font-size: 16px; text-align: left;">Tasks by Issue</div>',
-                        margin: '10 30 0',
+                    // {
+                    //     xtype: 'component',
+                    //     html: '<div style="font-size: 16px; text-align: left;">Tasks by Issue</div>',
+                    //     margin: '10 30 0',
                         
-                    },
-                    {
-                        xtype: 'progressbar',
-                        itemId: 'tasksbyissue',
-                        text: '',
-                        height: 20,
-                        margin: '10 30 5',
-                        flex: 1,
-                        value: 0,
-                        cls: 'cls-progress-bar',
-                        style: {
-                            'border-radius': '5px',
-                        },
-                    },
-                    {
-                        xtype: 'component',
-                        html: '<div style="font-size: 16px; text-align: left;">Tasks by Audit</div>',
-                        margin: '10 30 0',
+                    // },
+                    // {
+                    //     xtype: 'progressbar',
+                    //     itemId: 'tasksbyissue',
+                    //     text: '',
+                    //     height: 20,
+                    //     margin: '10 30 5',
+                    //     flex: 1,
+                    //     value: 0,
+                    //     cls: 'cls-progress-bar',
+                    //     style: {
+                    //         'border-radius': '5px',
+                    //     },
+                    // },
+                    // {
+                    //     xtype: 'component',
+                    //     html: '<div style="font-size: 16px; text-align: left;">Tasks by Audit</div>',
+                    //     margin: '10 30 0',
                         
-                    },
-                    {
-                        xtype: 'progressbar',
-                        itemId: 'tasksbyaudit',
-                        text: '',
-                        height: 20,
-                        margin: '10 30 5',
-                        flex: 1,
-                        value: 0,
-                        cls: 'cls-progress-bar',
-                        style: {
-                            'border-radius': '5px',
-                        },
-                    },
+                    // },
+                    // {
+                    //     xtype: 'progressbar',
+                    //     itemId: 'tasksbyaudit',
+                    //     text: '',
+                    //     height: 20,
+                    //     margin: '10 30 5',
+                    //     flex: 1,
+                    //     value: 0,
+                    //     cls: 'cls-progress-bar',
+                    //     style: {
+                    //         'border-radius': '5px',
+                    //     },
+                    // },
 
                        
                 ],
@@ -1090,8 +1374,19 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         dataIndex: 'user',
                                         flex: 1,
                                         tdCls: 'wrap',
+                                        
                                         renderer: function (value) {
                                             return '<div style="display: flex; align-items: center;"><div style="width: 24px; height: 24px; background-color: #666; border-radius: 50%; margin-right: 10px; display: flex; align-items: center; justify-content: center;"><i class="x-fa fa-user" style="color: #fff;"></i></div>' + value + '</div>';
+                                        }
+                                    },
+                                    {
+                                        xtype: 'gridcolumn',
+                                        //text: 'Users',
+                                        dataIndex: 'last_name',
+                                        flex: 1,
+                                        //tdCls: 'wrap',
+                                        renderer: function (value) {
+                                            return '<div style="display: flex; align-items: left;"><div style="width: 24px; height: 24px; border-radius: 50%; margin-right: 10px; display: flex; align-items: left; justify-content: left;"></div>' + value + '</div>';
                                         }
                                     },
                                     {
@@ -1113,7 +1408,12 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         flex: 1,
                                         tdCls: 'wrap',
                                         renderer: function (value) {
-                                            return value + ' day(s) ago';
+                                            if (value < 1){
+                                                return ' Today';
+                                            } else{
+                                                return value + ' day(s) ago';
+                                            }
+                                            
                                         }
                                     }
 
@@ -1127,9 +1427,9 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                 }]
             }]
 
-        }
+        },
     ],
-
+    
     bbar: [{
         xtype: 'pagingtoolbar',
         displayInfo: true,

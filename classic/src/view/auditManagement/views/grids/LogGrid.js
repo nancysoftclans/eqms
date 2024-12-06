@@ -76,12 +76,6 @@ Ext.define('Admin.view.auditManagement.views.grids.LogGrid', {
         flex: 1,
         sortable: true
     },
-        {xtype: 'gridcolumn',
-        dataIndex: 'application_code',
-        text: 'Application Code',
-        flex: 1,
-        sortable: true
-    }, 
     {
         xtype: 'gridcolumn',
         dataIndex: 'action',
