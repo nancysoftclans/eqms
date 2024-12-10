@@ -53,11 +53,11 @@ class DashboardController extends Controller
                 ->distinct('reference_no')
                 ->count();
 
-            
+                
             $qry['average_acknowledgment_time'] = DB::table('tra_submissions as t1')
                 ->join('tra_evaluation_recommendations as t2', 't1.application_code', '=', 't2.application_code')
-                ->select(DB::raw('ROUND(AVG(TIMESTAMPDIFF(SECOND, t2.created_on, t1.created_on)), 0) as avg_time'))
-                ->where('t1.current_stage', 2)
+                ->select(DB::raw('ROUND(AVG(TIMESTAMPDIFF(SECOND, t1.created_on, now())), 0) as avg_time'))
+                ->where('t1.current_stage', 1)
                 ->value('avg_time');
 
 
@@ -222,7 +222,7 @@ class DashboardController extends Controller
                     $query->whereMonth('created_on', $monthNumber);
                 }
                 if ($day) {
-                    $query->whereDay('created_on', $day);
+                    $query->whereDate('created_on', $day);
                 }
                 return $query;
             };
@@ -255,13 +255,14 @@ class DashboardController extends Controller
                         $year, $month, $day
                     )->get()
                 )
-                ->groupBy('day') 
+                ->groupBy('day')
                 ->map(function ($items, $day) {
                     return [
                         'day' => $day,
                         'total_documents' => $items->sum('total_documents'),
                     ];
                 })
+                ->sortBy('day') 
                 ->values();
     
             return response()->json([
@@ -290,21 +291,21 @@ class DashboardController extends Controller
 
             $query = DB::table('tra_login_logs')
                 ->select(
-                    DB::raw("DATE_FORMAT(created_on, '%b %Y') as date"), 
+                    DB::raw("DATE_FORMAT(created_on, '%Y-%m-%d') as date"), 
                     DB::raw("COUNT(id) as totalLogins"),                 
                     DB::raw("COUNT(DISTINCT user_id) as uniqueUsers")    
                 )
                 ->whereNotNull('login_time');
 
-            if (!empty($year)) {
+            if ($year) {
                 $query->whereYear('created_on', $year);
             }
 
-            if (!empty($month)) {
+            if ($month) {
                 $query->whereMonth('created_on', $month);
             }
 
-            if (!empty($day)) {
+            if ($day) {
                 $query->whereDate('created_on', $day);
             }
 

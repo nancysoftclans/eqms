@@ -15,9 +15,25 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
     this.fireEvent("viewApplicationDetails", record);
   },
 
+  clearDashboardFilter: function(btn){
+    const panel = btn.up('panel');
+    const chart = panel.down('cartesian');
+    const store = chart.getStore();
+    console.log(store);
+    
+    panel.down('[reference=yearFilter]').reset();
+    panel.down('[reference=monthFilter]').reset();
+    panel.down('[reference=dayFilter]').reset();
+    
+    store.getProxy().setExtraParams({
+      year: new Date().getFullYear() 
+    });
+    store.load();
+  },
 
-  DocumentChangeChartType: function(){
-    var chart = this.lookup('chart');
+
+  DocumentChangeChartType: function(btn){
+    var chart = this.lookup('documentchart');
     const series = chart.getSeries()[0];
     var menuItem = btn;
     //var yField = chart.getyField();
@@ -32,19 +48,31 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
           xField: 'day',
           yField: 'total_documents',
           style: {
-              fillStyle: '#35baf6'
+              fillStyle: '#35baf6',
+              opacity: 0.80,
+              minGapWidth: 10
           },
+          
+        highlightCfg: {
+            strokeStyle: 'black',
+            radius: 10
+        },
+        label: {
+            field: 'total_documents',
+            display: 'insideEnd',
+            
+        },
           tooltip: {
             trackMouse: true,
             renderer: function (tooltip, model, item) {
                 tooltip.setHtml(
-                    `Logged in Users: ${model.get('uniqueUsers')}`
+                    `Documents waiting review: ${model.get('total_documents')}`
                 );
             }
         }
         
       });
-      menuItem.setText('Bar');
+      menuItem.setText('Line');
   } else {
       chart.addSeries({
           type: 'line',
@@ -65,6 +93,11 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
               lineWidth: 2,
               strokeStyle: '#fff'
           },
+          label: {
+            field: 'total_documents',
+            display: 'insideEnd',
+           
+        },
           tooltip: {
               renderer: function (tooltip, model) {
                   tooltip.setHtml(
@@ -73,7 +106,7 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
               }
           }
       });
-      menuItem.setText('Line');
+      menuItem.setText('Bar');
       
   }
   chart.redraw();
@@ -102,8 +135,20 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
             xField: 'date',
             yField: 'uniqueUsers',
             style: {
-                fillStyle: '#35baf6'
-            },
+              fillStyle: '#35baf6',
+              opacity: 0.80,
+              minGapWidth: 10
+          },
+          
+        highlightCfg: {
+            strokeStyle: 'black',
+            radius: 10
+        },
+        label: {
+            field: 'uniqueUsers',
+            display: 'insideEnd',
+           
+        },
             tooltip: {
                 renderer: function (tooltip, model) {
                     tooltip.setHtml(
@@ -134,6 +179,11 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
                 lineWidth: 2,
                 strokeStyle: '#fff'
             },
+            label: {
+              field: 'uniqueUsers',
+              display: 'insideEnd',
+             
+          },
             tooltip: {
                 renderer: function (tooltip, model) {
                     tooltip.setHtml(

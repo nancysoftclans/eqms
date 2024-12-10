@@ -327,14 +327,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                             Ext.Array.each(progressbars, function (progressbar) {
                                                 var value = progressbar.getValue();
 
-                                                if(value < 0.3){
-                                                    color = 'red';
-                                                } else if( value <= 0.7){
-                                                    color = 'orange';
-                                                } else {
-                                                    color = 'green';
-                                                }
-                                                //var color = value < 0.3 ? 'red' : (value < 0.8 ? 'orange' : 'green');
+                                                var color = value < 0.3 ? 'red' : (value < 0.7 ? 'orange' : 'green');
                                                 if (progressbar && progressbar.bar) {
                                                     var bar = progressbar.bar; 
                                                     
@@ -606,7 +599,6 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                     if (success && records.length > 0) {
                                         var data = records[0].data;
                     
-                                        // Retrieve progress bars from the panel
                                         var progressbars = panel.query('progressbar');
                     
                                         Ext.Array.each(progressbars, function (progressbar, index) {
@@ -646,7 +638,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                                     break;
                                             }
                     
-                                            // Apply dynamic colors to the progress bar based on value
+                                            
                                             var color = percentage < 0.3 ? 'red' : percentage <= 0.7 ? 'orange' : 'green';
                     
                                             if (progressbar && progressbar.bar) {
@@ -677,7 +669,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                     }, {
                         xtype: 'component',
                         itemId: 'releasedversion',
-                        html: '<div style="font-size: 16px; text-align: left;">2 Versions (2%)</div>',
+                        html: '<div style="font-size: 16px; text-align: left;">0 Versions (0%)</div>',
                         margin: '4 30 0',
                         padding: '0 10',
                     },
@@ -700,7 +692,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                     }, {
                         xtype: 'component',
                         itemId: 'refused',
-                        html: '<div style="font-size: 16px; text-align: left;">2 Versions (2%)</div>',
+                        html: '<div style="font-size: 16px; text-align: left;">0 Versions (0%)</div>',
                         margin: '4 30 0',
                         padding: '0 10',
                     },
@@ -713,7 +705,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                         // padding: 5,
                         // width: '80%',
                         flex: 1,
-                        value: 0.81,
+                        value: 0,
                         cls: 'cls-progress-bar',
                         
                     },
@@ -729,14 +721,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                         Ext.Array.each(progressBars, function (progressBar) {
                             var value = progressBar.getValue();
 
-                            if(value < 0.3){
-                                color = 'red';
-                            } else if( value <= 0.7){
-                                color = 'orange';
-                            } else {
-                                color = 'green';
-                            }
-                            //var color = value < 0.3 ? 'red' : (value < 0.8 ? 'orange' : 'green');
+                            var color = value < 0.3 ? 'red' : (value < 0.7 ? 'orange' : 'green');
                             if (progressBar && progressBar.bar) {
                                 var bar = progressBar.bar; 
                                 
@@ -753,36 +738,6 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                     }
                 }
                 
-                
-                
-                // listeners: {
-                //     afterrender: function (panel) {
-                //         var progressBar = panel.down('progressbar');
-                //         if (progressBar) {
-                //             progressBar.getEl().down('.x-progressbar-bar').setStyle({
-                //                 'background-color': 'red', // Change bar color
-                //                 'border-radius': '20px',  // Rounded corners
-                //                 'height': '20px',         // Adjust height if needed
-                //             });
-                //         }
-                //         // panel.down('progressbar').down('x-progressbar-inner').setStyle({
-                //         //     'background': 'red',
-                //         //     'border-radius': '20px',
-                //         //     'height': '20px',
-                            
-                //         // });
-                //         // // panel.down('progressbar').setStyle({
-                //         // //     'backgroundColor': 'green',  // Color of the changing bar
-                //         // // });
-                //         // var bar = Ext.ComponentQuery.query('#progress')[0]; 
-                //         // bar.setStyle({
-                //         //     'background-color': 'green',  // Color of the changing bar
-                //         // });
-                //         // bar
-                        
-                //     }
-                // }
-
             }]
         },  
 
@@ -1212,14 +1167,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
 
                                                 var value = progressbar.getValue();
 
-                                                        if(value < 0.3){
-                                                            color = 'red';
-                                                        } else if( value <= 0.7){
-                                                            color = 'orange';
-                                                        } else {
-                                                            color = 'green';
-                                                        }
-                                                        //var color = value < 0.3 ? 'red' : (value < 0.8 ? 'orange' : 'green');
+                                                        var color = value < 0.3 ? 'red' : (value < 0.7 ? 'orange' : 'green');
                                                         if (progressbar && progressbar.bar) {
                                                             var bar = progressbar.bar; 
                                                             
@@ -1230,7 +1178,7 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                                                 });
                                                             
                                                         } else {
-                                                            console.error('Progress bar or its inner bar element is not available.');
+                                                            console.error('Progress bar is not available.');
                                                         }
                                             });
 
