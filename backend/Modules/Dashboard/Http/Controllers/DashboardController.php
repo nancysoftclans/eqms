@@ -39,6 +39,7 @@ class DashboardController extends Controller
     {
         try {
             
+            
             $qry = [];
             // Total live documents: application_status_id == 4
             $qry['documents_live'] = 
@@ -49,7 +50,7 @@ class DashboardController extends Controller
             // Total overdue documents: expected_end_date < current time
             $qry['overdue_documents'] = DB::table('tra_submissions')
                 ->where('expected_end_date', '<', Carbon::now())
-                ->where('iscomplete', '0')
+                //->where('iscomplete', '0')
                 ->distinct('reference_no')
                 ->count();
 
@@ -65,12 +66,12 @@ class DashboardController extends Controller
             // Overdue document tasks: expected_end-date < current time
             $qry['overdue_document_tasks'] = DB::table('tra_submissions')
                 ->where('expected_end_date', '<', Carbon::now())
-                ->where('iscomplete', '=', '0')
+                //->where('iscomplete', '=', '0')
                 ->where('module_id', '=', 26)
                 ->count();
 
                 //refused: sent back for review
-            $qry['refused'] = DB::table('tra_evaluation_recommendations')
+            $qry['rejected'] = DB::table('tra_evaluation_recommendations')
                 ->whereNotNull('application_code')
                 ->count();
 
@@ -130,13 +131,17 @@ class DashboardController extends Controller
             // User log in stats: 
             $qry['user_stats'] = [
                 'totalUsers' => DB::table('users')->count(),
-                'loggedInToday' => DB::table('tra_login_logs')->whereDate('login_time', now()->toDateString())->distinct('user_id')->count('user_id'),
+                //'loggedInToday' => DB::table('tra_login_logs')->whereDate('login_time', now()->toDateString())->distinct('user_id')->count('user_id'),
                 'activeLast30Days' => DB::table('tra_login_logs')->where('login_time', '>=', now()->subDays(30))->distinct('user_id')->count('user_id'),
                 'neverLoggedIn' => DB::table('users')->whereNotIn('id', function ($query) {
                     $query->select('user_id')->from('tra_login_logs');
                 })->count(),
                 'loggedlasthour' => DB::table('tra_login_logs')
                 ->where('login_time', '>=', now()->subHour())
+                ->distinct('user_id')
+                ->count('user_id'),
+                'loggedInToday' => DB::table('tra_login_logs')
+                ->whereBetween('login_time', [now()->startOfDay(), now()->endOfDay()])
                 ->distinct('user_id')
                 ->count('user_id'),
                 'activeusers' => DB::table('users as t1')
@@ -175,7 +180,7 @@ class DashboardController extends Controller
             if ($totalTasks === 0) {
                 return response()->json([]);
             }
-            $result = DB::table('tra_submissions')
+            $qry = DB::table('tra_submissions')
                 ->join('users', 'tra_submissions.usr_to', '=', 'users.id')
                 ->select(
                     DB::raw("decrypt(users.first_name) as user, decrypt(users.last_name) as last_name"),
@@ -188,7 +193,7 @@ class DashboardController extends Controller
                 ->orderByDesc('tasks') 
                 ->limit(5)
                 ->get();
-                $results = convertStdClassObjToArray($result);
+                $results = convertStdClassObjToArray($qry);
                 $res = decryptArray($results);
 
             return $res; 
@@ -326,89 +331,6 @@ class DashboardController extends Controller
             return response()->json(['error' => $res], 500);
         }
     }
-
-
-
-
-
-    // public function getUserAnalysis(Request $request)
-    // {
-    //     try {
-    //         // Fetch the year from the request (optional)
-    //         $year = $request->input('year');
-
-    //         $query = DB::table('tra_login_logs')
-    //             ->select(
-    //                 DB::raw("DATE_FORMAT(created_on, '%b %Y') as date"), // Month and year format
-    //                 DB::raw("COUNT(id) as totalLogins"), 
-    //                 DB::raw("COUNT(DISTINCT user_id) as uniqueUsers") 
-    //             )
-    //             ->whereNotNull('login_time');
-
-            
-    //         if (!empty($year)) {
-    //             $query->whereYear('created_on', $year);
-    //         }
-
-    //         $data = $query->groupBy(DB::raw("DATE_FORMAT(created_on, '%b %Y')"))
-    //             ->orderBy(DB::raw("MIN(created_on)"), 'asc')
-    //             ->get();
-
-    //         return response()->json($data, 200);
-    //     } catch (\Exception $exception) {
-    //         // Handle exceptions
-    //         $res = sys_error_handler(
-    //             $exception->getMessage(),
-    //             2,
-    //             debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),
-    //             explode('\\', __CLASS__),
-    //             \Auth::user()->id
-    //         );
-
-    //         return response()->json(['error' => $res], 500);
-    //     } catch (\Throwable $throwable) {
-    //         // Handle throwables
-    //         $res = sys_error_handler(
-    //             $throwable->getMessage(),
-    //             2,
-    //             debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),
-    //             explode('\\', __CLASS__),
-    //             \Auth::user()->id
-    //         );
-
-    //         return response()->json(['error' => $res], 500);
-    //     }
-    // }
-
-    
-
-    // public function getUserAnalysis()
-    // {
-    //     try {
-            
-    //         $data = DB::table('tra_login_logs')
-    //             ->select(
-    //                 DB::raw("DATE_FORMAT(created_on, '%b %Y') as date"), 
-    //                 DB::raw("COUNT(id) as totalLogins"), 
-    //                 DB::raw("COUNT(DISTINCT user_id) as uniqueUsers"), 
-    //             )
-    //             ->whereNotNull('login_time') 
-    //             ->groupBy(DB::raw("DATE_FORMAT(created_on, '%b %Y')"))
-    //             ->orderBy(DB::raw("MIN(created_on)"), 'asc')
-    //             ->get();
-
-            
-    //         return response()->json($data, 200);
-    //     } catch (\Exception $exception) {
-    //         $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
-
-    //     } catch (\Throwable $throwable) {
-    //         $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
-    //     }
-    // }
-
-
-
 
 
     public function getInTrayItems(Request $request)

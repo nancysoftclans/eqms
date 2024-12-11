@@ -20,6 +20,14 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
 
     bodyPadding: 5,
 
+    tbar: [{
+        xtype: 'tbspacer',
+        width: 5
+    },
+    {
+        xtype: 'exportbtn'
+    }],
+
 
     //requires: ['Admin.view.dashboard.views.charts.CustomProgressBar'],
     items: [
@@ -64,13 +72,13 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         if (success && records.length > 0) {
                                             var data = records[0].data;
         
-                                            panel.down('#lasthourlogin').setHtml(`<div 
+                                            panel.down('#todayLogin').setHtml(`<div 
                                                 style="font-size: 24px; 
                                                 color: #ffffff; 
                                                 padding: 10px 0;
                                                 background: #35baf6;
                                                 ">
-                                                ${data.user_stats.loggedlasthour}
+                                                ${data.user_stats.loggedInToday}
                                                 </div>`);
                                             panel.down('#totalusers').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.user_stats.totalUsers}</div>`);
                                             panel.down('#groupedusers').setHtml(`<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">${data.user_stats.groupswithusers}</div>`);
@@ -96,11 +104,11 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                         items: [
                                             {
                                                 xtype: 'component',
-                                                html: '<div style="font-size: 14px; color: #ffffff; background:#35baf6">Users Logged in the last 1 hour</div>'
+                                                html: '<div style="font-size: 14px; color: #ffffff; background:#35baf6">Users Logged in Today</div>'
                                             },
                                             {
                                                 xtype: 'component',
-                                                itemId: 'lasthourlogin',
+                                                itemId: 'todayLogin',
                                                 html: '<div style="font-size: 24px; color: #ffffff; padding: 10px 0;">0</div>'
                                             }
                                         ],
@@ -308,17 +316,21 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                             Ext.Array.each(progressbars, function (progressbar, index) {
                                                 switch (index) {
                                                     case 0: // Active Last 30 Days
-                                                        progressbar.setValue(data.user_stats.activeLast30Days / data.user_stats.totalUsers);
+                                                        var value = data.user_stats.activeLast30Days / data.user_stats.totalUsers;
+                                                        progressbar.setValue(value);
                                                         break;
                                                     case 1: // Logged In Today
-                                                        progressbar.setValue(data.user_stats.loggedInToday / data.user_stats.totalUsers);
+                                                        var value = data.user_stats.loggedInToday / data.user_stats.totalUsers;
+                                                        progressbar.setValue(value);
                                                         break;
                                                     case 2: // Never Logged In
-                                                        progressbar.setValue(data.user_stats.neverLoggedIn / data.user_stats.totalUsers);
+                                                        var value = data.user_stats.neverLoggedIn / data.user_stats.totalUsers;
+                                                        progressbar.setValue(value);
                                                        
                                                         break;
                                                     case 3: // Licensed Users
-                                                        progressbar.setValue(data.user_stats.activeusers / data.user_stats.totalUsers);
+                                                        var value = data.user_stats.activeusers / data.user_stats.totalUsers;
+                                                        progressbar.setValue(value);
                                                         break;
                                                 }
                                             });
@@ -622,18 +634,18 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                                                     break;
                     
                                                 case 1: // Refused documents
-                                                    percentage = data.refused / data.document_analysis.total_documents;
+                                                    percentage = data.rejected / data.document_analysis.total_documents;
                                                     progressbar.setValue(percentage);
                     
-                                                    var refused = panel.down('#refused');
-                                                    if (refused) {
-                                                        refused.setHtml(
+                                                    var rejected = panel.down('#rejected');
+                                                    if (rejected) {
+                                                        rejected.setHtml(
                                                             `<div style="font-size: 16px; text-align: left;">
-                                                            ${data.refused} Version (${Math.round(percentage * 100)}%)
+                                                            ${data.rejected} Version (${Math.round(percentage * 100)}%)
                                                             </div>`
                                                         );
                                                     } else {
-                                                        console.warn('Refused component not found!');
+                                                        console.warn('Rejected component not found!');
                                                     }
                                                     break;
                                             }
@@ -686,12 +698,12 @@ Ext.define('Admin.view.dashboard.views.grids.MyWorkspaceGrid', {
                     },
                     {
                         xtype: 'component',
-                        html: '<div style="font-size: 16px; text-align: left;">Refused</div>',
+                        html: '<div style="font-size: 16px; text-align: left;">Rejected</div>',
                         margin: '4 30 0',
                         padding: '10 0 10 10',
                     }, {
                         xtype: 'component',
-                        itemId: 'refused',
+                        itemId: 'rejected',
                         html: '<div style="font-size: 16px; text-align: left;">0 Versions (0%)</div>',
                         margin: '4 30 0',
                         padding: '0 10',

@@ -26,7 +26,7 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
             zoomOnPanGesture: true
         },
         animation: {
-            duration: 200
+            duration: 100
         },
         innerPadding: {
             left: 40,
@@ -37,7 +37,8 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                 type: 'numeric',
                 position: 'left',
                 grid: true,
-                minimum: 0
+                minimum: 0,
+            
             },
             {
                 type: 'category',
