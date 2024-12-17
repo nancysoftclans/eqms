@@ -9902,16 +9902,24 @@ public function printAdministrativeSubmissionResponses(Request $req)
 
      
         $comment_records = DB::table('tra_checklistitems_responses as t1')
-            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-            ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')   
-            ->select(
-            		't2.application_code', 't2.tracking_no as audit_id', 't2.audit_reference', 't2.audit_title', 't2.audit_start_date', 't2.audit_end_date', 't1.comment')  	
-            ->where('t1.application_code', $application_code)
-            ->groupBy('t1.checklist_item_id')
-            ->get();
+							->leftJoin('tra_auditsmanager_application as t2', 't1.application_code', '=', 't2.application_code')
+							->leftJoin('par_checklist_items as t3', 't1.checklist_item_id', '=', 't3.id')
+							->select(DB::raw("
+								GROUP_CONCAT(t2.application_code) as application_codes, 
+								GROUP_CONCAT(t2.tracking_no) as audit_ids, 
+								GROUP_CONCAT(t2.audit_reference) as audit_references, 
+								GROUP_CONCAT(DISTINCT t2.audit_title) as audit_titles, 
+								GROUP_CONCAT(DISTINCT t2.audit_start_date) as audit_start_dates, 
+								GROUP_CONCAT(DISTINCT t2.audit_end_date) as audit_end_dates, 
+								GROUP_CONCAT(t1.comment) as comments
+							"))
+							->where('t1.application_code', $application_code)
+							->groupBy('t1.checklist_item_id')
+							->get();
 
-            $comment_records = convertStdClassObjToArray($comment_records);
-         	$comment_records = decryptArray($comment_records);
+						$comment_records = convertStdClassObjToArray($comment_records);
+						$comment_records = decryptArray($comment_records);
+
 
 
         $evidence_records = DB::table('tra_application_documents as t1')
@@ -9921,8 +9929,7 @@ public function printAdministrativeSubmissionResponses(Request $req)
                     $join->on('t1.id', '=', 't4.application_document_id')
                         ->where('t4.application_code', '=', $application_code);
                 }) 
-            ->select(
-            		't4.initial_file_name')  	
+            ->select(DB::raw("GROUP_CONCAT(t4.initial_file_name) as initial_file_name "))  	
             ->where('t1.application_code', $application_code)
             ->whereNotNull('t1.checklist_item_id')
             ->groupBy('t1.checklist_item_id')
