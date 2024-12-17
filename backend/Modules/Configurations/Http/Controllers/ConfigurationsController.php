@@ -4069,7 +4069,7 @@ class ConfigurationsController extends Controller
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
-        $res = array('success' => true, 'message' => '');
+       
         return \response()->json($res);
     }
     public function validateHasImportExportProductDetils(Request $req)

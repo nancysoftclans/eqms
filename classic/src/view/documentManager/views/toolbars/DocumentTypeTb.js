@@ -24,35 +24,41 @@ Ext.define('Admin.view.documentManager.views.toolbars.DocumentTypeTb', {
         },
         {
             text: 'Create Document',
+            handler:'onInitiateDocumentApplication',
             iconCls: 'x-fa fa-plus-square',
-             menu:{
-                xtype: 'menu',
-                    items:[{
-                    text: 'Quality Manual',
-                    iconCls: 'x-fa fa-envelope',
-                    handler:'onInitiateDocumentApplication',
-                    app_type: 101
-                },
-                {
-                    text: 'Template for Procedures, WI, Policies, Appendix',
-                    iconCls: 'x-fa fa-file',
-                    handler:'onInitiateDocumentApplication',
-                    app_type: 104
-                },
-                {
-                    text: 'Form Format',
-                    iconCls: 'x-fa fa-file-alt',
-                    handler:'onInitiateDocumentApplication',
-                    app_type: 106
-                },
-                {
-                    text: 'LOG Databases',
-                    iconCls: 'x-fa fa-database',
-                    handler:'onInitiateDocumentApplication',
-                    app_type: 107
-                }
-                ]
-            }
+            app_type: 104,
+            //  menu:{
+            //     xtype: 'menu',
+            //         items:[{
+            //         text: 'Quality Manual',
+            //         iconCls: 'x-fa fa-envelope',
+            //         handler:'onInitiateDocumentApplication',
+            //         app_type: 101,
+            //         hidden: true
+            //     },
+            //     {
+            //         text: 'Template for Procedures, WI, Policies, Appendix',
+            //         iconCls: 'x-fa fa-file',
+            //         handler:'onInitiateDocumentApplication',
+            //         app_type: 104,
+            //         hidden: true
+            //     },
+            //     {
+            //         text: 'Form Format',
+            //         iconCls: 'x-fa fa-file-alt',
+            //         handler:'onInitiateDocumentApplication',
+            //         app_type: 106,
+            //         hidden: true
+            //     },
+            //     {
+            //         text: 'LOG Databases',
+            //         iconCls: 'x-fa fa-database',
+            //         handler:'onInitiateDocumentApplication',
+            //         app_type: 107,
+            //         hidden: true
+            //     }
+            //     ]
+            // }
         },
        
     ]

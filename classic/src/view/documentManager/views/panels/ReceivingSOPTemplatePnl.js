@@ -233,7 +233,7 @@ Ext.define('Admin.view.documentManager.views.panels.ReceivingSOPTemplatePnl',{
                     wizard:'receivingsoptemplatepnl',
                     handler: 'onPrevCardClick'
                 },{
-                    text: 'Save SOP Details',
+                    text: 'Save Details',
                     ui: 'soft-blue',
                     iconCls: 'fa fa-save',
                     table_name: 'tra_documentmanager_application',

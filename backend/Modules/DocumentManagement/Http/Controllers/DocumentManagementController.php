@@ -480,6 +480,7 @@ class DocumentManagementController extends Controller
                 "document_type_id" => $request->input('document_type_id'),
                 "template_id" => $request->input('template_id'),
                 "navigator_folder_id" => $request->input('navigator_folder_id'),
+                "renewal_type_id" => $request->input('renewal_type_id'),
                 "document_number" => $doc_number,
 
             );
@@ -523,6 +524,7 @@ class DocumentManagementController extends Controller
                         "document_type_id" => $request->input('document_type_id'),
                         "template_id" => $request->input('template_id'),
                         "navigator_folder_id" => $request->input('navigator_folder_id'),
+                        "renewal_type_id" => $request->input('renewal_type_id'),
 
                         );
                     }

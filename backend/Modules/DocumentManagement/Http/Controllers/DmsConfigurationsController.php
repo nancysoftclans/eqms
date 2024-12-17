@@ -328,18 +328,10 @@ public function getArchivedDocdDetails(Request $req)
      ->where('t1.application_status_id', 4)
      ->get();
 
-     // $docVersions = [];
 
-     //   foreach ($results as $item) {
-     //    $docVersions[] = ($item->doc_version);
+     // foreach ($results as $item) {
+     //        $item->doc_version = (float) $item->doc_version + 1;
      //    }
-
-     //  $docVersions = array_map(function ($version) {
-     //        return $version + 1;
-     //    }, $docVersions);
-     foreach ($results as $item) {
-            $item->doc_version = (float) $item->doc_version + 1;
-        }
 
 
         $results = convertStdClassObjToArray($results);
@@ -470,8 +462,8 @@ public function getArchivedDocdDetails(Request $req)
                         't1.docparent_id',
                         't1.is_enabled',
                         't1.has_restriction_id',
-                        't1.owner_user_id',
-                        't1.owner_group_id',
+                        't1.navigator_owner_id',
+                        't1.navigator_group_id',
                         't2.application_code',
                         't2.module_id',
                         't2.sub_module_id',
@@ -540,8 +532,8 @@ public function getArchivedDocdDetails(Request $req)
                         't1.has_parent_level',
                         't1.is_enabled',
                         't1.has_restriction_id',
-                        't1.owner_user_id',
-                        't1.owner_group_id',
+                        't1.navigator_owner_id',
+                        't1.navigator_group_id',
                         't3.id AS T3ID',
                         't2.application_code',
                         't2.module_id',

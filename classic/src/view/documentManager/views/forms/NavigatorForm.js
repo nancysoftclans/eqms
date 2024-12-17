@@ -134,8 +134,8 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
             listeners: {
                 change: function (cmb, newVal) {
                     var form = cmb.up('form'),
-                        owneruser = form.down('combo[name=owner_user_id]'),
-                        ownergroup = form.down('combo[name=owner_group_id]');
+                        owneruser = form.down('combo[name=navigator_owner_id]'),
+                        ownergroup = form.down('combo[name=navigator_group_id]');
                     if (newVal == 1 || newVal === 1) {
                         owneruser.setVisible(true);
                         ownergroup.setVisible(true);
@@ -162,7 +162,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
         xtype: 'tagfield',
         fieldLabel: 'Owner User',
         margin: '0 20 20 0',
-        name: 'owner_user_id',
+        name: 'navigator_owner_id',
         allowBlank: true,
         forceSelection: true,
         filterPickList: true,
@@ -193,7 +193,7 @@ Ext.define('Admin.view.documentManager.views.forms.NavigatorForm',{
         xtype: 'tagfield',
         fieldLabel: 'Owner Group',
         margin: '0 20 20 0',
-        name: 'owner_group_id',
+        name: 'navigator_group_id',
         allowBlank: true,
         forceSelection: true,
         filterPickList: true,
