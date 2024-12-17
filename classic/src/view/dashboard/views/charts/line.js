@@ -1,6 +1,6 @@
-Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
+Ext.define('Admin.view.dashboard.views.charts.line', {
     extend: 'Ext.Panel',
-    xtype: 'documentchart',
+    xtype: 'line',
     scrollable: true,
 
     requires: [
@@ -9,24 +9,24 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
         'Ext.chart.axis.Numeric',
         'Ext.chart.interactions.PanZoom',
         'Ext.chart.series.Line',
-        'Ext.chart.series.Bar',  // Add Bar Series
-        //'Admin.store.dashboard.UserAnalysisStr'
+        'Admin.store.dashboard.UserAnalysisStr'
     ],
     controller: 'dashboardvctr',
 
-    width: 700,
+    width: 650,
+    
 
     items: {
         xtype: 'cartesian',
-        reference: 'chart',
+        reference: 'documentchart',
         width: '100%',
         height: 400,
         interactions: {
             type: 'panzoom',
-            zoomOnPanGesture: true
+            zoomOnPanGesture: false
         },
         animation: {
-            duration: 100
+            duration: 200
         },
         innerPadding: {
             left: 40,
@@ -37,14 +37,13 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                 type: 'numeric',
                 position: 'left',
                 grid: true,
-                minimum: 0,
-            
+                minimum: 0
             },
             {
                 type: 'category',
                 position: 'bottom',
                 grid: true,
-                fields: ['date'],
+                fields: ['day'],
                 label: {
                     rotate: {
                     degrees: -45
@@ -54,9 +53,9 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
         ],
         series: [
             {
-                type: 'line',  
-                xField: 'date',
-                yField: 'uniqueUsers',
+                type: 'line',
+                xField: 'day',
+                yField: 'total_documents',
                 smooth: true,
                 style: {
                     lineWidth: 2,
@@ -66,51 +65,48 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                     radius: 4,
                     lineWidth: 2
                 },
+                label: {
+                    field: 'total_documents',
+                    display: 'over'
+                },
                 highlight: {
                     fillStyle: '#000',
                     radius: 5,
                     lineWidth: 2,
                     strokeStyle: '#fff'
                 },
-                label:{
-                    field: 'uniqueUsers',
-                    display: 'over'
-                },
                 tooltip: {
                     trackMouse: true,
                     renderer: function (tooltip, model, item) {
                         tooltip.setHtml(
-                            `Logged in Users: ${model.get('uniqueUsers')}`
+                            `${model.get(item.field)} Documents waiting review`
                         );
                     }
                 }
             }
         ],
-        
         listeners: {
             beforerender: {
                 fn: 'setCompStore',
                 config: {
+                    //pageSize: 10000,
                     proxy: {
-                        url: 'dashboard/getUserAnalysis',
-                        extraParams: {
-                            year: new Date().getFullYear() 
+                        url: 'dashboard/getDocumentAnalysis',
+                        extraParams: { 
+                            year: new Date().getFullYear()
                         }
-                    },
-                    autoLoad: true 
-                }
-                
-                //isLoad: true,
+                    },  
+                    autoLoad: true
+                },
                 
             }
-        },
+        }
     },
 
     tbar: [
         {
             xtype: 'combobox',
             fieldLabel: 'Select Year',
-            reference: 'yearFilter',
             labelAlign: 'right',
             store: Ext.create('Ext.data.Store', {
                 fields: ['year'],
@@ -127,15 +123,16 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
             displayField: 'year',
             valueField: 'year',
             value: new Date().getFullYear(),
+            reference: 'yearFilter',
             listeners: {
                 select: function (combo, record) {
                     const year = record.get('year');
                     const chart = combo.up('panel').down('cartesian');
                     const store = chart.getStore();
-                    if (chart && store){
+                    if (chart && store) {
                         store.getProxy().setExtraParams({ year: year });
                         store.load();
-                    } else{
+                    } else {
                         console.warn('Chart or store not found');
                     }
                     
@@ -144,33 +141,34 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
             style: {
                 height: '25px',
                 width: '200px',
+                
             }
         },
         {
             xtype: 'combobox',
             fieldLabel: 'Select Month',
-            reference: 'monthFilter',
             labelAlign: 'right',
             store: Ext.create('Ext.data.Store', {
-                fields: ['month', 'name'],
+                fields: ['month'],
                 data: [
-                    { month: 1, name: 'January' },
-                    { month: 2, name: 'February' },
-                    { month: 3, name: 'March' },
-                    { month: 4, name: 'April' },
-                    { month: 5, name: 'May' },
-                    { month: 6, name: 'June' },
-                    { month: 7, name: 'July' },
-                    { month: 8, name: 'August' },
-                    { month: 9, name: 'September' },
-                    { month: 10, name: 'October' },
-                    { month: 11, name: 'November' },
-                    { month: 12, name: 'December' }
+                    { month: 'January' },
+                    { month: 'February' },
+                    { month: 'March' },
+                    { month: 'April' },
+                    { month: 'May' },
+                    { month: 'June' },
+                    { month: 'July' },
+                    { month: 'August' },
+                    { month: 'September' },
+                    { month: 'October' },
+                    { month: 'November' },
+                    { month: 'December' }
                 ]
             }),
             queryMode: 'local',
-            displayField: 'name',
+            displayField: 'month',
             valueField: 'month',
+            reference: 'monthFilter',
             listeners: {
                 select: function (combo, record) {
                     const month = record.get('month');
@@ -178,9 +176,9 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                     const store = chart.getStore();
                     if (chart && store){
                         store.getProxy().setExtraParams({ month: month });
-                    store.load();
+                        store.load();
                     } else {
-                        console.warn('Chart or store not found');
+                        console.warn('Chart or store not found')
                     }
                     
                 }
@@ -214,13 +212,51 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                 width: '200px',
             }
         },
+        // {
+        //     xtype: 'combobox',
+        //     fieldLabel: 'Select Day',
+        //     labelAlign: 'right',
+        //     store: Ext.create('Ext.data.Store', {
+        //         fields: ['day'],
+        //         data: (function () {
+        //             const days = [];
+        //             for (let i = 1; i <= 31; i++) {
+        //                 days.push({ day: i });
+        //             }
+        //             return days;
+        //         })()
+        //     }),
+        //     queryMode: 'local',
+        //     displayField: 'day',
+        //     valueField: 'day',
+        //     reference: 'dayFilter',
+        //     listeners: {
+        //         select: function (combo, record) {
+        //             const day = record.get('day');
+        //             const chart = combo.up('panel').down('cartesian');
+        //             const store = chart.getStore();
+        //             if (chart && store) {
+        //                 store.getProxy().setExtraParams({ day: day });
+        //                 store.load();
+        //             } else {
+        //                 console.warn('Chart or store not found')
+        //             }
+                    
+        //         }
+        //     },
+        //     style: {
+        //         height: '25px',
+        //         width: '200px',
+        //     }
+        // },
         {
             text: 'Clear',
             handler: 'clearDashboardFilter',
-            style: {
+            style:{
                 height: '25px',
                 width: '100px',
-                background: '#e44959', 
+                backgroundColor: '#e44959',
+                color:'red'
             }
         },
         '->',
@@ -233,7 +269,7 @@ Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
                 items: [
                     {
                         text: 'Bar',
-                        handler: 'changeChartType'
+                        handler: 'DocumentChangeChartType'
                             
                     },
                     {

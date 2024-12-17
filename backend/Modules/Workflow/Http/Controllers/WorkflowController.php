@@ -2819,7 +2819,8 @@ class WorkflowController extends Controller
                     'issue_status_id' => $issue_status->issue_status_id,
                     'dola' => Carbon::now(),
                     'altered_by' => $this->user_id,
-                    'date_closed' => $date_closed
+                    'date_closed' => $date_closed,
+                    //'expected_end_date' => Carbon::now()->addDays(10)
                 ]);
                 $IssueManagement->save();
             }
@@ -3158,7 +3159,8 @@ class WorkflowController extends Controller
                         'application_code' => $application_code,
                         'investigation_decision_id' => 1,
                         'comment' => $remarks,
-                        'approved_by' => $user_id
+                        'approved_by' => $user_id,
+                        //'expected_end_date' => Carbon::now()->addDays(10)
                     );
                     $res = insertRecord('tra_investigation_approvals', $app_data, $user_id, '');
                     DB::commit();
@@ -5128,6 +5130,7 @@ class WorkflowController extends Controller
                 'directive_id' => $directive_id,
                 //'date_received' => Carbon::now(),
                 //'created_on' => Carbon::now(),
+                //'expected_end_date' => Carbon::now()->addDays(10),
                 'created_by' => $user_id
             );
             if (validateIsNumeric($external_user_id)) {
