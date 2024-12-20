@@ -133,6 +133,24 @@ Ext.define('Admin.view.auditManagement.views.grids.AuditMgmntGrid', {
             }
         }
     },
+    {
+        xtype: 'widgetcolumn',
+        width: 120,
+        widget: {
+            width: 120,
+            textAlign: 'left',
+            xtype: 'button',
+            itemId: 'prints',
+            ui: 'soft-blue',
+            text: 'Download Report',
+            iconCls: 'x-fa fa-file-word',
+            handler: 'generateAuditReportWord',
+            bind: {
+                disabled: '{record.application_status_id == 9}'
+                //disabled: '{record.decision_id !== 1}'
+            }
+        }
+    },
         {
         xtype: 'gridcolumn',
         dataIndex: 'tracking_no',

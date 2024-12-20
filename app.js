@@ -341,11 +341,14 @@ function print_report(url) {
 
                     this.up('window').body.mask('Loading...');
                 }
-            }
-        }]
+            },
+            
+        }],
     });
     win.show();
 }
+
+
 
 function download_report(url) {
     var win = Ext.create('Ext.window.Window', {
