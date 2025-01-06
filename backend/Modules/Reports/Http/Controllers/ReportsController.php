@@ -10066,11 +10066,12 @@ public function generateAuditReportWord(Request $req)
 		$centerCell = $headerTable->addCell(6000, ['align' => 'center']);
 		// Right column: Issue Number
 		$headerTable->addCell(2000, ['align' => 'right'])->addText(
-			'Issue No. 26',
+			'Issue No. 2.0',
 			['bold' => true, 'size' => 10],
 			['align' => 'right']
 		);
 
+		//add footer wiht the date and prvided format
 		// footer section
 		$footer = $section->addFooter();
 		$footerTable = $footer->addTable([
@@ -10079,7 +10080,7 @@ public function generateAuditReportWord(Request $req)
 		]);
 
 		$footerTable->addRow();
-		$footerTable->addCell(5000)->addPreserveText('{DATE}', ['size' => 10], ['alignment' => 'left']);
+		$footerTable->addCell(5000)->addPreserveText('10-11-2022', ['size' => 10], ['alignment' => 'left']);
 		$footerTable->addCell(5000)->addPreserveText('Page {PAGE} of {NUMPAGES}', ['size' => 10], ['alignment' => 'right']);
 
 
@@ -10425,7 +10426,7 @@ public function generateAuditReportWord(Request $req)
 			$pdf->AddPage();
 			$pdf->SetFont('Times', '', 12);
 			
-			
+				
 
 		// function checkPageBreak($pdf, $contentHeight) {
 		//     // Use a hardcoded value for top margin if necessary
