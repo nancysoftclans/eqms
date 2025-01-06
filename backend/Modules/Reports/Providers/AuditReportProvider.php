@@ -54,7 +54,7 @@ class AuditReportProvider extends TcpdfFpdi
 
         // Left-aligned header text
         $this->SetX(10);
-        $this->Cell(0, 10, 'BOMRA/' .$this->tracking_no, 0, 0, 'L');
+        $this->Cell(0, 10, 'BOMRA/QM/PO3/F02' .$this->tracking_no, 0, 0, 'L');
 
         // Center-aligned header text
         $centerText1 = 'Botswana Medicines Regulatory Authority';

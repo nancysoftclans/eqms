@@ -586,5 +586,13 @@ generateAuditReport: function (item) {
         this.fireEvent('generateAuditReport', application_code,module_id,sub_module_id);
     },
 
+    generateAuditReportWord: function (item) {
+        var record = item.getWidgetRecord(),
+            application_code = record.get('application_code');
+            module_id = record.get('module_id');
+            sub_module_id = record.get('sub_module_id');
+        this.fireEvent('generateAuditReportWord', application_code,module_id,sub_module_id);
+    },
+
    
 })
