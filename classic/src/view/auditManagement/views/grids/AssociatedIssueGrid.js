@@ -90,7 +90,8 @@ Ext.define("Admin.view.auditManagement.views.grids.AssociatedIssueGrid", {
           },
         },
         proxy: {
-          url: "issuemanagement/getIssueManagementDetails",
+          //url: "issuemanagement/getIssueManagementDetails",
+          url: "issuemanagement/getCorrectiveIssueManagementDetails",
         },
       },
       isLoad: true,

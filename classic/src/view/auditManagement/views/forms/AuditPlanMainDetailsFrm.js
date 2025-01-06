@@ -53,13 +53,47 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
         },
         layout: 'column',
         items:[{
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Option',
+        name: 'option_type',
+        valueField: 'id',
+        displayField: `name`,
+        margin: '0 20 20 0',
+        forceSelection: true,
+        allowBlank: true,
+        hidden: true,
+        queryMode: 'local',
+        listeners: {
+            afterrender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 10000,
+                    proxy: {
+                        //url: 'usermanagement/documentOwner',
+                        extraParams: {
+                            table_name: 'par_groups'
+                        }
+                    }
+                },
+                isLoad: true
+            }
+        }
+    },{
+        xtype: 'textfield',
+        fieldLabel: 'ID',
+        margin: '0 20 20 0',
+        name: 'audit_id',
+        allowBlank: true
+    },{
             xtype: 'textfield',
             fieldLabel: 'Reference',
+            margin: '0 20 20 0',
             name: 'audit_reference',
 
         }, {
             xtype: 'textfield',
             fieldLabel: 'Title',
+            margin: '0 20 20 0',
             name: 'audit_title',
 
         },
@@ -73,7 +107,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
         {
             xtype: 'textfield',
             name: 'audit_type_id',
-            columnWidth: 0.9,
+           // columnWidth: 0.9,
             allowBlank: false,
             hidden: true,
             fieldLabel: 'AUDIT ID',
@@ -96,6 +130,8 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             name: 'audit_summary',
             columnWidth: 1,
             labelAlign : 'top',
+            margin: '0 20 20 0',
+            columnWidth: 1,
             fieldLabel: 'Summary & Scope'
 
         }
@@ -147,7 +183,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             format: 'd F Y',
             columnWidth: 0.5,
             fieldLabel: 'Start Date',
-            allowBlank: false,
+            allowBlank: true,
             //minValue: new Date(),
         }, 
         {
@@ -156,7 +192,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             format: 'd F Y',
             labelAlign: 'top',
             columnWidth: 0.5,
-            allowBlank: false,
+            allowBlank: true,
             fieldLabel: 'End Date',
         }, 
         {
@@ -170,6 +206,7 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             columnWidth: 0.5,
             anchor: '100%',
             hidden: true,
+            allowBlank: true,
             itemId: 'startTimeField'
         }, 
         {
@@ -182,12 +219,68 @@ Ext.define('Admin.view.auditManagement.panels.AuditPlanMainDetailsFrm',{
             increment: 30,
             columnWidth: 0.5,
             anchor: '100%',
+            allowBlank: true,
             hidden: true,
             itemId: 'endTimeField'
         }
 
        
         ]
-    }]
+    },{
+    xtype:'fieldset',
+    columnWidth: 1,
+    title: "",
+    collapsible: true,
+    defaults: {
+        labelAlign: 'top',
+        allowBlank: false,
+        labelAlign: 'top',
+        margin: 5,
+        xtype: 'textfield',
+        allowBlank: false,
+        columnWidth: 0.33,
+    },
+    layout: 'column',
+     items:[
+
+        {
+        xtype: 'textfield',
+        fieldLabel: 'Function Audited',
+        margin: '0 20 20 0',
+        name: 'function_audited',
+        allowBlank: true
+    },
+    {
+        xtype: 'textfield',
+        fieldLabel: 'Audit Criteria',
+        margin: '0 20 20 0',
+        name: 'audit_criteria',
+        allowBlank: true
+    },
+    {
+        xtype: 'textfield',
+        fieldLabel: 'Additional Auditor',
+        margin: '0 20 20 0',
+        name: 'additional_auditor',
+        allowBlank: true
+    },
+    {
+        xtype: 'htmleditor',
+        fieldLabel: 'Audit Standard',
+        margin: '0 20 20 0',
+        name: 'audit_standard',
+        columnWidth: 0.5,
+        allowBlank: true
+    },
+    {
+        xtype: 'htmleditor',
+        fieldLabel: 'Audit Objectives',
+        margin: '0 20 20 0',
+        name: 'audit_objectives',
+        columnWidth: 0.5,
+        allowBlank: true
+    },
+]
+ },]
 
 })

@@ -635,9 +635,16 @@ class AuditManagementController extends Controller
                 "audit_end_date" => $request->input('audit_end_date'),
                 "start_time" => $request->input('start_time'),
                 "end_time" => $request->input('end_time'),
+                "audit_id" => $request->input('audit_id'),
+                "function_audited" => $request->input('function_audited'),
+                "audit_criteria" => $request->input('audit_criteria'),
+                "additional_auditor" => $request->input('additional_auditor'),
+                "audit_standard" => $request->input('audit_standard'),
+                "audit_objectives" => $request->input('audit_objectives'),
                
 
             );
+
             if (validateIsNumeric($application_code)) {
                 //update
                 $app_data['dola'] = Carbon::now();

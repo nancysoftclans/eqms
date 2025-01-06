@@ -586,6 +586,60 @@ class IssueManagementController extends Controller
         return \response()->json($res);
     }
 
+
+    public function getCorrectiveIssueManagementDetails(Request $request)
+    {
+        $issue_type_id = $request->input("issue_type_id");
+        try {
+            $qry = IssueManagement::from('tra_issue_management_applications as t1')
+                ->leftjoin('tra_submissions as t2', 't1.submission_id', 't2.id')
+                ->leftJoin('wf_workflow_stages as t3', 't1.workflow_stage_id', '=', 't3.id')
+                ->leftjoin('wf_processes as t4', 't2.process_id', '=', 't4.id')
+                ->join('par_issue_statuses as t5', 't1.issue_status_id', 't5.id')
+                ->join('users as t6', 't1.created_by', 't6.id')
+                ->select(
+                    't2.*',
+                    't1.*',
+                    't3.name as workflow_stage',
+                    't4.name as process_name',
+                    't1.created_on as raised_date',
+                    't5.title as issue_status',
+                    't1.id as active_application_id',
+                    't1.workflow_stage_id',
+                    't1.id as issue_id',
+                    't6.first_name',
+                    't6.last_name'
+                )
+                ->where('t1.issue_type_id', 4)
+                ->get();
+            if (validateIsNumeric($issue_type_id)) {
+                $qry->where('t1.issue_type_id', $issue_type_id);
+            }
+            //$results = $qry->get();
+
+            $results = convertStdClassObjToArray($qry);
+            $results = decryptArray($results);
+
+            $res = array(
+                'success' => true,
+                'results' => $results,
+                'message' => 'All is well!!'
+            );
+        } catch (\Exception $exception) {
+            $res = array(
+                'success' => false,
+                'message' => $exception->getMessage()
+            );
+        } catch (\Throwable $throwable) {
+            $res = array(
+                "success" => false,
+                "message" => $throwable->getMessage()
+            );
+        }
+
+        return \response()->json($res);
+    }
+
     public function getIssueManagementDetailsById($active_application_id)
     {
         try {
