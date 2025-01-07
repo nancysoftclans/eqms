@@ -54,7 +54,7 @@ class AuditReportProvider extends TcpdfFpdi
 
         // Left-aligned header text
         $this->SetX(10);
-        $this->Cell(0, 10, 'BOMRA/' .$this->tracking_no, 0, 0, 'L');
+        $this->Cell(0, 10, 'BOMRA/QM/PO3/F02' .$this->tracking_no, 0, 0, 'L');
 
         // Center-aligned header text
         $centerText1 = 'Botswana Medicines Regulatory Authority';
@@ -78,7 +78,7 @@ class AuditReportProvider extends TcpdfFpdi
         $this->Cell($centerTextWidth2, 2, $centerText2, 0, 1, 'C');
 
         // Right-aligned header text
-        $rightText = 'Issue No. ' .$this->issue_no;
+        $rightText = 'Issue No. 2.0';
         $rightTextWidth = $this->GetStringWidth($rightText);
         $rightXPosition = $pageWidth - $rightTextWidth - 10; // 10 is the margin from the right edge
 
@@ -137,7 +137,8 @@ class AuditReportProvider extends TcpdfFpdi
         $this->SetFont('helvetica', 'I', 8);
     
    		 // Get the current date
-    		$currentDate = date('d-m-Y');
+    		//$currentDate = date('d-m-Y');
+    		$currentDate = "10-11-2022";
 
    		 // Left-aligned date
    			 $this->Cell(0, 10, $currentDate, 0, 0, 'L');

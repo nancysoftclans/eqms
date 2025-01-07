@@ -53,12 +53,9 @@
             columnWidth: 0.33,
         },
         layout: 'column',
-        items:[{
-        xtype: 'textfield',
-        fieldLabel: 'Document Title',
-        margin: '0 20 20 0',
-        name: 'doc_title'
-    },{
+        items:[
+
+        {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Document Type',
         margin: '0 20 20 0',
@@ -84,9 +81,42 @@
         }
     },{
         xtype: 'textfield',
+        fieldLabel: 'Document Title',
+        margin: '0 20 20 0',
+        name: 'doc_title'
+    },
+    // {
+    //     xtype: 'combo', anyMatch: true,
+    //     fieldLabel: 'Document Type',
+    //     margin: '0 20 20 0',
+    //     name: 'document_type_id',
+    //     valueField: 'id',
+    //     displayField: 'name',
+    //     forceSelection: true,
+    //     allowBlank: false,
+    //     queryMode: 'local',
+    //     listeners: {
+    //         afterrender: {
+    //             fn: 'setCompStore',
+    //             config: {
+    //                 pageSize: 10000,
+    //                 proxy: {
+    //                     extraParams: {
+    //                         table_name: 'par_qms_documents_types'
+    //                     }
+    //                 }
+    //             },
+    //             isLoad: true
+    //         }
+    //     }
+    // },
+    {
+        xtype: 'textfield',
         fieldLabel: 'Version',
         margin: '0 20 20 0',
-        name: 'doc_version'
+        name: 'doc_version',
+        value: '1.0',
+        readOnly: true
     },{
             xtype: 'combo',
             queryMode: 'local',

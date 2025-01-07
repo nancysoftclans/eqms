@@ -452,13 +452,13 @@ class DocumentManagementController extends Controller
             }
             $user_id = $this->user_id;
 
-                 $doc_prefix = DB::table('par_document_types')
-                ->select('prefix')
+                 $doc_prefix = DB::table('par_qms_documents_types')
+                ->select('format')
                 ->where('id', $request['document_type_id'])
                 ->first();
 
                     if ($doc_prefix) {
-                        $doc_prefix = $doc_prefix->prefix;
+                        $doc_prefix = $doc_prefix->format;
                     }
 
 
@@ -478,11 +478,12 @@ class DocumentManagementController extends Controller
                 "owner_type_id" => $request->input('owner_type_id'),
                 "doc_version" => $request->input('doc_version'),
                 "document_type_id" => $request->input('document_type_id'),
+                "template_id" => $request->input('template_id'),
                 "navigator_folder_id" => $request->input('navigator_folder_id'),
+                "renewal_type_id" => $request->input('renewal_type_id'),
                 "document_number" => $doc_number,
 
             );
-
 
             
              $action = array(
@@ -490,7 +491,6 @@ class DocumentManagementController extends Controller
                 'action' => 'application saved/updated',
                 'accessed_on' => Carbon::now()
             );
-
 
 
             if (validateIsNumeric($application_code)) {
@@ -501,38 +501,57 @@ class DocumentManagementController extends Controller
                 $where_app['application_code'] = $application_code;
 
 
-
                 if (recordExists($applications_table, $where_app)) {
+
 
                     if($request->input('workflow_stage_id') == 13){
 
                         $app_data = array(
 
-                         'application_status_id' => 1
+                        'application_status_id' => 1,
+                        "process_id" => $request->input('process_id'),
+                        "workflow_stage_id" => $request->input('workflow_stage_id'),
+                        "stage_category_id" => $request->input('stage_category_id'),
+                        "applicant_id" => $request->input('applicant_id'),
+                        "sub_module_id" => $sub_module_id,
+                        "module_id" => $module_id,
+                        "doc_title" => $request->input('doc_title'),
+                        "owner_user_id" => $request->input('owner_user_id'),
+                        "owner_group_id" => $request->input('owner_group_id'),
+                        "doc_description" => $request->input('doc_description'),
+                        "owner_type_id" => $request->input('owner_type_id'),
+                        "doc_version" => $request->input('doc_version'),
+                        "document_type_id" => $request->input('document_type_id'),
+                        "template_id" => $request->input('template_id'),
+                        "navigator_folder_id" => $request->input('navigator_folder_id'),
+                        "renewal_type_id" => $request->input('renewal_type_id'),
 
                         );
                     }
 
                     $apps_tableData = getTableData($applications_table, $where_app);
                   
-                    $app_details = getPreviousRecords($applications_table, $where_app);
-                   
+                    $app_details = getPreviousRecords($applications_table, $where_app);                   
  
                     if ($app_details['success'] == false) {
                         return $app_details;
                     }
 
                     $app_details = $app_details['results'];
+
                     
                     unset($app_data['document_number']);
 
                     $res =  updateRecord($applications_table, $where_app,  $app_data, $user_id);
-
                    // $previous_data = $app_details[0];
 
                     unset($apps_tableData['id']);
 
-                    $res = insertRecord('tra_documentmanager_archive', $apps_tableData, $user_id);
+                    if($apps_tableData['application_status_id'] = 4){
+                      $res = insertRecord('tra_documentmanager_archive', $apps_tableData, $user_id);  
+                    }
+
+                    
                     
                 }
                    $res['application_code'] = $app_details[0]['application_code'];
@@ -604,6 +623,7 @@ class DocumentManagementController extends Controller
                 $app_data['created_on'] = Carbon::now();
 
                 $res = insertRecord($applications_table, $app_data, $user_id);
+
                 insertRecord('tra_documents_useractions', $action, $user_id);
                
                  
@@ -1522,6 +1542,7 @@ class DocumentManagementController extends Controller
                     $table_name = 'tra_application_documents';
 
                     $wheres = array('id' => $record_id);
+
 
                     if (recordExists('tra_application_uploadeddocuments', $wheres)) {
                         $prev_file_data = DB::table('tra_application_uploadeddocuments')->where($wheres)->first();

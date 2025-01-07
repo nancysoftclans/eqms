@@ -321,14 +321,14 @@ class ConfigurationsController extends Controller
                 //check if exists
                 $from_serial = $req->from_serial;
                 $to_serial = $req->to_serial;
-                if (recordExists('par_brims_report_application', ['id' => $from_serial])) {
+                if (recordExists('par_brims_report_application', ['id' => $from_serial],'')) {
                     return ['success' => false, 'message' => 'Reference not found please confirm the serial again'];
                 }
-                if (recordExists('par_brims_report_application', ['id' => $to_serial])) {
+                if (recordExists('par_brims_report_application', ['id' => $to_serial],'')) {
                     return ['success' => false, 'message' => 'Reference Already assaigned to another letter'];
                 }
                 //update
-                updateRecord('par_brims_report_application', ['id' => $from_serial], ['id' => $to_serial]);
+                updateRecord('par_brims_report_application', ['id' => $from_serial], ['id' => $to_serial],1,'');
 
                 //update
                 $table_data['action_by'] = $this->user_id;
@@ -337,7 +337,7 @@ class ConfigurationsController extends Controller
 
             //application code if its a variation save
             if (validateIsNumeric($is_variation) && validateIsNumeric($req->premise_id)) {
-                $application_code = getSingleRecordColValue('tra_premises_applications', ['premise_id' => $req->premise_id], 'application_code');
+                $application_code = getSingleRecordColValue('tra_premises_applications', ['premise_id' => $req->premise_id], 'application_code', '');
                 $post_data['application_code'] = $application_code;
             }
 
@@ -371,12 +371,12 @@ class ConfigurationsController extends Controller
             }
             if (validateIsNumeric($id)) {
 
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                 } else {
                     $res = "Update record not found";
                 }
@@ -452,16 +452,16 @@ class ConfigurationsController extends Controller
         $where = array('id' => $id);
 
         if (isset($id) && $id != "") {
-            if (recordExists($table_name, $where)) {
+            if (recordExists($table_name, $where, '')) {
                 unset($table_data['created_on']);
                 unset($table_data['created_by']);
                 $table_data['dola'] = Carbon::now();
                 $table_data['altered_by'] = $user_id;
-                $res = updateRecord($table_name, $where, $table_data);
+                $res = updateRecord($table_name, $where, $table_data, $user_id, '');
             }
         } else {
             $table_data['dola'] = Carbon::now();
-            $res = insertRecord($table_name, $table_data);
+            $res = insertRecord($table_name, $table_data, 1, '');
 
      
             $id = $res['record_id'];
@@ -523,17 +523,17 @@ class ConfigurationsController extends Controller
             //$table_data = $this->uploadDocumentRequirementTemplate($req,$table_data);
 
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
 
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                 }
             } else {
                 $table_data['dola'] = Carbon::now();
-                $res = insertRecord($table_name, $table_data);
+                $res = insertRecord($table_name, $table_data, 1, '');
 
                 //dd($res);
                 $id = $res['record_id'];
@@ -622,16 +622,16 @@ class ConfigurationsController extends Controller
                 'id' => $id
             );
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
 
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                 }
             } else {
-                $res = insertRecord($table_name, $table_data);
+                $res = insertRecord($table_name, $table_data, $user_id, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
@@ -764,7 +764,7 @@ class ConfigurationsController extends Controller
             $where = array(
                 'id' => $record_id
             );
-            $res = deleteRecord($table_name, $where, $user_id);
+            $res = deleteRecord($table_name, $where, $user_id, '');
             if ($res['success']) {
                 if ($table_name == 'par_formfield_designs') {
                     DB::table('par_formfield_relations')->where('form_fielddesign_id', $record_id)->orWhere('parent_field_id', $record_id)->delete();
@@ -2370,17 +2370,17 @@ class ConfigurationsController extends Controller
 
             $table_data['code'] = $code;
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                 } else {
                     dd('hew');
                 }
             } else {
-                $res = insertRecord($table_name, $table_data);
+                $res = insertRecord($table_name, $table_data, 1, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
@@ -2749,13 +2749,13 @@ class ConfigurationsController extends Controller
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data, 'portal_db');
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, 'portal_db');
                 } else {
                     $res = "Update record not found";
                 }
             } else {
 
-                $res = insertRecord($table_name, $table_data, 'portal_db');
+                $res = insertRecord($table_name, $table_data,1, 'portal_db');
             }
 
         } catch (\Exception $exception) {
@@ -2831,13 +2831,13 @@ class ConfigurationsController extends Controller
 
             if (validateIsNumeric($id)) {
 
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
 
-                    $res = updateRecord($table_name, $where, $table_data, $db_con);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, 1, $db_con);
                 } else {
                     $res = "Update record not found";
                 }
@@ -2963,7 +2963,7 @@ class ConfigurationsController extends Controller
                 $table_data = convertStdClassObjToArray($item);
                 $where = array('form_fielddesign_id' => $item->form_fielddesign_id, 'form_category_id' => $form_category_id);
                 //delete previous entries
-                deleteRecord($table_name, $where, $user_id);
+                deleteRecord($table_name, $where, $user_id, '');
                 if ($item->bind_column != '' || $item->parent_field_id > 0 || $item->has_logic != '') {
                     $table_data['form_category_id'] = $form_category_id;
                     $res = insertRecord($table_name, $table_data, $user_id);
@@ -3013,7 +3013,7 @@ class ConfigurationsController extends Controller
             }
 
 
-            $form_category_id = getSingleRecordColValue('par_form_categories', $where, 'id');
+            $form_category_id = getSingleRecordColValue('par_form_categories', $where, 'id', '');
 
             if (validateIsnumeric($form_category_id)) {
                 $qry = DB::table('par_formtype_fields as t22')
@@ -3133,17 +3133,17 @@ class ConfigurationsController extends Controller
 
             if (validateIsNumeric($id)) {
 
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data, $db_con);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, $db_con);
                 } else {
                     $res = "Update record not found";
                 }
             } else {
-                $res = insertRecord($table_name, $table_data);
+                $res = insertRecord($table_name, $table_data, 1, '');
                 // $db_con
             }
 
@@ -3266,15 +3266,15 @@ class ConfigurationsController extends Controller
             );
 
             if (isset($id) && $id != "") {
-                if (recordExists($param_def_table_name, $where)) {
+                if (recordExists($param_def_table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($param_def_table_name, $where, $table_data);
+                    $res = updateRecord($param_def_table_name, $where, $table_data, 1, '');
                 }
             } else {
-                $res = insertRecord($param_def_table_name, $table_data);
+                $res = insertRecord($param_def_table_name, $table_data, 1, '');
             }
 
             if ($res['success']) {
@@ -3362,7 +3362,7 @@ class ConfigurationsController extends Controller
             $results['param_name'] = $param->param_name;
             $results['table_name'] = $param->table_name;
             $results['no_joins'] = $param->no_joins;
-            $results['db_con_name'] = getSingleRecordColValue('par_connections', ['id' => $param->connection_id], 'config');
+            $results['db_con_name'] = getSingleRecordColValue('par_connections', ['id' => $param->connection_id], 'config', '');
 
             $res = array(
                 'success' => true,
@@ -3569,7 +3569,7 @@ class ConfigurationsController extends Controller
                 'sub_module_id' => $sub_module_id,
                 'section_id' => $section_id
             );
-            $process_id = getSingleRecordColValue('wf_processes', $where, 'id');
+            $process_id = getSingleRecordColValue('wf_processes', $where, 'id', '');
             //get applicable document types
             $qry1 = DB::table('tra_proc_applicable_doctypes')
                 ->select('doctype_id');
@@ -3688,7 +3688,7 @@ class ConfigurationsController extends Controller
             $workflow_stage = $stage_details->id;
             $where['stage_id'] = $workflow_stage;
         }
-        $stage_category_id = getSingleRecordColValue('wf_workflow_stages', ['id' => $workflow_stage], 'stage_category_id');
+        $stage_category_id = getSingleRecordColValue('wf_workflow_stages', ['id' => $workflow_stage], 'stage_category_id', '');
         try {
             if ($sub_module_id == 7) {
                 if ($section_id == 2 || $section_id == 3) {
@@ -4069,7 +4069,7 @@ class ConfigurationsController extends Controller
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
-        $res = array('success' => true, 'message' => '');
+       
         return \response()->json($res);
     }
     public function validateHasImportExportProductDetils(Request $req)
@@ -4165,8 +4165,8 @@ class ConfigurationsController extends Controller
                     $master[$i]['sub_categories'][$j]['name'] = $sub_cat->name;
 
                     //add data for sub
-                    $master[$i]['sub_categories'][$j]['workspace_value'] = getSingleRecordColValue('par_ct_assessment_category_details', ['sub_category_id' => $sub_cat->id, 'active_application_code' => $application_code], 'workspace');
-                    $master[$i]['sub_categories'][$j]['comment_value'] = getSingleRecordColValue('par_ct_assessment_category_details', ['sub_category_id' => $sub_cat->id, 'active_application_code' => $application_code], 'comment');
+                    $master[$i]['sub_categories'][$j]['workspace_value'] = getSingleRecordColValue('par_ct_assessment_category_details', ['sub_category_id' => $sub_cat->id, 'active_application_code' => $application_code], 'workspace', '');
+                    $master[$i]['sub_categories'][$j]['comment_value'] = getSingleRecordColValue('par_ct_assessment_category_details', ['sub_category_id' => $sub_cat->id, 'active_application_code' => $application_code], 'comment', '');
 
                     if ($items->isEmpty()) {
                         $master[$i]['sub_categories'][$j]['items'] = [];
@@ -4177,10 +4177,10 @@ class ConfigurationsController extends Controller
                     foreach ($items as $item) {
                         if ($item->is_checklist == 1) {
                             $master[$i]['sub_categories'][$j]['items'][$k]['is_checklist'] = 1;
-                            $master[$i]['sub_categories'][$j]['items'][$k]['item_value'] = getSingleRecordColValue('par_ct_assessment_items_details', ['item_id' => $item->id, 'active_application_code' => $application_code], 'itemcheck');
+                            $master[$i]['sub_categories'][$j]['items'][$k]['item_value'] = getSingleRecordColValue('par_ct_assessment_items_details', ['item_id' => $item->id, 'active_application_code' => $application_code], 'itemcheck', '');
                         } else {
                             $master[$i]['sub_categories'][$j]['items'][$k]['is_checklist'] = 0;
-                            $master[$i]['sub_categories'][$j]['items'][$k]['item_value'] = getSingleRecordColValue('par_ct_assessment_items_details', ['item_id' => $item->id, 'active_application_code' => $application_code], 'item');
+                            $master[$i]['sub_categories'][$j]['items'][$k]['item_value'] = getSingleRecordColValue('par_ct_assessment_items_details', ['item_id' => $item->id, 'active_application_code' => $application_code], 'item', '');
                         }
                         $master[$i]['sub_categories'][$j]['items'][$k]['name'] = $item->name;
                         $master[$i]['sub_categories'][$j]['items'][$k]['id'] = $item->id;
@@ -4231,7 +4231,7 @@ class ConfigurationsController extends Controller
 //                             unset($table_data['created_by']);
 //                             $table_data['dola'] = Carbon::now();
 //                             $table_data['altered_by'] = $user_id;
-//                             $res = updateRecord($table_name, $where, $table_data, $user_id);
+//                             $res = updateRecord($table_name, $where, $table_data, $user_id, '');, $user_id);
 
     //                         }
 //                     } else {
@@ -4398,9 +4398,9 @@ class ConfigurationsController extends Controller
             $results = $qry->get();
             if (isset($results)) {
                 foreach ($results as $rec) {
-                    $module_name = getSingleRecordColValue('par_modules', array('id' => $rec->module_id), 'name');
-                    $sub_module_name = getSingleRecordColValue('par_sub_modules', array('id' => $rec->sub_module_id), 'name');
-                    $section_name = getSingleRecordColValue('par_sections', array('id' => $rec->section_id), 'name');
+                    $module_name = getSingleRecordColValue('par_modules', array('id' => $rec->module_id), 'name', '');
+                    $sub_module_name = getSingleRecordColValue('par_sub_modules', array('id' => $rec->sub_module_id), 'name', '');
+                    $section_name = getSingleRecordColValue('par_sections', array('id' => $rec->section_id), 'name', '');
                     $data[] = array(
                         'id' => $rec->id,
                         'application_code' => $rec->application_code,
@@ -7528,17 +7528,17 @@ class ConfigurationsController extends Controller
             );
             //Updating Records
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     // DD('HERE');
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $res = updateRecord($table_name, $where, $table_data, $user_id);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
 
                 }
             } else {
-                $res = insertRecord('par_meeting_groups', $table_data, $user_id);
+                $res = insertRecord('par_meeting_groups', $table_data, $user_id, '');
                 if (!isset($res['success']) || $res['success'] == false) {
                     return $res;
                 }

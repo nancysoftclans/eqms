@@ -213,21 +213,21 @@ class WorkflowController extends Controller
                 'id' => $id
             );
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $previous_data = getPreviousRecords($table_name, $where);
+                    $previous_data = getPreviousRecords($table_name, $where, '');
                     if ($previous_data['success'] == false) {
                         return $previous_data;
                     }
                     $previous_data = $previous_data['results'];
-                    $res = updateRecord($table_name, $where, $table_data);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                     $res['record_id'] = $id;
                 }
             } else {
-                $res = insertRecord($table_name, $table_data, $user_id);
+                $res = insertRecord($table_name, $table_data, $user_id, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
@@ -500,7 +500,7 @@ class WorkflowController extends Controller
             $where = array(
                 'id' => $record_id
             );
-            $previous_data = getPreviousRecords($table_name, $where);
+            $previous_data = getPreviousRecords($table_name, $where, '');
             if ($previous_data['success'] == false) {
                 return $previous_data;
             }
@@ -523,7 +523,7 @@ class WorkflowController extends Controller
             $where = array(
                 'id' => $record_id
             );
-            $previous_data = getPreviousRecords($table_name, $where);
+            $previous_data = getPreviousRecords($table_name, $where, '');
             if ($previous_data['success'] == false) {
                 return $previous_data;
             }
@@ -549,7 +549,7 @@ class WorkflowController extends Controller
             if ($table_name == 'wf_workflows') {
                 $res = $this->deleteWorkflowMappingRecord($record_id);
             } else {
-                $res = deleteRecord($table_name, $where);
+                $res = deleteRecord($table_name, $where, $this->user_id, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
@@ -1385,21 +1385,21 @@ class WorkflowController extends Controller
                 'id' => $id
             );
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $previous_data = getPreviousRecords($table_name, $where);
+                    $previous_data = getPreviousRecords($table_name, $where, '');
                     if ($previous_data['success'] == false) {
                         return $previous_data;
                     }
                     $previous_data = $previous_data['results'];
-                    $res = updateRecord($table_name, $where, $table_data, $user_id);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                     $res['record_id'] = $id;
                 }
             } else {
-                $res = insertRecord($table_name, $table_data, $user_id);
+                $res = insertRecord($table_name, $table_data, $user_id, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
@@ -1433,17 +1433,17 @@ class WorkflowController extends Controller
                 'id' => $id
             );
             if (isset($id) && $id != "") {
-                if (recordExists($table_name, $where)) {
+                if (recordExists($table_name, $where, '')) {
                     unset($table_data['created_on']);
                     unset($table_data['created_by']);
                     $table_data['dola'] = Carbon::now();
                     $table_data['altered_by'] = $user_id;
-                    $previous_data = getPreviousRecords($table_name, $where);
+                    $previous_data = getPreviousRecords($table_name, $where, '');
                     if ($previous_data['success'] == false) {
                         return $previous_data;
                     }
                     $previous_data = $previous_data['results'];
-                    $res = updateRecord($table_name, $where, $table_data, $user_id);
+                    $res = updateRecord($table_name, $where, $table_data, $user_id, '');
                     $res['record_id'] = $id;
                 }
             } else {
@@ -1463,7 +1463,7 @@ class WorkflowController extends Controller
                     );
                     return response()->json($res);
                 }
-                $res = insertRecord($table_name, $table_data, $user_id);
+                $res = insertRecord($table_name, $table_data, $user_id, '');
             }
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
@@ -1957,13 +1957,16 @@ class WorkflowController extends Controller
                         ->where('t7.application_code', '=', $application_code);
                 })
                 ->select(DB::raw("t1.*, t1.id as checklist_item_id, t1.serial_no as order_no, 
-                              t2.id as item_resp_id, t2.pass_status, t2.comment, t2.observation, 
-                              t2.auditor_comment, t3.name as checklist_type, 
-                              t2.auditorpass_status, t2.risk_type_remarks, 
-                              $module_id as module_id, $sub_module_id as sub_module_id,  
-                              t4.query, t4.query_response, 
-                              CASE WHEN t2.risk_type IS NULL THEN t1.risk_type ELSE t2.risk_type END as risk_type,
-                              COUNT(t6.checklist_item_id) as findings, t8.initial_file_name as evidence, t8.node_ref"))
+                        t2.id as item_resp_id, t2.pass_status, t2.comment, t2.observation, 
+                        t2.auditor_comment, t3.name as checklist_type, 
+                        t2.auditorpass_status, t2.risk_type_remarks, 
+                        $module_id as module_id, $sub_module_id as sub_module_id,  
+                        t4.query, t4.query_response, 
+                        CASE WHEN t2.risk_type IS NULL THEN t1.risk_type ELSE t2.risk_type END as risk_type,
+                        COUNT(t6.checklist_item_id) as findings, 
+                        GROUP_CONCAT(t8.initial_file_name) as evidence, 
+                        GROUP_CONCAT(t8.node_ref) as node_ref"))
+
                 ->where('t1.is_enabled', 1)
                 ->groupBy('t1.id', 't1.serial_no', 't2.id', 't3.name', 't4.query', 't4.query_response', 't5.id')
                 ->orderBy('t1.serial_no', 'ASC');
@@ -2819,7 +2822,8 @@ class WorkflowController extends Controller
                     'issue_status_id' => $issue_status->issue_status_id,
                     'dola' => Carbon::now(),
                     'altered_by' => $this->user_id,
-                    'date_closed' => $date_closed
+                    'date_closed' => $date_closed,
+                    //'expected_end_date' => Carbon::now()->addDays(10)
                 ]);
                 $IssueManagement->save();
             }
@@ -2911,7 +2915,7 @@ class WorkflowController extends Controller
             $where = array(
                 'application_code' => $application_code
             );
-            $previous_data = getPreviousRecords('tra_onlinesubmissions', $where);
+            $previous_data = getPreviousRecords('tra_onlinesubmissions', $where, '');
 
             if ($previous_data['success']) {
                 $previous_data = $previous_data['results'];
@@ -2919,8 +2923,8 @@ class WorkflowController extends Controller
                 $onlinesubmission_status_id = 2;
                 $update_data = array('onlinesubmission_status_id' => $onlinesubmission_status_id, 'date_received' => Carbon::now(), 'altered_by' => $user_id, 'dola' => Carbon::now());
 
-                updateRecord('tra_onlinesubmissions', $where, $update_data, $user_id);
-                // deleteRecord('tra_onlinesubmissions', $previous_data, $where, $user_id);
+                updateRecord('tra_onlinesubmissions', $where, $update_data, $user_id, '');
+                // deleteRecord('tra_onlinesubmissions', $previous_data, $where, $user_id, '');
 
             }
         }
@@ -2969,15 +2973,97 @@ class WorkflowController extends Controller
         $is_inspection_submission = $request->input('is_inspection_submission');
         $user_id = $this->user_id;
         DB::beginTransaction();
+
+        $action_details = $this->getApplicationWorkflowActionDetails($action);
+        $has_qms_notification = $action_details->has_qms_notification;
+        $qms_msg_id = $action_details->qms_msg_id;
         try {
             //get application_details
             //notify submission
 
+            if ($has_qms_notification == 1) {
+                if($module_id == 26){
+                $application_details = DB::table('tra_documentmanager_application')
+                    ->where('application_code', $application_code)
+                    ->get();
+                }    
+                //get the emails
+
+            
+            foreach($application_details as $application_detail){
+
+                if (validateIsNumeric($application_detail->application_code)) {
+                    $app_description = '';
+                    $application_code = $application_detail->application_code;                   
+
+                    //var_dump($meeting_details);exit;
+                    $revieweremail = $this->getQMSAssignmentEmail($application_code);
+
+                    $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
+
+                    $vars = array(
+                         '{module_name}' => $module_name
+                    );
+                    //check for the external users and
+                    sendTemplatedApplicationNotificationEmail($qms_msg_id, $revieweremail, $vars);
+
+                
+                    $assignedEmails = explode(';', $revieweremail);
+                    foreach ($assignedEmails as $assignedEmail) {
+                     sendInvitationMail($qms_msg_id, $assignedEmail, $vars);
+                    }
+
+                    // //send an email to the rest of the users
+                    // $records = DB::table('tc_meeting_participants')
+                    //     ->select('*')
+                    //     ->where(array('meeting_id' => $meeting_id))
+                    //     ->whereNull($user_id)
+                    //     ->get();
+
+
+                    // if ($records) {
+
+                    //     foreach ($records as $rec) {
+
+                    //         $user_id = $rec->user_id;
+                    //         $email_address = $rec->email;
+                    //         $participant_id = $rec->id;
+                    //         //print_r($user_id);
+
+                    //         /*if(!validateIsNumeric($user_id)){
+
+                    //             $participant_id = $rec->id;
+                    //             //users details
+                    //             $table_data = array(
+                    //                 'first_name' => $rec->participant_name,
+                    //                 'mobile' => $rec->phone,
+                    //                 'phone' => $rec->phone,
+                    //                 'user_category_id' => 2
+                    //             );
+                    //             $this->createExternalUserAccountDetails($table_data,$email_address,$participant_id,$vars);
+                    //         }*/ //endif
+
+                    //         $table_data = array(
+                    //             'first_name' => $rec->participant_name,
+                    //             'mobile' => $rec->phone,
+                    //             'phone' => $rec->phone,
+                    //             'user_category_id' => 2
+                    //         );
+                    //         $this->createExternalUserAccountDetails($table_data, $email_address, $participant_id, $vars);
+                    //     } //endforeach
+                    // } //endif
+
+                }
+            }
+
+        }
+
+
             if (validateIsNumeric($request->responsible_user)) {
-                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
-                $process_name = getSingleRecordColValue('wf_processes', array('id' => $request->process_id), 'name');
-                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
-                $email_address = getSingleRecordColValue('users', array('id' => $request->responsible_user), 'email');
+                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name', '');
+                $process_name = getSingleRecordColValue('wf_processes', array('id' => $request->process_id), 'name', '');
+                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name', '');
+                $email_address = getSingleRecordColValue('users', array('id' => $request->responsible_user), 'email', '');
                 $vars = array(
                     '{module_name}' => $module_name,
                     '{process_name}' => $process_name,
@@ -2989,7 +3075,7 @@ class WorkflowController extends Controller
 
             $module_id = $request->input('module_id');
             if ($table_name == '') {
-                $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename');
+                $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename', '');
             }
 
             if ($table_name == 'tra_product_notifications') {
@@ -3022,12 +3108,12 @@ class WorkflowController extends Controller
                     'workflow_stage_id' => $to_stage,
                     'application_status_id' => $application_status_id
                 );
-                $prev_data = getPreviousRecords($table_name, $where);
+                $prev_data = getPreviousRecords($table_name, $where, '');
                 if ($prev_data['success'] == false) {
                     echo json_encode($prev_data);
                     exit();
                 }
-                $update_res = updateRecord($table_name, $where, $app_update);
+                $update_res = updateRecord($table_name, $where, $app_update, $user_id, '');
                 if ($update_res['success'] == false) {
                     echo json_encode($update_res);
                     exit();
@@ -3050,14 +3136,14 @@ class WorkflowController extends Controller
                 }
             }
             //check if MIR final stage
-            $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $to_stage], 'stage_status');
+            $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $to_stage], 'stage_status', '');
             if ($stage_status == 3 && $module_id == 22) {
                 $update = ['is_completed' => 1];
-                updateRecord('tra_mir_applications', ['id' => $application_code], $update);
+                updateRecord('tra_mir_applications', ['id' => $application_code], $update, $user_id, '');
             }
 
             //check if Monitoring is going to final stage
-            $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $to_stage], 'stage_status');
+            $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $to_stage], 'stage_status', '');
             $sub_module_id = $application_details->sub_module_id;
             if ($stage_status == 3 && $module_id == 8 && $sub_module_id == 88) {
                 $application_code = $application_details->application_code;
@@ -3076,9 +3162,10 @@ class WorkflowController extends Controller
                         'application_code' => $application_code,
                         'investigation_decision_id' => 1,
                         'comment' => $remarks,
-                        'approved_by' => $user_id
+                        'approved_by' => $user_id,
+                        //'expected_end_date' => Carbon::now()->addDays(10)
                     );
-                    $res = insertRecord('tra_investigation_approvals', $app_data);
+                    $res = insertRecord('tra_investigation_approvals', $app_data, $user_id, '');
                     DB::commit();
                     // DD($application_code);tracking_no
                     $lead_investigator = $results[0]->lead_investigator;
@@ -3122,7 +3209,7 @@ class WorkflowController extends Controller
 
         //for Facility Initial Submission
         $curr_stage_id = $request->curr_stage_id;
-        $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $curr_stage_id], 'stage_status');
+        $stage_status = getSingleRecordColValue('wf_workflow_stages', ['id' => $curr_stage_id], 'stage_status', '');
         if ($request->sub_module_id == 50 && $stage_status == 1) {
             $res = $this->handleInitialFacilityInspectionSubmission($request);
             echo json_encode($res);
@@ -3132,7 +3219,7 @@ class WorkflowController extends Controller
 
         DB::beginTransaction();
         if ($table_name == '') {
-            $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename');
+            $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename', '');
             $request['table_name'] = $table_name;
         }
         try {
@@ -3204,8 +3291,7 @@ class WorkflowController extends Controller
             $technicalmeetinemail_msg_id = $action_details->technicalmeetinemail_msg_id;
 
 
-            $has_qms_notification = $action_details->has_qms_notification;
-            $qms_msg_id = $action_details->qms_msg_id;
+           
 
             $has_preminsp_notification = $action_details->has_preminsp_notification;
             $preminspmail_msg_id = $action_details->preminspmail_msg_id;
@@ -3219,7 +3305,7 @@ class WorkflowController extends Controller
                 $is_inspection_submission = $action_details->is_inspection_submission;
             }
 
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code', '');
             $processtransition_data = $this->getActionTransitionDetails($action);
 
             $is_multi_submission = $processtransition_data->is_multi_submission;
@@ -3324,10 +3410,10 @@ class WorkflowController extends Controller
                     if (validateIsNumeric($external_user_id)) {
                         $usersubmission_data['usr_to'] = $external_user_id;
                         //send and email to the Extrenal user
-                        $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
-                        $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name');
-                        $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
-                        $email_address = getSingleRecordColValue('users', array('id' => $external_user_id), 'email');
+                        $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name', '');
+                        $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name', '');
+                        $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name', '');
+                        $email_address = getSingleRecordColValue('users', array('id' => $external_user_id), 'email', '');
                         $vars = array(
                             '{module_name}' => $module_name,
                             '{process_name}' => $process_name,
@@ -3337,10 +3423,10 @@ class WorkflowController extends Controller
                         //send an email to the rest of the users
 
                     } else {
-                        $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
-                        $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name');
-                        $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
-                        $email_address = getSingleRecordColValue('users', array('id' => $responsible_user), 'email');
+                        $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name', '');
+                        $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name', '');
+                        $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name', '');
+                        $email_address = getSingleRecordColValue('users', array('id' => $responsible_user), 'email', '');
                         $vars = array(
                             '{module_name}' => $module_name,
                             '{process_name}' => $process_name,
@@ -3352,11 +3438,11 @@ class WorkflowController extends Controller
 
                     // if ($action_details->has_submission_notification == 1 && validateIsNumeric($responsible_user)) {
 
-                    //     $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name');
-                    //     $process_name = getSingleRecordColValue('wf_processes', array('id'=>$process_id), 'name');
-                    //     $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id'=>$to_stage), 'name');
-                    //     $email_address = getSingleRecordColValue('users', array('id'=>$responsible_user), 'email');
-                    //     $user_from = decryptval(getSingleRecordColValue('users', array('id'=>$user_id), 'first_name'),env('encryption_key'),env('encryption_iv'));
+                    //     $module_name = getSingleRecordColValue('par_modules', array('id'=>$module_id), 'name', '');
+                    //     $process_name = getSingleRecordColValue('wf_processes', array('id'=>$process_id), 'name', '');
+                    //     $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id'=>$to_stage), 'name', '');
+                    //     $email_address = getSingleRecordColValue('users', array('id'=>$responsible_user), 'email', '');
+                    //     $user_from = decryptval(getSingleRecordColValue('users', array('id'=>$user_id), 'first_name'),env('encryption_key'),env('encryption_iv'), '');
                     //     $vars = array(
                     //         '{module_name}' => $module_name,
                     //         '{process_name}' => $process_name,
@@ -3497,7 +3583,7 @@ class WorkflowController extends Controller
 
             if (count($multisubmission_params) > 0) {
 
-                $res_multisubmission = insertRecord('tra_submissions', $multisubmission_params);
+                $res_multisubmission = insertRecord('tra_submissions', $multisubmission_params, $user_id, '');
                 //print_r(($multisubmission_params));
 
             }
@@ -3545,7 +3631,7 @@ class WorkflowController extends Controller
                     // $directorate_name = $directorate_details->directorate_name;
                     // $director_name = $directorate_details->director_name;
                     // $section_name = $directorate_details->section_name;
-                    $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
+                    $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name', '');
 
                     $vars = array(
                         '{meeting_name}' => $meeting_details->meeting_name,
@@ -3649,7 +3735,7 @@ class WorkflowController extends Controller
 
             $email_res = sendTemplatedApplicationNotificationEmail(15, $email_address, $vars);
 
-            $results = insertRecord('users', $table_data, $this->user_id);
+            $results = insertRecord('users', $table_data, $this->user_id, '');
             if ($results['success'] == true) {
                 $insertId = $results['record_id'];
                 DB::table('tc_meeting_participants')->where(array('id' => $participant_id))->update(array('user_id' => $insertId));
@@ -3719,6 +3805,26 @@ class WorkflowController extends Controller
         $inspectors_email = implode(';', $inspectors_email);
         return $inspectors_email;
     }
+
+    public function getQMSAssignmentEmail($application_code)
+    {
+        $qms_email = array();
+        $records = DB::table('tra_documentmanager_application as t1')
+            ->join('tra_submissions as t2', 't1.application_code', 't2.application_code')
+            ->join('users as t3', 't2.usr_to', 't3.id')
+            ->select(DB::raw("decrypt(t3.email) as email"))
+            ->where(array('t1.application_code' => $application_code))
+            ->groupBy('t2.id')
+            ->get();
+        if ($records) {
+            foreach ($records as $rec) {
+                $qms_email[] = $rec->email;
+            }
+        }
+        $qms_email = implode(';', $qms_email);
+        return $qms_email;
+    }
+
     public function getMeetingAttendantsEmails($application_code)
     {
         $meeting_attendantsemail = array();
@@ -3738,6 +3844,7 @@ class WorkflowController extends Controller
         $meeting_attendantsemail = implode(';', $meeting_attendantsemail);
         return $meeting_attendantsemail;
     }
+
     public function getApplicationInspEvaUsers($application_code)
     {
         $record = DB::table('tra_submissions as t1')
@@ -3809,7 +3916,7 @@ class WorkflowController extends Controller
 
             $has_appdate_defination = $action_details->has_appdate_defination;
             $appdate_defination_id = $action_details->appdate_defination_id;
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code', '');
             $application_processdefdata = array();
             foreach ($application_details as $key => $application_detail) {
                 if ($keep_status == true) {
@@ -3824,7 +3931,7 @@ class WorkflowController extends Controller
                     /* $vars = array(
                          '{reference_no}' => $application_detail->reference_no,
                      );
-                     $applicant_email = getSingleRecordColValue('wb_trader_account', array('id' => $application_detail->applicant_id), 'email');
+                     $applicant_email = getSingleRecordColValue('wb_trader_account', array('id' => $application_detail->applicant_id), 'email', '');
                      $permit_report = $this->generatePremisePermit($application_detail->premise_id);
                      $certificate_report = $this->generatePremiseCertificate($application_detail->premise_id);
                      applicationPermitEmail(7, $applicant_email, $vars, $permit_report,$certificate_report);*/
@@ -4008,7 +4115,7 @@ class WorkflowController extends Controller
 
             $has_appdate_defination = $action_details->has_appdate_defination;
             $appdate_defination_id = $action_details->appdate_defination_id;
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code', '');
             $application_processdefdata = array();
             //application details
             foreach ($application_details as $key => $application_detail) {
@@ -4306,7 +4413,7 @@ class WorkflowController extends Controller
                 'workflow_stage_id' => $to_stage,
                 'application_status_id' => $application_status_id
             );
-            $prev_data = getPreviousRecords($table_name, $where);
+            $prev_data = getPreviousRecords($table_name, $where, '');
             if ($prev_data['success'] == false) {
                 DB::rollBack();
                 echo json_encode($prev_data);
@@ -4381,7 +4488,7 @@ class WorkflowController extends Controller
                 'workflow_stage_id' => $to_stage,
                 'application_status_id' => $application_status_id
             );
-            $prev_data = getPreviousRecords($table_name, $where);
+            $prev_data = getPreviousRecords($table_name, $where, '');
             if ($prev_data['success'] == false) {
                 DB::rollBack();
                 echo json_encode($prev_data);
@@ -4416,19 +4523,19 @@ class WorkflowController extends Controller
                 ->first();
             $data->rejection_reason = $remarks;
             $data = convertStdClassObjToArray($data);
-            $mis_insert_res = insertRecord('tra_rejected_premises_applications', $data, $user_id);
+            $mis_insert_res = insertRecord('tra_rejected_premises_applications', $data, $user_id, '');
             if ($mis_insert_res['success'] == false) {
                 DB::rollBack();
                 echo json_encode($mis_insert_res);
                 exit();
             }
-            $prev_data = getPreviousRecords($table_name, $where);
+            $prev_data = getPreviousRecords($table_name, $where, '');
             if ($prev_data['success'] == false) {
                 DB::rollBack();
                 echo json_encode($prev_data);
                 exit();
             }
-            $delete_res = deleteRecord($table_name, $prev_data['results'], $where, $user_id);
+            $delete_res = deleteRecord($table_name, $prev_data['results'], $user_id, '');
             if ($delete_res['success'] == false) {
                 DB::rollBack();
                 echo json_encode($delete_res);
@@ -4709,7 +4816,7 @@ class WorkflowController extends Controller
 
             $has_appdate_defination = $action_details->has_appdate_defination;
             $appdate_defination_id = $action_details->appdate_defination_id;
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code', '');
             $application_processdefdata = array();
 
             foreach ($application_details as $key => $application_detail) {
@@ -4836,7 +4943,7 @@ class WorkflowController extends Controller
                 'remarks' => $remarks,
                 'created_by' => $user_id
             );
-            $res = insertRecord($recommendation_table, $data, $user_id);
+            $res = insertRecord($recommendation_table, $data, $user_id, '');
             if ($res['success'] == false) {
                 echo json_encode($res);
                 exit();
@@ -4965,7 +5072,7 @@ class WorkflowController extends Controller
             if (isset($action_details->is_inspection_submission)) {
                 $is_inspection_submission = $action_details->is_inspection_submission;
             }
-            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code');
+            $appdate_defination = getSingleRecordColValue('par_appprocess_definations', array('id' => $appdate_defination_id), 'code', '');
             $application_processdefdata = array();
             if ($has_appdate_defination == 1) {
                 $application_processdefdata = array(
@@ -4994,7 +5101,7 @@ class WorkflowController extends Controller
                 'created_on' => Carbon::now(),
                 'created_by' => $user_id
             );
-            insertRecord('tra_applications_transitions', $transition_params);
+            insertRecord('tra_applications_transitions', $transition_params,$user_id, '');
 
             // DB::table('tra_applications_transitions')
             //     ->insert($transition_params);
@@ -5026,15 +5133,16 @@ class WorkflowController extends Controller
                 'directive_id' => $directive_id,
                 //'date_received' => Carbon::now(),
                 //'created_on' => Carbon::now(),
+                //'expected_end_date' => Carbon::now()->addDays(10),
                 'created_by' => $user_id
             );
             if (validateIsNumeric($external_user_id)) {
                 $submission_params['usr_to'] = $external_user_id;
                 //send and email to the Extrenal user
-                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
-                $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name');
-                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
-                $email_address = getSingleRecordColValue('users', array('id' => $external_user_id), 'email');
+                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name', '');
+                $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name', '');
+                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name', '');
+                $email_address = getSingleRecordColValue('users', array('id' => $external_user_id), 'email', '');
                 $vars = array(
                     '{module_name}' => $module_name,
                     '{process_name}' => $process_name,
@@ -5057,10 +5165,10 @@ class WorkflowController extends Controller
 
             if ($action_details->has_submission_notification == 1 && validateIsNumeric($responsible_user)) {
 
-                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name');
-                $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name');
-                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name');
-                $email_address = getSingleRecordColValue('users', array('id' => $responsible_user), 'email');
+                $module_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'name', '');
+                $process_name = getSingleRecordColValue('wf_processes', array('id' => $process_id), 'name', '');
+                $process_stage = getSingleRecordColValue('wf_workflow_stages', array('id' => $to_stage), 'name', '');
+                $email_address = getSingleRecordColValue('users', array('id' => $responsible_user), 'email', '');
                 $vars = array(
                     '{module_name}' => $module_name,
                     '{process_name}' => $process_name,
@@ -5094,7 +5202,7 @@ class WorkflowController extends Controller
 
             if ($action_details->update_portal_status == 1) {
                 $portal_status_id = $action_details->portal_status_id;
-                $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename');
+                $table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename', '');
                 $portal_table = getPortalApplicationsTable($module_id);
 
                 $proceed = updatePortalApplicationStatus($application_id, $portal_status_id, $table_name, $portal_table);
@@ -5120,7 +5228,7 @@ class WorkflowController extends Controller
             if ($is_multi_submission == 1) {
                 $submission_params['current_stage'] = $multinextstage_id;
                 $submission_params['usr_to'] = '';
-                insertRecord('tra_submissions', $submission_params);
+                insertRecord('tra_submissions', $submission_params, $user_id, '');
             }
             DB::commit();
             $res = array(
@@ -5672,7 +5780,7 @@ class WorkflowController extends Controller
 
                 // $invoice_params['prepared_by'] = $prepared_by;
                 $invoice_params['due_date'] = $due_date;
-                $exchange_rate = getSingleRecordColValue('par_exchange_rates', array('currency_id' => $currency_id), 'exchange_rate');
+                $exchange_rate = getSingleRecordColValue('par_exchange_rates', array('currency_id' => $currency_id), 'exchange_rate', '');
 
 
                 $invoice_no = generateInvoiceNo($user_id);
@@ -5680,7 +5788,7 @@ class WorkflowController extends Controller
                 $invoice_params['application_id'] = $application_id;
                 $invoice_params['application_code'] = $application_code;
                 $invoice_params['applicant_id'] = $applicant_id;
-                $res = insertRecord('tra_application_invoices', $invoice_params, $user_id);
+                $res = insertRecord('tra_application_invoices', $invoice_params, $user_id, '');
 
                 if ($res['success'] == false) {
                     return \response()->json($res);
@@ -5712,7 +5820,7 @@ class WorkflowController extends Controller
                     'exchange_rate' => $exchange_rate
                 );
 
-                $res = insertRecord('tra_invoice_details', $params, $user_id);
+                $res = insertRecord('tra_invoice_details', $params, $user_id, '');
 
                 $invoice_details = getInvoiceDetails($module_id, $application_id);
                 $params = array(
@@ -5773,7 +5881,7 @@ class WorkflowController extends Controller
             $process_id = $request->process_id;
             $user_id = $this->user_id;
             $table_name = 'tra_appdata_ammendementrequests';
-            $app_table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename');
+            $app_table_name = getSingleRecordColValue('par_modules', array('id' => $module_id), 'tablename', '');
             $app_details = getSingleRecord($app_table_name, array('application_code' => $application_code, 'id' => $application_id));
             if (is_null($app_details)) {
                 $res = array(
@@ -5792,8 +5900,8 @@ class WorkflowController extends Controller
                 $where_app = array('id' => $appdata_ammendementrequest_id);
                 $ammendment_requestdata['dola'] = Carbon::now();
                 $ammendment_requestdata['altered_by'] = $user_id;
-                if (recordExists($table_name, $where_app)) {
-                    $app_details = getPreviousRecords($table_name, $where_app);
+                if (recordExists($table_name, $where_app, '')) {
+                    $app_details = getPreviousRecords($table_name, $where_app, '');
                     if ($app_details['success'] == false) {
                         return $app_details;
                     }
@@ -5806,7 +5914,7 @@ class WorkflowController extends Controller
                 $ammendment_requestdata['created_on'] = Carbon::now();
                 $ammendment_requestdata['created_by'] = $user_id;
 
-                $res = insertRecord($table_name, $ammendment_requestdata, $user_id);
+                $res = insertRecord($table_name, $ammendment_requestdata, $user_id, '');
                 $appdata_ammendementrequest_id = $res['record_id'];
                 $submission_params = array(
                     'application_id' => $application_id,
@@ -5833,7 +5941,7 @@ class WorkflowController extends Controller
                     'appdata_ammendementrequest_id' => $appdata_ammendementrequest_id
                 );
 
-                $sub_res = insertRecord('tra_submissions', $submission_params, $user_id);
+                $sub_res = insertRecord('tra_submissions', $submission_params, $user_id, '');
             }
 
             if ($res['success']) {
@@ -6032,7 +6140,7 @@ class WorkflowController extends Controller
                         $table_data->app_id = $table_data->id;
                         unset($table_data->id);
                         $table_data = (array) $table_data;
-                        $res = insertRecord($cancellation_table_name, $table_data, $user_id);
+                        $res = insertRecord($cancellation_table_name, $table_data, $user_id, '');
                         if (!$res['success']) {
                             DB::rollBack();
                             return $res;
@@ -6050,7 +6158,7 @@ class WorkflowController extends Controller
                             'remarks' => $remarks,
                             'cancellation_status_id' => 1
                         );
-                        $res = insertRecord('tra_registrationcancellation_requests', $cancellation_request_data, $user_id);
+                        $res = insertRecord('tra_registrationcancellation_requests', $cancellation_request_data, $user_id, '');
 
                         if (!$res['success']) {
                             DB::rollBack();
@@ -6075,7 +6183,7 @@ class WorkflowController extends Controller
                             //$email = $applicant->email;
                             $vars = array(
                                 '{reference_no}' => $reference_no,
-                                '{cancellation_reason}' => getSingleRecordColValue('par_cancellation_reasons', array('id' => $cancellation_reason_id), 'name'),
+                                '{cancellation_reason}' => getSingleRecordColValue('par_cancellation_reasons', array('id' => $cancellation_reason_id), 'name', ''),
                                 '{requested_by}' => $requested_by,
                                 '{cancellation_date}' => Carbon::now()
                             );
@@ -6308,7 +6416,7 @@ class WorkflowController extends Controller
                         $data->id = $data->app_id;
                         unset($data->app_id);
                         $table_data = (array) $data;
-                        $res = insertRecord($table_name, $table_data, $user_id);
+                        $res = insertRecord($table_name, $table_data, $user_id, '');
                         if (!$res['success']) {
                             DB::rollBack();
                             return $res;
@@ -6395,7 +6503,7 @@ class WorkflowController extends Controller
             $workflow_stage_id = $request->input('workflow_stage_id');
             $is_auditor = $request->is_auditor;
             //get logs
-            $reg_premise_id = getSingleRecordColValue('tra_premises_applications', ['application_code', $application_code], 'reg_premise_id');
+            $reg_premise_id = getSingleRecordColValue('tra_premises_applications', ['application_code', $application_code], 'reg_premise_id', '');
             $application_codes = DB::table('tra_premises_applications')->where('reg_premise_id', $reg_premise_id)->select('application_code')->get();
             $app_codes = convertStdClassObjToArray($application_codes);
             $codes = convertAssArrayToSimpleArray($app_codes, 'application_code');
@@ -6594,7 +6702,7 @@ class WorkflowController extends Controller
             );
 
             //delete transitions
-            $res = deleteRecord('wf_workflow_transitions', $where);
+            $res = deleteRecord('wf_workflow_transitions', $where, $this->user_id, '');
             // if(!$res['success']){
             //     DB::rollback();
             //     return $res;
@@ -6604,26 +6712,26 @@ class WorkflowController extends Controller
             foreach ($stages as $stage) {
                 $stage_id = $stage->id;
                 //delete Actions
-                $res = deleteRecord('wf_workflow_actions', ['stage_id' => $stage_id]);
+                $res = deleteRecord('wf_workflow_actions', ['stage_id' => $stage_id], $this->user_id, '');
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
                 //delete stage to group mapping
-                $res = deleteRecord('wf_stages_groups', ['stage_id' => $stage_id]);
+                $res = deleteRecord('wf_stages_groups', ['stage_id' => $stage_id], $this->user_id, '');
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
                 //delete Stage
-                $res = deleteRecord('wf_workflow_stages', ['id' => $stage_id]);
+                $res = deleteRecord('wf_workflow_stages', ['id' => $stage_id], $this->user_id, '');
                 // if(!$res['success']){
                 //     DB::rollback();
                 //     return $res;
                 // }
             }
             //wf to menu mapping
-            $res = deleteRecord('wf_menu_workflows', $where);
+            $res = deleteRecord('wf_menu_workflows', $where, $this->user_id, '');
             // if(!$res['success']){
             //     DB::rollback();
             //     return $res;
@@ -6631,7 +6739,7 @@ class WorkflowController extends Controller
             //may delete processes inheriting the workflow
 
             //delete workflow
-            $res = deleteRecord('wf_workflows', ['id' => $workflow_id]);
+            $res = deleteRecord('wf_workflows', ['id' => $workflow_id], $this->user_id, '');
 
             if (!$res['success']) {
                 DB::rollback();

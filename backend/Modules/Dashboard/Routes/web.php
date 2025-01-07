@@ -25,5 +25,13 @@ Route::group(['prefix' => 'dashboard','middleware' => ['auth:api', 'web']], func
     Route::get('getExternalUserInTrayItems', 'DashboardController@getExternalUserInTrayItems');
     Route::get('getOnlineApplicationDashboard', 'DashboardController@getOnlineApplicationDashboard');
     Route::get('getQeuriedApplications', 'DashboardController@getQeuriedApplications');
+    Route::get('getUserAnalysis', [DashboardController::class, 'getUserAnalysis']);
+    Route::get('getUserStats', [DashboardController::class, 'getUserStats']);
+    Route::get('getDocumentAnalysis', [DashboardController::class, 'getDocumentAnalysis']);
+    Route::get('getTopTaskClearers', [DashboardController::class, 'getTopTaskClearers']);
+    Route::get('getTopClearers', [DashboardController::class, 'getTopClearers']);
+    Route::get('getDocumentStatistics', [DashboardController::class, 'getDocumentStatistics']);
+    Route::get('getDashboardStats', [DashboardController::class, 'getDashboardStats']);
+
     
 });

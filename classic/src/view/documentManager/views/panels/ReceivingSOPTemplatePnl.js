@@ -38,7 +38,14 @@ Ext.define('Admin.view.documentManager.views.panels.ReceivingSOPTemplatePnl',{
                     'color': 'green',
                     'font-weight': 'bold',
                     'font-size': '10px'
-                }
+                },
+                renderer: function (value) {
+                        if (!value) return '';
+                        const date = new Date(value);
+                        // Format date as YYYY/MM/DD
+                        const formattedDate = `${date.getFullYear()}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getDate().toString().padStart(2, '0')}`;
+                        return formattedDate;
+                    }
             },'->',  {
                 xtype: 'displayfield',
                 name: 'process_name',
@@ -142,7 +149,7 @@ Ext.define('Admin.view.documentManager.views.panels.ReceivingSOPTemplatePnl',{
             ],
         }, {
             xtype: 'soptemplategrid',
-            title: 'SOP Document Upload'
+            title: 'Template Document Upload'
         },
         {
             xtype: 'hiddenfield',
@@ -172,7 +179,7 @@ Ext.define('Admin.view.documentManager.views.panels.ReceivingSOPTemplatePnl',{
                     iconCls: 'fa fa-university',
                     enableToggle: true,
                     pressed: true,
-                    text: 'SOP Template Application Details',
+                    text: 'Template Application Details',
                     max_step:1,
                     action: 'quickNav', wizard: 'receivingsoptemplatepnl',
                     handler: 'quickNavigation'
@@ -181,7 +188,7 @@ Ext.define('Admin.view.documentManager.views.panels.ReceivingSOPTemplatePnl',{
                     iconCls: 'fa fa-product-hunt',
                     enableToggle: true,
                     max_step:1,
-                    text: 'SOP Document Upload',
+                    text: 'Template Document Upload',
                     action: 'quickNav', 
                     wizard: 'receivingsoptemplatepnl',
                     handler: 'quickNavigation'
@@ -226,7 +233,7 @@ Ext.define('Admin.view.documentManager.views.panels.ReceivingSOPTemplatePnl',{
                     wizard:'receivingsoptemplatepnl',
                     handler: 'onPrevCardClick'
                 },{
-                    text: 'Save SOP Details',
+                    text: 'Save Details',
                     ui: 'soft-blue',
                     iconCls: 'fa fa-save',
                     table_name: 'tra_documentmanager_application',

@@ -99,10 +99,35 @@
             }
         }
     },{
+        xtype: 'combo', anyMatch: true,
+        fieldLabel: 'Renewal Type',
+        margin: '0 20 20 0',
+        name: 'renewal_type_id',
+        valueField: 'id',
+        displayField: 'name',
+        forceSelection: true,
+        allowBlank: false,
+        queryMode: 'local',
+        listeners: {
+            afterrender: {
+                fn: 'setCompStore',
+                config: {
+                    pageSize: 10000,
+                    proxy: {
+                        extraParams: {
+                            table_name: 'qms_renewal_types'
+                        }
+                    }
+                },
+                isLoad: true
+            }
+        }
+    },{
         xtype: 'textfield',
         fieldLabel: 'Version',
         margin: '0 20 20 0',
-        name: 'doc_version'
+        name: 'doc_version',
+       // readOnly: true
     },{
             xtype: 'combo',
             queryMode: 'local',

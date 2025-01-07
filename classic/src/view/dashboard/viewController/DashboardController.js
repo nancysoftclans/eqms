@@ -14,6 +14,200 @@ Ext.define("Admin.view.dashboard.viewController.DashboardController", {
   onIntrayItemDblClick: function (view, record, item, index, e, eOpts) {
     this.fireEvent("viewApplicationDetails", record);
   },
+
+  clearDashboardFilter: function(btn){
+    const panel = btn.up('panel');
+    const chart = panel.down('cartesian');
+    const store = chart.getStore();
+    console.log(store);
+    
+    panel.down('[reference=yearFilter]').reset();
+    panel.down('[reference=monthFilter]').reset();
+    panel.down('[reference=dayFilter]').reset();
+    
+    store.getProxy().setExtraParams({
+      year: new Date().getFullYear() 
+    });
+    store.load();
+  },
+
+
+  DocumentChangeChartType: function(btn){
+    var chart = this.lookup('documentchart');
+    const series = chart.getSeries()[0];
+    var menuItem = btn;
+    //var yField = chart.getyField();
+    //console.log(yField);
+    const currentType = series.type;
+    chart.getSeries().forEach(function (s) {
+      chart.removeSeries(s);
+    });
+    if (currentType === 'line') {
+      chart.addSeries({
+          type: 'bar',
+          xField: 'day',
+          yField: 'total_documents',
+          style: {
+              fillStyle: '#35baf6',
+              opacity: 0.80,
+              minGapWidth: 10
+          },
+          
+        highlightCfg: {
+            strokeStyle: 'black',
+            radius: 10
+        },
+        label: {
+            field: 'total_documents',
+            display: 'insideEnd',
+            
+        },
+          tooltip: {
+            trackMouse: true,
+            renderer: function (tooltip, model, item) {
+                tooltip.setHtml(
+                    `Documents waiting review: ${model.get('total_documents')}`
+                );
+            }
+        }
+        
+      });
+      menuItem.setText('Line');
+  } else {
+      chart.addSeries({
+          type: 'line',
+          xField: 'day',
+          yField: 'total_documents',
+          smooth: true,
+          style: {
+              lineWidth: 2,
+              strokeStyle: '#999'
+          },
+          marker: {
+              radius: 4,
+              lineWidth: 2
+          },
+          highlight: {
+              fillStyle: '#000',
+              radius: 5,
+              lineWidth: 2,
+              strokeStyle: '#fff'
+          },
+          label: {
+            field: 'total_documents',
+            display: 'insideEnd',
+           
+        },
+          tooltip: {
+              renderer: function (tooltip, model) {
+                  tooltip.setHtml(
+                      `Documents waiting review: ${model.get('total_documents')}`
+                  );
+              }
+          }
+      });
+      menuItem.setText('Bar');
+      
+  }
+  chart.redraw();
+  
+  },
+
+
+
+  changeChartType: function (btn) {
+    var chart = this.lookup('chart');
+    const series = chart.getSeries()[0];
+    const currentType = series.type;
+
+    // Access the menu item that triggered the handler
+    var menuItem = btn;
+
+    // Remove existing series
+    chart.getSeries().forEach(function (s) {
+        chart.removeSeries(s);
+    });
+
+    // Add the new series based on the current type
+    if (currentType === 'line') {
+        chart.addSeries({
+            type: 'bar',
+            xField: 'date',
+            yField: 'uniqueUsers',
+            style: {
+              fillStyle: '#35baf6',
+              opacity: 0.80,
+              minGapWidth: 10
+          },
+          
+        highlightCfg: {
+            strokeStyle: 'black',
+            radius: 10
+        },
+        label: {
+            field: 'uniqueUsers',
+            display: 'insideEnd',
+           
+        },
+            tooltip: {
+                renderer: function (tooltip, model) {
+                    tooltip.setHtml(
+                        `Logged in Users: ${model.get('uniqueUsers')}`
+                    );
+                }
+            }
+        });
+        // Change the menu item text to 'Line'
+        menuItem.setText('Line');
+    } else {
+        chart.addSeries({
+            type: 'line',
+            xField: 'date',
+            yField: 'uniqueUsers',
+            smooth: true,
+            style: {
+                lineWidth: 2,
+                strokeStyle: '#999'
+            },
+            marker: {
+                radius: 4,
+                lineWidth: 2
+            },
+            highlight: {
+                fillStyle: '#000',
+                radius: 5,
+                lineWidth: 2,
+                strokeStyle: '#fff'
+            },
+            label: {
+              field: 'uniqueUsers',
+              display: 'insideEnd',
+             
+          },
+            tooltip: {
+                renderer: function (tooltip, model) {
+                    tooltip.setHtml(
+                        `Logged in Users: ${model.get('uniqueUsers')}`
+                    );
+                }
+            }
+        });
+        // Change the menu item text to 'Bar'
+        menuItem.setText('Bar');
+    }
+
+    // Redraw the chart to apply changes
+    chart.redraw();
+},
+
+
+
+  onPreview: function () {
+    
+    var chart = this.lookup('chart');
+    chart.preview();
+  },
+
   previewCorrespondence: function (btn) {
     var record = btn.getWidgetRecord(),
       store = btn.up("grid").getStore(),

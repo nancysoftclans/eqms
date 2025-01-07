@@ -37,7 +37,7 @@
         allowBlank: true
     }, {
         xtype: 'textfield',
-        fieldLabel: 'Name',
+        fieldLabel: 'Question',
         margin: '0 20 20 0',
         name: 'name',
         allowBlank: false
@@ -48,6 +48,12 @@
         name: 'order_no',
         allowBlank: false
     }, {
+        xtype: 'textfield',
+        fieldLabel: 'Code',
+        margin: '0 20 20 0',
+        name: 'code',
+        allowBlank: false
+    },{
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Checklist Category',
         margin: '0 20 20 0',
@@ -208,6 +214,7 @@
         valueField: 'id',
         displayField: 'name',
         forceSelection: true,
+        hidden: true,
         allowBlank: true,
         queryMode: 'local',
         listeners: {

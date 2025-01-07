@@ -121,7 +121,22 @@
     columns: [{
     xtype: 'gridcolumn',
     dataIndex: 'name',
-    text: 'Detail',
+    text: 'Question',
+    tdCls: 'wrap',  // Use the existing wrap class if needed
+    flex: 1.2,
+    filter: {
+        xtype: 'textfield'
+    },
+    renderer: function(value, metaData) {
+        // Apply text alignment and justification via metaData.style
+        metaData.style = 'text-align: justify;';  // Justify text alignment
+        return value;
+    }
+    },
+    {
+    xtype: 'gridcolumn',
+    dataIndex: 'code',
+    text: 'Code',
     tdCls: 'wrap',  // Use the existing wrap class if needed
     flex: 1.2,
     filter: {

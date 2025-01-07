@@ -34,6 +34,305 @@ class DashboardController extends Controller
     }
 
 
+
+    public function getDashboardStats()
+    {
+        try {
+            
+            
+            $qry = [];
+            // Total live documents: application_status_id == 4
+            $qry['documents_live'] = 
+                DB::table('tra_documentmanager_application')->where('application_status_id', 4)->count()+
+                DB::table('tra_auditsmanager_application')->where('application_status_id', 9)->count()+
+                DB::table('tra_issue_management_applications')->where('application_status_id', 4)->count();
+
+            // Total overdue documents: expected_end_date < current time
+            $qry['overdue_documents'] = DB::table('tra_submissions')
+                ->where('expected_end_date', '<', Carbon::now())
+                //->where('iscomplete', '0')
+                ->distinct('reference_no')
+                ->count();
+
+                
+            $qry['average_acknowledgment_time'] = DB::table('tra_submissions as t1')
+                ->join('tra_evaluation_recommendations as t2', 't1.application_code', '=', 't2.application_code')
+                ->select(DB::raw('ROUND(AVG(TIMESTAMPDIFF(SECOND, t1.created_on, now())), 0) as avg_time'))
+                ->where('t1.current_stage', 1)
+                ->value('avg_time');
+
+
+
+            // Overdue document tasks: expected_end-date < current time
+            $qry['overdue_document_tasks'] = DB::table('tra_submissions')
+                ->where('expected_end_date', '<', Carbon::now())
+                //->where('iscomplete', '=', '0')
+                ->where('module_id', '=', 26)
+                ->count();
+
+                //refused: sent back for review
+            $qry['rejected'] = DB::table('tra_evaluation_recommendations')
+                ->whereNotNull('application_code')
+                ->count();
+
+            // Issued document tasks: document module wheren usr_to exists 
+            $qry['issued_document_tasks'] = DB::table('tra_submissions')
+                ->whereNotNull('usr_to')
+                ->where('module_id', '=', 26)
+                ->count();
+
+            // Completed document tasks: doc module where released
+            $qry['completed_document_tasks'] = DB::table('tra_submissions')
+                ->where('date_released', '!=', '')
+                ->where('module_id', '=', 26)
+                ->count();
+
+            // where: released
+            $qry['completed_tasks'] = DB::table('tra_submissions')
+                ->where('date_released', '!=', '')
+                ->count();
+
+            // Upcoming document reviews: expected_start_date > now
+            $qry['upcoming_document_reviews'] = DB::table('tra_submissions')
+                ->where('expected_start_date', '>', Carbon::now())
+                ->count();
+
+            $qry['tasks_by_document'] = DB::table('tra_submissions')
+                ->where('module_id', '26')
+                ->count();
+            $qry['tasks_by_issue'] = DB::table('tra_submissions')
+                ->where('module_id', '28')
+                ->count();
+            $qry['tasks_by_audit'] = DB::table('tra_submissions')
+                ->where('module_id', '29')
+                ->count();
+            // Total tasks: all tasks complete & incomplete
+            $qry['total_tasks'] = DB::table('tra_submissions')->count();
+
+            $totalTasks = $qry['total_tasks'];
+            // Document analysis
+
+            //live documents
+            $qry['document_analysis'] = [
+                'released' => DB::table('tra_documentmanager_application')->where('application_status_id', '=', '4')->count() +
+                            DB::table('tra_issue_management_applications')->where('application_status_id', '=', 4)->count() +
+                            DB::table('tra_auditsmanager_application')->where('application_status_id', '=', 9)->count(),
+                'total_documents' => DB::table('tra_documentmanager_application')->whereNotNull('application_code')->count()+
+                            DB::table('tra_issue_management_applications')->whereNotNull('application_code')->count()+
+                            DB::table('tra_auditsmanager_application')->whereNotNull('application_code')->count(),
+                'percentage' => 0 
+            ];
+            if ($qry['document_analysis']['total_documents'] > 0) {
+                $qry['document_analysis']['percentage'] = round(
+                    ($qry['document_analysis']['released'] / $qry['document_analysis']['total_documents'])
+                );
+            }
+
+            // User log in stats: 
+            $qry['user_stats'] = [
+                'totalUsers' => DB::table('users')->count(),
+                //'loggedInToday' => DB::table('tra_login_logs')->whereDate('login_time', now()->toDateString())->distinct('user_id')->count('user_id'),
+                'activeLast30Days' => DB::table('tra_login_logs')->where('login_time', '>=', now()->subDays(30))->distinct('user_id')->count('user_id'),
+                'neverLoggedIn' => DB::table('users')->whereNotIn('id', function ($query) {
+                    $query->select('user_id')->from('tra_login_logs');
+                })->count(),
+                'loggedlasthour' => DB::table('tra_login_logs')
+                ->where('login_time', '>=', now()->subHour())
+                ->distinct('user_id')
+                ->count('user_id'),
+                'loggedInToday' => DB::table('tra_login_logs')
+                ->whereBetween('login_time', [now()->startOfDay(), now()->endOfDay()])
+                ->distinct('user_id')
+                ->count('user_id'),
+                'activeusers' => DB::table('users as t1')
+                ->leftJoin('tra_blocked_accounts as t6', 't1.id', '=', 't6.account_id')
+                ->select('t1.email')
+                ->whereNull('t6.id')
+                ->count(),
+                'groupswithusers' => DB::table('users as t1') 
+                ->distinct('t1.department_id')
+                ->whereNotNull('t1.department_id')
+                ->count('t1.department_id')
+            ];
+
+
+            return response()->json([
+                
+                    'success' => true,
+                    'data' => $qry
+                
+            ]);
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+        }
+        //return $res;
+    }
+
+
+
+    //get top 5 users
+    public function getTopClearers()
+    {
+        try{
+            $totalTasks = DB::table('tra_submissions')->count(); 
+
+            
+            if ($totalTasks === 0) {
+                return response()->json([]);
+            }
+            $qry = DB::table('tra_submissions')
+                ->join('users', 'tra_submissions.usr_to', '=', 'users.id')
+                ->select(
+                    DB::raw("decrypt(users.first_name) as user, decrypt(users.last_name) as last_name"),
+                    DB::raw('COUNT(tra_submissions.id) as tasks'), 
+                    DB::raw('(COUNT(tra_submissions.id) / '.$totalTasks.') as percentage'), 
+                    DB::raw('DATEDIFF(NOW(), MAX(tra_submissions.created_on)) as activity')
+                )
+                ->where('tra_submissions.date_released', '!=', '') 
+                ->groupBy('tra_submissions.usr_to', 'users.email') 
+                ->orderByDesc('tasks') 
+                ->limit(5)
+                ->get();
+                $results = convertStdClassObjToArray($qry);
+                $res = decryptArray($results);
+
+            return $res; 
+
+            
+            } catch (\Exception $exception) {
+                $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+    
+            } catch (\Throwable $throwable) {
+                $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),explode('\\', __CLASS__), \Auth::user()->id);
+            }
+    }
+
+
+    public function getDocumentAnalysis(Request $request)
+    {
+        try {
+            $year = $request->input('year');
+            $month = $request->input('month');
+            $day = $request->input('day');
+            
+    
+            
+            $filter = function ($query, $year, $month, $day) {
+
+                if ($year) {
+                    $query->whereYear('created_on', $year);
+                }
+                if ($month) {
+                    $monthNumber = date('m', strtotime($month));
+                    $query->whereMonth('created_on', $monthNumber);
+                }
+                if ($day) {
+                    $query->whereDate('created_on', $day);
+                }
+                return $query;
+            };
+    
+            $data = collect()
+                ->merge(
+                    $filter(
+                        DB::table('tra_documentmanager_application')
+                            ->selectRaw("DATE_FORMAT(created_on, '%Y-%m-%d') as day, COUNT(DISTINCT reference_no) as total_documents")
+                            ->where('application_status_id', '!=', '4')
+                            ->groupBy('day'),
+                        $year, $month, $day
+                    )->get()
+                )
+                ->merge(
+                    $filter(
+                        DB::table('tra_auditsmanager_application')
+                            ->selectRaw("DATE_FORMAT(created_on, '%Y-%m-%d') as day, COUNT(DISTINCT reference_no) as total_documents")
+                            ->where('application_status_id', '!=', '4')
+                            ->groupBy('day'),
+                        $year, $month, $day
+                    )->get()
+                )
+                ->merge(
+                    $filter(
+                        DB::table('tra_issue_management_applications')
+                            ->selectRaw("DATE_FORMAT(created_on, '%Y-%m-%d') as day, COUNT(DISTINCT reference_no) as total_documents")
+                            ->where('application_status_id', '!=', '4')
+                            ->groupBy('day'),
+                        $year, $month, $day
+                    )->get()
+                )
+                ->groupBy('day')
+                ->map(function ($items, $day) {
+                    return [
+                        'day' => $day,
+                        'total_documents' => $items->sum('total_documents'),
+                    ];
+                })
+                ->sortBy('day') 
+                ->values();
+    
+            return response()->json([
+                'success' => true,
+                'results' => $data,
+            ]);
+    
+        } catch (\Exception $exception) {
+            $res = sys_error_handler(
+                $exception->getMessage(),
+                2,
+                debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),
+                explode('\\', __CLASS__),
+                \Auth::user()->id
+            );
+        }
+    }
+
+
+    public function getUserAnalysis(Request $request)
+    {
+        try {
+            $year = $request->input('year');
+            $month = $request->input('month'); 
+            $day = $request->input('day');     
+
+            $query = DB::table('tra_login_logs')
+                ->select(
+                    DB::raw("DATE_FORMAT(created_on, '%Y-%m-%d') as date"), 
+                    DB::raw("COUNT(id) as totalLogins"),                 
+                    DB::raw("COUNT(DISTINCT user_id) as uniqueUsers")    
+                )
+                ->whereNotNull('login_time');
+
+            if ($year) {
+                $query->whereYear('created_on', $year);
+            }
+
+            if ($month) {
+                $query->whereMonth('created_on', $month);
+            }
+
+            if ($day) {
+                $query->whereDate('created_on', $day);
+            }
+
+            $data = $query->groupBy(DB::raw("DATE_FORMAT(created_on, '%b %Y')"))
+                ->orderBy(DB::raw("MIN(created_on)"), 'asc')
+                ->get();
+
+            return response()->json($data, 200);
+        } catch (\Exception $exception) {
+            $res = sys_error_handler(
+                $exception->getMessage(),
+                2,
+                debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),
+                explode('\\', __CLASS__),
+                \Auth::user()->id
+            );
+
+            return response()->json(['error' => $res], 500);
+        }
+    }
+
+
     public function getInTrayItems(Request $request)
     {
           $res  =$this->getUserIntrayDashboard($request,true);
@@ -113,7 +412,7 @@ class DashboardController extends Controller
                 ->leftJoin('par_sub_modules as t13', 't1.sub_module_id', '=', 't13.id')
                 ->select(DB::raw("t1.*, t1.current_stage as workflow_stage_id,t13.name as sub_module,  t1.application_id as active_application_id, t2.name as process_name,t4.is_receipting_stage,t1.application_status_id,
                     t3.name as prev_stage, if(t4.is_receipting_stage=1,concat(t4.name,' :',t5.name), t4.name ) as workflow_stage,t4.is_general,t5.name as application_status,t6.name as urgencyName,t6.name as urgency_name,
-                    CONCAT_WS(' ',decrypt(t7.first_name),decrypt(t7.last_name)) as from_user,CONCAT_WS(' ',decrypt(t8.first_name),decrypt(t8.last_name)) as to_user,
+                    t7.first_name as from_first_name, t7.last_name as from_last_name, t8.first_name as to_first_name, t8.last_name as to_last_name,
                      
                     if(t1.module_id= 2, t12.name , t9.name) as applicant_name,t12.name as premises_name, '' as sample_analysis_status"));
                 
@@ -183,7 +482,8 @@ class DashboardController extends Controller
             }
             //LIMS records 
            
-
+            $results = convertStdClassObjToArray($results);
+            $results = decryptArray($results);
             $res = array(
                 'success' => true,
                 'results' => $results,
@@ -250,7 +550,7 @@ class DashboardController extends Controller
                 ->leftJoin('wb_trader_account as t9', 't1.applicant_id', '=', 't9.id')
                 ->select(DB::raw("t1.*, t1.current_stage as workflow_stage_id, t1.application_id as active_application_id, t2.name as process_name,
                     t3.name as prev_stage, t4.name as workflow_stage,t5.name as application_status,t6.name as urgencyName,t6.name as urgency_name,
-                    CONCAT(decryptval(t7.first_name,".getDecryptFunParams()."),decryptval(t7.last_name,".getDecryptFunParams().")) as from_user,CONCAT(decryptval(t8.first_name,".getDecryptFunParams()."),decryptval(t8.last_name,".getDecryptFunParams().")) as to_user,
+                    t7.first_name as from_user,CONCAT(decryptval(t8.first_name,".getDecryptFunParams()."),decryptval(t8.last_name,".getDecryptFunParams().")) as to_user,
                     t9.name as applicant_name"))
                 ->where('isComplete', 0);
             if($is_internaluser){

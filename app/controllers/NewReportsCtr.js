@@ -39,7 +39,8 @@ Ext.define('Admin.controller.NewReportsCtr', {
                 // onReProductRegApplication: 'onReProductRegApplication',
                 // doSaveResearchFindings: 'doSaveResearchFindings'
                    generateDocumentPermit:'generateDocumentPermit',
-                   generateAuditReport: 'generateAuditReport'
+                   generateAuditReport: 'generateAuditReport',
+                   generateAuditReportWord: 'generateAuditReportWord'
             }
         }
     },
@@ -100,5 +101,11 @@ Ext.define('Admin.controller.NewReportsCtr', {
     generateAuditReport: function (application_code) {
         var action_url = 'reports/generateAuditReport?application_code=' + application_code;
         print_report(action_url);
+        
+},
+generateAuditReportWord: function (application_code) {
+    var action_url = 'reports/generateAuditReportWord?application_code=' + application_code;
+    print_report(action_url);
+    
 },
 });

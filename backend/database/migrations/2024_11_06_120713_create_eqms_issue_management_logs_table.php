@@ -29,7 +29,7 @@ class CreateEqmsIssueManagementLogsTable extends Migration
             $table->text('process_name')->nullable();
             $table->text('current_stage_name')->nullable();
             $table->integer('next_stage')->nullable();
-
+            $table->integer('responsible_user')->nullable();
             $table->timestamps();
         });
     }
