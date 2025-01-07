@@ -1,6 +1,6 @@
-Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
+Ext.define("Admin.view.gbt.views.grids.GbtReceivingPnl", {
   extend: "Ext.tab.Panel",
-  xtype: "issuereceivingpnl",
+  xtype: "gbtreceivingpnl",
   layout: {
     type: "fit",
   },
@@ -8,11 +8,11 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueReceivingPnl", {
     margin: 3,
   },
   viewModel: {
-    type: "issuemanagementvm",
+    type: "gbtplanvm",
   },
   items: [
     {
-      xtype: "issuemanagementfrm",
+      xtype: "gbtmanagementfrm",
       autoScroll: true,      
       title: "Details",
     },    

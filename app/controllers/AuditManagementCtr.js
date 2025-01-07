@@ -65,7 +65,7 @@ Ext.define('Admin.controller.AuditManagementCtr',{
 
         var me = this,
             mainTabPanel = me.getMainTabPanel(),
-            activeTab = mainTabPanel.getActiveTab(),
+            activeTab = mainTabPanel.getActiveTab();
             dashboardWrapper = activeTab.down("#auditManagementDashWrapperPnl"),
             module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
         

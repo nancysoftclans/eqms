@@ -3,6 +3,7 @@
 namespace Modules\Reports\Providers;
 
 use setasign\Fpdi\TcpdfFpdi;
+use PhpOffice\PhpWord\PhpWord;
 class AuditReportProvider extends TcpdfFpdi
 {
   public $params = array();
@@ -20,6 +21,7 @@ class AuditReportProvider extends TcpdfFpdi
         $this->tracking_no = $tracking_no;
         $this->issue_no = $issue_no;
     }
+
   function Header(){
 			 $this->setMargins(7, 50, 7, true);
    

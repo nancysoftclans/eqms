@@ -1,0 +1,170 @@
+Ext.define("Admin.view.gbt.views.grids.GbtManagementFrm", {
+  extend: "Ext.form.Panel",
+  xtype: "gbtmanagementfrm",
+  height: Ext.Element.getViewportHeight() - 118,
+  controller: "gbtMgmntVctr",
+  autoScroll: true,
+  viewModel: {
+    type: "gbtplanvm",
+  },
+  layout: {
+    type: "column",
+  },
+  bodyPadding: 8,
+  defaults: {
+    columnWidth: 0.5,
+    margin: 5,
+    labelAlign: "top",
+  },
+  frame: true,
+  items: [
+    {
+      xtype: "hiddenfield",
+      margin: "0 20 20 0",
+      name: "_token",
+      value: token,
+      allowBlank: true,
+    },
+    {
+      xtype: "hiddenfield",
+      fieldLabel: "id",
+      margin: "0 20 20 0",
+      name: "id",
+      allowBlank: true,
+    },
+    // {
+    //   xtype: "fieldset",
+    //   columnWidth: 1,
+    //   title: "Issue Details",
+    //   collapsible: true,
+    //   defaults: {
+    //     labelAlign: "top",
+    //     allowBlank: false,
+    //     labelAlign: "top",
+    //     margin: 5,
+    //     xtype: "textfield",
+    //     allowBlank: false,
+    //     columnWidth: 0.5,
+    //   },
+    //   layout: "column",
+    // items: [
+    // {
+    //   xtype: "combo",
+    //   anyMatch: true,
+    //   fieldLabel: "<strong>Issue Type</strong>",
+    //   margin: "0 20 20 0",
+    //   name: "issue_type_id",
+    //   valueField: "id",
+    //   displayField: "title",
+    //   forceSelection: true,
+    //   allowBlank: false,
+    //   readOnly: true,
+    //   queryMode: "local",
+    //   listeners: {
+    //     afterrender: {
+    //       fn: "setCompStore",
+    //       config: {
+    //         pageSize: 10000,
+    //         proxy: {
+    //           extraParams: {
+    //             table_name: "par_issue_types",
+    //           },
+    //         },
+    //       },
+    //       isLoad: true,
+    //     },
+    //   },
+    // },
+    // {
+    //   xtype: "datefield",
+    //   fieldLabel: "<strong>Creation Date</strong>",
+    //   margin: "0 20 20 0",
+    //   name: "creation_date",
+    //   format: "d M Y",
+    //   readOnly: true,
+    // },
+    // {
+    //   xtype: "textfield",
+    //   fieldLabel: "<strong>Title</strong>",
+    //   margin: "0 20 20 0",
+    //   name: "title",
+    //   columnWidth: 1,
+    //   allowBlank: false,
+    // },
+    // {
+    //   xtype: "textarea",
+    //   fieldLabel: "<strong>Description</strong>",
+    //   margin: "0 20 20 0",
+    //   name: "description",
+    //   columnWidth: 1,
+    //   allowBlank: false,
+    // },
+    // {
+    //   xtype: "combo",
+    //   anyMatch: true,
+    //   fieldLabel: "<strong>Status</strong>",
+    //   margin: "0 20 20 0",
+    //   name: "issue_status_id",
+    //   valueField: "id",
+    //   displayField: "name",
+    //   forceSelection: true,
+    //   allowBlank: false,
+    //   readOnly: true,
+    //   queryMode: "local",
+    //   listeners: {
+    //     afterrender: {
+    //       fn: "setCompStore",
+    //       config: {
+    //         pageSize: 10000,
+    //         proxy: {
+    //           extraParams: {
+    //             table_name: "par_issue_statuses",
+    //           },
+    //         },
+    //       },
+    //       isLoad: true,
+    //     },
+    //   },
+    // },
+    // {
+    //   xtype: "datefield",
+    //   fieldLabel: "<strong>Target Resolution Date</strong>",
+    //   margin: "0 20 20 0",
+    //   name: "target_resolution_date",
+    //   format: "d M Y",
+    // },
+    // {
+    //   xtype: "tagfield",
+    //   fieldLabel: "<strong>Organisational Areas</strong>",
+    //   margin: "0 20 20 0",
+    //   name: "section_ids",
+    //   allowBlank: true,
+    //   // forceSelection: true,
+    //   filterPickList: true,
+    //   encodeSubmitValue: true,
+    //   emptyText: "Select",
+    //   growMax: 100,
+    //   queryMode: "local",
+    //   valueField: "id",
+    //   displayField: "name",
+    //   columnWidth: 1,
+    //   listeners: {
+    //     beforerender: {
+    //       fn: "setWorkflowCombosStore",
+    //       config: {
+    //         pageSize: 1000,
+    //         proxy: {
+    //           url: "configurations/getConfigParamFromTable",
+    //           extraParams: {
+    //             table_name: "par_departments",
+    //           },
+    //         },
+    //       },
+    //       isLoad: true,
+    //     },
+    //   },
+    // },
+    // ],
+    // },
+  ],
+});

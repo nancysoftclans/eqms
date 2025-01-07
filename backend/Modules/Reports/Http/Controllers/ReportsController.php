@@ -1,23 +1,24 @@
 <?php
 namespace Modules\Reports\Http\Controllers;
+use PDF;
+use DateTime;
+use Carbon\Carbon;
+use \Mpdf\Mpdf as mPDF;
 use Illuminate\Http\Request;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
-use PDF;
-use Carbon\Carbon;
-use Symfony\Component\HttpFoundation\StreamedResponse;
+
+use PhpOffice\PhpWord\Shared\Converter;
+use Modules\Reports\Traits\ReportsTrait;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-
 use Modules\Reports\Providers\PdfProvider;
 use Modules\Reports\Providers\PdfLettersProvider;
 use Modules\Reports\Providers\AuditReportProvider;
-use Modules\Reports\Traits\ReportsTrait;
-use \Mpdf\Mpdf as mPDF;
-use DateTime;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\IOFactory;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 
 class ReportsController extends Controller
@@ -10006,7 +10007,8 @@ public function generateAuditReportWord(Request $req)
         $phpWord = new \PhpOffice\PhpWord\PhpWord();
 
         // Adding a section
-        $section = $phpWord->addSection();
+        $section = $phpWord->addSection(array('marginLeft' => 600, 'marginRight' => 600,
+		'marginTop' => 600, 'marginBottom' => 600));
 		$tableStyle = [
 			            'borderSize' => 6, 
 			            'borderColor' => '999999', 
@@ -10014,64 +10016,63 @@ public function generateAuditReportWord(Request $req)
 			        ];
 		$cellStyle = ['valign' => 'center'];
 		$headerCellStyle = ['bgColor' => 'd3d3d3', 'valign' => 'center'];
-
-
-		
 		$header = $section->addHeader();
 		$headerTable = $header->addTable([
 			'width' => 100,  
 			'unit' => 'pct'       
 		]);
 
-		//logo row
-		$headerTable->addRow();
+				//  logo
+		$headerTable->addRow();  
 		$headerTable->addCell(2000, ['align' => 'left'])->addText(
-			'',
+			'', 
 			['bold' => true, 'size' => 10],
 			['align' => 'left']
 		);
 
 		$centerCell = $headerTable->addCell(6000, ['align' => 'center']);
 		$centerCell->addImage(getcwd() . '/resources/images/logo.jpg', [
-			'width' => 120,     
-			//'height' => 50,   
-			'align' => 'center'
+			'width' => 90,
+			'align' => 'center' 
 		]);
+		$headerTable->addCell(2000, ['align' => 'right'])->addText(
+			'', 
+			['bold' => true, 'size' => 10],
+			['align' => 'right']
+		);
+	
+		$headerTable->addRow(); 
+		$headerTable->addCell(3000, ['align' => 'left'])->addText(
+			'BOMRA/QM/PO3/F02',
+			['bold' => true, 'size' => 11],
+			['align' => 'left']
+		);
+
+		$centerCell = $headerTable->addCell(6000, ['align' => 'center']);
 		$centerCell->addText(
 			'Botswana Medicines Regulatory Authority',
-			['bold' => true, 'size' => 12],
+			['bold' => true, 'size' => 11],
 			['align' => 'center']
 		);
 		$centerCell->addText(
 			'Internal Audit Report',
-			['bold' => true, 'size' => 12],
+			['bold' => true, 'size' => 11, 'marginTop' => 0],
 			['align' => 'center']
 		);
 
-		$headerTable->addCell(2000, ['align' => 'right'])->addText(
-			'',
-			['bold' => true, 'size' => 10],
-			['align' => 'right']
-		);
-
-		$headerTable->addRow();
-
-		$headerTable->addCell(3000, ['align' => 'left'])->addText(
-			'BOMRA/QM/PO3/F02',
-			['bold' => true, 'size' => 10],
-			['align' => 'left']
-		);
-
-		
-		$centerCell = $headerTable->addCell(6000, ['align' => 'center']);
-		// Right column: Issue Number
 		$headerTable->addCell(2000, ['align' => 'right'])->addText(
 			'Issue No. 2.0',
 			['bold' => true, 'size' => 10],
 			['align' => 'right']
 		);
 
-		//add footer wiht the date and prvided format
+		$headerTable->addRow();  
+		$headerTable->addCell(2000, ['align' => 'left']);;
+		$centerCell = $headerTable->addCell(6000, ['align' => 'center']);
+		$headerTable->addCell(2000, ['align' => 'right']);
+
+
+		//add footer wiht the date and provided format
 		// footer section
 		$footer = $section->addFooter();
 		$footerTable = $footer->addTable([
@@ -10083,9 +10084,6 @@ public function generateAuditReportWord(Request $req)
 		$footerTable->addCell(5000)->addPreserveText('10-11-2022', ['size' => 10], ['alignment' => 'left']);
 		$footerTable->addCell(5000)->addPreserveText('Page {PAGE} of {NUMPAGES}', ['size' => 10], ['alignment' => 'right']);
 
-
-
-        $section->addTextBreak(2);
 
         // table style
         $tableStyle = [
@@ -10154,34 +10152,52 @@ public function generateAuditReportWord(Request $req)
 
 		//questionnaire
 		$section->addTextBreak(1);
-		$section->addText("Questionnaire",['bold' => true]);
+		$section->addText("Questionnaire",['bold' => true, 'size' => 18]);
+		$lineStyle = array('weight' => 1,'width' => 535, 'height' => 0, 'color' =>'');
+		$section->addLine($lineStyle);
 
 		foreach ($question_records as $questionRecord) {
 
 			$table = $section->addTable('AuditTable');
 
 			$table->addRow();
-			$cell = $table->addCell(12000, ['gridSpan' => 2, 'bgColor' => 'd3d3d3']); // Merges two columns
+			$cell = $table->addCell(12000, ['gridSpan' => 2, 'bgColor' => 'd3d3d3']); 
 			$cell->addText($questionRecord['name'], ['bold' => true]);
 
-			$table->addRow();
-			$table->addCell(3000, $headerCellStyle)->addText("Status", ['bold' => true]);
-			$table->addCell(6000)->addText($questionRecord['pass_status'], ['bold' => false]);
+			// $table->addRow();
+			// $table->addCell(3000, $headerCellStyle)->addText("Status", ['bold' => true]);
+			// $table->addCell(6000)->addText($questionRecord['pass_status'], ['bold' => false]);
+			$table->addRow(); // 
+			$cell = $table->addCell(12000, ['gridSpan' => 2, 'bgColor' => '']); 
+			$cell->addText($questionRecord['pass_status'], ['bold' => false]);
+			
 
 			$table->addRow();
-			$table->addCell(3000, $headerCellStyle)->addText("Comments Notes", ['bold' => true]);
-			$table->addCell(6000)->addText($questionRecord['comment'], ['bold' => false]);
+			$cell = $table->addCell(12000, ['gridSpan' => 2, 'bgColor' => 'd3d3d3']); 
+			$cell->addText('Note', ['bold' => true]);
+			
 
 			$table->addRow();
-			$table->addCell(3000, $headerCellStyle)->addText("Evidence", ['bold' => true]);
-			$table->addCell(6000)->addText($questionRecord['evidence_files'], ['bold' => false]);
+			$cell = $table->addCell(12000, ['gridSpan' => 2, 'bgColor' => '']); 
+			$cell->addText($questionRecord['comment'], ['bold' => false]);
+			$cell->addText('');
+
+			$table->addRow();
+			$cell = $table->addCell(12000, ['gridSpan' => 2, 'bgColor' => 'd3d3d3']); 
+			$cell->addText('Evidence', ['bold' => true]);
+
+			$table->addRow();
+			$cell = $table->addCell(12000, ['gridSpan' => 2, 'bgColor' => '']); 
+			$cell->addText($questionRecord['evidence_files'], ['bold' => false]);
+			$cell->addText('');
 			$section->addTextBreak(1);
 		}
 
 
 		$section->addTextBreak(1);
 		//findings
-		$section->addText("Findings", ['bold' => true, 'size' => 12]);
+		$section->addText("Findings", ['bold' => true, 'size' => 18]);
+		$section->addLine($lineStyle);
 		$totalFindings = $findings[0]['total_findings']; 
 		$section->addText("Total findings: $totalFindings", ['size' => 12]);
 
@@ -10249,6 +10265,7 @@ public function generateAuditReportWord(Request $req)
 
         	$section->addTextBreak(1);
 		}
+		$section->addTextBreak(2);
 
         // Save the file
         $fileName = "Audit_Report_" . $application_code . ".docx";

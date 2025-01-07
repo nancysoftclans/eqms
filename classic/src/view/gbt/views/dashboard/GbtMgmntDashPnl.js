@@ -1,11 +1,11 @@
-Ext.define('Admin.view.gbt.views.dashboard.GbtDashPnl',{ 
+Ext.define('Admin.view.QMS.gbt.views.dashboard.GbtMgmntDashPnl',{ 
     extend: 'Ext.Container',
-    xtype: 'gbtDashPnl',
+    xtype: 'gbtMgmntDashPnl',
     layout: 'border',
 
     items: [
         {
-            xtype: 'gbtGrid',
+            xtype: 'gbtMgmntGrid',
             region: 'center',
             // title: 'Active Tasks',
             margin: 2,
