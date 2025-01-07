@@ -9872,68 +9872,41 @@ public function generateAuditReportWord(Request $req)
     try {
         $application_code = $req->input('application_code');
 
-        // Fetch audit records
-        $audit_records = DB::table('tra_auditsmanager_application as t1')
-            ->join('par_qms_audit_types as t7', 't1.audit_type_id', 't7.id')
-            ->join('users as t8', 't1.applicant_id', 't8.id')
-            ->join('par_system_statuses as t9', 't1.application_status_id', 't9.id')
-            ->select(
-                DB::raw("decrypt(t8.first_name) as first_name, decrypt(t8.last_name) as last_name"), 't1.audit_id', 't1.function_audited', 't1.audit_criteria', 't1.additional_auditor', 't1.audit_standard', 't1.audit_objectives',
-                't1.application_code', 't1.audit_reference', 
-                't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't1.audit_summary', 
-                't7.name as audit_type', 't9.name as status'
-            )
-            ->where('t1.application_code', $application_code)
-            ->get();
-
-        $records = convertStdClassObjToArray($audit_records);
-        $records = decryptArray($records);
-
-		$question_records = DB::table('tra_checklistitems_responses as t1')
-				->leftJoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-				->leftJoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')
-				->leftJoin('par_checklist_status as t4', 't1.pass_status', 't4.id')
-				->leftJoin('tra_application_documents as t5', 't1.checklist_item_id', '=', 't5.checklist_item_id')
-				->leftJoin('tra_application_uploadeddocuments as t6', function ($join) use ($application_code) {
-					$join->on('t5.id', '=', 't6.application_document_id')
-						->where('t6.application_code', '=', $application_code);
-				})
+        // Query to fetch the records
+			$audit_records = DB::table('tra_auditsmanager_application as t1')
+				->join('par_qms_audit_types as t7', 't1.audit_type_id', 't7.id')
+				->join('users as t8', 't1.applicant_id', 't8.id')
+				->join('par_system_statuses as t9', 't1.application_status_id', 't9.id')
+			// ->join('tra_issue_management_related_issues as t13', 't11.id', 't13.related_id')
 				->select(
-					't2.application_code',
-					't2.tracking_no as audit_id',
-					't2.audit_reference',
-					't2.audit_title',
-					't2.audit_start_date',
-					't2.audit_end_date',
-					't3.name',
-					't4.name as pass_status',
-					't1.comment', // Assuming questions are stored in `par_checklist_items`
-					DB::raw("GROUP_CONCAT(t6.initial_file_name SEPARATOR ', ') as evidence_files") // Combine evidence files for each question
-				)
+					DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"), 't1.audit_id', 't1.function_audited', 't1.audit_criteria', 't1.additional_auditor', 't1.audit_standard', 't1.audit_objectives',
+						't1.application_code', 't1.audit_reference', 't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't1.audit_summary', 't7.name as audit_type', 't9.name as status')  	
 				->where('t1.application_code', $application_code)
-				->groupBy('t1.checklist_item_id')
 				->get();
-			
-			$question_records = convertStdClassObjToArray($question_records);
-			$question_records = decryptArray($question_records);
 
-        // Fetch status records
-        $status_records = DB::table('tra_checklistitems_responses as t1')
-            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-            ->join('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')
-            ->leftJoin('par_checklist_status as t4', function ($join) {
-                $join->on('t1.pass_status', '=', 't4.id')
-                    ->where('t1.checklist_item_id', '=', 't3.id');
-            }) 
-            ->select('t1.pass_status')
-            ->where('t1.application_code', $application_code)
-            ->get();
+			// Convert the result into an array
+			$records = convertStdClassObjToArray($audit_records);
+			$records = decryptArray($records);
 
-        $status_records = convertStdClassObjToArray($status_records);
-        $status_records = decryptArray($status_records);
 
-        // Fetch comment records
-        $comment_records = DB::table('tra_checklistitems_responses as t1')
+			$status_records = DB::table('tra_checklistitems_responses as t1')
+				->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+				->join('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')      
+				->leftJoin('par_checklist_status as t4', function ($join) {
+						$join->on('t1.pass_status', '=', 't4.id')
+							->where('t1.checklist_item_id', '=', 't3.id');
+					}) 
+				->select(
+						't1.pass_status', 't3.name')  	
+				->where('t1.application_code', $application_code)
+				->get();
+
+				$status_records = convertStdClassObjToArray($status_records);
+				$status_records = decryptArray($status_records);
+				
+
+		
+			$comment_records = DB::table('tra_checklistitems_responses as t1')
 							->leftJoin('tra_auditsmanager_application as t2', 't1.application_code', '=', 't2.application_code')
 							->leftJoin('par_checklist_items as t3', 't1.checklist_item_id', '=', 't3.id')
 							->select(DB::raw("
@@ -9951,36 +9924,65 @@ public function generateAuditReportWord(Request $req)
 
 						$comment_records = convertStdClassObjToArray($comment_records);
 						$comment_records = decryptArray($comment_records);
+						
+						
+						
+			$question_records = DB::table('tra_checklistitems_responses as t1')
+				->leftJoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+				->leftJoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')
+				->leftJoin('par_checklist_status as t4', 't1.pass_status', 't4.id')
+				->leftJoin('tra_application_documents as t5', 't1.checklist_item_id', '=', 't5.checklist_item_id')
+				->leftJoin('tra_application_uploadeddocuments as t6', function ($join) use ($application_code) {
+					$join->on('t5.id', '=', 't6.application_document_id')
+						->where('t6.application_code', '=', $application_code);
+				})
+				->select(DB::raw("
+					GROUP_CONCAT(t2.application_code) as application_code,
+					GROUP_CONCAT(t2.audit_reference) as audit_reference,
+					GROUP_CONCAT(t2.audit_title) as audit_title,
+					GROUP_CONCAT(t2.audit_start_date) as audit_start_date,
+					GROUP_CONCAT(t2.audit_end_date) as audit_end_date,
+					GROUP_CONCAT(t3.name) as name,
+					GROUP_CONCAT(t4.name) as pass_status,
+					GROUP_CONCAT(t1.comment) as comment
+					"),
+					DB::raw("GROUP_CONCAT(t6.initial_file_name SEPARATOR ', ') as evidence_files") // Combine evidence files for each question
+				)
+				->where('t1.application_code', $application_code)
+				->groupBy('t1.checklist_item_id')
+				->get();
+			
+			$question_records = convertStdClassObjToArray($question_records);
+			$question_records = decryptArray($question_records);			
+				
+			
+			
+			$evidence_records = DB::table('tra_application_documents as t1')
+								->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+								->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
+								->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code){
+										$join->on('t1.id', '=', 't4.application_document_id')
+											->where('t4.application_code', '=', $application_code);
+									}) 
+								->select(DB::raw("GROUP_CONCAT(t4.initial_file_name) as initial_file_name "))  	
+								->where('t1.application_code', $application_code)
+								->whereNotNull('t1.checklist_item_id')
+								->groupBy('t1.checklist_item_id')
+								->get();
 
-
-
-        // Fetch evidence records
-        $evidence_records = DB::table('tra_application_documents as t1')
-            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-            ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
-            ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code){
-                    $join->on('t1.id', '=', 't4.application_document_id')
-                        ->where('t4.application_code', '=', $application_code);
-                }) 
-            ->select(DB::raw("GROUP_CONCAT(t4.initial_file_name) as initial_file_name "))  	
-            ->where('t1.application_code', $application_code)
-            ->whereNotNull('t1.checklist_item_id')
-            ->groupBy('t1.checklist_item_id')
-            ->get();
-
-        $evidence_records = convertStdClassObjToArray($evidence_records);
-        $evidence_records = decryptArray($evidence_records);
+							$evidence_records = convertStdClassObjToArray($evidence_records);
+							$evidence_records = decryptArray($evidence_records);
 
         // Fetch findings
         $findings = DB::table('par_audit_findings as t1')
-            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-            ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
-            ->select(DB::raw('COUNT(t1.id) as total_findings'))  
-            ->where('t1.application_code', $application_code)
-            ->get();
+					->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+					->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
+					->select(DB::raw('COUNT(t1.id) as total_findings'))  
+					->where('t1.application_code', $application_code)
+					->get();
 
-        $findings = convertStdClassObjToArray($findings);
-        $findings = decryptArray($findings);
+				$findings = convertStdClassObjToArray($findings);
+				$findings = decryptArray($findings);
 
         // Fetch issues raised against findings
         $issue_raised_against_findings_record = DB::table('par_audit_findings as t1')
@@ -10310,22 +10312,31 @@ public function generateAuditReportWord(Request $req)
 
 				$status_records = convertStdClassObjToArray($status_records);
 				$status_records = decryptArray($status_records);
+				
 
 		
 			$comment_records = DB::table('tra_checklistitems_responses as t1')
-				->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-				->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')   
-				->select(
-						't2.application_code', 't2.tracking_no as audit_id', 't2.audit_reference', 't2.audit_title', 't2.audit_start_date', 't2.audit_end_date', 't1.comment')  	
-				->where('t1.application_code', $application_code)
-				->groupBy('t1.checklist_item_id')
-				->get();
+							->leftJoin('tra_auditsmanager_application as t2', 't1.application_code', '=', 't2.application_code')
+							->leftJoin('par_checklist_items as t3', 't1.checklist_item_id', '=', 't3.id')
+							->select(DB::raw("
+								GROUP_CONCAT(t2.application_code) as application_codes, 
+								GROUP_CONCAT(t2.tracking_no) as audit_ids, 
+								GROUP_CONCAT(t2.audit_reference) as audit_references, 
+								GROUP_CONCAT(DISTINCT t2.audit_title) as audit_titles, 
+								GROUP_CONCAT(DISTINCT t2.audit_start_date) as audit_start_dates, 
+								GROUP_CONCAT(DISTINCT t2.audit_end_date) as audit_end_dates, 
+								GROUP_CONCAT(t1.comment) as comments
+							"))
+							->where('t1.application_code', $application_code)
+							->groupBy('t1.checklist_item_id')
+							->get();
 
-				$comment_records = convertStdClassObjToArray($comment_records);
-				$comment_records = decryptArray($comment_records);
-			
-			
-				$question_records = DB::table('tra_checklistitems_responses as t1')
+						$comment_records = convertStdClassObjToArray($comment_records);
+						$comment_records = decryptArray($comment_records);
+						
+						
+						
+			$question_records = DB::table('tra_checklistitems_responses as t1')
 				->leftJoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
 				->leftJoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')
 				->leftJoin('par_checklist_status as t4', 't1.pass_status', 't4.id')
@@ -10334,58 +10345,56 @@ public function generateAuditReportWord(Request $req)
 					$join->on('t5.id', '=', 't6.application_document_id')
 						->where('t6.application_code', '=', $application_code);
 				})
-				->select(
-					't2.application_code',
-					't2.tracking_no as audit_id',
-					't2.audit_reference',
-					't2.audit_title',
-					't2.audit_start_date',
-					't2.audit_end_date',
-					't3.name',
-					't4.name as pass_status',
-					't1.comment',
-					't6.initial_file_name as evidence_files' // Assuming questions are stored in `par_checklist_items`
-					//DB::raw("GROUP_CONCAT(t6.initial_file_name SEPARATOR ', ') as evidence_files") // Combine evidence files for each question
+				->select(DB::raw("
+					GROUP_CONCAT(t2.application_code) as application_code,
+					GROUP_CONCAT(t2.audit_reference) as audit_reference,
+					GROUP_CONCAT(t2.audit_title) as audit_title,
+					GROUP_CONCAT(t2.audit_start_date) as audit_start_date,
+					GROUP_CONCAT(t2.audit_end_date) as audit_end_date,
+					GROUP_CONCAT(t3.name) as name,
+					GROUP_CONCAT(t4.name) as pass_status,
+					GROUP_CONCAT(t1.comment) as comment
+					"),
+					DB::raw("GROUP_CONCAT(t6.initial_file_name SEPARATOR ', ') as evidence_files") // Combine evidence files for each question
 				)
 				->where('t1.application_code', $application_code)
 				->groupBy('t1.checklist_item_id')
 				->get();
 			
 			$question_records = convertStdClassObjToArray($question_records);
-			$question_records = decryptArray($question_records);
+			$question_records = decryptArray($question_records);			
+				
 			
-
-
+			
 			$evidence_records = DB::table('tra_application_documents as t1')
-				->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-				->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
-				->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code){
-						$join->on('t1.id', '=', 't4.application_document_id')
-							->where('t4.application_code', '=', $application_code);
-					}) 
-				->select(
-						't4.initial_file_name')  	
-				->where('t1.application_code', $application_code)
-				->whereNotNull('t1.checklist_item_id')
-				->groupBy('t1.checklist_item_id')
-				->get();
+								->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+								->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
+								->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code){
+										$join->on('t1.id', '=', 't4.application_document_id')
+											->where('t4.application_code', '=', $application_code);
+									}) 
+								->select(DB::raw("GROUP_CONCAT(t4.initial_file_name) as initial_file_name "))  	
+								->where('t1.application_code', $application_code)
+								->whereNotNull('t1.checklist_item_id')
+								->groupBy('t1.checklist_item_id')
+								->get();
 
-				$evidence_records = convertStdClassObjToArray($evidence_records);
-				$evidence_records = decryptArray($evidence_records);
+							$evidence_records = convertStdClassObjToArray($evidence_records);
+							$evidence_records = decryptArray($evidence_records);
 
-			$findings = DB::table('par_audit_findings as t1')
-				->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-				->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
-				->select(
-						DB::raw('COUNT(t1.id) as total_findings'))	
-				->where('t1.application_code', $application_code)
-				->get();
+        // Fetch findings
+        $findings = DB::table('par_audit_findings as t1')
+					->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
+					->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
+					->select(DB::raw('COUNT(t1.id) as total_findings'))  
+					->where('t1.application_code', $application_code)
+					->get();
 
 				$findings = convertStdClassObjToArray($findings);
 				$findings = decryptArray($findings);
 
-
-			$issue_raised_against_findings_record = DB::table('par_audit_findings as t1')
+        // Fetch issues raised against findings
+        $issue_raised_against_findings_record = DB::table('par_audit_findings as t1')
 				->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
 				->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
 				->leftjoin('tra_issue_management_applications as t4', 't1.issue_id', 't4.id') 
@@ -10394,7 +10403,7 @@ public function generateAuditReportWord(Request $req)
 				->leftJoin('par_issue_types as t7', 't4.issue_type_id', 't7.id')
 				->leftjoin('users as t8', 't4.created_by', 't8.id')
 				->leftJoin('par_issue_statuses as t9', 't4.application_status_id', 't9.id')
-				->select('t1.results','t1.id as finding_id', 't1.finding_title', 't2.created_on', 't2.dola as completed_on', 't2.audit_summary as description',  't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
+				->select('t1.results','t1.id as finding_id', 't1.finding_title', 't2.created_on', 't2.dola as completed_on', 't2.audit_summary as description', 't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
 					DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"), 't9.title as issue_status')	
 				->where('t1.application_code', $application_code)
 				->get();
