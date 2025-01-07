@@ -916,7 +916,6 @@ class AuditManagementController extends Controller
                 $res = insertRecord($table_name, $table_data);
 
 
-
                 if($res['success'] == false) {
 
                     DB::rollBack();

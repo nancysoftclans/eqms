@@ -9878,8 +9878,8 @@ public function generateAuditReportWord(Request $req)
             ->join('users as t8', 't1.applicant_id', 't8.id')
             ->join('par_system_statuses as t9', 't1.application_status_id', 't9.id')
             ->select(
-                DB::raw("decrypt(t8.first_name) as first_name, decrypt(t8.last_name) as last_name"),
-                't1.application_code', 't1.tracking_no as audit_id', 't1.audit_reference', 
+                DB::raw("decrypt(t8.first_name) as first_name, decrypt(t8.last_name) as last_name"), 't1.audit_id', 't1.function_audited', 't1.audit_criteria', 't1.additional_auditor', 't1.audit_standard', 't1.audit_objectives',
+                't1.application_code', 't1.audit_reference', 
                 't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't1.audit_summary', 
                 't7.name as audit_type', 't9.name as status'
             )
@@ -9992,7 +9992,7 @@ public function generateAuditReportWord(Request $req)
 				->leftJoin('par_issue_types as t7', 't4.issue_type_id', 't7.id')
 				->leftjoin('users as t8', 't4.created_by', 't8.id')
 				->leftJoin('par_issue_statuses as t9', 't4.application_status_id', 't9.id')
-				->select('t1.id as finding_id', 't1.finding_title', 't2.created_on', 't2.dola as completed_on', 't2.audit_summary as description', 't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
+				->select('t1.results','t1.id as finding_id', 't1.finding_title', 't2.created_on', 't2.dola as completed_on', 't2.audit_summary as description', 't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
 					DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"), 't9.title as issue_status')	
 				->where('t1.application_code', $application_code)
 				->get();
@@ -10073,7 +10073,7 @@ public function generateAuditReportWord(Request $req)
 		$centerCell = $headerTable->addCell(6000, ['align' => 'center']);
 		// Right column: Issue Number
 		$headerTable->addCell(2000, ['align' => 'right'])->addText(
-			'Issue No. 26',
+			'Issue No. 2.0',
 			['bold' => true, 'size' => 10],
 			['align' => 'right']
 		);
@@ -10143,18 +10143,18 @@ public function generateAuditReportWord(Request $req)
 		$table = $section->addTable('AuditTable');
 		$table->addRow();
         $table->addCell(6000, $headerCellStyle)->addText("Function Audited", ['bold' => true]);
-        $table->addCell(6000)->addText("");
+        $table->addCell(6000)->addText($record['function_audited']);
         $table->addCell(6000, $headerCellStyle)->addText("Audit Standard", ['bold' => true]);
-        $table->addCell(6000)->addText("");
+        $table->addCell(6000)->addText($record['audit_standard']);
 		$table->addRow();
         $table->addCell(6000, $headerCellStyle)->addText("Audit Criteria", ['bold' => true]);
-        $table->addCell(6000)->addText("");
+        $table->addCell(6000)->addText($record['audit_criteria']);
         $table->addCell(6000, $headerCellStyle)->addText("Audit Objectives", ['bold' => true]);
-        $table->addCell(6000)->addText("");
+        $table->addCell(6000)->addText($record['audit_objectives']);
 
 		$table->addRow();
 		$table->addCell(3000, $headerCellStyle)->addText("Additional Auditor", ['bold' => true]);
-		$table->addCell(18000, ['gridSpan' => 3])->addText("", ['bold' => false]
+		$table->addCell(18000, ['gridSpan' => 3])->addText($record['additional_auditor'], ['bold' => false]
 		);
 
 
@@ -10228,6 +10228,10 @@ public function generateAuditReportWord(Request $req)
 			$findingsTable->addCell(9000, ['gridSpan' => 3])->addText($record['audit_summary']);
 
 			$findingsTable->addRow();
+			$findingsTable->addCell(3000, $headerCellStyle)->addText("Finding", ['bold' => true]);
+			$findingsTable->addCell(9000, ['gridSpan' => 3])->addText($finding_record['results']);
+
+			$findingsTable->addRow();
 			$findingsTable->addCell(3000, $headerCellStyle)->addText("Related issue", ['bold' => true]);
 			$findingsTable->addCell(9000, ['gridSpan' => 3])->addText($finding_record['related_issue']);
 
@@ -10282,8 +10286,8 @@ public function generateAuditReportWord(Request $req)
 				->join('par_system_statuses as t9', 't1.application_status_id', 't9.id')
 			// ->join('tra_issue_management_related_issues as t13', 't11.id', 't13.related_id')
 				->select(
-					DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"),
-						't1.application_code', 't1.tracking_no as audit_id', 't1.audit_reference', 't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't1.audit_summary', 't7.name as audit_type', 't9.name as status')  	
+					DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"), 't1.audit_id', 't1.function_audited', 't1.audit_criteria', 't1.additional_auditor', 't1.audit_standard', 't1.audit_objectives',
+						't1.application_code', 't1.audit_reference', 't1.audit_title', 't1.audit_start_date', 't1.audit_end_date', 't1.audit_summary', 't7.name as audit_type', 't9.name as status')  	
 				->where('t1.application_code', $application_code)
 				->get();
 
@@ -10339,8 +10343,9 @@ public function generateAuditReportWord(Request $req)
 					't2.audit_end_date',
 					't3.name',
 					't4.name as pass_status',
-					't1.comment', // Assuming questions are stored in `par_checklist_items`
-					DB::raw("GROUP_CONCAT(t6.initial_file_name SEPARATOR ', ') as evidence_files") // Combine evidence files for each question
+					't1.comment',
+					't6.initial_file_name as evidence_files' // Assuming questions are stored in `par_checklist_items`
+					//DB::raw("GROUP_CONCAT(t6.initial_file_name SEPARATOR ', ') as evidence_files") // Combine evidence files for each question
 				)
 				->where('t1.application_code', $application_code)
 				->groupBy('t1.checklist_item_id')
@@ -10389,7 +10394,7 @@ public function generateAuditReportWord(Request $req)
 				->leftJoin('par_issue_types as t7', 't4.issue_type_id', 't7.id')
 				->leftjoin('users as t8', 't4.created_by', 't8.id')
 				->leftJoin('par_issue_statuses as t9', 't4.application_status_id', 't9.id')
-				->select('t1.id as finding_id', 't1.finding_title', 't2.created_on', 't2.dola as completed_on', 't2.audit_summary as description', 't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
+				->select('t1.results','t1.id as finding_id', 't1.finding_title', 't2.created_on', 't2.dola as completed_on', 't2.audit_summary as description',  't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
 					DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"), 't9.title as issue_status')	
 				->where('t1.application_code', $application_code)
 				->get();
@@ -10507,15 +10512,15 @@ public function generateAuditReportWord(Request $req)
 			$html .= '<h3></h3>';
 			$html .= '<table border="1" cellpadding="5" cellspacing="0" width="100%" style="border-collapse: collapse; page-break-inside: avoid;">';
 			$html .= '<tr>';
-			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Function Audited:</th><td>' . htmlspecialchars('') . '</td>';
-			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Standard:</th><td>' . htmlspecialchars('') . '</td>';
+			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Function Audited:</th><td>' . htmlspecialchars($record['function_audited']) . '</td>';
+			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Standard:</th><td>' . htmlspecialchars($record['audit_standard']) . '</td>';
 			$html .= '</tr>';
 			$html .= '<tr>';
-			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Criteria:</th><td>' . htmlspecialchars('') . '</td>';
-			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Objectives:</th><td>' . htmlspecialchars('') . '</td>';
+			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Criteria:</th><td>' . htmlspecialchars($record['audit_criteria']) . '</td>';
+			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Audit Objectives:</th><td>' . htmlspecialchars($record['audit_objectives']) . '</td>';
 			$html .= '</tr>';
 			$html .= '<tr>';
-			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Additional Auditor:</th><td colspan="3">' . htmlspecialchars('') . '</td>';
+			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Additional Auditor:</th><td colspan="3">' . htmlspecialchars($record['additional_auditor']) . '</td>';
 			$html .= '</tr>';
 			$html .= '</table>';
 			
@@ -10598,6 +10603,9 @@ public function generateAuditReportWord(Request $req)
 			$html .= '</tr>';
 			$html .= '<tr>';
 			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Description</th><td colspan="3">' . htmlspecialchars($record['audit_summary']) . '</td>';
+			$html .= '</tr>';
+			$html .= '<tr>';
+			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Finding</th><td colspan="3">' . htmlspecialchars($finding_record['results']) . '</td>';
 			$html .= '</tr>';
 			$html .= '<tr>';
 			$html .= '<th style="font-weight:bold;">Related Issue</th><td colspan="3">' . htmlspecialchars($finding_record['related_issue']) . '</td>';
