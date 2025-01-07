@@ -9934,28 +9934,35 @@ public function generateAuditReportWord(Request $req)
 
         // Fetch comment records
         $comment_records = DB::table('tra_checklistitems_responses as t1')
-            ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
-            ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id')   
-            ->select(
-                't2.application_code', 't2.tracking_no as audit_id', 't2.audit_reference', 
-                't2.audit_title', 't2.audit_start_date', 't2.audit_end_date', 't1.comment'
-            )  
-            ->where('t1.application_code', $application_code)
-            ->groupBy('t1.checklist_item_id')
-            ->get();
+							->leftJoin('tra_auditsmanager_application as t2', 't1.application_code', '=', 't2.application_code')
+							->leftJoin('par_checklist_items as t3', 't1.checklist_item_id', '=', 't3.id')
+							->select(DB::raw("
+								GROUP_CONCAT(t2.application_code) as application_codes, 
+								GROUP_CONCAT(t2.tracking_no) as audit_ids, 
+								GROUP_CONCAT(t2.audit_reference) as audit_references, 
+								GROUP_CONCAT(DISTINCT t2.audit_title) as audit_titles, 
+								GROUP_CONCAT(DISTINCT t2.audit_start_date) as audit_start_dates, 
+								GROUP_CONCAT(DISTINCT t2.audit_end_date) as audit_end_dates, 
+								GROUP_CONCAT(t1.comment) as comments
+							"))
+							->where('t1.application_code', $application_code)
+							->groupBy('t1.checklist_item_id')
+							->get();
 
-        $comment_records = convertStdClassObjToArray($comment_records);
-        $comment_records = decryptArray($comment_records);
+						$comment_records = convertStdClassObjToArray($comment_records);
+						$comment_records = decryptArray($comment_records);
+
+
 
         // Fetch evidence records
         $evidence_records = DB::table('tra_application_documents as t1')
             ->leftjoin('tra_auditsmanager_application as t2', 't1.application_code', 't2.application_code')
             ->leftjoin('par_checklist_items as t3', 't1.checklist_item_id', 't3.id') 
-            ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code) {
-                $join->on('t1.id', '=', 't4.application_document_id')
-                    ->where('t4.application_code', '=', $application_code);
-            }) 
-            ->select('t4.initial_file_name')
+            ->leftJoin('tra_application_uploadeddocuments as t4', function ($join) use ($application_code){
+                    $join->on('t1.id', '=', 't4.application_document_id')
+                        ->where('t4.application_code', '=', $application_code);
+                }) 
+            ->select(DB::raw("GROUP_CONCAT(t4.initial_file_name) as initial_file_name "))  	
             ->where('t1.application_code', $application_code)
             ->whereNotNull('t1.checklist_item_id')
             ->groupBy('t1.checklist_item_id')
@@ -10066,12 +10073,11 @@ public function generateAuditReportWord(Request $req)
 		$centerCell = $headerTable->addCell(6000, ['align' => 'center']);
 		// Right column: Issue Number
 		$headerTable->addCell(2000, ['align' => 'right'])->addText(
-			'Issue No. 2.0',
+			'Issue No. 26',
 			['bold' => true, 'size' => 10],
 			['align' => 'right']
 		);
 
-		//add footer wiht the date and prvided format
 		// footer section
 		$footer = $section->addFooter();
 		$footerTable = $footer->addTable([
@@ -10080,7 +10086,7 @@ public function generateAuditReportWord(Request $req)
 		]);
 
 		$footerTable->addRow();
-		$footerTable->addCell(5000)->addPreserveText('10-11-2022', ['size' => 10], ['alignment' => 'left']);
+		$footerTable->addCell(5000)->addPreserveText('{DATE}', ['size' => 10], ['alignment' => 'left']);
 		$footerTable->addCell(5000)->addPreserveText('Page {PAGE} of {NUMPAGES}', ['size' => 10], ['alignment' => 'right']);
 
 
@@ -10426,7 +10432,7 @@ public function generateAuditReportWord(Request $req)
 			$pdf->AddPage();
 			$pdf->SetFont('Times', '', 12);
 			
-				
+			
 
 		// function checkPageBreak($pdf, $contentHeight) {
 		//     // Use a hardcoded value for top margin if necessary
