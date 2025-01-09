@@ -782,6 +782,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       activeTab.down("button[name=add_upload]").setHidden(true);
     }
 
+    if(sub_module_id == 108){
+      activeTab.down("button[name=process_submission_btn]").setVisible(false);
+    }
+
     store.getProxy().extraParams = {
       application_code: application_code,
       // table_name: table_name,
@@ -958,6 +962,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             qmsdoclistfrm.loadRecord(model);
             grid.down("button[name=add_upload]").setHidden(true);
             grid.down("button[name=download]").setHidden(true);
+            grid.down("button[name=log_download]").setHidden(true);
+            grid.down("button[name=form_download]").setHidden(true);
             activeTab.down("textfield[name=approval_id]").setValue(results.approval);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
 
@@ -1084,6 +1090,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             qmsdoclistfrm.loadRecord(model);
             grid.down("button[name=add_upload]").setHidden(true);
             grid.down("button[name=download]").setHidden(true);
+            grid.down("button[name=log_download]").setHidden(true);
+            grid.down("button[name=form_download]").setHidden(true);
             activeTab.down("textfield[name=recommendation_id]").setValue(results.recommendation);
             activeTab.down("displayfield[name=workflow_stage]").setValue(results.workflow_stage);
           } else {
@@ -1377,6 +1385,10 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
       stage_category_id = activeTab.down("hiddenfield[name=stage_category_id]").getValue();
 
+      if(sub_module_id == 108){
+        activeTab.down("button[name=process_submission_btn]").setVisible(false);
+      }
+
     if (application_code) {
       Ext.Ajax.request({
         method: "GET",
@@ -1407,13 +1419,17 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
             activeTab.down('displayfield[name=created_on]').setValue(results.created_on);
             qmsdoclistfrm.down("textfield[name=navigator_name]").setValue(results.navigator_name);
 
+          
+                activeTab.down("button[name=recommendation]").setVisible(false);
+                activeTab.down("button[name=approval]").setVisible(false);
+                activeTab.down("textfield[name=recommendation_id]").setVisible(false);
+                activeTab.down("textfield[name=approval_id]").setVisible(false);
+                activeTab.down("button[name=add_upload]").setHidden(false);
 
-            activeTab.down("button[name=recommendation]").setVisible(false);
-            activeTab.down("button[name=approval]").setVisible(false);
-            activeTab.down("textfield[name=recommendation_id]").setVisible(false);
-            activeTab.down("textfield[name=approval_id]").setVisible(false);
-            activeTab.down("button[name=add_upload]").setHidden(false);
-
+            if(sub_module_id == 108){
+              activeTab.down("button[name=process_submission_btn]").setVisible(false);
+            }
+          
           } else {
             toastr.error(message, "Failure Response");
           }
@@ -1638,17 +1654,25 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       table_name = btn.table_name,
       winWidth = btn.winWidth,
       activeTab = mainTabPanel.getActiveTab(),
+      grid = activeTab.down("soptemplategrid"),
       workflow_stage_id = activeTab.down("hiddenfield[name=workflow_stage_id]").getValue(),
       document_id = activeTab.down("combo[name=document_type_id]").getValue(),
       application_code = activeTab.down("hiddenfield[name=active_application_code]").getValue(),
       module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
       sub_module_id = activeTab.down("hiddenfield[name=sub_module_id]").getValue(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
-      //section_id = activeTab.down('hiddenfield[name=section_id]').getValue(),
-      // premise_id = activeTab.down('hiddenfield[name=premise_id]').getValue(),
-      // storeID = getApplicationStore(module_id, section_id),
+      
+
+      
       valid = this.validateNewReceivingSubmission(),
       validateHasDocuments = validateHasUploadedDocumentsDetils(application_code);
+
+      if(grid){
+         var recommendation = grid.down('textfield[name=recommendation_id]').getValue(),
+             approval = grid.down('textfield[name=approval_id]').getValue();
+
+      }
+
 
     if (!validateHasDocuments) {
       toastr.error(
@@ -1657,6 +1681,32 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       Ext.getBody().unmask();
       return;
     }
+
+    if(workflow_stage_id == 18){
+
+      if (!recommendation || recommendation.trim() === " ") {
+      toastr.error(
+          "Response: Please recommend the documents to proceed."
+      );
+      Ext.getBody().unmask();
+      return;
+      }
+
+    }
+
+    if(workflow_stage_id == 19){
+
+      if (!approval || approval.trim() === " ") {
+      toastr.error(
+          "Response: Please Approve the documents to proceed."
+      );
+      Ext.getBody().unmask();
+      return;
+      }
+
+    }
+    
+
     if (valid) {
       Ext.Ajax.request({
         method: "POST",

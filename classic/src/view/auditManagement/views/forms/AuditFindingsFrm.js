@@ -107,7 +107,7 @@ Ext.define('Admin.view.auditManagement.views.forms.AuditFindingsFrm',{
         margin: '0 20 20 0',
         name: 'results',
         columnWidth: 1,
-        allowBlank: false
+        allowBlank: true
     },
     ]},
     {

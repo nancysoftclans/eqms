@@ -225,6 +225,7 @@ class DmsConfigurationsController extends Controller
 public function getdocdefinationrequirementDetails(Request $req)
 {
  
+ $user_id = \Auth::user()->id;
     try {
      $results = DB::table('tra_documentmanager_application as t1')
     ->leftJoin('par_qms_documents_types as t2', 't1.document_type_id', '=', 't2.id')
@@ -250,6 +251,9 @@ public function getdocdefinationrequirementDetails(Request $req)
 
     )
     ->where('t1.sub_module_id', '!=', 105)
+    ->when($user_id !== 1, function ($query) use ($user_id) {
+        return $query->whereRaw("JSON_CONTAINS(t1.owner_user_id, CAST(? AS JSON))", [$user_id]);
+    })
     ->get();
 
         $results = convertStdClassObjToArray($results);
@@ -324,18 +328,10 @@ public function getArchivedDocdDetails(Request $req)
      ->where('t1.application_status_id', 4)
      ->get();
 
-     // $docVersions = [];
 
-     //   foreach ($results as $item) {
-     //    $docVersions[] = ($item->doc_version);
+     // foreach ($results as $item) {
+     //        $item->doc_version = (float) $item->doc_version + 1;
      //    }
-
-     //  $docVersions = array_map(function ($version) {
-     //        return $version + 1;
-     //    }, $docVersions);
-     foreach ($results as $item) {
-            $item->doc_version = (float) $item->doc_version + 1;
-        }
 
 
         $results = convertStdClassObjToArray($results);
@@ -445,6 +441,7 @@ public function getArchivedDocdDetails(Request $req)
         $section_id = $req->section_id;
         $premise_type_id = $req->premise_type_id;
         $parent_id = $req->node;
+        $user_id = \Auth::user()->id;
 
     try {
         if (validateIsNumeric($parent_id)) {
@@ -452,15 +449,21 @@ public function getArchivedDocdDetails(Request $req)
                 $folders = DB::table('par_navigator_folders as t1')
                     ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
                     ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
+                   // ->leftJoin('users as t4', 't1.owner_user_id', '=', 't4.id')
                     ->select(
                         //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
-                        DB::raw("CASE WHEN (SELECT COUNT(id)
- FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
+                        DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
                          //DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),attachments
                        't1.name AS navigator_name',
                         't1.id',
                         't1.id AS navigator_folder_id',
-                        't1.*',
+                        't1.name',
+                        't1.has_parent_level',
+                        't1.docparent_id',
+                        't1.is_enabled',
+                        't1.has_restriction_id',
+                        't1.navigator_owner_id',
+                        't1.navigator_group_id',
                         't2.application_code',
                         't2.module_id',
                         't2.sub_module_id',
@@ -472,6 +475,10 @@ public function getArchivedDocdDetails(Request $req)
                     )
                     // ->groupBy('t1.id')
                     ->where('t1.docparent_id', $parent_id)
+                    ->when($user_id !== 1, function ($query) use ($user_id) {
+                        return $query->whereRaw("JSON_CONTAINS(t1.owner_user_id, CAST(? AS JSON))", [$user_id]);
+                    })
+                    //->whereRaw("JSON_CONTAINS(t1.owner_user_id, CAST(? AS JSON))", [$user_id])
                     ->get();
 
                 //all documents of the parent
@@ -486,7 +493,7 @@ public function getArchivedDocdDetails(Request $req)
                     't2.doc_version AS navigator_version', 
                     't1.dola',
                     't1.id AS navigator_folder_id',
-                    't1.*',
+                  //  't1.*',
                     't3.id AS doc_id',
                     't3.application_code',
                     't2.module_id',
@@ -498,6 +505,10 @@ public function getArchivedDocdDetails(Request $req)
                 )
                // ->groupBy('t1.id')
                 ->WHERE('t2.navigator_folder_id', $parent_id)
+
+                ->when($user_id !== 1, function ($query) use ($user_id) {
+                        return $query->whereRaw("JSON_CONTAINS(t2.owner_user_id, CAST(? AS JSON))", [$user_id]);
+                    })
                 ->get();
 
             //merge both
@@ -508,33 +519,54 @@ public function getArchivedDocdDetails(Request $req)
             $data = DB::table('par_navigator_folders as t1')
                     ->leftJoin('tra_documentmanager_application as t2', 't1.id', '=', 't2.navigator_folder_id')
                     ->leftJoin('tra_application_uploadeddocuments as t3', 't2.application_code', '=', 't3.application_code')
+                   // ->leftJoin('users as t4', 't1.owner_user_id', '=', 't4.id')
                     ->select(
                         //'t1.*',, if(t1.navigator_folder_name IS NULL, t9.initial_file_name, t1.navigator_folder_name) AS recoil
-                        DB::raw("CASE WHEN (SELECT COUNT(id)
- FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
+                        DB::raw("CASE WHEN (SELECT COUNT(id) FROM par_navigator_folders q WHERE q.docparent_id = t1.id) = 0 THEN CASE WHEN t3.id is null THEN true else false end ELSE FALSE END AS leaf"),
                          //DB::raw("CASE WHEN t3.id IS NULL THEN t1.name else t3.initial_file_name END AS navigator_name"),
                        't1.name AS navigator_name',
                         't1.id',
                         't1.id AS navigator_folder_id',
-                        't1.*',
+                        't1.name',
+                        't1.docparent_id',
+                        't1.has_parent_level',
+                        't1.is_enabled',
+                        't1.has_restriction_id',
+                        't1.navigator_owner_id',
+                        't1.navigator_group_id',
                         't3.id AS T3ID',
                         't2.application_code',
                         't2.module_id',
                         't2.sub_module_id',
                         't2.workflow_stage_id',
-
-                        
               
                     )
                     // ->groupBy('t1.id')
                     ->whereNull('t1.docparent_id')
+                    ->when($user_id !== 1, function ($query) use ($user_id) {
+                        return $query->whereRaw("JSON_CONTAINS(t1.owner_user_id, CAST(? AS JSON))", [$user_id]);
+                    })
                     ->get();
         }
  
     } catch (\Exception $exception) {
-        $data = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', _CLASS_), \Auth::user()->id);
+        $data = sys_error_handler(
+    $exception->getMessage(),
+    2,
+    debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),
+    explode('\\', __CLASS__), // Replace _CLASS_ with __CLASS__
+    \Auth::user()->id
+);
+
     } catch (\Throwable $throwable) {
-        $data = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', _CLASS_), \Auth::user()->id);
+        $data = sys_error_handler(
+    $exception->getMessage(),
+    2,
+    debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),
+    explode('\\', __CLASS__), // Replace _CLASS_ with __CLASS__
+    \Auth::user()->id
+);
+
     }
     return $data;
 

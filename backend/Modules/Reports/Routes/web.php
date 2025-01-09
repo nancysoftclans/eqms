@@ -71,5 +71,6 @@ Route::group(['prefix' => 'reports'], function() {
     Route::get('printAdministrativeSubmissionResponses', [ReportsController::class, 'printAdministrativeSubmissionResponses']);
     Route::get('generateDocumentPermit', [ReportsController::class, 'generateDocumentPermit']);
     Route::get('generateAuditReport', [ReportsController::class, 'generateAuditReport']);
+    Route::get('generateAuditReportWord', [ReportsController::class, 'generateAuditReportWord']);
     
     });

@@ -1,124 +1,251 @@
 Ext.define('Admin.view.dashboard.views.charts.DocumentLineChart', {
-    extend: 'Ext.panel.Panel',
+    extend: 'Ext.Panel',
     xtype: 'documentchart',
     scrollable: true,
 
-    requires: ['Ext.chart.CartesianChart', 'Ext.chart.axis.Category', 'Ext.chart.axis.Numeric', 'Ext.chart.interactions.PanZoom', 'Ext.chart.series.Line'],
+    requires: [
+        'Ext.chart.CartesianChart',
+        'Ext.chart.axis.Category',
+        'Ext.chart.axis.Numeric',
+        'Ext.chart.interactions.PanZoom',
+        'Ext.chart.series.Line',
+        'Ext.chart.series.Bar',  // Add Bar Series
+        //'Admin.store.dashboard.UserAnalysisStr'
+    ],
+    controller: 'dashboardvctr',
 
-    // getDataForChart: function () {
-    //     var data = {
+    width: 700,
 
-    //         "name": "Brand",
-    //         "value": 597,
-    //         "color": "#028D99",
-    //         "total": 1000,
-    //     };
-    //     console.log(data);
-    //     return this.updatePercentData(data);
-    // },
-    // updatePercentData: function (data) {
-    //     var dataVal = []
-
-    //     title = data.name
-    //     value = data.value
-    //     total = data.total
-
-    //     percent = value / total * 100;
-
-    //     dataVal.push({
-    //         GroupName: title,
-    //         GroupData: percent.toFixed(2)
-    //     })
-
-    //     return dataVal;
-
-
-    // },
-
-    items: [{
+    items: {
         xtype: 'cartesian',
+        reference: 'chart',
         width: '100%',
-        height: 300,
-        padding: '10',
-        insetPadding: '10 30 0 5',
-        store: {
-            fields: ['date', 'value1', 'value2', 'value3'],
-            data: [
-
-                { date: 'Dec 2020', value1: 5, value2: 6, value3: 1 },
-                { date: 'Mar 2021', value1: 7, value2: 4, value3: 1 },
-                { date: 'Jun 2021', value1: 8, value2: 3, value3: 1 },
-                { date: 'Sep 2021', value1: 9, value2: 2, value3: 2 },
-                { date: 'Dec 2021', value1: 10, value2: 5, value3: 1 },
-                { date: 'Mar 2022', value1: 12, value2: 8, value3: 1 },
-                { date: 'Jun 2022', value1: 6, value2: 1, value3: 3 },
-                { date: 'Sep 2022', value1: 3, value2: 2, value3: 2 },
-                { date: 'Dec 2022', value1: 13, value2: 2, value3: 1 }
-
-            ]
+        height: 400,
+        interactions: {
+            type: 'panzoom',
+            zoomOnPanGesture: true
         },
-        axes: [{
-            type: 'numeric',
-            position: 'left',
-            grid: true,
-            minimum: 0,
-            // fields: [
-            //     'value1',
-            // ]
-
-        }, {
-            type: 'category',
-            position: 'bottom',
-            grid: true,
-            fields: [
-                'date'
-            ]
-
-        }],
-        series: [{
-            type: 'line',
-            xField: 'date',
-            yField: 'value1',
-            smooth: true,
-            style: {
-                lineWidth: 2,
-                strokeStyle: '#666'
+        animation: {
+            duration: 100
+        },
+        innerPadding: {
+            left: 40,
+            right: 40
+        },
+        axes: [
+            {
+                type: 'numeric',
+                position: 'left',
+                grid: true,
+                minimum: 0,
+            
             },
-            marker: {
-                radius: 4,
-                fillStyle: '#666'
+            {
+                type: 'category',
+                position: 'bottom',
+                grid: true,
+                fields: ['date'],
+                label: {
+                    rotate: {
+                    degrees: -45
+                    }
+                } 
             }
-        }, {
-            type: 'line',
-            xField: 'date',
-            yField: 'value2',
-            smooth: true,
-            style: {
-                lineWidth: 2,
-                strokeStyle: '#999'
+        ],
+        series: [
+            {
+                type: 'line',  
+                xField: 'date',
+                yField: 'uniqueUsers',
+                smooth: true,
+                style: {
+                    lineWidth: 2,
+                    strokeStyle: '#999'
+                },
+                marker: {
+                    radius: 4,
+                    lineWidth: 2
+                },
+                highlight: {
+                    fillStyle: '#000',
+                    radius: 5,
+                    lineWidth: 2,
+                    strokeStyle: '#fff'
+                },
+                label:{
+                    field: 'uniqueUsers',
+                    display: 'over'
+                },
+                tooltip: {
+                    trackMouse: true,
+                    renderer: function (tooltip, model, item) {
+                        tooltip.setHtml(
+                            `Logged in Users: ${model.get('uniqueUsers')}`
+                        );
+                    }
+                }
+            }
+        ],
+        
+        listeners: {
+            beforerender: {
+                fn: 'setCompStore',
+                config: {
+                    proxy: {
+                        url: 'dashboard/getUserAnalysis',
+                        extraParams: {
+                            year: new Date().getFullYear() 
+                        }
+                    },
+                    autoLoad: true 
+                }
+                
+                //isLoad: true,
+                
+            }
+        },
+    },
+
+    tbar: [
+        {
+            xtype: 'combobox',
+            fieldLabel: 'Select Year',
+            reference: 'yearFilter',
+            labelAlign: 'right',
+            store: Ext.create('Ext.data.Store', {
+                fields: ['year'],
+                data: (function () {
+                    const currentYear = new Date().getFullYear();
+                    const years = [];
+                    for (let i = currentYear; i >= currentYear - 10; i--) {
+                        years.push({ year: i });
+                    }
+                    return years;
+                })()
+            }),
+            queryMode: 'local',
+            displayField: 'year',
+            valueField: 'year',
+            value: new Date().getFullYear(),
+            listeners: {
+                select: function (combo, record) {
+                    const year = record.get('year');
+                    const chart = combo.up('panel').down('cartesian');
+                    const store = chart.getStore();
+                    if (chart && store){
+                        store.getProxy().setExtraParams({ year: year });
+                        store.load();
+                    } else{
+                        console.warn('Chart or store not found');
+                    }
+                    
+                }
             },
-            marker: {
-                radius: 4,
-                fillStyle: '#999'
-            }
-        }, {
-            type: 'line',
-            xField: 'date',
-            yField: 'value3',
-            smooth: true,
             style: {
-                lineWidth: 2,
-                strokeStyle: '#ccc'
-            },
-            marker: {
-                radius: 4,
-                fillStyle: '#ccc'
+                height: '25px',
+                width: '200px',
             }
-        }],
-        interactions: 'panzoom'
-
-
-    }],
-
+        },
+        {
+            xtype: 'combobox',
+            fieldLabel: 'Select Month',
+            reference: 'monthFilter',
+            labelAlign: 'right',
+            store: Ext.create('Ext.data.Store', {
+                fields: ['month', 'name'],
+                data: [
+                    { month: 1, name: 'January' },
+                    { month: 2, name: 'February' },
+                    { month: 3, name: 'March' },
+                    { month: 4, name: 'April' },
+                    { month: 5, name: 'May' },
+                    { month: 6, name: 'June' },
+                    { month: 7, name: 'July' },
+                    { month: 8, name: 'August' },
+                    { month: 9, name: 'September' },
+                    { month: 10, name: 'October' },
+                    { month: 11, name: 'November' },
+                    { month: 12, name: 'December' }
+                ]
+            }),
+            queryMode: 'local',
+            displayField: 'name',
+            valueField: 'month',
+            listeners: {
+                select: function (combo, record) {
+                    const month = record.get('month');
+                    const chart = combo.up('panel').down('cartesian');
+                    const store = chart.getStore();
+                    if (chart && store){
+                        store.getProxy().setExtraParams({ month: month });
+                    store.load();
+                    } else {
+                        console.warn('Chart or store not found');
+                    }
+                    
+                }
+            },
+            style: {
+                height: '25px',
+                width: '200px',
+            }
+        },
+        {
+            xtype: 'datefield',
+            fieldLabel: 'Select Day',
+            reference: 'dayFilter',
+            labelAlign: 'right',
+            format: 'Y-m-d',
+            listeners: {
+                change: function (field, newValue) {
+                    const chart = field.up('panel').down('cartesian');
+                    const store = chart.getStore();
+                    if (store && chart) {
+                        store.getProxy().setExtraParams({ day: Ext.Date.format(newValue, 'Y-m-d') });
+                        store.load();
+                    } else {
+                        console.warn('Chart or store not found');
+                    }
+                    
+                }
+            },
+            style: {
+                height: '25px',
+                width: '200px',
+            }
+        },
+        {
+            text: 'Clear',
+            handler: 'clearDashboardFilter',
+            style: {
+                height: '25px',
+                width: '100px',
+                background: '#e44959', 
+            }
+        },
+        '->',
+        {
+            xtype: 'button',
+            hidden: false,
+            text: 'Options',
+            menu: {
+                xtype: 'menu',
+                items: [
+                    {
+                        text: 'Bar',
+                        handler: 'changeChartType'
+                            
+                    },
+                    {
+                        text: 'Preview',
+                        handler: 'onPreview'
+                    }
+                ]
+            }
+        }
+    ]
 });
+
+
+
 

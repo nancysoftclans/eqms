@@ -24,6 +24,7 @@ Ext.define('Admin.view.commoninterfaces.grids.SOPTemplateDocUploadGrid', {
             }
         }
     },
+    itemId: 'templatedocuploadgrid',
     tbar: [{
         xtype: 'hiddenfield',
         name: 'process_id'
@@ -64,15 +65,39 @@ Ext.define('Admin.view.commoninterfaces.grids.SOPTemplateDocUploadGrid', {
         bind: {
             hidden: '{isReadOnly}'
         }
-    },{
+    },
+    '->',
+    {
         text: 'Download SOP Template',
         iconCls: 'x-fa fa-download',
         action: 'add',
-        ui: 'soft-blue',
+        ui: 'soft-purple',
         name: 'download',
         winTitle: 'Download SOP Tempalate',
         winWidth: '80%',
         handler: 'downloadsopTemplate',
+        module_id : 26,
+        stores: '[]'
+    },{
+        text: 'Log Databases Template',
+        iconCls: 'x-fa fa-download',
+        action: 'add',
+        ui: 'soft-green',
+        name: 'log_download',
+        winTitle: 'Log Databases Tempalate',
+        winWidth: '80%',
+        handler: 'downloadlogdatabasesTemplate',
+        module_id : 26,
+        stores: '[]'
+    },{
+        text: 'Download Form Format',
+        iconCls: 'x-fa fa-download',
+        action: 'add',
+        ui: 'blue',
+        name: 'form_download',
+        winTitle: 'Download Form Format',
+        winWidth: '80%',
+        handler: 'downloadFormFormat',
         module_id : 26,
         stores: '[]'
     },

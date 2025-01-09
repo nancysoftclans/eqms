@@ -459,18 +459,18 @@ showEditConfigParamWinFrm: function (item) {
 
         form.on('afterrender', function() {
         try {
-            const owner_user_id = record.get('owner_user_id');
-            const owner_group_id = record.get('owner_group_id');
+            const owner_user_id = record.get('navigator_owner_id');
+            const owner_group_id = record.get('navigator_group_id');
 
         
                if (owner_user_id) {
                     const owner_user_id_array = JSON.parse(owner_user_id);
-                    form.down("tagfield[name=owner_user_id]").setValue(owner_user_id_array);
+                    form.down("tagfield[name=navigator_owner_id]").setValue(owner_user_id_array);
                 }
 
                 if (owner_group_id) {
                     const owner_group_id_array = JSON.parse(owner_group_id);
-                    form.down("tagfield[name=owner_group_id]").setValue(owner_group_id_array);
+                    form.down("tagfield[name=navigator_group_id]").setValue(owner_group_id_array);
                 }
 
         } catch (e) {

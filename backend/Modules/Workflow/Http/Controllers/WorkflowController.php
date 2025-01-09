@@ -1957,13 +1957,16 @@ class WorkflowController extends Controller
                         ->where('t7.application_code', '=', $application_code);
                 })
                 ->select(DB::raw("t1.*, t1.id as checklist_item_id, t1.serial_no as order_no, 
-                              t2.id as item_resp_id, t2.pass_status, t2.comment, t2.observation, 
-                              t2.auditor_comment, t3.name as checklist_type, 
-                              t2.auditorpass_status, t2.risk_type_remarks, 
-                              $module_id as module_id, $sub_module_id as sub_module_id,  
-                              t4.query, t4.query_response, 
-                              CASE WHEN t2.risk_type IS NULL THEN t1.risk_type ELSE t2.risk_type END as risk_type,
-                              COUNT(t6.checklist_item_id) as findings, t8.initial_file_name as evidence, t8.node_ref"))
+                        t2.id as item_resp_id, t2.pass_status, t2.comment, t2.observation, 
+                        t2.auditor_comment, t3.name as checklist_type, 
+                        t2.auditorpass_status, t2.risk_type_remarks, 
+                        $module_id as module_id, $sub_module_id as sub_module_id,  
+                        t4.query, t4.query_response, 
+                        CASE WHEN t2.risk_type IS NULL THEN t1.risk_type ELSE t2.risk_type END as risk_type,
+                        COUNT(t6.checklist_item_id) as findings, 
+                        GROUP_CONCAT(t8.initial_file_name) as evidence, 
+                        GROUP_CONCAT(t8.node_ref) as node_ref"))
+
                 ->where('t1.is_enabled', 1)
                 ->groupBy('t1.id', 't1.serial_no', 't2.id', 't3.name', 't4.query', 't4.query_response', 't5.id')
                 ->orderBy('t1.serial_no', 'ASC');
@@ -2819,7 +2822,8 @@ class WorkflowController extends Controller
                     'issue_status_id' => $issue_status->issue_status_id,
                     'dola' => Carbon::now(),
                     'altered_by' => $this->user_id,
-                    'date_closed' => $date_closed
+                    'date_closed' => $date_closed,
+                    //'expected_end_date' => Carbon::now()->addDays(10)
                 ]);
                 $IssueManagement->save();
             }
@@ -3158,7 +3162,8 @@ class WorkflowController extends Controller
                         'application_code' => $application_code,
                         'investigation_decision_id' => 1,
                         'comment' => $remarks,
-                        'approved_by' => $user_id
+                        'approved_by' => $user_id,
+                        //'expected_end_date' => Carbon::now()->addDays(10)
                     );
                     $res = insertRecord('tra_investigation_approvals', $app_data, $user_id, '');
                     DB::commit();
@@ -5128,6 +5133,7 @@ class WorkflowController extends Controller
                 'directive_id' => $directive_id,
                 //'date_received' => Carbon::now(),
                 //'created_on' => Carbon::now(),
+                //'expected_end_date' => Carbon::now()->addDays(10),
                 'created_by' => $user_id
             );
             if (validateIsNumeric($external_user_id)) {
