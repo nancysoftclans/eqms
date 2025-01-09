@@ -53,9 +53,10 @@
         margin: '0 20 20 0',
         name: 'code',
         allowBlank: false
-    },{
+    },
+    {
         xtype: 'combo', anyMatch: true,
-        fieldLabel: 'Checklist Category',
+        fieldLabel: 'Associated clause of standard',
         margin: '0 20 20 0',
         name: 'checklist_category_id',
         valueField: 'id',
@@ -63,6 +64,7 @@
         forceSelection: true,
         allowBlank: true,
         queryMode: 'local',
+        hidden: false,
         listeners: {
             beforerender: {
                 fn: 'setCompStore',
@@ -84,7 +86,8 @@
                 type_store.load({params: {checklist_category: newVal}});
             }
         }
-    }, {
+    }, 
+    {
         xtype: 'combo', anyMatch: true,
         fieldLabel: 'Checklist Type',
         margin: '0 20 20 0',
@@ -119,6 +122,7 @@
         forceSelection: true,
         allowBlank: true,
         queryMode: 'local',
+        hidden: true,
         listeners: {
             beforerender: {
                 fn: 'setCompStore',
