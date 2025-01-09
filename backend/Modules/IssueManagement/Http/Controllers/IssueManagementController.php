@@ -434,7 +434,8 @@ class IssueManagementController extends Controller
                     ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
                 if ($IssueManagement) {
                     $ref_number = $IssueManagement->reference_no;
-                    initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+                    
+                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                     $res = array(
                         "success" => true,
                         "message" => 'Data Updated Successfully!!',
@@ -509,8 +510,7 @@ class IssueManagementController extends Controller
                         ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
                         ->where('t1.submission_id', $res['record_id'])->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
 
-                    initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-
+                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                     $res = array(
                         "success" => true,
                         "message" => 'Data Saved Successfully!!',
@@ -761,7 +761,7 @@ class IssueManagementController extends Controller
                 ->leftJoin('tra_issue_management_applications as t2', 't1.issue_id', 't2.id')
                 ->leftJoin('tra_documentmanager_application as t3', 't1.document_id', 't3.id')
                 ->leftJoin('tra_application_uploadeddocuments as t4', 't1.upload_id', 't4.id')
-                ->where('issue_id', $request->issue_id)
+                ->where('t2.application_code', $request->application_code)
                 ->select(
                     't1.*',
                     DB::raw('COALESCE(t3.doc_title, t4.initial_file_name) as title'),

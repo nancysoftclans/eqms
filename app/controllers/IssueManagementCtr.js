@@ -42,7 +42,7 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         click: "showIssueManagementAssociatedWin",
       },
       "issuemanagementdocgrid button[name=add_upload]": {
-        click: "showIssueManagementAssociatedWin",
+        click: "showIssueManagementAssociatedDocWin",
       },
       "issuemanagementissuegrid button[name=select_issue_btn]": {
         click: "showIssueManagementAssociatedWin",
@@ -2916,6 +2916,99 @@ Ext.define("Admin.controller.IssueManagementCtr", {
         "Failure Response"
       );
     }
+  },
+  showIssueManagementAssociatedDocWin: function (btn) {
+    var mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      childXtype = btn.childXtype,
+      form = Ext.widget(childXtype),
+      winTitle = btn.winTitle,
+      winWidth = btn.winWidth,
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      section_id = activeTab.down("hiddenfield[name=section_id]").getValue(),
+      module_id = activeTab.down("hiddenfield[name=module_id]").getValue(),
+      sub_module_id = activeTab
+        .down("hiddenfield[name=sub_module_id]")
+        .getValue(),
+      workflow_stage = activeTab
+        .down("hiddenfield[name=workflow_stage_id]")
+        .getValue(),
+      application_code = activeTab
+        .down("hiddenfield[name=active_application_code]")
+        .getValue();
+    if (application_code != "") {
+      form.setHeight(400);
+      this.showApplicationDocUploadWinGeneric(
+        btn,
+        section_id,
+      module_id,
+      sub_module_id,
+      workflow_stage,
+      application_code,
+      query_id = null
+      );
+    } else {
+      toastr.error(
+        "Application details not found, save application to select!!",
+        "Failure Response"
+      );
+    }
+  },
+  showApplicationDocUploadWinGeneric: function (
+    btn,
+    section_id,
+    module_id,
+    sub_module_id,
+    workflow_stage,
+    application_code,
+    query_id = null
+  ) {
+    var childXtype = btn.childXtype,
+      winTitle = btn.winTitle,
+      winWidth = btn.winWidth,
+      storeID = btn.storeID,
+      mainTabPanel = this.getMainTabPanel(),
+      activeTab = mainTabPanel.getActiveTab(),
+      process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
+      prodclass_category = activeTab.down(
+        "hiddenfield[name=prodclass_category_id]"
+      ),
+      premise_type_id = activeTab.down("hiddenfield[name=premise_type_id]"),
+      form = Ext.widget(childXtype),
+      prodclass_category_id;
+    if (prodclass_category) {
+      prodclass_category_id = prodclass_category.getValue();
+    }
+    if (premise_type_id) {
+      premise_type_id = premise_type_id.getValue();
+    }
+    form.down("hiddenfield[name=application_code]").setValue(application_code);
+    form.down("hiddenfield[name=section_id]").setValue(section_id);
+    form.down("hiddenfield[name=module_id]").setValue(module_id);
+    form.down("hiddenfield[name=sub_module_id]").setValue(sub_module_id);
+    form.down("hiddenfield[name=query_ref_id]").setValue(query_id);
+    form
+      .down("hiddenfield[name=prodclass_category_id]")
+      .setValue(prodclass_category_id); //for products only
+    form.down("hiddenfield[name=premise_type_id]").setValue(premise_type_id); //for premises only
+    form.down("hiddenfield[name=process_id]").setValue(process_id); //added for clean filtering of required docs
+    form.down("button[name=upload_file_btn]").storeID = storeID;
+    // if (!btn.show_assessor) {
+    //   form.down("combo[name=assessment_by]").setVisible(false);
+    // }
+    funcShowCustomizableWindow(winTitle, winWidth, form, "customizablewindow");
+    var docTypesStr = form.down("combo[name=doctype_id]").getStore();
+    docTypesStr.removeAll();
+    docTypesStr.load({
+      params: {
+        section_id: section_id,
+        module_id: module_id,
+        sub_module_id: sub_module_id,
+        query_id: query_id,
+        process_id: process_id,
+        workflow_stage: workflow_stage,
+      },
+    });
   },
   refreshGrid: function (me) {
     var store = me.store,

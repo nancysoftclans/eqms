@@ -1570,9 +1570,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       rec = form.getValues(),
       id = rec.application_id,
       application_id = rec.application_id,
+      application_code = activeTab.down('hiddenfield[name=application_code]').getValue(),
       module_id = activeTab.down('hiddenfield[name=module_id]').getValue(),
       uploads_store = Ext.getStore('applicationDocumentsUploadsStr'),
+      issue_store = Ext.getStore('issuemanagementdocumentstr'),
       progressBar = Ext.widget('progress');
+      if(uploads_store == null){
+        uploads_store = issue_store;
+      }
     // let browseFile = $('#browseFile');
     let resumable = new Resumable({
       target: 'documentmanagement/resumableuploadApplicationDocumentFile',
@@ -1581,7 +1586,7 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         view_module_id: module_id,
         id: id,
         application_id: application_id,
-        application_code: '',
+        application_code: application_code,
         process_id: '',
         section_id: '',
         module_id: '',
