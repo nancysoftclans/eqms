@@ -761,7 +761,7 @@ class IssueManagementController extends Controller
                 ->leftJoin('tra_issue_management_applications as t2', 't1.issue_id', 't2.id')
                 ->leftJoin('tra_documentmanager_application as t3', 't1.document_id', 't3.id')
                 ->leftJoin('tra_application_uploadeddocuments as t4', 't1.upload_id', 't4.id')
-                ->where('t2.application_code', $request->application_code)
+                ->where('issue_id', $request->issue_id)
                 ->select(
                     't1.*',
                     DB::raw('COALESCE(t3.doc_title, t4.initial_file_name) as title'),

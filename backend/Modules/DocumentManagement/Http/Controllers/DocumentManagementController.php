@@ -2,12 +2,12 @@
 
 namespace Modules\DocumentManagement\Http\Controllers;
 
-use Illuminate\Contracts\Support\Renderable;
-use Illuminate\Http\Request;
-use Illuminate\Routing\Controller;
-use Illuminate\Http\Response;
-use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\DB;
+use PDF;
+use File;
+use Excel;
+use ZipArchive;
+use ZanySoft\Zip\Zip;
+use \Mpdf\Mpdf as mPDF;
 // use Pion\Laravel\ChunkUpload\Config\AbstractConfig;
 // use Pion\Laravel\ChunkUpload\Exceptions\UploadFailedException;
 // use Pion\Laravel\ChunkUpload\Handler\AbstractHandler;
@@ -15,39 +15,42 @@ use Illuminate\Support\Facades\DB;
 // use Pion\Laravel\ChunkUpload\Save\ChunkSave;
 // use Pion\Laravel\ChunkUpload\Save\SingleSave;
 // use Illuminate\Http\UploadedFile;
-use Illuminate\Support\Facades\Storage;
+use Exports\GridExport;
 // use Illuminate\Http\File;
-use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
-use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
-use ZanySoft\Zip\Zip;
-use File;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Http\UploadedFile;
-use ZipArchive;
-use PhpOffice\PhpSpreadsheet\Spreadsheet;
-use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
-use Symfony\Component\HttpFoundation\StreamedResponse;
 use Illuminate\Support\Arr;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Carbon;
+use PhpOffice\PhpWord\PhpWord;
+use PhpOffice\PhpWord\IOFactory;
+use Illuminate\Http\UploadedFile;
+use PhpOffice\PhpWord\Style\Font;
+use Illuminate\Routing\Controller;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Storage;
 
 
 //watermark
-use Exports\GridExport;
-use Maatwebsite\Excel\Concerns\WithHeadings;
-use Excel;
-use PhpOffice\PhpSpreadsheet\Style\Fill;
-use PDF;
-use \Mpdf\Mpdf as mPDF;
-use PhpOffice\PhpPresentation\Style\Alignment;
-use PhpOffice\PhpPresentation\Style\Color;
-use PhpOffice\PhpWord\PhpWord;
-use PhpOffice\PhpWord\Style\Font;
 use PhpOffice\PhpWord\Shared\Converter;
-//use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpWord\TemplateProcessor;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpPresentation\Style\Color;
+use Illuminate\Contracts\Support\Renderable;
+use Maatwebsite\Excel\Concerns\WithHeadings;
+use PhpOffice\PhpPresentation\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Worksheet\Drawing;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+//use PhpOffice\PhpSpreadsheet\IOFactory;
+use Pion\Laravel\ChunkUpload\Receiver\FileReceiver;
+use Pion\Laravel\ChunkUpload\Handler\HandlerFactory;
 
-use PhpOffice\PhpWord\IOFactory;
-use PhpOffice\PhpWord\TemplateProcessor;
+use Modules\IssueManagement\Entities\IssueManagement;
+use Symfony\Component\HttpFoundation\StreamedResponse;
+use Modules\IssueManagement\Entities\IssueManagementDocument;
+use Modules\IssueManagement\Http\Controllers\IssueManagementController;
 //use PhpOffice\PhpWord\PhpWord;
 
 class DocumentManagementController extends Controller
@@ -77,7 +80,7 @@ class DocumentManagementController extends Controller
 
                 $method = $request->route()->getActionMethod();
 
-                $req = $request;                
+                $req = $request;
                 $table_name = 'eqms_document_management_logs';
                 $user_id = $this->user_id;
                 $application_code = $request->input('application_code') ?? $req->input('application_code') ?? null;
@@ -106,14 +109,13 @@ class DocumentManagementController extends Controller
                         break;
                     case 'saveDocumentRecommendationComments':
                         $action = 'saved comments';
-                        break;                
+                        break;
                     default:
                         break;
                 }
 
-                
-                if($action != '')
-                {
+
+                if ($action != '') {
                     $table_data = array(
                         'user_id' => $user_id,
                         'application_code' => $application_code,
@@ -134,13 +136,13 @@ class DocumentManagementController extends Controller
                         'navigator_name' => $navigator_name,
                         'navigator_folder_id' => $navigator_folder_id,
                     );
-    
-                    
+
+
                     DB::table($table_name)->insert($table_data);
                 }
-                
-                
-                
+
+
+
                 return $next($request);
             });
         }
@@ -188,7 +190,7 @@ class DocumentManagementController extends Controller
     //             break;
     //     }
 
-        
+
     //     if($action != '')
     //     {
     //         $table_data = array(
@@ -212,13 +214,14 @@ class DocumentManagementController extends Controller
     //             'navigator_folder_id' => $navigator_folder_id,
     //         );
 
-            
+
     //         DB::table($table_name)->insert($table_data);
     //     } 
     // }
 
 
-    public function getDocumentTypeLogs(Request $request) {
+    public function getDocumentTypeLogs(Request $request)
+    {
         //Capture input values
         try {
             //$application_code = $request->input('application_code');
@@ -230,38 +233,40 @@ class DocumentManagementController extends Controller
                     ->join('users as user', 'logs.user_id', '=', 'user.id')
                     ->join('users as owner_user', 'logs.owner_user_id', '=', 'owner_user.id')
                     ->join('par_groups as groups', 'logs.owner_group_id', '=', 'groups.id')
-                    ->select('logs.id as log_id', 
-                             'user.email as user_name',
-                             'owner_user.email as owner',
-                             'groups.name as group',
-                             'logs.user_id', 
-                             'logs.ref_id', 
-                             'logs.action',
-                             'logs.name',
-                             'logs.review_period',
-                             'logs.expiry_period',
-                             'logs.disposition_instructions',
-                             'logs.review_instructions',
-                             'logs.owner_user_id',
-                             'logs.owner_group_id',
-                             //'logs.issue_state_id',
-                             //'logs.description',
-                             //'logs.form_id',
-                             //'logs.status_group_id',
-                             //'logs.issue_type_category_id',
-                             'user.email as submitted_by',
-                             //'logs.is_enabled', 
-                             'logs.created_on')
-                //filter logs by id
-                
+                    ->select(
+                        'logs.id as log_id',
+                        'user.email as user_name',
+                        'owner_user.email as owner',
+                        'groups.name as group',
+                        'logs.user_id',
+                        'logs.ref_id',
+                        'logs.action',
+                        'logs.name',
+                        'logs.review_period',
+                        'logs.expiry_period',
+                        'logs.disposition_instructions',
+                        'logs.review_instructions',
+                        'logs.owner_user_id',
+                        'logs.owner_group_id',
+                        //'logs.issue_state_id',
+                        //'logs.description',
+                        //'logs.form_id',
+                        //'logs.status_group_id',
+                        //'logs.issue_type_category_id',
+                        'user.email as submitted_by',
+                        //'logs.is_enabled', 
+                        'logs.created_on'
+                    )
+                    //filter logs by id
+
                     ->where('logs.ref_id', '=', $ref_id)
                     ->orderBy('logs.created_on', 'desc')
                     ->get();
             } else {
-               
+
                 $logs = collect([]);
             }
-    
+
             $res = [
                 'success' => true,
                 'results' => $logs,
@@ -271,12 +276,13 @@ class DocumentManagementController extends Controller
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
-    
+
         return response()->json($res);
     }
 
 
-    public function getDocumentLogs(Request $request) {
+    public function getDocumentLogs(Request $request)
+    {
         //Capture input values
         try {
             $application_code = $request->input('application_code');
@@ -289,29 +295,31 @@ class DocumentManagementController extends Controller
                     ->leftJoin('wf_workflow_stages as workflow', 'logs.workflow_stage_id', '=', 'workflow.id')
                     ->leftJoin('par_owner_type as ownertype', 'logs.owner_type_id', '=', 'ownertype.id')
                     ->leftJoin('par_groups as group', 'logs.owner_group_id', '=', 'group.id')
-                    ->select('logs.id as log_id', 
-                             'user.email as user_name',
-                             'logs.user_id', 
-                             'logs.application_code', 
-                             'logs.action',
-                             'logs.current_stage_name',
-                             'logs.application_status',
-                             'workflow.name as workflow_stage_id',
-                             'ownertype.name as owner_type_id',
-                             'group.name as owner_group_id',
-                             'logs.doc_description',
-                             'logs.navigator_name',
-                             'user.email as submitted_by',
-                             'logs.created_on')
-                
+                    ->select(
+                        'logs.id as log_id',
+                        'user.email as user_name',
+                        'logs.user_id',
+                        'logs.application_code',
+                        'logs.action',
+                        'logs.current_stage_name',
+                        'logs.application_status',
+                        'workflow.name as workflow_stage_id',
+                        'ownertype.name as owner_type_id',
+                        'group.name as owner_group_id',
+                        'logs.doc_description',
+                        'logs.navigator_name',
+                        'user.email as submitted_by',
+                        'logs.created_on'
+                    )
+
                     ->where('logs.application_code', '=', $application_code)
                     ->orderBy('logs.created_on', 'desc')
                     ->get();
             } else {
-               
+
                 $logs = collect([]);
             }
-    
+
             $res = [
                 'success' => true,
                 'results' => $logs,
@@ -321,7 +329,7 @@ class DocumentManagementController extends Controller
         } catch (\Throwable $throwable) {
             $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
         }
-    
+
         return response()->json($res);
     }
 
@@ -443,23 +451,23 @@ class DocumentManagementController extends Controller
             $zone_id = $request->input('zone_id');
             $module_id = $request->input('module_id');
             $sub_module_id = $request->input('sub_module_id');
-            
 
-            if($sub_module_id == 108){
+
+            if ($sub_module_id == 108) {
                 $applications_table = 'tra_documentrecords_application';
-            }else{
+            } else {
                 $applications_table = $request->input('table_name');
             }
             $user_id = $this->user_id;
 
-                 $doc_prefix = DB::table('par_qms_documents_types')
+            $doc_prefix = DB::table('par_qms_documents_types')
                 ->select('format')
                 ->where('id', $request['document_type_id'])
                 ->first();
 
-                    if ($doc_prefix) {
-                        $doc_prefix = $doc_prefix->format;
-                    }
+            if ($doc_prefix) {
+                $doc_prefix = $doc_prefix->format;
+            }
 
 
             $doc_number = generateDocumentNumber($sub_module_id, $process_id, $user_id, $doc_prefix);
@@ -485,8 +493,8 @@ class DocumentManagementController extends Controller
 
             );
 
-            
-             $action = array(
+
+            $action = array(
                 'user_id' => $user_id,
                 'action' => 'application saved/updated',
                 'accessed_on' => Carbon::now()
@@ -504,91 +512,91 @@ class DocumentManagementController extends Controller
                 if (recordExists($applications_table, $where_app)) {
 
 
-                    if($request->input('workflow_stage_id') == 13){
+                    if ($request->input('workflow_stage_id') == 13) {
 
                         $app_data = array(
 
-                        'application_status_id' => 1,
-                        "process_id" => $request->input('process_id'),
-                        "workflow_stage_id" => $request->input('workflow_stage_id'),
-                        "stage_category_id" => $request->input('stage_category_id'),
-                        "applicant_id" => $request->input('applicant_id'),
-                        "sub_module_id" => $sub_module_id,
-                        "module_id" => $module_id,
-                        "doc_title" => $request->input('doc_title'),
-                        "owner_user_id" => $request->input('owner_user_id'),
-                        "owner_group_id" => $request->input('owner_group_id'),
-                        "doc_description" => $request->input('doc_description'),
-                        "owner_type_id" => $request->input('owner_type_id'),
-                        "doc_version" => $request->input('doc_version'),
-                        "document_type_id" => $request->input('document_type_id'),
-                        "template_id" => $request->input('template_id'),
-                        "navigator_folder_id" => $request->input('navigator_folder_id'),
-                        "renewal_type_id" => $request->input('renewal_type_id'),
+                            'application_status_id' => 1,
+                            "process_id" => $request->input('process_id'),
+                            "workflow_stage_id" => $request->input('workflow_stage_id'),
+                            "stage_category_id" => $request->input('stage_category_id'),
+                            "applicant_id" => $request->input('applicant_id'),
+                            "sub_module_id" => $sub_module_id,
+                            "module_id" => $module_id,
+                            "doc_title" => $request->input('doc_title'),
+                            "owner_user_id" => $request->input('owner_user_id'),
+                            "owner_group_id" => $request->input('owner_group_id'),
+                            "doc_description" => $request->input('doc_description'),
+                            "owner_type_id" => $request->input('owner_type_id'),
+                            "doc_version" => $request->input('doc_version'),
+                            "document_type_id" => $request->input('document_type_id'),
+                            "template_id" => $request->input('template_id'),
+                            "navigator_folder_id" => $request->input('navigator_folder_id'),
+                            "renewal_type_id" => $request->input('renewal_type_id'),
 
                         );
                     }
 
                     $apps_tableData = getTableData($applications_table, $where_app);
-                  
-                    $app_details = getPreviousRecords($applications_table, $where_app);                   
- 
+
+                    $app_details = getPreviousRecords($applications_table, $where_app);
+
                     if ($app_details['success'] == false) {
                         return $app_details;
                     }
 
                     $app_details = $app_details['results'];
 
-                    
+
                     unset($app_data['document_number']);
 
-                    $res =  updateRecord($applications_table, $where_app,  $app_data, $user_id);
-                   // $previous_data = $app_details[0];
+                    $res = updateRecord($applications_table, $where_app, $app_data, $user_id);
+                    // $previous_data = $app_details[0];
 
                     unset($apps_tableData['id']);
 
-                    if($apps_tableData['application_status_id'] = 4){
-                      $res = insertRecord('tra_documentmanager_archive', $apps_tableData, $user_id);  
+                    if ($apps_tableData['application_status_id'] = 4) {
+                        $res = insertRecord('tra_documentmanager_archive', $apps_tableData, $user_id);
                     }
 
-                    
-                    
+
+
                 }
-                   $res['application_code'] = $app_details[0]['application_code'];
-                   $res['tracking_no'] = $app_details[0]['tracking_no'];
-                   $res['document_number'] = $app_details[0]['document_number'];
-                   $res['created_on'] = $app_details[0]['created_on'];
-                   $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
+                $res['application_code'] = $app_details[0]['application_code'];
+                $res['tracking_no'] = $app_details[0]['tracking_no'];
+                $res['document_number'] = $app_details[0]['document_number'];
+                $res['created_on'] = $app_details[0]['created_on'];
+                $ref_number = $app_details[0]['reference_no']; //$app_details->reference_no;
 
-                   if($request->input('workflow_stage_id') == 13){
+                if ($request->input('workflow_stage_id') == 13) {
 
-                        $submission_params = array(
-                            'application_id' => $app_details[0]['id'],
-                            'process_id' => $app_details[0]['process_id'],
-                            'application_code' => $application_code,
-                            'reference_no' => $app_details[0]['tracking_no'],
-                            'tracking_no' => $app_details[0]['tracking_no'],
-                            'usr_from' => $user_id,
-                            'usr_to' => $user_id,
-                            'previous_stage' => $workflow_stage_id,
-                            'current_stage' => $workflow_stage_id,
-                            'module_id' => $module_id,
-                            'sub_module_id' => $sub_module_id,
-                            'application_status_id' => 1,
-                            'urgency' => 1,
-                            'remarks' => 'Initial Renewal',
-                            'date_received' => Carbon::now(),
-                            'created_on' => Carbon::now(),
-                            'created_by' => $user_id
-                        );
+                    $submission_params = array(
+                        'application_id' => $app_details[0]['id'],
+                        'process_id' => $app_details[0]['process_id'],
+                        'application_code' => $application_code,
+                        'reference_no' => $app_details[0]['tracking_no'],
+                        'tracking_no' => $app_details[0]['tracking_no'],
+                        'usr_from' => $user_id,
+                        'usr_to' => $user_id,
+                        'previous_stage' => $workflow_stage_id,
+                        'current_stage' => $workflow_stage_id,
+                        'module_id' => $module_id,
+                        'sub_module_id' => $sub_module_id,
+                        'application_status_id' => 1,
+                        'urgency' => 1,
+                        'remarks' => 'Initial Renewal',
+                        'date_received' => Carbon::now(),
+                        'created_on' => Carbon::now(),
+                        'created_by' => $user_id
+                    );
 
 
-                        $res = insertRecord('tra_submissions', $submission_params, $user_id);
-                    }
+                    $res = insertRecord('tra_submissions', $submission_params, $user_id);
+                }
 
                 if ($res['success']) {
                     initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-                } 
+                }
             } else {
                 $zone_code = getSingleRecordColValue('par_zones', array('id' => $zone_id), 'zone_code');
                 $apptype_code = getSingleRecordColValue('par_sub_modules', array('id' => $sub_module_id), 'code');
@@ -625,8 +633,8 @@ class DocumentManagementController extends Controller
                 $res = insertRecord($applications_table, $app_data, $user_id);
 
                 insertRecord('tra_documents_useractions', $action, $user_id);
-               
-                 
+
+
 
 
                 $active_application_id = $res['record_id'];
@@ -672,9 +680,9 @@ class DocumentManagementController extends Controller
 
 
                 if ($res['success']) {
-                initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
 
-                
+
 
                 } else {
                     $res = array(
@@ -820,7 +828,7 @@ class DocumentManagementController extends Controller
                 // Send mail notification
                 // sendMailNotification($rec->name, $rec->email, "{$rec->reference_no} Permit Approval Recommendation: {$approval_decision}", $message);
 
-                return response()->json(['success' => true, 'results' => $res ,'message' => 'Document Recommendation saved successfully']);
+                return response()->json(['success' => true, 'results' => $res, 'message' => 'Document Recommendation saved successfully']);
             });
         } catch (\Exception $exception) {
             return response()->json(['success' => false, 'message' => $exception->getMessage()]);
@@ -838,7 +846,7 @@ class DocumentManagementController extends Controller
             $application_id = $request->input('application_id');
             $application_code = $request->input('application_code');
             $sub_module_id = $request->input('sub_module_id');
-           
+
             $user_id = $this->user_id;
 
             return DB::transaction(function () use ($application_code, $table_name, $request) {
@@ -960,9 +968,9 @@ class DocumentManagementController extends Controller
         $table_name = $req->input('table_name');
         try {
             $main_qry = DB::table('tra_documentmanager_application as t1')
-                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
+                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
                 ->leftJoin('par_navigator_folders as t3', 't1.navigator_folder_id', '=', 't3.id')
-                ->select('t1.*','t2.name as workflow_stage', 't2.stage_category_id','t3.name AS navigator_name')
+                ->select('t1.*', 't2.name as workflow_stage', 't2.stage_category_id', 't3.name AS navigator_name')
                 ->where('t1.application_code', $application_code);
 
             $results = $main_qry->first();
@@ -988,9 +996,9 @@ class DocumentManagementController extends Controller
         $table_name = $req->input('table_name');
         try {
             $main_qry = DB::table('tra_documentrecords_application as t1')
-                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id' ,'=', 't2.id')
+                ->leftJoin('wf_workflow_stages as t2', 't1.workflow_stage_id', '=', 't2.id')
                 ->leftJoin('par_navigator_folders as t3', 't1.navigator_folder_id', '=', 't3.id')
-                ->select('t1.*','t2.name as workflow_stage', 't2.stage_category_id','t3.name AS navigator_name')
+                ->select('t1.*', 't2.name as workflow_stage', 't2.stage_category_id', 't3.name AS navigator_name')
                 ->where('t1.application_code', $application_code);
 
             $results = $main_qry->first();
@@ -1112,7 +1120,7 @@ class DocumentManagementController extends Controller
     function getApplicationDocumentsUploads($req)
     {
 
-        $application_code =  $req->input('application_code'); //20412100
+        $application_code = $req->input('application_code'); //20412100
         $workflow_stage = $req->input('workflow_stage');
         $doc_type_id = $req->input('document_type_id');
         $portal_uploads = $req->input('portal_uploads');
@@ -1175,8 +1183,8 @@ class DocumentManagementController extends Controller
                 ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
                 ->select(DB::raw("t2.*, t1.*,t1.initial_file_name as file_name, t2.remarks,t1.file_type, t1.created_on as uploaded_on,CONCAT_WS(' ',decrypt(t5.first_name),decrypt(t5.last_name)) as uploaded_by, case when (select count(id) from tra_application_uploadeddocuments q where q.application_code = t1.application_code) = 0 then false else true end leaf"))
                 ->where('t1.application_code', $application_code);
-                // ->orderBy('t1.created_on', 'desc')
-                // ->limit(1);
+            // ->orderBy('t1.created_on', 'desc')
+            // ->limit(1);
             //->where('t4.is_enabled', 1);
             $results = $qry->get();
         } else {
@@ -1317,7 +1325,7 @@ class DocumentManagementController extends Controller
 
         try {
             $data = array();
-            $upload_url =  Config('constants.dms.system_uploadurl'); //get applicable document requirements
+            $upload_url = Config('constants.dms.system_uploadurl'); //get applicable document requirements
 
             $qry = DB::table('par_document_types as t1')
                 ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.document_type_id')
@@ -1333,7 +1341,7 @@ class DocumentManagementController extends Controller
 
             $results = $qry->get();
 
-            foreach ($results  as $res) {
+            foreach ($results as $res) {
 
                 $data[] = array(
                     'remarks' => $res->remarks,
@@ -1369,7 +1377,7 @@ class DocumentManagementController extends Controller
         $product_id = $req->input('product_id');
         try {
             $data = array();
-            $upload_url =  Config('constants.dms.system_uploadurl');
+            $upload_url = Config('constants.dms.system_uploadurl');
             $qry = DB::table('par_document_types as t1')
                 ->join('tra_documentmanager_application as t2', 't1.id', '=', 't2.document_type_id')
                 ->select(DB::raw("t4.remarks, t1.id as document_type_id, t4.product_id, t2.id as document_requirement_id,
@@ -1382,7 +1390,7 @@ class DocumentManagementController extends Controller
                 ->leftJoin('users as t5', 't4.uploaded_by', '=', 't5.id');
 
             $results = $qry->get();
-            foreach ($results  as $res) {
+            foreach ($results as $res) {
 
                 $data[] = array(
                     'remarks' => $res->remarks,
@@ -1439,7 +1447,7 @@ class DocumentManagementController extends Controller
 
             $allowed_filetypes = $record[0]->allowed_filetypes;
 
-            if (isset($record[0]) &&  $allowed_filetypes != '') {
+            if (isset($record[0]) && $allowed_filetypes != '') {
                 $response = array('is_allowedextension' => true, 'allowed_filetypes' => $allowed_filetypes);
             } else {
                 $response = array('is_allowedextension' => true, 'allowed_filetypes' => '');
@@ -1478,7 +1486,7 @@ class DocumentManagementController extends Controller
             $app_rootnode = getApplicationRootNode($application_code);
 
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
-           
+
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
             $reg_serial = 0;
@@ -1505,39 +1513,39 @@ class DocumentManagementController extends Controller
 
                     //save application document details
 
-                    if($module_id == 29){
+                    if ($module_id == 29) {
                         $doc_app_details = array(
-                        'application_code' => $application_code,
-                        'document_requirement_id' => $document_requirement_id,
-                        'document_type_id' => $document_type_id,
-                        'uploaded_on' => Carbon::now(),
-                        'uploaded_by' => $user_id,
-                        'query_ref_id' => $query_ref_id,
-                        'created_on' => Carbon::now(),
-                        'created_by' => $user_id,
-                        'assessment_start_date' => $assessment_start_date,
-                        'assessment_end_date' => $assessment_end_date,
-                        'assessment_by' => $assessment_by,
-                        'reg_serial' => $reg_serial,
-                        'checklist_item_id' => $checklist_item_id
-                    );
-                    }else{
+                            'application_code' => $application_code,
+                            'document_requirement_id' => $document_requirement_id,
+                            'document_type_id' => $document_type_id,
+                            'uploaded_on' => Carbon::now(),
+                            'uploaded_by' => $user_id,
+                            'query_ref_id' => $query_ref_id,
+                            'created_on' => Carbon::now(),
+                            'created_by' => $user_id,
+                            'assessment_start_date' => $assessment_start_date,
+                            'assessment_end_date' => $assessment_end_date,
+                            'assessment_by' => $assessment_by,
+                            'reg_serial' => $reg_serial,
+                            'checklist_item_id' => $checklist_item_id
+                        );
+                    } else {
                         $doc_app_details = array(
-                        'application_code' => $application_code,
-                        'document_requirement_id' => $document_requirement_id,
-                        'document_type_id' => $document_type_id,
-                        'uploaded_on' => Carbon::now(),
-                        'uploaded_by' => $user_id,
-                        'query_ref_id' => $query_ref_id,
-                        'created_on' => Carbon::now(),
-                        'created_by' => $user_id,
-                        'assessment_start_date' => $assessment_start_date,
-                        'assessment_end_date' => $assessment_end_date,
-                        'assessment_by' => $assessment_by,
-                        'reg_serial' => $reg_serial
-                    );
+                            'application_code' => $application_code,
+                            'document_requirement_id' => $document_requirement_id,
+                            'document_type_id' => $document_type_id,
+                            'uploaded_on' => Carbon::now(),
+                            'uploaded_by' => $user_id,
+                            'query_ref_id' => $query_ref_id,
+                            'created_on' => Carbon::now(),
+                            'created_by' => $user_id,
+                            'assessment_start_date' => $assessment_start_date,
+                            'assessment_end_date' => $assessment_end_date,
+                            'assessment_by' => $assessment_by,
+                            'reg_serial' => $reg_serial
+                        );
                     }
-                    
+
                     $where = array('application_code' => $application_code);
                     $table_name = 'tra_application_documents';
 
@@ -1546,14 +1554,14 @@ class DocumentManagementController extends Controller
 
                     if (recordExists('tra_application_uploadeddocuments', $wheres)) {
                         $prev_file_data = DB::table('tra_application_uploadeddocuments')->where($wheres)->first();
-                        $pre_file = (array)$prev_file_data;
+                        $pre_file = (array) $prev_file_data;
 
                         //dump revision
                         //delete the old copy
                         deleteRecord('tra_application_uploadeddocuments', $wheres);
                         //insert revision
-                        
-                        
+
+
                         //unset uneeded copy data
                         //count total versions
                         $count = DB::table('tra_documents_prevversions')->where('original_file_id', $record_id)->count();
@@ -1568,7 +1576,7 @@ class DocumentManagementController extends Controller
                         $where = array('id' => $prev_file_data->application_document_id);
                         insertRecord('tra_documents_prevversions', $pre_file);
                         $res = updateRecord($table_name, $where, $doc_app_details);
-  
+
                     } else {
 
                         $res = insertRecord($table_name, $doc_app_details);
@@ -1614,6 +1622,17 @@ class DocumentManagementController extends Controller
 
             if ($res['success']) {
                 DB::commit();
+                //If issue documents, create related issue document
+                $issuedata = IssueManagement::where('application_code', $application_code)->first();
+                $data = array(
+                    'issue_id' => $issuedata->id,
+                    'upload_id' => $res['record_id'],
+                    'type' => 'Attached file',
+                    'dola' => Carbon::now(),
+                    'altered_by' => $this->user_id,
+                );
+                $IssueManagementDocument = new IssueManagementDocument();
+                $IssueManagementDocument->create($data);
             } else {
                 DB::rollback();
             }
@@ -1781,7 +1800,7 @@ class DocumentManagementController extends Controller
         $extension = $file->getClientOriginalExtension();
         $fileSize = $file->getSize();
         $file_path = $file->getPathName();
-        $document_rootupload =  Config('constants.dms.doc_rootupload');
+        $document_rootupload = Config('constants.dms.doc_rootupload');
         $user_id = $this->user_id;
         $destination = getcwd() . $document_rootupload;
         $savedName = str_random(3) . time() . '.' . $extension;
@@ -1888,7 +1907,7 @@ class DocumentManagementController extends Controller
 
                         $fileSize = $file->getSize();
                         $file_path = $file->getPathName();
-                        $document_rootupload =  Config('constants.dms.doc_rootupload');
+                        $document_rootupload = Config('constants.dms.doc_rootupload');
 
                         $destination = getcwd() . $document_rootupload;
                         $savedName = str_random(3) . time() . '.' . $extension;
@@ -2027,7 +2046,8 @@ class DocumentManagementController extends Controller
                     $origFileName = $file->getClientOriginalName();
                     $extension = $file->getClientOriginalExtension();
                     $fileSize = $file->getSize();
-                    $document_rootupload =  Config('constants.dms.doc_rootupload');;
+                    $document_rootupload = Config('constants.dms.doc_rootupload');
+                    ;
 
                     $destination = getcwd() . $document_rootupload;
                     $savedName = str_random(3) . time() . '.' . $extension;
@@ -2142,7 +2162,7 @@ class DocumentManagementController extends Controller
                 //$folder = '\resources\uploads';
                 $document_root = $_SERVER['DOCUMENT_ROOT'];
 
-                $upload_directory =     $document_root . '/' . Config('constants.dms.system_uploaddirectory');
+                $upload_directory = $document_root . '/' . Config('constants.dms.system_uploaddirectory');
 
                 $folder = 'product_images';
                 $thumbnail_folder = 'thumbnails';
@@ -2193,7 +2213,8 @@ class DocumentManagementController extends Controller
             }
         } catch (\Exception $e) {
             $res = array(
-                'success' => false,  'message1' =>  $thumb_dest,
+                'success' => false,
+                'message1' => $thumb_dest,
                 'message' => $e->getMessage()
             );
         } catch (\Throwable $throwable) {
@@ -2266,18 +2287,18 @@ class DocumentManagementController extends Controller
         return \response()->json($res);
     }
 
-// public function getApplicationDocumentDownloadurl(Request $req)
+    // public function getApplicationDocumentDownloadurl(Request $req)
 // {
 //     try {
 //         set_time_limit(0);
 //         ini_set('memory_limit', '-1');
 
-//         $user_id = $this->user_id;
+    //         $user_id = $this->user_id;
 //         $application_code = $req->application_code;
 //         $uploadeddocuments_id = $req->uploadeddocuments_id;
 //         $node_ref = $req->node_ref;
 
-//         $data = array(
+    //         $data = array(
 //             'user_id' => $user_id,
 //             'application_code' => $application_code,
 //             'uploadeddocuments_id' => $uploadeddocuments_id,
@@ -2285,7 +2306,7 @@ class DocumentManagementController extends Controller
 //             'accessed_on' => Carbon::now()
 //         );
 
-//         if (empty($node_ref)) {
+    //         if (empty($node_ref)) {
 //             return response()->json([
 //                 'success' => false,
 //                 'message' => 'Document Not Uploaded'
@@ -2309,38 +2330,38 @@ class DocumentManagementController extends Controller
 //                 }
 //             }
 
-//             if ($record) {
+    //             if ($record) {
 //                 $file_type = $record->file_type;
 //                 $document_number = getSingleRecordColValue('tra_permitsrelease_recommendation', ['application_code' => $application_code], 'document_number');
 //                 $initial_file_name = $record->initial_file_name;
 
-//                 // Save the document access
+    //                 // Save the document access
 //                 $data['created_on'] = Carbon::now();
 //                 $data['created_by'] = $user_id;
 //                 insertRecord('tra_uploadeddocuments_useraccess', $data, $user_id);
 
-//                 $document_versionid = $req->document_versionid;
+    //                 $document_versionid = $req->document_versionid;
 //                 $url = downloadDocumentUrl($node_ref, $document_versionid);
 
-//                 // Log the URL for debugging
+    //                 // Log the URL for debugging
 //                 \Log::info('Download URL: ' . $url);
 
-//                 $public_dir = public_path() . '/resources/uploads';
+    //                 $public_dir = public_path() . '/resources/uploads';
 //                 $public_dir = str_replace('\\', '/', $public_dir);
 
-//                 if (!is_dir($public_dir)) {
+    //                 if (!is_dir($public_dir)) {
 //                     mkdir($public_dir, 0755, true);
 //                 }
 
-//                 $filetopath = $public_dir . '/' . $initial_file_name;
+    //                 $filetopath = $public_dir . '/' . $initial_file_name;
 
-//                 $context = stream_context_create(['http' => ['timeout' => 3600]]);
+    //                 $context = stream_context_create(['http' => ['timeout' => 3600]]);
 //                 $file = fopen($url, 'r', false, $context);
 //                 if ($file === false) {
 //                     throw new \Exception("Unable to open remote file: $url");
 //                 }
 
-//                 $stream = fopen($filetopath, 'w');
+    //                 $stream = fopen($filetopath, 'w');
 //                 while (!feof($file)) {
 //                     $chunk = fread($file, 8192);
 //                     if ($chunk === false) {
@@ -2349,23 +2370,23 @@ class DocumentManagementController extends Controller
 //                     fwrite($stream, $chunk);
 //                 }
 
-//                 fclose($file);
+    //                 fclose($file);
 //                 fclose($stream);
 
-//                 // Verify file integrity
+    //                 // Verify file integrity
 //                 if (filesize($filetopath) <= 0) {
 //                     throw new \Exception("Downloaded file is empty or corrupted: $filetopath");
 //                 }
 
-//                 if ($file_type == "pdf") {
+    //                 if ($file_type == "pdf") {
 //                     $attachment_path = $this->addPDFDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number);
 //                 } else if ($file_type == "docx") {
 //                     $attachment_path = $this->addWordDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number);
 //                 }
 
-//                 unlink($filetopath);
+    //                 unlink($filetopath);
 
-//                 if (file_exists($attachment_path)) {
+    //                 if (file_exists($attachment_path)) {
 //                     $file = file_get_contents($attachment_path);
 //                     unlink($attachment_path);
 //                     return response()->json([
@@ -2386,10 +2407,10 @@ class DocumentManagementController extends Controller
 //         $res = sys_error_handler($throwable->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), \Auth::user()->id);
 //     }
 
-//     return response()->json($res);
+    //     return response()->json($res);
 // }
 
-public function getApplicationDocumentDownloadurl(Request $req)
+    public function getApplicationDocumentDownloadurl(Request $req)
     {
         try {
             $user_id = $this->user_id;
@@ -2414,75 +2435,74 @@ public function getApplicationDocumentDownloadurl(Request $req)
             } else {
 
 
-                if(validateIsNumeric($uploadeddocuments_id)){
+                if (validateIsNumeric($uploadeddocuments_id)) {
                     $record = DB::table('tra_documents_prevversions as t1')
-                                ->select('*')
-                                ->where('t1.id',$uploadeddocuments_id)
-                                ->first();
-                }
-                else{
+                        ->select('*')
+                        ->where('t1.id', $uploadeddocuments_id)
+                        ->first();
+                } else {
 
-                        $record = DB::table('tra_application_uploadeddocuments')
-                                ->select('*')
-                                ->where('node_ref',$node_ref)
-                                ->first();
+                    $record = DB::table('tra_application_uploadeddocuments')
+                        ->select('*')
+                        ->where('node_ref', $node_ref)
+                        ->first();
 
 
-                    if(!$record){
+                    if (!$record) {
                         //tc_meeting_uploaddocuments
-                            $record = DB::table('tc_meeting_uploaddocuments')
-                                ->select('*')
-                                ->where('node_ref',$node_ref)
-                                ->first();
+                        $record = DB::table('tc_meeting_uploaddocuments')
+                            ->select('*')
+                            ->where('node_ref', $node_ref)
+                            ->first();
                     }
-                    
+
                 }
-        
+
                 $file_type = $record->file_type;
 
 
-                if($record){
-      
-                $document_number = getSingleRecordColValue('tra_documentmanager_application', ['application_code' => $application_code], 'document_number');
+                if ($record) {
 
-                $initial_file_name = $record->initial_file_name;
-                //save the documetn access
-                $data['created_on'] = Carbon::now();
-                $data['created_by'] = $user_id;
+                    $document_number = getSingleRecordColValue('tra_documentmanager_application', ['application_code' => $application_code], 'document_number');
 
-                $res = insertRecord('tra_uploadeddocuments_useraccess', $data, $user_id);
+                    $initial_file_name = $record->initial_file_name;
+                    //save the documetn access
+                    $data['created_on'] = Carbon::now();
+                    $data['created_by'] = $user_id;
 
-                $document_versionid = $req->document_versionid;
+                    $res = insertRecord('tra_uploadeddocuments_useraccess', $data, $user_id);
 
-                if($download == 1){
+                    $document_versionid = $req->document_versionid;
 
-                    $url = downloadDocumentPreviewUrl($uploadeddocuments_id, $document_versionid);
-                }else{
+                    if ($download == 1) {
 
-                    $url = downloadDocumentUrl($node_ref, $document_versionid);
+                        $url = downloadDocumentPreviewUrl($uploadeddocuments_id, $document_versionid);
+                    } else {
 
-                }
+                        $url = downloadDocumentUrl($node_ref, $document_versionid);
 
-                // $res = array(
-                //     'success' => true,
-                //     'document_url' => $url
-                // );
+                    }
 
-                   set_time_limit(0); 
+                    // $res = array(
+                    //     'success' => true,
+                    //     'document_url' => $url
+                    // );
 
-                    $public_dir=public_path().'/resources/uploads';
-                    $public_dir = str_replace('\\', '/', $public_dir);  
+                    set_time_limit(0);
+
+                    $public_dir = public_path() . '/resources/uploads';
+                    $public_dir = str_replace('\\', '/', $public_dir);
 
                     if (!is_dir($public_dir)) {
                         mkdir($public_dir, 0755, true);
-                     }              
-                    
+                    }
+
                     $file = file_get_contents($url);
-                    $filetopath=$public_dir.'/'.$initial_file_name;
+                    $filetopath = $public_dir . '/' . $initial_file_name;
                     file_put_contents($filetopath, $file);
 
                     //dd($destination);
-                    
+
                     // $res = array(
                     //     'success' => true,
                     //     'document_url' => $url
@@ -2497,13 +2517,13 @@ public function getApplicationDocumentDownloadurl(Request $req)
                     //         $attachment_path = $this->addExcelDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number);
 
                     //     }
-                        
+
                     //     unlink($filetopath); 
                     //    // dd($attachment_path);
                     // }else{
                     //     $attachment_path = $filetopath;
                     // }
-                    
+
                     // ini_set('memory_limit', '-1');
                     // if(file_exists($attachment_path)){
                     //    $file = file_get_contents($attachment_path);
@@ -2518,14 +2538,14 @@ public function getApplicationDocumentDownloadurl(Request $req)
                     //     );
                     //     return json_encode($res);
                     // }
-                    
-                   
+
+
                     $res = array(
-                            'success' => true,
-                            'message' => 'all is well',
-                            'filename' => $initial_file_name,
-                            'document_url' => $url
-                        );
+                        'success' => true,
+                        'message' => 'all is well',
+                        'filename' => $initial_file_name,
+                        'document_url' => $url
+                    );
                 }
             }
         } catch (\Exception $exception) {
@@ -2583,19 +2603,19 @@ public function getApplicationDocumentDownloadurl(Request $req)
     // }
 
     public function getApplicationDocumentPreviousVersions(Request $req)
-{
-    try {
-        $original_file_id = $req->input('document_id');
-        
-        // Retrieve necessary data
-        $application_document_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_document_id');
-        $application_code = getSingleRecordColValue('tra_application_documents', ['id' => $application_document_id], 'application_code');
-        
-        // Fetch previous versions of the document
-        $doc_data = DB::table('tra_documents_prevversions as t1')
-            ->join('tra_application_documents as t2', 't1.application_code', '=', 't2.application_code')
-            ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
-            ->select(DB::raw("
+    {
+        try {
+            $original_file_id = $req->input('document_id');
+
+            // Retrieve necessary data
+            $application_document_id = getSingleRecordColValue('tra_application_uploadeddocuments', ['id' => $original_file_id], 'application_document_id');
+            $application_code = getSingleRecordColValue('tra_application_documents', ['id' => $application_document_id], 'application_code');
+
+            // Fetch previous versions of the document
+            $doc_data = DB::table('tra_documents_prevversions as t1')
+                ->join('tra_application_documents as t2', 't1.application_code', '=', 't2.application_code')
+                ->leftJoin('users as t5', 't2.uploaded_by', '=', 't5.id')
+                ->select(DB::raw("
                 t1.*, 
                 t1.id as uploadeddocuments_id,
                 t1.initial_file_name as file_name, 
@@ -2609,38 +2629,38 @@ public function getApplicationDocumentDownloadurl(Request $req)
                     ELSE true 
                 END as leaf
             "))
-            ->where('t1.application_code', $application_code)
-            ->orderBy('t1.created_on', 'desc') // Optional: order by latest
-            ->get();
+                ->where('t1.application_code', $application_code)
+                ->orderBy('t1.created_on', 'desc') // Optional: order by latest
+                ->get();
 
             $results = convertStdClassObjToArray($doc_data);
             $res = decryptArray($results);
-        
-        // Prepare successful response
-        $res = [
-            'success' => true, 
-            'results' => $res
-        ];
-    } catch (\Exception $exception) {
-        $res = sys_error_handler(
-            $exception->getMessage(), 
-            2, 
-            debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), 
-            explode('\\', __CLASS__), 
-            \Auth::user()->id
-        );
-    } catch (\Throwable $throwable) {
-        $res = sys_error_handler(
-            $throwable->getMessage(), 
-            2, 
-            debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), 
-            explode('\\', __CLASS__), 
-            \Auth::user()->id
-        );
+
+            // Prepare successful response
+            $res = [
+                'success' => true,
+                'results' => $res
+            ];
+        } catch (\Exception $exception) {
+            $res = sys_error_handler(
+                $exception->getMessage(),
+                2,
+                debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),
+                explode('\\', __CLASS__),
+                \Auth::user()->id
+            );
+        } catch (\Throwable $throwable) {
+            $res = sys_error_handler(
+                $throwable->getMessage(),
+                2,
+                debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1),
+                explode('\\', __CLASS__),
+                \Auth::user()->id
+            );
+        }
+
+        return response()->json($res);
     }
-    
-    return response()->json($res);
-}
 
     public function deleteSingleFile($file_id)
     {
@@ -2946,7 +2966,7 @@ public function getApplicationDocumentDownloadurl(Request $req)
 
             $file = $fileReceived->getFile(); // get file
 
-                        // $extension = $file->getClientOriginalExtension();
+            // $extension = $file->getClientOriginalExtension();
             // $fileName = str_replace('.'.$extension, '', $file->getClientOriginalName()); //file name without extenstion
             // $fileName .= '.' . $extension; // a unique file name
 
@@ -2973,7 +2993,7 @@ public function getApplicationDocumentDownloadurl(Request $req)
             'status' => true
         ];
     }
-    public function  getFileContent($item, $zip, $folder = '')
+    public function getFileContent($item, $zip, $folder = '')
     {
         //check if directory
         if ($item->is_directory == 1) {
@@ -3009,7 +3029,7 @@ public function getApplicationDocumentDownloadurl(Request $req)
             if ($res->success) {
                 $document_url = str_replace(' ', '%20', $res->document_url);
                 $document_url = str_replace('#', '%20', $document_url);
-                $content =  file_get_contents($document_url);
+                $content = file_get_contents($document_url);
                 $file = array('success' => true, 'file' => $content, 'file_name' => $item->initial_file_name);
                 if ($folder != '') {
                     $zip->addFromString($folder . '/' . $file['file_name'], $file['file']);
@@ -3221,21 +3241,109 @@ public function getApplicationDocumentDownloadurl(Request $req)
         return response()->json($res);
     }
 
-    public function addExcelWatermark($attachment, $destination, $watermarkText, $savedName) {
-    try {
-        // Create a temporary file for the uploaded Excel
-        $tempPath = tempnam(sys_get_temp_dir(), 'excel_');
-        $attachment->move(dirname($tempPath), basename($tempPath));
+    public function addExcelWatermark($attachment, $destination, $watermarkText, $savedName)
+    {
+        try {
+            // Create a temporary file for the uploaded Excel
+            $tempPath = tempnam(sys_get_temp_dir(), 'excel_');
+            $attachment->move(dirname($tempPath), basename($tempPath));
 
-        // Load the Excel file using the Xlsx reader
-        $reader = IOFactory::createReader('Xlsx');
-        $spreadsheet = $reader->load($tempPath);
+            // Load the Excel file using the Xlsx reader
+            $reader = IOFactory::createReader('Xlsx');
+            $spreadsheet = $reader->load($tempPath);
 
-        // Loop through all sheets and add the text watermark to each sheet
-        foreach ($spreadsheet->getAllSheets() as $sheet) {
-            // Add text watermark
-            $sheet->getHeaderFooter()->setOddHeader('&L&G&F' . $watermarkText);
-            $sheet->getHeaderFooter()->setEvenHeader('&L&G&F' . $watermarkText);
+            // Loop through all sheets and add the text watermark to each sheet
+            foreach ($spreadsheet->getAllSheets() as $sheet) {
+                // Add text watermark
+                $sheet->getHeaderFooter()->setOddHeader('&L&G&F' . $watermarkText);
+                $sheet->getHeaderFooter()->setEvenHeader('&L&G&F' . $watermarkText);
+            }
+
+            // Ensure the destination directory exists
+            if (!is_dir($destination)) {
+                mkdir($destination, 0755, true);
+            }
+
+            // Form the full path for the output Excel file
+            $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
+
+            // Save the modified Excel file
+            $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save($outputPath);
+
+            // Remove the temporary file
+            unlink($tempPath);
+
+            return true; // Return true on success
+        } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
+            // Handle any exceptions that occur during the process
+            echo 'Error: ' . $e->getMessage();
+            return false; // Return false on failure
+        }
+    }
+
+
+
+    public function addImageWatermark($sourceFile, $destination, $watermarkFile, $savedName)
+    {
+        // Create an Imagick object for the source image
+        $image = new Imagick($sourceFile);
+
+        // Create an Imagick object for the watermark image
+        $watermark = new Imagick($watermarkFile);
+
+        // Get the dimensions of the source image and the watermark image
+        $imageWidth = $image->getImageWidth();
+        $imageHeight = $image->getImageHeight();
+        $watermarkWidth = $watermark->getImageWidth();
+        $watermarkHeight = $watermark->getImageHeight();
+
+        // Calculate the position to place the watermark (centered)
+        $x = ($imageWidth - $watermarkWidth) / 2;
+        $y = ($imageHeight - $watermarkHeight) / 2;
+
+        // Composite the watermark on the source image
+        $image->compositeImage($watermark, imagick::COMPOSITE_OVER, $x, $y);
+
+        // Ensure the destination directory exists
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
+
+        // Form the full path for the output image file
+        $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
+
+        // Write the new image to the destination
+        $image->writeImage($outputPath);
+
+        // Clean up
+        $image->clear();
+        $image->destroy();
+        $watermark->clear();
+        $watermark->destroy();
+    }
+
+
+    //public function addWordWatermark($sourceFile, $destination, $watermarkText, $savedName) {
+    public function addWordWatermark($filetopath, $destination)
+    {
+        // Load the Word document
+        $phpWord = IOFactory::load($filetopath);
+
+        // Loop through all sections and add the watermark text to the header
+        foreach ($phpWord->getSections() as $section) {
+            $header = $section->addHeader();
+
+            // Add a text watermark
+            $watermark = $header->addWatermarkShape();
+            $watermark->addText($watermarkText, [
+                'font' => ['size' => 50, 'color' => 'C0C0C0', 'bold' => true],
+                'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
+                'rotate' => 45
+            ]);
+
+            // Alternatively, you can use an image as a watermark
+            // $header->addImage('path/to/watermark/image.png', ['width' => 100, 'height' => 100, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'marginTop' => -80, 'wrappingStyle' => 'behind']);
         }
 
         // Ensure the destination directory exists
@@ -3243,261 +3351,178 @@ public function getApplicationDocumentDownloadurl(Request $req)
             mkdir($destination, 0755, true);
         }
 
-        // Form the full path for the output Excel file
+        // Form the full path for the output Word document
         $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
 
-        // Save the modified Excel file
-        $writer = IOFactory::createWriter($spreadsheet, 'Xlsx');
+        // Save the modified Word document
+        $writer = IOFactory::createWriter($phpWord, 'Word2007');
         $writer->save($outputPath);
-
-        // Remove the temporary file
-        unlink($tempPath);
-
-        return true; // Return true on success
-    } catch (\PhpOffice\PhpSpreadsheet\Exception $e) {
-        // Handle any exceptions that occur during the process
-        echo 'Error: ' . $e->getMessage();
-        return false; // Return false on failure
-    }
-}
-
-
-
-public function addImageWatermark($sourceFile, $destination, $watermarkFile, $savedName) {
-    // Create an Imagick object for the source image
-    $image = new Imagick($sourceFile);
-
-    // Create an Imagick object for the watermark image
-    $watermark = new Imagick($watermarkFile);
-
-    // Get the dimensions of the source image and the watermark image
-    $imageWidth = $image->getImageWidth();
-    $imageHeight = $image->getImageHeight();
-    $watermarkWidth = $watermark->getImageWidth();
-    $watermarkHeight = $watermark->getImageHeight();
-
-    // Calculate the position to place the watermark (centered)
-    $x = ($imageWidth - $watermarkWidth) / 2;
-    $y = ($imageHeight - $watermarkHeight) / 2;
-
-    // Composite the watermark on the source image
-    $image->compositeImage($watermark, imagick::COMPOSITE_OVER, $x, $y);
-
-    // Ensure the destination directory exists
-    if (!is_dir($destination)) {
-        mkdir($destination, 0755, true);
     }
 
-    // Form the full path for the output image file
-    $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
 
-    // Write the new image to the destination
-    $image->writeImage($outputPath);
+    public function addPptWatermark($sourceFile, $destination, $watermarkText, $savedName)
+    {
+        // Load the PowerPoint file
+        $ppt = IOFactory::load($sourceFile);
 
-    // Clean up
-    $image->clear();
-    $image->destroy();
-    $watermark->clear();
-    $watermark->destroy();
-}
+        foreach ($ppt->getAllSlides() as $slide) {
+            // Create a new rich text shape
+            $shape = $slide->createRichTextShape()
+                ->setHeight(100)
+                ->setWidth(600)
+                ->setOffsetX(170)
+                ->setOffsetY(180);
 
+            // Center the text
+            $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
 
-//public function addWordWatermark($sourceFile, $destination, $watermarkText, $savedName) {
-public function addWordWatermark($filetopath, $destination) {
-    // Load the Word document
-    $phpWord = IOFactory::load($filetopath);
+            // Add the watermark text
+            $textRun = $shape->createTextRun($watermarkText);
+            $textRun->getFont()->setBold(true)
+                ->setSize(60)
+                ->setColor(new Color(Color::COLOR_GRAY));
+        }
 
-    // Loop through all sections and add the watermark text to the header
-    foreach ($phpWord->getSections() as $section) {
-        $header = $section->addHeader();
+        // Ensure the destination directory exists
+        if (!is_dir($destination)) {
+            mkdir($destination, 0755, true);
+        }
 
-        // Add a text watermark
-        $watermark = $header->addWatermarkShape();
-        $watermark->addText($watermarkText, [
-            'font' => ['size' => 50, 'color' => 'C0C0C0', 'bold' => true],
-            'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER,
-            'rotate' => 45
-        ]);
+        // Form the full path for the output PowerPoint file
+        $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
 
-        // Alternatively, you can use an image as a watermark
-        // $header->addImage('path/to/watermark/image.png', ['width' => 100, 'height' => 100, 'alignment' => \PhpOffice\PhpWord\SimpleType\Jc::CENTER, 'marginTop' => -80, 'wrappingStyle' => 'behind']);
+        // Save the modified PowerPoint file
+        $writer = IOFactory::createWriter($ppt, 'PowerPoint2007');
+        $writer->save($outputPath);
     }
 
-    // Ensure the destination directory exists
-    if (!is_dir($destination)) {
-        mkdir($destination, 0755, true);
-    }
-
-    // Form the full path for the output Word document
-    $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
-
-    // Save the modified Word document
-    $writer = IOFactory::createWriter($phpWord, 'Word2007');
-    $writer->save($outputPath);
-}
-
-
-public function addPptWatermark($sourceFile, $destination, $watermarkText, $savedName) {
-    // Load the PowerPoint file
-    $ppt = IOFactory::load($sourceFile);
-
-    foreach ($ppt->getAllSlides() as $slide) {
-        // Create a new rich text shape
-        $shape = $slide->createRichTextShape()
-            ->setHeight(100)
-            ->setWidth(600)
-            ->setOffsetX(170)
-            ->setOffsetY(180);
-
-        // Center the text
-        $shape->getActiveParagraph()->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
-
-        // Add the watermark text
-        $textRun = $shape->createTextRun($watermarkText);
-        $textRun->getFont()->setBold(true)
-            ->setSize(60)
-            ->setColor(new Color(Color::COLOR_GRAY));
-    }
-
-    // Ensure the destination directory exists
-    if (!is_dir($destination)) {
-        mkdir($destination, 0755, true);
-    }
-
-    // Form the full path for the output PowerPoint file
-    $outputPath = rtrim($destination, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . $savedName;
-
-    // Save the modified PowerPoint file
-    $writer = IOFactory::createWriter($ppt, 'PowerPoint2007');
-    $writer->save($outputPath);
-}
-
-// public function addWatermark($filetopath, $initial_file_name, $public_dir) {
+    // public function addWatermark($filetopath, $initial_file_name, $public_dir) {
 //     $pdf = new \Mpdf\Mpdf();
 //     // Save the uploaded file to a temporary location
 //     // $tempPath = tempnam(sys_get_temp_dir(), 'pdf_');
 //     // $filetopath->move(dirname($tempPath), basename($tempPath));
 //     $watermarkText = 'CONFIDENTIAL';
-    
-//     // Set source file
+
+    //     // Set source file
 //     $pageCount = $pdf->setSourceFile($filetopath);
 
-//     for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+    //     for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
 //         // Import a page
 //         $tplId = $pdf->importPage($pageNo);
 //         $pdf->AddPage();
 //         $pdf->useTemplate($tplId);
 
-//         // Set watermark font and color
+    //         // Set watermark font and color
 //         $pdf->SetFont('Helvetica', 'B', 50);
 //         $pdf->SetTextColor(255, 192, 203);
 
-//         // Get page width and height
+    //         // Get page width and height
 //         $size = $pdf->getTemplateSize($tplId);
 //         $width = $size['width'];
 //         $height = $size['height'];
 
-//         // Add watermark text
+    //         // Add watermark text
 //         $pdf->StartTransform();
 //         $pdf->Rotate(45, $width / 2, $height / 2);
 //         $pdf->Text($width / 4, $height / 2, $watermarkText);
 //         $pdf->StopTransform();
 
-//          // Reset the transparency to default
+    //          // Reset the transparency to default
 //         $pdf->SetAlpha(1);
 //     }
 
 
-public function addPDFDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number) {
-    $pdf = new \Mpdf\Mpdf();
-    
-
-    // Set source file
-    $pageCount = $pdf->setSourceFile($filetopath);
-
-    for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
-        // Import a page
-        $tplId = $pdf->importPage($pageNo);
-        $pdf->AddPage();
-        $pdf->useTemplate($tplId);
-
-        // Set watermark font and color
-        $pdf->SetFont('Helvetica', 'B', 13);
-        $pdf->Cell(0,8,$document_number,0,1, 'R');
-        //$pdf->WriteHTML($watermarkText, true, false, true, true, 'R');
-        // $pdf->SetTextColor(255, 192, 203);
-
-        // // Get page width and height
-        // $size = $pdf->getTemplateSize($tplId);
-        // $width = $size['width'];
-        // $height = $size['height'];
-
-        // // Add watermark text
-        // $pdf->StartTransform();
-        // $pdf->Rotate(45, $width / 2, $height / 2);
-        // $pdf->Text($width / 4, $height / 2, $watermarkText);
-        // $pdf->StopTransform();
-
-        // // Reset the transparency to default
-        // $pdf->SetAlpha(1);
-    }
-
-    // Save the watermarked PDF
-    $watermarkedFilePath = $public_dir . '/watermarked_' . $initial_file_name;
-    $pdf->Output($watermarkedFilePath, \Mpdf\Output\Destination::FILE);
-
-    return $watermarkedFilePath;
-}
+    public function addPDFDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number)
+    {
+        $pdf = new \Mpdf\Mpdf();
 
 
-public function addWordDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number)
-{
-    try {
-        // Check if the file exists and is readable
-        if (!file_exists($filetopath) || !is_readable($filetopath)) {
-            throw new \Exception("File does not exist or is not readable: " . $filetopath);
+        // Set source file
+        $pageCount = $pdf->setSourceFile($filetopath);
+
+        for ($pageNo = 1; $pageNo <= $pageCount; $pageNo++) {
+            // Import a page
+            $tplId = $pdf->importPage($pageNo);
+            $pdf->AddPage();
+            $pdf->useTemplate($tplId);
+
+            // Set watermark font and color
+            $pdf->SetFont('Helvetica', 'B', 13);
+            $pdf->Cell(0, 8, $document_number, 0, 1, 'R');
+            //$pdf->WriteHTML($watermarkText, true, false, true, true, 'R');
+            // $pdf->SetTextColor(255, 192, 203);
+
+            // // Get page width and height
+            // $size = $pdf->getTemplateSize($tplId);
+            // $width = $size['width'];
+            // $height = $size['height'];
+
+            // // Add watermark text
+            // $pdf->StartTransform();
+            // $pdf->Rotate(45, $width / 2, $height / 2);
+            // $pdf->Text($width / 4, $height / 2, $watermarkText);
+            // $pdf->StopTransform();
+
+            // // Reset the transparency to default
+            // $pdf->SetAlpha(1);
         }
 
-        // Load the existing Word document
-        $phpWord = \PhpOffice\PhpWord\IOFactory::load($filetopath);
-
-        // Get the first section (assuming there's at least one section)
-        $section = $phpWord->getSections()[0];
-
-        // Create a new text run at the beginning of the first section
-        $textrun = $section->addTextRun();
-        $textrun->addText($document_number);
-
-        // Add a break line for visual separation
-        $textrun->addTextBreak();
-
-        // Copy existing elements to the new text run
-        foreach ($section->getElements() as $element) {
-            $textrun->addElement($element);
-        }
-
-        // Ensure the destination directory exists
-        if (!is_dir($public_dir)) {
-            mkdir($public_dir, 0755, true);
-        }
-
-        // Form the full path for the output Word document
-        $watermarkedFilePath = rtrim($public_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'watermarked_' . $initial_file_name;
-
-        // Save the modified Word document
-        $phpWordWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
-        $phpWordWriter->save($watermarkedFilePath);
+        // Save the watermarked PDF
+        $watermarkedFilePath = $public_dir . '/watermarked_' . $initial_file_name;
+        $pdf->Output($watermarkedFilePath, \Mpdf\Output\Destination::FILE);
 
         return $watermarkedFilePath;
-    } catch (\Exception $e) {
-        // Handle any exceptions
-        throw new \Exception("Error adding document number to Word document: " . $e->getMessage());
     }
-}
-    
 
 
-// public function addWordDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number)
+    public function addWordDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number)
+    {
+        try {
+            // Check if the file exists and is readable
+            if (!file_exists($filetopath) || !is_readable($filetopath)) {
+                throw new \Exception("File does not exist or is not readable: " . $filetopath);
+            }
+
+            // Load the existing Word document
+            $phpWord = \PhpOffice\PhpWord\IOFactory::load($filetopath);
+
+            // Get the first section (assuming there's at least one section)
+            $section = $phpWord->getSections()[0];
+
+            // Create a new text run at the beginning of the first section
+            $textrun = $section->addTextRun();
+            $textrun->addText($document_number);
+
+            // Add a break line for visual separation
+            $textrun->addTextBreak();
+
+            // Copy existing elements to the new text run
+            foreach ($section->getElements() as $element) {
+                $textrun->addElement($element);
+            }
+
+            // Ensure the destination directory exists
+            if (!is_dir($public_dir)) {
+                mkdir($public_dir, 0755, true);
+            }
+
+            // Form the full path for the output Word document
+            $watermarkedFilePath = rtrim($public_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'watermarked_' . $initial_file_name;
+
+            // Save the modified Word document
+            $phpWordWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
+            $phpWordWriter->save($watermarkedFilePath);
+
+            return $watermarkedFilePath;
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            throw new \Exception("Error adding document number to Word document: " . $e->getMessage());
+        }
+    }
+
+
+
+    // public function addWordDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number)
 // {
 //     try {
 //         // Check if the file exists and is readable
@@ -3505,29 +3530,29 @@ public function addWordDocumentNumber($filetopath, $initial_file_name, $public_d
 //             throw new \Exception("File does not exist or is not readable: " . $filetopath);
 //         }
 
-//         // Load the existing Word document
+    //         // Load the existing Word document
 //         $phpWord = \PhpOffice\PhpWord\IOFactory::load($filetopath);
 
-//         // Get the first section (assuming there's at least one section)
+    //         // Get the first section (assuming there's at least one section)
 //         $section = $phpWord->getSections()[0];
 
-//         // Add document number at the beginning of the first section
+    //         // Add document number at the beginning of the first section
 //         $textRun = $section->addTextRun();
 //         $textRun->addText($document_number, ['bold' => true, 'size' => 16, 'color' => 'FF0000'], ['alignment' => 'center']);
 
-//         // Ensure the destination directory exists
+    //         // Ensure the destination directory exists
 //         if (!is_dir($public_dir)) {
 //             mkdir($public_dir, 0755, true);
 //         }
 
-//         // Form the full path for the output Word document
+    //         // Form the full path for the output Word document
 //         $watermarkedFilePath = rtrim($public_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'watermarked_' . $initial_file_name;
 
-//         // Save the modified Word document
+    //         // Save the modified Word document
 //         $phpWordWriter = \PhpOffice\PhpWord\IOFactory::createWriter($phpWord, 'Word2007');
 //         $phpWordWriter->save($watermarkedFilePath);
 
-//         return $watermarkedFilePath;
+    //         return $watermarkedFilePath;
 //     } catch (\Exception $e) {
 //         // Handle any exceptions
 //         throw new \Exception("Error adding document number to Word document: " . $e->getMessage());
@@ -3536,194 +3561,196 @@ public function addWordDocumentNumber($filetopath, $initial_file_name, $public_d
 
 
 
-public function addExcelDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number)
-{
-    try {
-        // Check if the file exists and is readable
-        if (!file_exists($filetopath) || !is_readable($filetopath)) {
-            throw new \Exception("File does not exist or is not readable: " . $filetopath);
+    public function addExcelDocumentNumber($filetopath, $initial_file_name, $public_dir, $document_number)
+    {
+        try {
+            // Check if the file exists and is readable
+            if (!file_exists($filetopath) || !is_readable($filetopath)) {
+                throw new \Exception("File does not exist or is not readable: " . $filetopath);
+            }
+
+            // Load the existing Excel document
+            $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filetopath);
+
+            // Get the active sheet (assuming there is only one sheet)
+            $sheet = $spreadsheet->getActiveSheet();
+
+            // Add document number to a specific cell (e.g., A1)
+            $sheet->setCellValue('A1', $document_number);
+
+            // Ensure the destination directory exists
+            if (!is_dir($public_dir)) {
+                mkdir($public_dir, 0755, true);
+            }
+
+            // Form the full path for the output Excel document
+            $watermarkedFilePath = rtrim($public_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'watermarked_' . $initial_file_name;
+
+            // Save the modified Excel document
+            $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
+            $writer->save($watermarkedFilePath);
+
+            return $watermarkedFilePath;
+        } catch (\Exception $e) {
+            // Handle any exceptions
+            throw new \Exception("Error adding document number to Excel document: " . $e->getMessage());
         }
-
-        // Load the existing Excel document
-        $spreadsheet = \PhpOffice\PhpSpreadsheet\IOFactory::load($filetopath);
-
-        // Get the active sheet (assuming there is only one sheet)
-        $sheet = $spreadsheet->getActiveSheet();
-
-        // Add document number to a specific cell (e.g., A1)
-        $sheet->setCellValue('A1', $document_number);
-
-        // Ensure the destination directory exists
-        if (!is_dir($public_dir)) {
-            mkdir($public_dir, 0755, true);
-        }
-
-        // Form the full path for the output Excel document
-        $watermarkedFilePath = rtrim($public_dir, DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'watermarked_' . $initial_file_name;
-
-        // Save the modified Excel document
-        $writer = \PhpOffice\PhpSpreadsheet\IOFactory::createWriter($spreadsheet, 'Xlsx');
-        $writer->save($watermarkedFilePath);
-
-        return $watermarkedFilePath;
-    } catch (\Exception $e) {
-        // Handle any exceptions
-        throw new \Exception("Error adding document number to Excel document: " . $e->getMessage());
-    }
-}
-
-    public function downloadsopTemplate(Request $req){
-
-            $public_dir = public_path() . '/resources/SOPTemplate.docx';
-            $public_dir = str_replace('\\', '/', $public_dir); 
-            // Initialize data array
-            $data = array();
-            $module_id = $req->module_id;
-            $val = date('Ymdhis');
-
-            if (validateIsNumeric($module_id)) {
-                $module_details = getTableData('par_modules', array('id' => $module_id));
-                $table_name = $module_details['sop_table_name'];
-            }
-
-            $db_columns = DB::select('SHOW COLUMNS FROM '. $table_name);
-            $column_data = array();
-
-            foreach ($db_columns as $row) {
-                if (strpos($row->Field, '_id') === false) {
-                    $column_data[strtoupper($row->Field)] = ""; 
-                }
-            }
-
-            $data[] = $column_data;
-            $data_array = json_decode(json_encode($data), true);
-
-            // Load the pre-existing Word document template
-            $templateProcessor = new TemplateProcessor($public_dir);
-
-            if (isset($data_array[0])) {
-                $header = array_keys($data_array[0]);
-            } else {
-                $data_array = array();
-                $header = array();
-                $templateProcessor->setValue('table_placeholder', 'No data');
-            }
-
-            // Add the data table to the document
-            foreach ($header as $index => $col) {
-                $templateProcessor->setValue('HEADER_PLACEHOLDER' . ($index + 1), $col);
-            }
-
-            foreach ($data_array as $rowIndex => $row) {
-                foreach ($header as $colIndex => $col) {
-                    $templateProcessor->setValue('COLUMN_PLACEHOLDER' . ($colIndex + 1), $row[$col]);
-                }
-            }
-
-            // Save the modified document
-            $tempFilePath = tempnam(sys_get_temp_dir(), 'PHPWord');
-            $templateProcessor->saveAs($tempFilePath);
-
-            $response = new StreamedResponse(function () use ($tempFilePath) {
-                readfile($tempFilePath);
-            });
-
-            $filename = 'SOP Template';
-            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-            $response->headers->set('Content-Disposition', 'attachment;filename=' . $filename . '.docx');
-            $response->headers->set('Cache-Control', 'max-age=0');
-
-            return $response;
     }
 
-    public function downloadFormFormat(Request $req){
+    public function downloadsopTemplate(Request $req)
+    {
 
-            $public_dir = public_path() . '/resources/FormFormat.docx';
-            $public_dir = str_replace('\\', '/', $public_dir); 
-            // Initialize data array
-            $data = array();
-            $module_id = $req->module_id;
-            $val = date('Ymdhis');
+        $public_dir = public_path() . '/resources/SOPTemplate.docx';
+        $public_dir = str_replace('\\', '/', $public_dir);
+        // Initialize data array
+        $data = array();
+        $module_id = $req->module_id;
+        $val = date('Ymdhis');
 
-            if (validateIsNumeric($module_id)) {
-                $module_details = getTableData('par_modules', array('id' => $module_id));
-                $table_name = $module_details['sop_table_name'];
+        if (validateIsNumeric($module_id)) {
+            $module_details = getTableData('par_modules', array('id' => $module_id));
+            $table_name = $module_details['sop_table_name'];
+        }
+
+        $db_columns = DB::select('SHOW COLUMNS FROM ' . $table_name);
+        $column_data = array();
+
+        foreach ($db_columns as $row) {
+            if (strpos($row->Field, '_id') === false) {
+                $column_data[strtoupper($row->Field)] = "";
             }
+        }
 
-            $db_columns = DB::select('SHOW COLUMNS FROM '. $table_name);
-            $column_data = array();
+        $data[] = $column_data;
+        $data_array = json_decode(json_encode($data), true);
 
-            foreach ($db_columns as $row) {
-                if (strpos($row->Field, '_id') === false) {
-                    $column_data[strtoupper($row->Field)] = ""; 
-                }
+        // Load the pre-existing Word document template
+        $templateProcessor = new TemplateProcessor($public_dir);
+
+        if (isset($data_array[0])) {
+            $header = array_keys($data_array[0]);
+        } else {
+            $data_array = array();
+            $header = array();
+            $templateProcessor->setValue('table_placeholder', 'No data');
+        }
+
+        // Add the data table to the document
+        foreach ($header as $index => $col) {
+            $templateProcessor->setValue('HEADER_PLACEHOLDER' . ($index + 1), $col);
+        }
+
+        foreach ($data_array as $rowIndex => $row) {
+            foreach ($header as $colIndex => $col) {
+                $templateProcessor->setValue('COLUMN_PLACEHOLDER' . ($colIndex + 1), $row[$col]);
             }
+        }
 
-            $data[] = $column_data;
-            $data_array = json_decode(json_encode($data), true);
+        // Save the modified document
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'PHPWord');
+        $templateProcessor->saveAs($tempFilePath);
 
-            // Load the pre-existing Word document template
-            $templateProcessor = new TemplateProcessor($public_dir);
+        $response = new StreamedResponse(function () use ($tempFilePath) {
+            readfile($tempFilePath);
+        });
 
-            if (isset($data_array[0])) {
-                $header = array_keys($data_array[0]);
-            } else {
-                $data_array = array();
-                $header = array();
-                $templateProcessor->setValue('table_placeholder', 'No data');
+        $filename = 'SOP Template';
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        $response->headers->set('Content-Disposition', 'attachment;filename=' . $filename . '.docx');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
+    }
+
+    public function downloadFormFormat(Request $req)
+    {
+
+        $public_dir = public_path() . '/resources/FormFormat.docx';
+        $public_dir = str_replace('\\', '/', $public_dir);
+        // Initialize data array
+        $data = array();
+        $module_id = $req->module_id;
+        $val = date('Ymdhis');
+
+        if (validateIsNumeric($module_id)) {
+            $module_details = getTableData('par_modules', array('id' => $module_id));
+            $table_name = $module_details['sop_table_name'];
+        }
+
+        $db_columns = DB::select('SHOW COLUMNS FROM ' . $table_name);
+        $column_data = array();
+
+        foreach ($db_columns as $row) {
+            if (strpos($row->Field, '_id') === false) {
+                $column_data[strtoupper($row->Field)] = "";
             }
+        }
 
-            // Add the data table to the document
-            foreach ($header as $index => $col) {
-                $templateProcessor->setValue('HEADER_PLACEHOLDER' . ($index + 1), $col);
+        $data[] = $column_data;
+        $data_array = json_decode(json_encode($data), true);
+
+        // Load the pre-existing Word document template
+        $templateProcessor = new TemplateProcessor($public_dir);
+
+        if (isset($data_array[0])) {
+            $header = array_keys($data_array[0]);
+        } else {
+            $data_array = array();
+            $header = array();
+            $templateProcessor->setValue('table_placeholder', 'No data');
+        }
+
+        // Add the data table to the document
+        foreach ($header as $index => $col) {
+            $templateProcessor->setValue('HEADER_PLACEHOLDER' . ($index + 1), $col);
+        }
+
+        foreach ($data_array as $rowIndex => $row) {
+            foreach ($header as $colIndex => $col) {
+                $templateProcessor->setValue('COLUMN_PLACEHOLDER' . ($colIndex + 1), $row[$col]);
             }
+        }
 
-            foreach ($data_array as $rowIndex => $row) {
-                foreach ($header as $colIndex => $col) {
-                    $templateProcessor->setValue('COLUMN_PLACEHOLDER' . ($colIndex + 1), $row[$col]);
-                }
-            }
+        // Save the modified document
+        $tempFilePath = tempnam(sys_get_temp_dir(), 'PHPWord');
+        $templateProcessor->saveAs($tempFilePath);
 
-            // Save the modified document
-            $tempFilePath = tempnam(sys_get_temp_dir(), 'PHPWord');
-            $templateProcessor->saveAs($tempFilePath);
+        $response = new StreamedResponse(function () use ($tempFilePath) {
+            readfile($tempFilePath);
+        });
 
-            $response = new StreamedResponse(function () use ($tempFilePath) {
-                readfile($tempFilePath);
-            });
+        $filename = 'Form Format';
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+        $response->headers->set('Content-Disposition', 'attachment;filename=' . $filename . '.docx');
+        $response->headers->set('Cache-Control', 'max-age=0');
 
-            $filename = 'Form Format';
-            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
-            $response->headers->set('Content-Disposition', 'attachment;filename=' . $filename . '.docx');
-            $response->headers->set('Cache-Control', 'max-age=0');
-
-            return $response;
+        return $response;
 
     }
 
     public function downloadlogdatabasesTemplate(Request $req)
-        {
-            $public_dir = public_path() . '/resources/LogDatabases.xlsx';
-            $public_dir = str_replace('\\', '/', $public_dir);
+    {
+        $public_dir = public_path() . '/resources/LogDatabases.xlsx';
+        $public_dir = str_replace('\\', '/', $public_dir);
 
-            if (!file_exists($public_dir)) {
-                abort(404, 'File not found.');
-            }
-
-            // Stream the existing file as a response
-            $response = new StreamedResponse(function () use ($public_dir) {
-                readfile($public_dir);
-            });
-
-            $filename = 'Log Databases Format';
-            $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-            $response->headers->set('Content-Disposition', 'attachment;filename=' . $filename . '.xlsx');
-            $response->headers->set('Cache-Control', 'max-age=0');
-
-            return $response;
+        if (!file_exists($public_dir)) {
+            abort(404, 'File not found.');
         }
 
-         public function deleteDocumentRecord(Request $req)
+        // Stream the existing file as a response
+        $response = new StreamedResponse(function () use ($public_dir) {
+            readfile($public_dir);
+        });
+
+        $filename = 'Log Databases Format';
+        $response->headers->set('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        $response->headers->set('Content-Disposition', 'attachment;filename=' . $filename . '.xlsx');
+        $response->headers->set('Cache-Control', 'max-age=0');
+
+        return $response;
+    }
+
+    public function deleteDocumentRecord(Request $req)
     {
         try {
             $application_code = $req->input('application_code');
@@ -3750,12 +3777,12 @@ public function addExcelDocumentNumber($filetopath, $initial_file_name, $public_
             if (recordExists('tra_permitsrelease_recommendation', $where)) {
                 $res = deleteRecord('tra_permitsrelease_recommendation', $where);
             }
-            
+
             if (recordExists('tra_documentmanager_archive', $where)) {
                 $res = deleteRecord('tra_documentmanager_archive', $where);
             }
-              
-            
+
+
         } catch (\Exception $exception) {
             $res = sys_error_handler($exception->getMessage(), 2, debug_backtrace(DEBUG_BACKTRACE_IGNORE_ARGS, 1), explode('\\', __CLASS__), Auth::user()->id);
         } catch (\Throwable $throwable) {
@@ -3764,23 +3791,23 @@ public function addExcelDocumentNumber($filetopath, $initial_file_name, $public_
         return response()->json($res);
     }
 
-//     if (!is_dir($public_dir)) {
+    //     if (!is_dir($public_dir)) {
 //         mkdir($public_dir, 0755, true);
 //     }
 
-//     // Form the full path for the output PDF
+    //     // Form the full path for the output PDF
 //     $outputPath = rtrim($filetopath);
 
-   
 
-//     // Output the new PDF to the specified destination
+
+    //     // Output the new PDF to the specified destination
 //     $pdf->Output($outputPath, 'F');
 
-//     // Clean up the temporary file
+    //     // Clean up the temporary file
 //     unlink($filetopath);
 // }
-    
-//     public function handleAttachment($file)
+
+    //     public function handleAttachment($file)
 // {
 //     if ($file) {
 //         $document_rootupload = Config('constants.dms.doc_rootupload');
