@@ -97,7 +97,8 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             applicationCode= containerPnl.down('hiddenfield[name=active_application_code]').getValue(),
             application_status_id = containerPnl.down('hiddenfield[name=application_status_id]').getValue(),
             workflow_stage_id = containerPnl.down('hiddenfield[name=workflow_stage_id]').getValue(),
-            auditPlanMainDetailsFrm = containerPnl.down('auditPlanMainDetailsFrm');
+            auditPlanMainDetailsFrm = containerPnl.down('auditPlanMainDetailsFrm'),
+            auditFindingGrid = containerPnl.down('auditfindingsgrid');
          
             auditPlanMainDetailsFrm = auditPlanMainDetailsFrm.getForm(); 
   
@@ -134,6 +135,7 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
                             containerPnl.down('hiddenfield[name=sub_module_id]').setValue(submodule_id);
                             containerPnl.down('hiddenfield[name=module_id]').setValue(moduleId);
                             containerPnl.down('displayfield[name=tracking_no]').setValue(tracking_no);
+                            auditFindingGrid.down('hiddenfield[name=application_code]').setValue(application_code);
                     } else {
                         toastr.error(message, "Failure Response");
                     }

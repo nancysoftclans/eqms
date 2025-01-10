@@ -1390,6 +1390,7 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
             //get the documetn Type Name
             $document_type = getParameterItem('par_document_types', $document_type_id, 'mysql');
 
+
             //create nore
             $node_name = $document_type;
             $node_details = array(

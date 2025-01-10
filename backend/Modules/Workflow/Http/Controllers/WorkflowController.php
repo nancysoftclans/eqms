@@ -1971,23 +1971,7 @@ class WorkflowController extends Controller
                 ->groupBy('t1.id', 't1.serial_no', 't2.id', 't3.name', 't4.query', 't4.query_response', 't5.id')
                 ->orderBy('t1.serial_no', 'ASC');
 
-            if (validateIsNumeric($query_id)) {
-                $qry->where('t4.query_id', $query_id);
-            }
-
-            if (validateIsNumeric($is_structured) && $is_structured == 1) {
-                $qry->where('t5.is_query', 1);
-            } else {
-                if (validateIsNumeric($checklist_type)) {
-                    $qry->where('t1.checklist_type_id', $checklist_type);
-                } else {
-                    $qry->whereIn('t1.checklist_type_id', $checklist_types);
-                }
-                if (validateIsNumeric($pass_status)) {
-                    $qry->where('t2.pass_status', $pass_status);
-                }
-            }
-
+          
             if ($filter_string != '') {
                 $qry->whereRaw($filter_string);
             }

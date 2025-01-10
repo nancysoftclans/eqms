@@ -1477,8 +1477,9 @@ class DocumentManagementController extends Controller
             DB::beginTransaction();
             $app_rootnode = getApplicationRootNode($application_code);
 
+
             $app_rootnode = getDocumentTypeRootNode($app_rootnode->dms_node_id, $application_code, $document_type_id, $user_id);
-           
+         
             $table_name = 'tra_application_uploadeddocuments';
             $mis_application_id = 0;
             $reg_serial = 0;
@@ -1497,6 +1498,8 @@ class DocumentManagementController extends Controller
                     $extension = $file->getClientOriginalExtension();
                     $docextension_check = $this->validateDocumentExtension($extension, $document_requirement_id);
                     $is_allowedextension = $docextension_check['is_allowedextension'];
+
+
 
                     if (!$is_allowedextension) {
                         $allowed_filetypes = $docextension_check['allowed_filetypes'];

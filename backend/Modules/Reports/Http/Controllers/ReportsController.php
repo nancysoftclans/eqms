@@ -10360,6 +10360,8 @@ public function generateAuditReportWord(Request $req)
 				->where('t1.application_code', $application_code)
 				->groupBy('t1.checklist_item_id')
 				->get();
+
+				dd($question_records);
 			
 			$question_records = convertStdClassObjToArray($question_records);
 			$question_records = decryptArray($question_records);			
@@ -10403,7 +10405,7 @@ public function generateAuditReportWord(Request $req)
 				->leftJoin('par_issue_types as t7', 't4.issue_type_id', 't7.id')
 				->leftjoin('users as t8', 't4.created_by', 't8.id')
 				->leftJoin('par_issue_statuses as t9', 't4.application_status_id', 't9.id')
-				->select('t1.results','t1.id as finding_id', 't1.finding_title', 't2.created_on', 't2.dola as completed_on', 't2.audit_summary as description', 't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
+				->select('t1.results','t1.id as finding_id', 't1.finding_title','t1.description', 't2.created_on', 't2.dola as completed_on',  't4.tracking_no as raised_against', 't4.tracking_no as related_issue', 't4.id as issue_id', 't4.creation_date as issue_raised', 't4.date_closed', 't5.name as finding_type', 't6.name as raised_against_status', 't7.title as issue_type', 't7.title',
 					DB::raw("decrypt(t8.first_name) as first_name,decrypt(t8.last_name) as last_name"), 't9.title as issue_status')	
 				->where('t1.application_code', $application_code)
 				->get();
@@ -10611,10 +10613,7 @@ public function generateAuditReportWord(Request $req)
 			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Completed</th><td colspan="3">' . htmlspecialchars($record['audit_end_date']) . '</td>';
 			$html .= '</tr>';
 			$html .= '<tr>';
-			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Description</th><td colspan="3">' . htmlspecialchars($record['audit_summary']) . '</td>';
-			$html .= '</tr>';
-			$html .= '<tr>';
-			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Finding</th><td colspan="3">' . htmlspecialchars($finding_record['results']) . '</td>';
+			$html .= '<th style="font-weight:bold; background-color: #d3d3d3;">Finding Description</th><td colspan="3">' . htmlspecialchars($finding_record['description']) . '</td>';
 			$html .= '</tr>';
 			$html .= '<tr>';
 			$html .= '<th style="font-weight:bold;">Related Issue</th><td colspan="3">' . htmlspecialchars($finding_record['related_issue']) . '</td>';
