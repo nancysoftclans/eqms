@@ -347,6 +347,67 @@ class WorkflowController extends Controller
         return response()->json($res);
     }
 
+
+    public function getGbtManagementWorkflowDetails(Request $request)
+{
+    $module_id = $request->input('module_id');
+    $sub_module_id = $request->input('sub_module_id');
+
+    try {
+        // Get workflow details based on module_id and sub_module_id only
+        $where = array(
+            't1.module_id' => $module_id,
+            't1.sub_module_id' => $sub_module_id
+        );
+
+        $qry = DB::table('wf_processes as t1')
+            ->join('wf_workflows as t2', 't1.workflow_id', '=', 't2.id')
+            ->join('wf_workflow_stages as t3', function ($join) {
+                $join->on('t2.id', '=', 't3.workflow_id')
+                    ->on('t3.stage_status', '=', DB::raw(1));
+            })
+            ->join('wf_workflow_interfaces as t4', 't3.interface_id', '=', 't4.id')
+            ->select('t4.viewtype', 't1.id as processId', 't1.name as processName', 't3.name as initialStageName', 't3.id as initialStageId');
+
+        // Add conditions for module_id and sub_module_id
+        $qry->where($where);
+
+        // Execute the query to get the first result
+        $results = $qry->first();
+
+        // Fetch initial application status details
+        $statusDetails = getApplicationInitialStatus($module_id, $sub_module_id);
+
+        // Add initial status to the results
+        if ($results) {
+            $results->initialAppStatus = $statusDetails->name;
+        }
+
+        // Prepare success response
+        $res = array(
+            'success' => true,
+            'results' => $results,
+            'message' => 'All is well'
+        );
+    } catch (\Exception $exception) {
+        // Handle any exception
+        $res = array(
+            'success' => false,
+            'message' => $exception->getMessage()
+        );
+    } catch (\Throwable $throwable) {
+        // Handle any throwable error
+        $res = array(
+            'success' => false,
+            'message' => $throwable->getMessage()
+        );
+    }
+
+    // Return the response as JSON
+    return response()->json($res);
+}
+
+
     public function getIssueManagementWorkflowDetails(Request $request)
     {
         $module_id = $request->input('module_id');

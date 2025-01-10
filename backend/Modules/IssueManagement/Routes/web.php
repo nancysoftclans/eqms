@@ -38,6 +38,5 @@ Route::group(['prefix' => 'issuemanagement', 'middleware' => ['web']], function 
     Route::get('getIssueTypeCategoriesLogs', [IssueManagementController::class, 'getIssueTypeCategoriesLogs']);
     Route::get('getIssueStatusGroupsLogs', [IssueManagementController::class, 'getIssueStatusGroupsLogs']);
     Route::get('getIssueStatusesLogs', [IssueManagementController::class, 'getIssueStatusesLogs']);
-    Route::get('getCorrectiveIssueManagementDetails', [IssueManagementController::class, 'getCorrectiveIssueManagementDetails']);
-    
+    Route::resource('gbt_types', 'GbtTypeController');
 });

@@ -1,6 +1,7 @@
 Ext.define('Admin.view.gbt.views.toolbars.GbtMgmntTb.js', {
     extend: 'Ext.toolbar.Toolbar',
-    xtype:'gbtDashTb',
+    xtype:'gbtManagementDashTb',
+    //controller: 'gbtMgmntVctr',
     ui: 'footer', 
     defaults: {
         ui: 'soft-blue',
@@ -15,14 +16,15 @@ Ext.define('Admin.view.gbt.views.toolbars.GbtMgmntTb.js', {
         {
             text: 'Home',
             iconCls: 'x-fa fa-home',
-            sec_dashboard:'gbtDashWrapperPnl',
+            sec_dashboard:'gbtManagementDashWrapperPnl',
             name: 'disposalpermitstbRegHomeBtn'
         },
         {
-            text: 'Plan GBT',
+            text: 'Gbt Application',
             iconCls: 'x-fa fa-plus-square',
             handler: 'onInitiateGbt',
-            app_type: 103
-        },
+            wrapper_xtype: "gbtManagementDashWrapperPnl",
+            app_type: 115,
+        }
     ]
 });

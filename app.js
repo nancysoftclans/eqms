@@ -2050,6 +2050,32 @@ function syncOnlineApplications() {
     });
 }
 
+
+function getGbtManagementWorkflowDetails(module_id,sub_module_id) {
+    var results = [];
+    Ext.Ajax.request({
+        method: 'GET',
+        async: false,
+        url: 'workflow/getGbtManagementWorkflowDetails',
+        params: {
+            module_id: module_id,
+            sub_module_id: sub_module_id
+        },
+        headers: {
+            'Authorization': 'Bearer ' + access_token
+        },
+        success: function (response) {
+            var resp = Ext.JSON.decode(response.responseText),
+                success = resp.success;
+            if (success || success == true || success === true) {
+                results = resp.results;
+            }
+        }
+    });
+    return results;
+}
+
+
 function getIssueManagementWorkflowDetails(module_id, issue_type_id,sub_module_id) {
     var results = [];
     Ext.Ajax.request({
@@ -2074,6 +2100,7 @@ function getIssueManagementWorkflowDetails(module_id, issue_type_id,sub_module_i
     });
     return results;
 }
+
 
 function checkUserNewTasks(mins) {
     var runner = new Ext.util.TaskRunner(),

@@ -110,6 +110,7 @@ Route::group(['prefix' => 'workflow','middleware' => ['auth:api', 'web']], funct
     Route::post('getApprovalExpiryDate', [WorkflowController::class, 'getApprovalExpiryDate']);
     Route::get('getReportApplicableChecklistItems', [WorkflowController::class, 'getReportApplicableChecklistItems']);
     Route::get('getIssueManagementWorkflowDetails', [WorkflowController::class, 'getIssueManagementWorkflowDetails']);
+    Route::get('getGbtManagementWorkflowDetails', [WorkflowController::class, 'getGbtManagementWorkflowDetails']);
     
 
 });

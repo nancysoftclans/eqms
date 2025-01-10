@@ -22,6 +22,7 @@ Ext.define('Admin.Application', {
         'OnlineServicesCtr',
         'IssueManagementCtr',
         'AuditManagementCtr',
+        'GbtManagementCtr',
     ],
     defaultToken : system_dashboard,
     // The name of the initial view to create. This class will gain a "viewport" plugin

@@ -15,7 +15,7 @@ Ext.define("Admin.view.issuemanagement.views.panels.IssueManagementPnl", {
     {
       xtype: "issuemanagementfrm",
       autoScroll: true,
-      title: "Issue Details",
+      title: "Details",
       fieldDefaults: {
         fieldStyle: {
           color: "green",

@@ -1,6 +1,6 @@
-Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
+Ext.define('Admin.view.gbt.viewController.GbtMgmntVctr', {
     extend: 'Ext.app.ViewController',
-    alias: 'controller.gbtViewctr',
+    alias: 'controller.gbtMgmntVctr',
 
     setGridStore: function (obj, options) {
         this.fireEvent('setGridStore', obj, options);
@@ -16,38 +16,8 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
         this.fireEvent('setGridTreeStore', obj, options);
     },
     /**
-        
+        Audit Types
      */
-
-    onInitiateGbt: function(btn) {
-        var application_type = btn.app_type;
- 
-             this.fireEvent('onInitiateNewGbt',application_type);
-     },
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     showAuditTypesRecords: function(btn){
         var grid = Ext.widget('audittypes'),
         form = btn.up('form');
@@ -98,9 +68,118 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
      */
     
 
+    onInitiateGbt: function(btn) {
+        
+        var application_type = btn.app_type;
+ 
+         this.fireEvent('onNewGbtApplication',application_type);
+         
+             
+     },
+
+
+    showNewGbtApplication: function (btn) {
+        var me = this,
+          form = btn.up("form"),
+          win = btn.up("window"),
+          wrapper_xtype = btn.wrapper_xtype;
+        // Get the selected Issue Type
+        issue_type_id = form.query('combo[name="issue_type_id"]')[0].getValue();
+    
+        if (!isNaN(issue_type_id)) {
+          //Find Application type and workflow using this
+          //Make the form dynamic based on this issue type i.e Change Management, Customer Complaints, Deviation, Corrective Actions
+          Ext.Ajax.request({
+            url: "issuemanagement/getIssueProcessDetails",
+            method: "GET",
+            params: {
+              issue_type_id: issue_type_id,
+            },
+            headers: {
+              Authorization: "Bearer " + access_token,
+              "X-CSRF-Token": token,
+            },
+            success: function (response) {
+              var resp = Ext.JSON.decode(response.responseText),
+                success = resp.success,
+                results = resp.results;
+              if (results != null && success === true) {
+                var application_type = resp.results.sub_module_id,
+                  module_id = resp.results.module_id;
+                me.fireEvent(
+                  "onNewIssueApplication",
+                  application_type,
+                  issue_type_id,
+                  wrapper_xtype,
+                  module_id
+                );
+                win.close();
+              } else {
+                win.close();
+                toastr.error(
+                  "Problem encountered while fetching workflow details-->Possibly workflow not set!!",
+                  "Failure Response"
+                );
+              }
+            },
+            failure: function (response) {
+              var resp = Ext.JSON.decode(response.responseText),
+                message = resp.message;
+              toastr.error(message, "Failure Response");
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+              toastr.error(
+                "Error downloading data: " + errorThrown,
+                "Error Response"
+              );
+            },
+          });
+        }
+      },
+
+    onInitiateNewGbtApplication: function(sub_module_id) {
+        Ext.getBody().mask('Please wait...');
+
+        var me = this,
+            mainTabPanel = me.getMainTabPanel(),
+            activeTab = mainTabPanel.getActiveTab(),
+            dashboardWrapper = activeTab.down("#gbtDashWrapperPnl"),
+            module_id = activeTab.down("hiddenfield[name=module_id]").getValue();
+        
+            workflow_details = getInitialWorkflowDetails(module_id, sub_module_id);
+            if (!workflow_details) {
+                Ext.getBody().unmask();
+                toastr.warning('Problem encountered while fetching workflow details-->Possibly workflow not set!!', 'Warning Response');
+                return false;
+            }
+
+            dashboardWrapper.removeAll();
+            var workflowContainer = Ext.widget(workflow_details.viewtype);
+
+            workflowContainer.down('displayfield[name=process_name]').setValue(workflow_details.processName);
+            workflowContainer.down('displayfield[name=workflow_stage]').setValue(workflow_details.initialStageName);
+            workflowContainer.down('displayfield[name=application_status]').setValue(workflow_details.initialAppStatus);
+            workflowContainer.down('hiddenfield[name=process_id]').setValue(workflow_details.processId);
+            workflowContainer.down('hiddenfield[name=workflow_stage_id]').setValue(workflow_details.initialStageId);
+            workflowContainer.down('hiddenfield[name=module_id]').setValue(module_id);
+            workflowContainer.down('hiddenfield[name=sub_module_id]').setValue(sub_module_id);
+            dashboardWrapper.add(workflowContainer);
+            Ext.Function.defer(function () {
+                Ext.getBody().unmask();
+            }, 300);
+            // workflowContainer.getViewModel().set({readOnly:false});
+    },
+
     onAuditPlanSchedule: function(btn) {
         // console.log(btn);
     },
+
+    //*remove after correct implement 
+    // getAuditLogsClick:function(){
+    //     var logWindow = Ext.create('Admin.view.auditManagement.views.panels.panel');
+    //     logWindow.show();
+        
+    // },
 
     saveNewAuditPlanDetails:function(btn){
        var wizard = btn.wizardpnl,
@@ -250,6 +329,54 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
         funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
        
     },
+
+    //show log window
+    showLogGridwin: function(btn){
+        var me = this,
+            childXtype = btn.childXtype,
+            winTitle = btn.winTitle,
+            winWidth= btn.winWidth,
+            child = Ext.widget(childXtype);
+        if (btn.has_params){
+            var param_value = btn.up('grid').down('hiddenfield[name='+btn.param_name+']').getValue();
+            child.down('hiddenfield[name='+btn.param_name+']').setValue(param_value);
+        }
+        //child.setHeight('600');
+
+
+
+        funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
+    },
+
+    showLogConfigwin: function(btn) {
+        
+        var button = btn.up('button'),
+        grid = button.up('grid'),
+        record = button.getWidgetRecord(),
+        
+        childXtype = btn.childXtype,
+         winWidth='100%',
+         winTitle="logs",
+    //     form = Ext.widget(childXtype),
+        storeArray = eval(btn.stores),
+        arrayLength = storeArray.length;
+    if (arrayLength > 0) {
+        me.fireEvent('refreshStores', storeArray);
+    }
+     var refId = record.get('id');
+     
+    // logGrid.loadRecord(refId);
+    //logGrid.setHeight(650);
+   // var logGrid = Ext.ComponentQuery.query('#audittypeloggrids')[0];
+    var logGrid = Ext.widget(childXtype);
+    //console.log(logGrid);
+    logGrid.down('textfield[name=id]').setValue(refId);
+
+    funcShowCustomizableWindow(winTitle, winWidth, logGrid, 'customizablewindow');
+     
+     },
+ 
+
     doCreateConfigParamWin: function (btn) {
         var me = this,
             url = btn.action_url,
@@ -268,14 +395,19 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
                     'Authorization': 'Bearer ' + access_token
                 },
                 success: function (form, action) {
+                    //console.log("Server response:", action.response.responseText);
                     var response = Ext.decode(action.response.responseText),
-                        success = response.success,
+                        success = response.success;
                         message = response.message;
+                        id = response.record_id;
+                        //console.log(id);
                     if (success == true || success === true) {
                         toastr.success(message, "Success Response");
                         store.removeAll();
                         store.load();
                         win.close();
+                        var logGrid = Ext.widget('audittypeloggrid');
+                        //logGrid.down('textfield[name=id]').setValue(id);
                     } else {
                         toastr.error(message, 'Failure Response');
                     }
@@ -283,9 +415,9 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
                 failure: function (form, action) {
                     var resp = action.result;
 
-                    console.log(resp);
+                    //console.log(resp);
                     toastr.error(resp.message, 'Failure Response');
-                }
+                },
             });
         }
     },
@@ -300,6 +432,7 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
             form = Ext.widget(childXtype),
             storeArray = eval(item.stores),
             arrayLength = storeArray.length;
+            
         if (arrayLength > 0) {
             me.fireEvent('refreshStores', storeArray);
         }
@@ -382,11 +515,11 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
 
     },
 
-    onSelectAssociatedIssueApplication: function (grid, record) {
+    // onSelectAssociatedIssueApplication: function (grid, record) {
 
-        this.fireEvent('onAssociatedIssueGridClick', record, grid);
+    //     this.fireEvent('onAssociatedIssueGridClick', record, grid);
 
-    },
+    // },
     setCompStore: function (obj, options) {
         this.fireEvent('setCompStore', obj, options);
     },
@@ -399,10 +532,12 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
             win = form.up('window'),
             storeID = btn.storeID,
             store = Ext.getStore(storeID),
-            frm = form.getForm(), 
+            frm = form.getForm(),
+            checklist_store = Ext.getStore('applicationpaymentsstr'), 
             activePanel = Ext.ComponentQuery.query("#wizardpnl")[0];
             applicationCode= activePanel.down('hiddenfield[name=active_application_code]').getValue();
-            //console.log(applicationCode);
+
+        
         if (frm.isValid()) {
             frm.submit({
                 url: url,
@@ -420,6 +555,10 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
                         store.removeAll();
                         store.load();
                         win.close();
+
+                        if(checklist_store){
+                            checklist_store.load();
+                        }
                     } else {
                         toastr.error(message, 'Failure Response');
                     }
@@ -438,5 +577,117 @@ Ext.define('Admin.view.gbt.viewController.GbtViewCtr', {
 
         this.fireEvent('showRAuditApplicationSubmissionWin', btn);
     },
+
+    showAddChecklistItemConfigParamWinFrm: function (btn) {
+        //if (this.fireEvent('checkFullAccess') || this.fireEvent('checkWriteUpdate')) {
+        var me = this,
+            childXtype = btn.childXtype,
+            winTitle=btn.winTitle,
+            winWidth=btn.winWidth,
+            child = Ext.widget(childXtype),
+            storeArray = eval(btn.stores),
+            grid = btn.up('grid'),
+            checklist_type_id = grid.down('hiddenfield[name=checklist_type_id]').getValue(),
+            checklist_category_id = grid.down('hiddenfield[name=checklist_category_id]').getValue(),
+            arrayLength = storeArray.length;
+        if (arrayLength > 0) {
+            me.fireEvent('refreshStores', storeArray);
+        }
+        child.down('combo[name=checklist_type_id]').setValue(checklist_type_id);
+        child.down('combo[name=checklist_category_id]').setValue(checklist_category_id);
+        funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
+        /* } else {
+             toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
+             return false;
+         }*/
+    },
+
+    previewUploadedDocument: function (item) {
+    var btn = item.up('button'),
+        download = item.download,
+        record = btn.getWidgetRecord(),
+        node_ref = record.get('node_ref'),
+        application_code = record.get('application_code'),
+        uploadeddocuments_id = record.get('uploadeddocuments_id');
+
+        if(item.up('grid')){
+           var grid = item.up('grid');
+        }else{
+           var grid  = Ext.ComponentQuery.query("#applicationdocuploadsgrid")[0]
+        }
+        
+        if(node_ref != ''){
+
+            this.functDownloadAppDocument(node_ref,download,application_code,uploadeddocuments_id, grid);
+        }
+        else{
+            toastr.error('Document Not Uploaded', 'Failure Response');
+        }
+        
+
+},
+
+functDownloadAppDocument:function(node_ref,download,application_code=null,uploadeddocuments_id=null, grid=''){
+        //get the document path 
+        if(grid != ''){
+
+            grid.mask('Document Preview..');
+        }
+      
+        Ext.Ajax.request({
+            url: 'documentmanagement/getApplicationDocumentDownloadurl',
+            method: 'GET',
+            params: {
+                node_ref: node_ref,
+                application_code:application_code,
+                uploadeddocuments_id:uploadeddocuments_id,
+                download:download
+            },
+            headers: {
+                'Authorization': 'Bearer ' + access_token,
+                'X-CSRF-Token': token
+            },
+            success: function (response) {
+                Ext.getBody().unmask();
+                grid.unmask();
+          
+                var resp = Ext.JSON.decode(response.responseText),
+                success = resp.success;
+                document_url = resp.document_url;
+                filename = resp.filename;
+                if (success == true || success === true) {
+                    var a = document.createElement("a");
+                    a.href = document_url; 
+                    a.download = filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                } else {
+                    toastr.error(resp.message, 'Failure Response');
+                }
+                   
+                    
+            },
+            failure: function (response) {
+                var resp = Ext.JSON.decode(response.responseText),
+                    message = resp.message;
+                toastr.error(message, 'Failure Response');
+            },
+            error: function (jqXHR, textStatus, errorThrown) {
+                Ext.getBody().unmask();
+                toastr.error('Error downloading data: ' + errorThrown, 'Error Response');
+            }
+        });
+
+
+},
+generateAuditReport: function (item) {
+        var record = item.getWidgetRecord(),
+            application_code = record.get('application_code');
+            module_id = record.get('module_id');
+            sub_module_id = record.get('sub_module_id');
+        this.fireEvent('generateAuditReport', application_code,module_id,sub_module_id);
+    },
+
    
 })

@@ -1,6 +1,6 @@
-Ext.define('Admin.view.gbt.viewmodels.GbtViewm', {
+Ext.define('Admin.view.gbt.viewmodels.GbtPlanVm', {
     extend: 'Ext.app.ViewModel',
-    alias: 'viewmodel.gbtviewm',
+    alias: 'viewmodel.gbtplanvm',
 
     stores: {
         /*
@@ -17,7 +17,7 @@ Ext.define('Admin.view.gbt.viewmodels.GbtViewm', {
         atBeginning: true,
         atEnd: false,
         isReadOnly: false,
-        //application_title: 'Audit Planning', *
+        application_title: 'Audit Planning',
         // isVisaApplication: true,
         // showProdDosageForm: false,
         // showProdSubCategory:false

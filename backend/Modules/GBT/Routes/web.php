@@ -35,6 +35,7 @@ Route::group(['prefix' => 'gbt', 'middleware' => ['auth:api', 'web']], function(
     // Route::get('prepapreAuditApplicationReceiving', [GBTController::class, 'prepapreAuditApplicationReceiving']);
     
     // Route::get('/getAuditTypeMetaData',[AuditManagementController::class, 'getAuditTypeMetaData'])
+    Route::resource('gbt_types', 'gbtTypeController');
 
 
     Route::get('index',[GBTController::class, 'index']);
