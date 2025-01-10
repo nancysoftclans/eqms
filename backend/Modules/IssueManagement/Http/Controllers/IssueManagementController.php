@@ -434,7 +434,8 @@ class IssueManagementController extends Controller
                     ->where('t1.id', $active_application_id)->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
                 if ($IssueManagement) {
                     $ref_number = $IssueManagement->reference_no;
-                    initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
+                    
+                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                     $res = array(
                         "success" => true,
                         "message" => 'Data Updated Successfully!!',
@@ -509,8 +510,7 @@ class IssueManagementController extends Controller
                         ->join('tra_submissions as t2', 't1.submission_id', 't2.id')
                         ->where('t1.submission_id', $res['record_id'])->select('t1.*', 't2.*', 't1.id as active_application_id')->first();
 
-                    initializeApplicationDMS($section_id, $module_id, $sub_module_id, $application_code, $ref_number, $user_id);
-
+                    initializeApplicationDMS($module_id, $sub_module_id, $application_code, $ref_number, $user_id);
                     $res = array(
                         "success" => true,
                         "message" => 'Data Saved Successfully!!',

@@ -487,13 +487,13 @@ Ext.define('Admin.view.auditManagement.viewController.AuditMgmntVctr', {
             storeArray = eval(btn.stores),
             grid = btn.up('grid'),
             checklist_type_id = grid.down('hiddenfield[name=checklist_type_id]').getValue(),
-            checklist_category_id = grid.down('hiddenfield[name=checklist_category_id]').getValue(),
+            //checklist_category_id = grid.down('hiddenfield[name=checklist_category_id]').getValue(),
             arrayLength = storeArray.length;
         if (arrayLength > 0) {
             me.fireEvent('refreshStores', storeArray);
         }
         child.down('combo[name=checklist_type_id]').setValue(checklist_type_id);
-        child.down('combo[name=checklist_category_id]').setValue(checklist_category_id);
+        //child.down('combo[name=checklist_category_id]').setValue(checklist_category_id);
         funcShowCustomizableWindow(winTitle, winWidth, child, 'customizablewindow');
         /* } else {
              toastr.warning('Sorry you don\'t have permission to perform this action!!', 'Warning Response');
