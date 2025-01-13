@@ -418,6 +418,7 @@ class IssueManagementController extends Controller
         $creationDateString = Carbon::parse($creationDateString);
 
         $issue_data = $request->all();
+
         try {
             if (validateIsNumeric($active_application_id)) {
                 //Update
@@ -427,6 +428,8 @@ class IssueManagementController extends Controller
                 $issue_data['dola'] = Carbon::now();
                 $issue_data['altered_by'] = $user_id;
                 $IssueManagement->update($issue_data);
+
+            
                 //End Update
 
                 $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')

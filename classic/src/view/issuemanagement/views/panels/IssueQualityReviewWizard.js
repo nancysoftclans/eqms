@@ -197,7 +197,8 @@ Ext.define(
             form_panel: "#issuemanagementfrm",
             action_url: "issuemanagement/saveIssueDetails",
             wizard: "issuequalityreviewwizard",
-            handler: "saveIssueManagementApplicationReceivingBaseDetails",
+            handler: "saveIssueManagementApplicationDetails",
+           // handler: "saveIssueManagementApplicationReceivingBaseDetails",
           },
           {
             text: "Submit Application",
