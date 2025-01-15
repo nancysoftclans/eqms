@@ -21,3 +21,4 @@ backend/bootstrap/
 production/*
 build/*
 backend.rar
+*.zip

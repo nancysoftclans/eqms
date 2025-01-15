@@ -429,7 +429,6 @@ class IssueManagementController extends Controller
                 $issue_data['altered_by'] = $user_id;
                 $IssueManagement->update($issue_data);
 
-            
                 //End Update
 
                 $IssueManagement = IssueManagement::from('tra_issue_management_applications as t1')
