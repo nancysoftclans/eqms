@@ -1476,8 +1476,6 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
             'sub_module_id' => $sub_module_id,
             'created_by' => $user,
             'created_on' => Carbon::now());
-
-
  
         $resp = insertRecord('tra_application_documentsdefination', $dmsapp_data, $user, $con);
     
@@ -1488,8 +1486,10 @@ static function downloadDocumentPreviewUrl($uploadeddocuments_id, $version_id)
     {
         //check if node exists tra_application_documentsdefination
         $exists = recordExists('tra_application_documentsdefination', ['application_code'=>$application_code], '');
+
         if(!$exists){
             $dms_node_details = self::getApplicationSubModuleNodeDetails($module_id, $sub_module_id, $user_id);
+
 
             $nodeTracking = str_replace("/", "-", $ref_number);
             $parentNode_ref = $dms_node_details->node_ref;//

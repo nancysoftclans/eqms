@@ -95,39 +95,19 @@ Ext.define('Admin.view.commoninterfaces.forms.ApplicationDocUploadsFrm', {
                 },
                 change: function (cmbo, newVal, oldVal) {
                     var form = cmbo.up('form'),
-                        section_id = form.down('hiddenfield[name=section_id]').getValue(),
                         module_id = form.down('hiddenfield[name=module_id]').getValue(),
                         sub_module_id = form.down('hiddenfield[name=sub_module_id]').getValue(),
-                        prodclass_category_id = form.down('hiddenfield[name=prodclass_category_id]').getValue(),
-                        premise_type_id = form.down('hiddenfield[name=premise_type_id]').getValue(),
                         process_id = form.down('hiddenfield[name=process_id]').getValue(),
-                        importexport_permittype_id = form.down('hiddenfield[name=importexport_permittype_id]').getValue(),
                         docReqFld = form.down('combo[name=document_requirement_id]'),
                         docReqStr = docReqFld.getStore(),
-                        assessment_start_date = form.down('datefield[name=assessment_start_date]'),
-                        assessment_end_date = form.down('datefield[name=assessment_end_date]'),
-                        assessment_by = form.down('combo[name=assessment_by]'),
+                       
                         selected_record = cmbo.getSelectedRecord();
-                    if(selected_record.get('is_assessment_doc') == 1){
-                        assessment_start_date.setVisible(true);
-                        assessment_end_date.setVisible(true);
-                        assessment_start_date.allowBlank = false;
-                        assessment_end_date.allowBlank = false;
-                        assessment_by.allowBlank = false;
-                        assessment_end_date.validateValue(assessment_end_date.getValue());
-                        assessment_start_date.validateValue(assessment_start_date.getValue());
-                        assessment_by.validateValue(assessment_by.getValue());
-                    }
                     docReqStr.removeAll();
                     docReqStr.load({
                         params: {
                             docType_id: newVal,
-                            section_id: section_id,
                             module_id: module_id,
-                            prodclass_category_id:prodclass_category_id,
-                            premise_type_id:premise_type_id,
                             process_id: process_id,
-                            importexport_permittype_id:importexport_permittype_id,
                             sub_module_id: sub_module_id
                         }
                     });

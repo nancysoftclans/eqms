@@ -1145,7 +1145,6 @@ class DocumentManagementController extends Controller
             'sub_module_id' => $sub_module_id
         );
 
-
         if (!validateIsNumeric($process_id)) {
             $process_id = getSingleRecordColValue('wf_processes', $where, 'id');
         }
@@ -1153,6 +1152,7 @@ class DocumentManagementController extends Controller
         //get applicable document types
         $qry1 = DB::table('tra_documentmanager_application')
             ->select('*');
+
         if (validateIsNumeric($process_id)) {
         }
         if (validateIsNumeric($workflow_stage)) {
@@ -1171,9 +1171,11 @@ class DocumentManagementController extends Controller
         $docTypes = convertStdClassObjToArray($docTypes);
         $docTypes = convertAssArrayToSimpleArray($docTypes, 'document_type_id');
 
+
         if (validateIsNumeric($doc_type_id)) {
             // $where['t1.document_type_id'] = $doc_type_id;
         }
+
 
         if (validateIsNumeric($application_code)) {
             $qry = DB::table('tra_application_uploadeddocuments as t1')
@@ -1603,8 +1605,6 @@ class DocumentManagementController extends Controller
                         //upload doc
 
                         $res = $this->uploadDocument($file, $parent_id, $application_document_id, $document_requirement_id, $app_rootnode, $node_ref, $application_code);
-
-
                     }
                 } else {
                     $res = array(
@@ -1623,7 +1623,8 @@ class DocumentManagementController extends Controller
                 Storage::deleteDirectory('' . $zipFolderName);
             }
 
-            if ($res['success']) {
+
+            if ($module_id != 26 && $module_id !=29){
                 DB::commit();
                 //If issue documents, create related issue document
                 $issuedata = IssueManagement::where('application_code', $application_code)->first();
@@ -1639,6 +1640,7 @@ class DocumentManagementController extends Controller
             } else {
                 DB::rollback();
             }
+
             //if folder/zip loop
             //save document and add doc table entry
         } catch (\Exception $exception) {
@@ -1854,6 +1856,8 @@ class DocumentManagementController extends Controller
                 'altered_by' => $user_id
             );
             $res = insertRecord('tra_application_uploadeddocuments', $document_data, $user_id);
+
+
         }
 
         return $res;

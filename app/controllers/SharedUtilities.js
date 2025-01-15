@@ -1539,23 +1539,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       resumable.opts.query.application_id = formValues.application_id;
       resumable.opts.query.application_code = formValues.application_code;
       resumable.opts.query.process_id = formValues.process_id;
-      resumable.opts.query.section_id = formValues.section_id;
       resumable.opts.query.module_id = formValues.module_id;
       resumable.opts.query.sub_module_id = formValues.sub_module_id;
       resumable.opts.query.workflow_stage_id = formValues.workflow_stage_id;
       resumable.opts.query.document_type_id = formValues.document_type_id;
-      resumable.opts.query.prodclass_category_id = formValues.prodclass_category_id;
-      resumable.opts.query.importexport_permittype_id = formValues.importexport_permittype_id;
-      resumable.opts.query.premise_type_id = formValues.premise_type_id;
-      resumable.opts.query.query_ref_id = formValues.query_ref_id;
       resumable.opts.query.node_ref = formValues.node_ref;
       resumable.opts.query.doctype_id = formValues.doctype_id;
       resumable.opts.query.document_requirement_id = formValues.document_requirement_id;
-      resumable.opts.query.assessment_by = formValues.assessment_by;
-      resumable.opts.query.assessment_start_date = formValues.assessment_start_date;
-      resumable.opts.query.assessment_end_date = formValues.assessment_end_date;
-      resumable.opts.query.description = formValues.description;
-
+    
       funcShowCustomizableWindow("Upload Progress", '20%', progressBar, 'customizablewindow', btn);
       resumable.upload();
     } else {
@@ -1588,22 +1579,14 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
         application_id: application_id,
         application_code: application_code,
         process_id: '',
-        section_id: '',
         module_id: '',
         sub_module_id: '',
         workflow_stage_id: '',
         document_type_id: '',
-        prodclass_category_id: '',
-        importexport_permittype_id: '',
-        premise_type_id: '',
-        query_ref_id: '',
         node_ref: '',
         doctype_id: '',
         document_requirement_id: '',
-        assessment_by: '',
-        assessment_start_date: '',
-        assessment_end_date: '',
-        description: ''
+      
       },
       fileType: [],
       chunkSize: 10 * 1024 * 1024, // 10mbs
@@ -2488,27 +2471,11 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
       mainTabPanel = this.getMainTabPanel(),
       activeTab = mainTabPanel.getActiveTab(),
       process_id = activeTab.down("hiddenfield[name=process_id]").getValue(),
-      prodclass_category = activeTab.down(
-        "hiddenfield[name=prodclass_category_id]"
-      ),
-      premise_type_id = activeTab.down("hiddenfield[name=premise_type_id]"),
-      form = Ext.widget(childXtype),
-      prodclass_category_id;
-    if (prodclass_category) {
-      prodclass_category_id = prodclass_category.getValue();
-    }
-    if (premise_type_id) {
-      premise_type_id = premise_type_id.getValue();
-    }
+      form = Ext.widget(childXtype);
+ 
     form.down("hiddenfield[name=application_code]").setValue(application_code);
-    form.down("hiddenfield[name=section_id]").setValue(section_id);
     form.down("hiddenfield[name=module_id]").setValue(module_id);
     form.down("hiddenfield[name=sub_module_id]").setValue(sub_module_id);
-    form.down("hiddenfield[name=query_ref_id]").setValue(query_id);
-    form
-      .down("hiddenfield[name=prodclass_category_id]")
-      .setValue(prodclass_category_id); //for products only
-    form.down("hiddenfield[name=premise_type_id]").setValue(premise_type_id); //for premises only
     form.down("hiddenfield[name=process_id]").setValue(process_id); //added for clean filtering of required docs
     form.down("button[name=upload_file_btn]").storeID = storeID;
     // if (!btn.show_assessor) {
@@ -2519,10 +2486,8 @@ Ext.define("Admin.controller.SharedUtilitiesCtr", {
     docTypesStr.removeAll();
     docTypesStr.load({
       params: {
-        section_id: section_id,
         module_id: module_id,
         sub_module_id: sub_module_id,
-        query_id: query_id,
         process_id: process_id,
         workflow_stage: workflow_stage,
       },
